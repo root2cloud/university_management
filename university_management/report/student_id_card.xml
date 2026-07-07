@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Custom Paper Format for ID Card -->
+    <record id="paperformat_id_card" model="report.paperformat">
+        <field name="name">ID Card Format</field>
+        <field name="format">custom</field>
+        <field name="page_height">86</field>
+        <field name="page_width">54</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">2</field>
+        <field name="margin_bottom">2</field>
+        <field name="margin_left">2</field>
+        <field name="margin_right">2</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">96</field>
+    </record>
+
+    <!-- Report Action -->
+    <record id="action_report_student_id_card" model="ir.actions.report">
+        <field name="name">Student ID Card</field>
+        <field name="model">student.id.card</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">university_management.report_student_id_card</field>
+        <field name="report_file">university_management.report_student_id_card</field>
+        <field name="binding_model_id" ref="model_student_id_card"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_id_card"/>
+    </record>
+
+    <!-- Report Template -->
+    <template id="report_student_id_card">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <!-- Front Side of ID Card -->
+                <div class="page" style="page-break-after: always;">
+                    <div style="width: 54mm; height: 86mm; border: 2px solid #333; border-radius: 8px; padding: 5mm; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: relative; overflow: hidden;">
+
+                        <!-- Background Pattern -->
+                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.1; background-image: url('/university_management/static/img/pattern.png'); background-size: cover;"></div>
+
+                        <!-- Header -->
+                        <div style="text-align: center; color: white; position: relative; z-index: 1;">
+                            <img t-if="o.student_id.company_id.logo" t-att-src="image_data_uri(o.student_id.company_id.logo)" style="max-height: 15mm; margin-bottom: 2mm;"/>
+                            <h4 style="margin: 2mm 0; font-size: 10pt; font-weight: bold; text-transform: uppercase;">
+                                <t t-esc="o.student_id.company_id.name or 'University'"/>
+                            </h4>
+                            <p style="margin: 0; font-size: 7pt;">STUDENT IDENTITY CARD</p>
+                        </div>
+
+                        <!-- Photo Section -->
+                        <div style="text-align: center; margin: 3mm 0; position: relative; z-index: 1;">
+                            <div style="width: 25mm; height: 30mm; border: 2px solid white; border-radius: 4px; margin: 0 auto; overflow: hidden; background: white;">
+                                <img t-if="o.student_id.student_photo"
+                                     t-att-src="image_data_uri(o.student_id.student_photo)"
+                                     style="width: 100%; height: 100%; object-fit: cover;"/>
+                                <div t-else="" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #f0f0f0; color: #999;">
+                                    <span style="font-size: 8pt;">No Photo</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Student Details -->
+                        <div style="background: white; padding: 2mm; border-radius: 4px; margin-top: 2mm; position: relative; z-index: 1;">
+                            <table style="width: 100%; font-size: 7pt; line-height: 1.4;">
+                                <tr>
+                                    <td style="font-weight: bold; width: 35%;">Name:</td>
+                                    <td style="text-transform: uppercase;"><t t-esc="o.student_id.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: bold;">Reg. No:</td>
+                                    <td><t t-esc="o.student_id.registration_number"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: bold;">Program:</td>
+                                    <td><t t-esc="o.student_id.program_id.code or o.student_id.program_id.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: bold;">Batch:</td>
+                                    <td><t t-esc="o.student_id.batch_id.name or 'N/A'"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: bold;">Blood Group:</td>
+                                    <td><t t-esc="o.student_id.blood_group or 'N/A'"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: bold;">Valid Till:</td>
+                                    <td><t t-esc="o.expiry_date"/></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Barcode -->
+                        <div style="text-align: center; margin-top: 2mm; position: relative; z-index: 1;">
+                            <img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('Code128', o.name, 300, 40)"
+                                 style="max-width: 40mm; height: 8mm;"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Back Side of ID Card -->
+                <div class="page" style="page-break-after: always;">
+                    <div style="width: 54mm; height: 86mm; border: 2px solid #333; border-radius: 8px; padding: 5mm; background: white;">
+
+                        <!-- Important Instructions -->
+                        <div style="margin-bottom: 3mm;">
+                            <h5 style="margin: 0 0 2mm 0; font-size: 8pt; color: #764ba2; border-bottom: 1px solid #764ba2; padding-bottom: 1mm;">IMPORTANT INSTRUCTIONS</h5>
+                            <ul style="margin: 0; padding-left: 4mm; font-size: 6pt; line-height: 1.5;">
+                                <li>This card is the property of the institution</li>
+                                <li>Must be carried at all times on campus</li>
+                                <li>Report loss immediately to admin office</li>
+                                <li>Not transferable to any other person</li>
+                            </ul>
+                        </div>
+
+                        <!-- Emergency Contact -->
+                        <div style="margin-bottom: 3mm;">
+                            <h5 style="margin: 0 0 2mm 0; font-size: 8pt; color: #764ba2; border-bottom: 1px solid #764ba2; padding-bottom: 1mm;">EMERGENCY CONTACT</h5>
+                            <table style="width: 100%; font-size: 6pt; line-height: 1.4;">
+                                <tr>
+                                    <td style="font-weight: bold; width: 35%;">Contact:</td>
+                                    <td><t t-esc="o.student_id.emergency_contact_name or 'N/A'"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: bold;">Phone:</td>
+                                    <td><t t-esc="o.student_id.emergency_contact or 'N/A'"/></td>  <!-- FIXED: emergency_contact not emergency_contact_phone -->
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: bold;">Student:</td>
+                                    <td><t t-esc="o.student_id.mobile or 'N/A'"/></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Address -->
+                        <div style="margin-bottom: 3mm;">
+                            <h5 style="margin: 0 0 2mm 0; font-size: 8pt; color: #764ba2; border-bottom: 1px solid #764ba2; padding-bottom: 1mm;">ADDRESS</h5>
+                            <p style="margin: 0; font-size: 6pt; line-height: 1.4;">
+                                <t t-esc="o.student_id.permanent_address or 'Not provided'"/>
+                            </p>
+                        </div>
+
+                        <!-- Institution Contact -->
+                        <div style="margin-top: 5mm; padding: 2mm; background: #f5f5f5; border-radius: 3px;">
+                            <p style="margin: 0; font-size: 6pt; text-align: center; line-height: 1.4;">
+                                <strong><t t-esc="o.student_id.company_id.name or 'University'"/></strong><br/>
+                                <t t-esc="o.student_id.company_id.phone or ''"/>
+                                <span t-if="o.student_id.company_id.email"> | <t t-esc="o.student_id.company_id.email"/></span><br/>
+                                <t t-esc="o.student_id.company_id.website or ''"/>
+                            </p>
+                        </div>
+
+                        <!-- Signature Section -->
+                        <div style="margin-top: 3mm;">
+                            <table style="width: 100%; font-size: 6pt;">
+                                <tr>
+                                    <td style="text-align: left; border-top: 1px solid #333; padding-top: 1mm; width: 50%;">
+                                        Student Signature
+                                    </td>
+                                    <td style="text-align: right; border-top: 1px solid #333; padding-top: 1mm; width: 50%;">
+                                        Authorized Signatory
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </t>
+        </t>
+    </template>
+
+</odoo>

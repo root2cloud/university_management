@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="nba_research_view_list" model="ir.ui.view">
+        <field name="name">nba.research.view.list</field>
+        <field name="model">nba.research</field>
+        <field name="arch" type="xml">
+            <list string="Research &amp; FDP">
+                <field name="name"/>
+                <field name="sar_id"/>
+                <field name="faculty_id"/>
+                <field name="year_label"/>
+                <field name="research_type"/>
+                <field name="title"/>
+                <field name="publisher_journal"/>
+                <field name="indexed_in"/>
+                <field name="publication_date"/>
+                <field name="amount_lacs"/>
+                <field name="fdp_duration_days"/>
+                <field name="fdp_points" readonly="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="nba_research_view_form" model="ir.ui.view">
+        <field name="name">nba.research.view.form</field>
+        <field name="model">nba.research</field>
+        <field name="arch" type="xml">
+            <form string="Research / FDP / Project Entry">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Identification">
+                            <field name="sar_id"/>
+                            <field name="faculty_id"/>
+                            <field name="department_id" readonly="1"/>
+                            <field name="academic_year_id"/>
+                            <field name="year_label"/>
+                            <field name="research_type"/>
+                            <field name="source"/>
+                        </group>
+                        <group string="Details">
+                            <field name="title"/>
+                            <field name="publisher_journal"/>
+                            <field name="doi"/>
+                            <field name="indexed_in"/>
+                            <field name="publication_date"/>
+                            <field name="funding_agency"/>
+                            <field name="duration_months"/>
+                        </group>
+                    </group>
+                    <group string="Financial" invisible="research_type not in ['funded_project','consultancy','seed_money']">
+                        <field name="amount_lacs"/>
+                        <field name="amount_utilized_lacs"/>
+                    </group>
+                    <group string="FDP Details" invisible="research_type not in ['fdp_attended','fdp_organized']">
+                        <field name="fdp_duration_days"/>
+                        <field name="fdp_is_external"/>
+                        <field name="fdp_organizer"/>
+                        <field name="fdp_location"/>
+                        <field name="fdp_points" readonly="1"/>
+                    </group>
+                    <group string="Patent" invisible="research_type != 'patent'">
+                        <field name="patent_status"/>
+                    </group>
+                    <group string="Co-Investigators" invisible="research_type not in ['funded_project','consultancy']">
+                        <field name="co_pi_ids" widget="many2many_tags"/>
+                    </group>
+                    <group string="Notes">
+                        <field name="notes" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="nba_research_view_search" model="ir.ui.view">
+        <field name="name">nba.research.view.search</field>
+        <field name="model">nba.research</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="title"/>
+                <field name="faculty_id"/>
+                <field name="sar_id"/>
+                <filter string="Journals" name="journals" domain="[('research_type','=','journal')]"/>
+                <filter string="FDP Attended" name="fdp_att" domain="[('research_type','=','fdp_attended')]"/>
+                <filter string="FDP Organized" name="fdp_org" domain="[('research_type','=','fdp_organized')]"/>
+                <filter string="Funded Projects" name="funded" domain="[('research_type','=','funded_project')]"/>
+                <filter string="Patents" name="patents" domain="[('research_type','=','patent')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Type" name="by_type" context="{'group_by': 'research_type'}"/>
+                    <filter string="Faculty" name="by_faculty" context="{'group_by': 'faculty_id'}"/>
+                    <filter string="Year" name="by_year" context="{'group_by': 'year_label'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nba_research" model="ir.actions.act_window">
+        <field name="name">Research &amp; FDP</field>
+        <field name="res_model">nba.research</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="nba_research_view_search"/>
+    </record>
+
+</odoo>

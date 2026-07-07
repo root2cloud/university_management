@@ -1,0 +1,2361 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ==================== PARENT PORTAL TEMPLATES ==================== -->
+
+    <!-- Parent Dashboard Template -->
+    <template id="parent_dashboard" name="Parent Dashboard">
+        <t t-call="portal.portal_layout">
+            <t t-set="title">Parent Dashboard</t>
+
+            <div class="container mt-3">
+                <!-- Page Header -->
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h4 class="mb-0">
+                                    <i class="fa fa-dashboard me-2"></i>Welcome, <t t-esc="parent.name"/>
+                                </h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="card text-center">
+                                            <div class="card-body">
+                                                <h1 class="display-4">
+                                                    <i class="fa fa-users text-primary"></i>
+                                                </h1>
+                                                <h5 class="card-title">Students</h5>
+                                                <p class="card-text">
+                                                    <span class="badge bg-primary fs-5">
+                                                        <t t-esc="len(students)"/>
+                                                    </span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="card text-center">
+                                            <div class="card-body">
+                                                <h1 class="display-4">
+                                                    <i class="fa fa-phone text-success"></i>
+                                                </h1>
+                                                <h5 class="card-title">Contact</h5>
+                                                <p class="card-text">
+                                                    <small class="text-muted">
+                                                        <t t-esc="parent.mobile or parent.phone or 'Not Provided'"/>
+                                                    </small>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="card text-center">
+                                            <div class="card-body">
+                                                <h1 class="display-4">
+                                                    <i class="fa fa-envelope text-warning"></i>
+                                                </h1>
+                                                <h5 class="card-title">Email</h5>
+                                                <p class="card-text">
+                                                    <small class="text-muted">
+                                                        <t t-esc="parent.email or 'Not Provided'"/>
+                                                    </small>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Students Section -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fa fa-graduation-cap me-2"></i>Your Students
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <t t-if="students">
+                                    <div class="row">
+                                        <t t-foreach="students" t-as="student">
+                                            <div class="col-md-4 mb-3">
+                                                <div class="card h-100">
+                                                    <div class="card-body">
+                                                        <h5 class="card-title">
+                                                            <i class="fa fa-user me-2"></i>
+                                                            <t t-esc="student.name"/>
+                                                        </h5>
+                                                        <p class="card-text">
+                                                            <small class="text-muted">
+                                                                Registration: <t t-esc="student.registration_number"/>
+                                                            </small>
+                                                        </p>
+                                                        <div class="mt-3">
+                                                            <a t-att-href="'/my/parent/student/%s/progress' % student.id"
+                                                               class="btn btn-sm btn-primary me-2">
+                                                                <i class="fa fa-line-chart"></i> Progress
+                                                            </a>
+                                                            <a t-att-href="'/my/parent/student/%s/attendance' % student.id"
+                                                               class="btn btn-sm btn-info me-2">
+                                                                <i class="fa fa-calendar"></i> Attendance
+                                                            </a>
+                                                            <a t-att-href="'/my/parent/student/%s/fees' % student.id"
+                                                               class="btn btn-sm btn-success">
+                                                                <i class="fa fa-money"></i> Fees
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </t>
+                                <t t-else="">
+                                    <div class="alert alert-warning">
+                                        <i class="fa fa-exclamation-triangle me-2"></i>
+                                        No students linked to your account. Please contact administration.
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fa fa-bolt me-2"></i>Quick Actions
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row text-center">
+                                    <div class="col-md-3 mb-3">
+                                        <a href="/my/parent/contact-teacher" class="btn btn-outline-primary btn-lg w-100">
+                                            <i class="fa fa-comments fa-2x mb-2"></i><br/>
+                                            Contact Teacher
+                                        </a>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <a href="/my/parent/select-student" class="btn btn-outline-info btn-lg w-100">
+                                            <i class="fa fa-search fa-2x mb-2"></i><br/>
+                                            View Student Details
+                                        </a>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <a t-att-href="'/my/parent/student/%s/events' % (students[0].id if students else '#')"
+                                           class="btn btn-outline-success btn-lg w-100">
+                                            <i class="fa fa-calendar fa-2x mb-2"></i><br/>
+                                            View Events
+                                        </a>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <a t-att-href="'/my/parent/student/%s/documents' % (students[0].id if students else '#')"
+                                           class="btn btn-outline-warning btn-lg w-100">
+                                            <i class="fa fa-file-text fa-2x mb-2"></i><br/>
+                                            Download Documents
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Select Student Template -->
+    <template id="parent_select_student" name="Select Student">
+        <t t-call="portal.portal_layout">
+            <t t-set="title">Select Student</t>
+
+            <div class="container mt-3">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">
+                            <i class="fa fa-graduation-cap me-2"></i>Select Student to View Details
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <t t-if="students">
+                            <div class="row">
+                                <t t-foreach="students" t-as="student">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="card h-100">
+                                            <div class="card-body text-center">
+                                                <div class="mb-3">
+                                                    <i class="fa fa-user-circle-o fa-5x text-primary"></i>
+                                                </div>
+                                                <h4 class="card-title">
+                                                    <t t-esc="student.name"/>
+                                                </h4>
+                                                <p class="card-text">
+                                                    <span class="badge bg-secondary">
+                                                        <t t-esc="student.registration_number"/>
+                                                    </span>
+                                                    <br/>
+                                                    <small class="text-muted">
+                                                        <t t-esc="student.program_id.name or ''"/>
+                                                        <t t-if="student.program_id.name and student.department_id.name"> - </t>
+                                                        <t t-esc="student.department_id.name or ''"/>
+                                                    </small>
+                                                    <br/>
+                                                    <small class="text-muted">
+                                                        Semester: <t t-esc="student.current_semester or ''"/>
+                                                    </small>
+                                                </p>
+                                                <div class="mt-3">
+                                                    <a t-att-href="'/my/parent/student/%s/progress' % student.id"
+                                                       class="btn btn-primary me-2">
+                                                        View Full Details
+                                                    </a>
+                                                    <div class="dropdown d-inline-block">
+                                                        <button class="btn btn-outline-secondary dropdown-toggle" type="button"
+                                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                            Quick Actions
+                                                        </button>
+                                                        <ul class="dropdown-menu">
+                                                            <li>
+                                                                <a class="dropdown-item"
+                                                                   t-att-href="'/my/parent/student/%s/progress' % student.id">
+                                                                    <i class="fa fa-line-chart me-2"></i>Academic Progress
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item"
+                                                                   t-att-href="'/my/parent/student/%s/attendance' % student.id">
+                                                                    <i class="fa fa-calendar me-2"></i>Attendance
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item"
+                                                                   t-att-href="'/my/parent/student/%s/fees' % student.id">
+                                                                    <i class="fa fa-money me-2"></i>Fee Payments
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item"
+                                                                   t-att-href="'/my/parent/student/%s/results' % student.id">
+                                                                    <i class="fa fa-graduation-cap me-2"></i>Exam Results
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item"
+                                                                   t-att-href="'/my/parent/student/%s/timetable' % student.id">
+                                                                    <i class="fa fa-calendar me-2"></i>Timetable
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item"
+                                                                   t-att-href="'/my/parent/student/%s/documents' % student.id">
+                                                                    <i class="fa fa-file-text me-2"></i>Documents
+                                                                </a>
+                                                            </li>
+                                                            <li><hr class="dropdown-divider"/></li>
+                                                            <li>
+                                                                <a class="dropdown-item"
+                                                                   t-att-href="'/my/parent/student/%s/leave/request' % student.id">
+                                                                    <i class="fa fa-calendar-plus-o me-2"></i>Apply Leave
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item"
+                                                                   t-att-href="'/my/parent/contact-teacher?student_id=%s' % student.id">
+                                                                    <i class="fa fa-comments me-2"></i>Contact Teacher
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="alert alert-warning text-center">
+                                <i class="fa fa-exclamation-triangle fa-3x mb-3"></i>
+                                <h4>No Students Found</h4>
+                                <p>There are no students linked to your account.</p>
+                                <a href="/my" class="btn btn-primary">Return to Dashboard</a>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Student Progress Template -->
+    <template id="parent_student_progress" name="Student Academic Progress">
+        <t t-call="portal.portal_layout">
+            <t t-set="title">Academic Progress - <t t-esc="student.name"/></t>
+
+            <div class="container mt-3">
+                <!-- Student Info Header -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h3 class="mb-1">
+                                    <i class="fa fa-graduation-cap text-primary me-2"></i>
+                                    <t t-esc="student.name"/>
+                                </h3>
+                                <p class="text-muted mb-0">
+                                    <i class="fa fa-id-card-o me-1"></i>
+                                    Registration: <t t-esc="student.registration_number"/>
+                                    <span class="mx-2">|</span>
+                                    <i class="fa fa-graduation-cap me-1"></i>
+                                    <t t-esc="student.program_id.name or ''"/>
+                                    <t t-if="student.program_id.name and student.department_id.name"> - </t>
+                                    <t t-esc="student.department_id.name or ''"/>
+                                    <span class="mx-2">|</span>
+                                    <i class="fa fa-list-ol me-1"></i>
+                                    Semester: <t t-esc="student.current_semester or '1'"/>
+                                </p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="btn-group">
+                                    <a href="/my/parent/select-student" class="btn btn-outline-secondary">
+                                        <i class="fa fa-arrow-left"></i> Back
+                                    </a>
+                                    <a href="/my/parent/dashboard" class="btn btn-outline-primary">
+                                        <i class="fa fa-home"></i> Dashboard
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Left Column: Key Metrics -->
+                    <div class="col-md-4">
+                        <!-- Overall Performance Card -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h6 class="mb-0">
+                                    <i class="fa fa-line-chart me-2"></i>Overall Performance
+                                </h6>
+                            </div>
+                            <div class="card-body text-center">
+                                <div class="mb-3">
+                                    <div class="display-4 fw-bold" t-attf-class="text-#{'success' if performance.cgpa >= 8.5 else 'warning' if performance.cgpa >= 6.0 else 'danger'}">
+                                        <t t-esc="'%.2f' % performance.cgpa if performance.cgpa else '0.00'"/>
+                                    </div>
+                                    <p class="text-muted">CGPA</p>
+                                </div>
+
+                                <div class="row text-center">
+                                    <div class="col-6">
+                                        <div class="border rounded p-2">
+                                            <h5 class="mb-0">
+                                                <t t-esc="'%.2f' % performance.percentage if performance.percentage else '0.00'"/>
+                                            </h5>
+                                            <small class="text-muted">Percentage</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Attendance Summary Card -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-info text-white">
+                                <h6 class="mb-0">
+                                    <i class="fa fa-calendar me-2"></i>Attendance Summary
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="text-center mb-3">
+                                    <div class="display-4 fw-bold"
+                                         t-attf-class="text-#{'success' if attendance_summary.overall >= 75 else 'warning' if attendance_summary.overall >= 65 else 'danger'}">
+                                        <t t-esc="'%.1f' % attendance_summary.overall if attendance_summary.overall else '0.0'"/>%
+                                    </div>
+                                    <p class="text-muted">Overall Attendance</p>
+                                </div>
+
+                                <div class="row text-center">
+                                    <div class="col-4">
+                                        <div class="border rounded p-2">
+                                            <h6 class="mb-0 text-success">
+                                                <t t-esc="attendance_summary.present or 0"/>
+                                            </h6>
+                                            <small class="text-muted">Present</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="border rounded p-2">
+                                            <h6 class="mb-0 text-danger">
+                                                <t t-esc="attendance_summary.absent or 0"/>
+                                            </h6>
+                                            <small class="text-muted">Absent</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="border rounded p-2">
+                                            <h6 class="mb-0">
+                                                <t t-esc="attendance_summary.total or 0"/>
+                                            </h6>
+                                            <small class="text-muted">Total</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Links -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">
+                                    <i class="fa fa-link me-2"></i>Quick Links
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-grid gap-2">
+                                    <a t-att-href="'/my/parent/student/%s/attendance' % student.id"
+                                       class="btn btn-outline-info btn-sm text-start">
+                                        <i class="fa fa-calendar me-2"></i>View Detailed Attendance
+                                    </a>
+                                    <a t-att-href="'/my/parent/student/%s/results' % student.id"
+                                       class="btn btn-outline-success btn-sm text-start">
+                                        <i class="fa fa-graduation-cap me-2"></i>Exam Results
+                                    </a>
+                                    <a t-att-href="'/my/parent/student/%s/fees' % student.id"
+                                       class="btn btn-outline-warning btn-sm text-start">
+                                        <i class="fa fa-money me-2"></i>Fee Payments
+                                    </a>
+                                    <a t-att-href="'/my/parent/student/%s/timetable' % student.id"
+                                       class="btn btn-outline-primary btn-sm text-start">
+                                        <i class="fa fa-calendar me-2"></i>Class Timetable
+                                    </a>
+                                    <a t-att-href="'/my/parent/contact-teacher?student_id=%s' % student.id"
+                                       class="btn btn-outline-secondary btn-sm text-start">
+                                        <i class="fa fa-comments me-2"></i>Contact Teacher
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Recent Results -->
+                    <div class="col-md-8">
+                        <!-- Recent Exam Results -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-success text-white">
+                                <h6 class="mb-0">
+                                    <i class="fa fa-graduation-cap me-2"></i>Recent Exam Results
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <t t-if="results">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Exam</th>
+                                                    <th>Subject</th>
+                                                    <th>Marks</th>
+                                                    <th>Percentage</th>
+                                                    <th>Grade</th>
+                                                    <th>Result</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-foreach="results" t-as="result">
+                                                    <tr>
+                                                        <td>
+                                                            <t t-esc="result.examination_id.name or ''"/>
+                                                        </td>
+                                                        <td>
+                                                            <t t-esc="result.subject_id.name or ''"/>
+                                                        </td>
+                                                        <td>
+                                                            <strong>
+                                                                <t t-esc="result.total_marks or 0"/>/
+                                                                <t t-esc="result.max_marks or 100"/>
+                                                            </strong>
+                                                        </td>
+                                                        <td>
+                                                            <span t-attf-class="badge bg-#{'success' if result.percentage >= 60 else 'warning' if result.percentage >= 40 else 'danger'}">
+                                                                <t t-esc="'%.1f' % result.percentage if result.percentage else '0.0'"/>%
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <span t-attf-class="badge bg-#{'success' if result.grade_letter in ['A+', 'A', 'B+'] else 'info' if result.grade_letter in ['B', 'C+'] else 'warning' if result.grade_letter in ['C', 'D+'] else 'secondary'}">
+                                                                <t t-esc="result.grade_letter or '-'"/>
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <span t-attf-class="badge bg-#{'success' if result.is_pass else 'danger'}">
+                                                                <t t-esc="'Pass' if result.is_pass else 'Fail'"/>
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="text-end">
+                                        <a t-att-href="'/my/parent/student/%s/results' % student.id"
+                                           class="btn btn-sm btn-outline-success">
+                                            View All Results <i class="fa fa-arrow-right ms-1"></i>
+                                        </a>
+                                    </div>
+                                </t>
+                                <t t-else="">
+                                    <div class="alert alert-info text-center">
+                                        <i class="fa fa-info-circle fa-2x mb-3"></i>
+                                        <h5>No Results Available</h5>
+                                        <p class="mb-0">Exam results will appear here once published.</p>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+
+                        <!-- Performance Trend -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">
+                                    <i class="fa fa-bar-chart me-2"></i>Academic Progress
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-light border">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span>CGPA Progress</span>
+                                        <span class="badge bg-primary">
+                                            Current: <t t-esc="'%.2f' % performance.cgpa if performance.cgpa else '0.00'"/>
+                                        </span>
+                                    </div>
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated"
+                                             role="progressbar"
+                                             t-attf-style="width: #{min(100, (performance.cgpa or 0) * 10)}%"
+                                             t-attf-aria-valuenow="#{min(100, (performance.cgpa or 0) * 10)}"
+                                             aria-valuemin="0"
+                                             aria-valuemax="100">
+                                            <t t-esc="'%.2f' % performance.cgpa if performance.cgpa else '0.00'"/> CGPA
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between mt-2">
+                                        <small class="text-muted">0 (Fail)</small>
+                                        <small class="text-muted">4 (Pass)</small>
+                                        <small class="text-muted">7 (Good)</small>
+                                        <small class="text-muted">10 (Excellent)</small>
+                                    </div>
+                                </div>
+
+                                <div class="alert alert-light border">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span>Attendance Progress</span>
+                                        <span class="badge"
+                                              t-attf-class="bg-#{'success' if attendance_summary.overall >= 75 else 'warning' if attendance_summary.overall >= 65 else 'danger'}">
+                                            <t t-esc="'%.1f' % attendance_summary.overall if attendance_summary.overall else '0.0'"/>%
+                                        </span>
+                                    </div>
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar"
+                                             t-attf-class="progress-bar-#{'success' if attendance_summary.overall >= 75 else 'warning' if attendance_summary.overall >= 65 else 'danger'}"
+                                             role="progressbar"
+                                             t-attf-style="width: #{attendance_summary.overall or 0}%"
+                                             t-attf-aria-valuenow="#{attendance_summary.overall or 0}"
+                                             aria-valuemin="0"
+                                             aria-valuemax="100">
+                                            <t t-esc="'%.1f' % attendance_summary.overall if attendance_summary.overall else '0.0'"/>%
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between mt-2">
+                                        <small class="text-muted">Below 65% (Poor)</small>
+                                        <small class="text-muted">65-75% (Average)</small>
+                                        <small class="text-muted">Above 75% (Good)</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Cards -->
+                <div class="row mt-4">
+                    <div class="col-md-3 mb-3">
+                        <a t-att-href="'/my/parent/student/%s/attendance' % student.id"
+                           class="card text-decoration-none h-100">
+                            <div class="card-body text-center">
+                                <i class="fa fa-calendar fa-3x text-info mb-3"></i>
+                                <h5>Attendance</h5>
+                                <p class="text-muted">View detailed attendance records</p>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <a t-att-href="'/my/parent/student/%s/fees' % student.id"
+                           class="card text-decoration-none h-100">
+                            <div class="card-body text-center">
+                                <i class="fa fa-money fa-3x text-success mb-3"></i>
+                                <h5>Fee Payments</h5>
+                                <p class="text-muted">View fee history and payments</p>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <a t-att-href="'/my/parent/student/%s/results' % student.id"
+                           class="card text-decoration-none h-100">
+                            <div class="card-body text-center">
+                                <i class="fa fa-graduation-cap fa-3x text-primary mb-3"></i>
+                                <h5>Exam Results</h5>
+                                <p class="text-muted">View all exam results</p>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <a t-att-href="'/my/parent/contact-teacher?student_id=%s' % student.id"
+                           class="card text-decoration-none h-100">
+                            <div class="card-body text-center">
+                                <i class="fa fa-comments fa-3x text-warning mb-3"></i>
+                                <h5>Contact Teacher</h5>
+                                <p class="text-muted">Send message to teacher</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Student Attendance Template -->
+    <template id="parent_student_attendance" name="Student Attendance">
+        <t t-call="portal.portal_layout">
+            <t t-set="title">Attendance - <t t-esc="student.name"/></t>
+
+            <div class="container mt-3">
+                <!-- Student Info Header -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb">
+                                        <li class="breadcrumb-item">
+                                            <a href="/my/parent/dashboard">Dashboard</a>
+                                        </li>
+                                        <li class="breadcrumb-item">
+                                            <a href="/my/parent/select-student">Students</a>
+                                        </li>
+                                        <li class="breadcrumb-item">
+                                            <a t-att-href="'/my/parent/student/%s/progress' % student.id">
+                                                <t t-esc="student.name"/>
+                                            </a>
+                                        </li>
+                                        <li class="breadcrumb-item active">Attendance</li>
+                                    </ol>
+                                </nav>
+                                <h3 class="mb-0">
+                                    <i class="fa fa-calendar text-info me-2"></i>
+                                    Attendance Records
+                                </h3>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#filterModal">
+                                        <i class="fa fa-filter"></i> Filter
+                                    </button>
+                                    <a href="/my/parent/select-student" class="btn btn-outline-secondary">
+                                        <i class="fa fa-arrow-left"></i> Back
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-center border-success">
+                            <div class="card-body">
+                                <h1 class="display-6 text-success">
+                                    <i class="fa fa-check-circle-o"></i>
+                                </h1>
+                                <h5 class="card-title">Present</h5>
+                                <p class="card-text fs-4">
+                                    <t t-esc="attendance_summary.present or 0"/>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-center border-danger">
+                            <div class="card-body">
+                                <h1 class="display-6 text-danger">
+                                    <i class="fa fa-times-circle-o"></i>
+                                </h1>
+                                <h5 class="card-title">Absent</h5>
+                                <p class="card-text fs-4">
+                                    <t t-esc="attendance_summary.absent or 0"/>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-center border-warning">
+                            <div class="card-body">
+                                <h1 class="display-6 text-warning">
+                                    <i class="fa fa-clock-o"></i>
+                                </h1>
+                                <h5 class="card-title">Total Classes</h5>
+                                <p class="card-text fs-4">
+                                    <t t-esc="attendance_summary.total or 0"/>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-center"
+                             t-attf-class="border-#{'success' if attendance_summary.overall >= 75 else 'warning' if attendance_summary.overall >= 65 else 'danger'}">
+                            <div class="card-body">
+                                <h1 class="display-6"
+                                    t-attf-class="text-#{'success' if attendance_summary.overall >= 75 else 'warning' if attendance_summary.overall >= 65 else 'danger'}">
+                                    <i class="fa fa-line-chart"></i>
+                                </h1>
+                                <h5 class="card-title">Overall %</h5>
+                                <p class="card-text fs-4">
+                                    <t t-esc="'%.1f' % attendance_summary.overall if attendance_summary.overall else '0.0'"/>%
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subject-wise Attendance -->
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h6 class="mb-0">
+                                    <i class="fa fa-book me-2"></i>Subject-wise Attendance
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <t t-if="subject_attendance">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Subject</th>
+                                                    <th>Present</th>
+                                                    <th>Absent</th>
+                                                    <th>Total</th>
+                                                    <th>Percentage</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-foreach="subject_attendance.items()" t-as="item">
+                                                    <tr>
+                                                        <td>
+                                                            <strong><t t-esc="item[0]"/></strong>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge bg-success">
+                                                                <t t-esc="item[1].get('present', 0)"/>
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge bg-danger">
+                                                                <t t-esc="item[1].get('absent', 0)"/>
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <t t-esc="item[1].get('total', 0)"/>
+                                                        </td>
+                                                        <td>
+                                                            <t t-esc="'%.1f' % item[1].get('percentage', 0) if item[1].get('percentage') else '0.0'"/>%
+                                                        </td>
+                                                        <td>
+                                                            <span t-attf-class="badge bg-#{'success' if item[1].get('percentage', 0) >= 75 else 'warning' if item[1].get('percentage', 0) >= 65 else 'danger'}">
+                                                                <t t-esc="'Good' if item[1].get('percentage', 0) >= 75 else 'Average' if item[1].get('percentage', 0) >= 65 else 'Poor'"/>
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </t>
+                                <t t-else="">
+                                    <div class="alert alert-info text-center">
+                                        <i class="fa fa-info-circle fa-2x mb-3"></i>
+                                        <h5>No Subject-wise Data</h5>
+                                        <p class="mb-0">Subject attendance data will appear here once available.</p>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daily Attendance Records -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">
+                                    <i class="fa fa-calendar me-2"></i>Daily Attendance Records
+                                    <small class="text-muted ms-2">(Last 30 records)</small>
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <t t-if="attendance">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>Day</th>
+                                                    <th>Course/Subject</th>
+                                                    <th>Time</th>
+                                                    <th>Status</th>
+                                                    <th>Faculty</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-foreach="attendance" t-as="record">
+                                                    <tr>
+                                                        <td>
+                                                            <t t-esc="record.date"/>
+                                                        </td>
+                                                        <td>
+                                                            <t t-esc="record.date.strftime('%A')"/>
+                                                        </td>
+                                                        <td>
+                                                            <t t-esc="record.course_id.name or ''"/>
+                                                            <t t-if="record.subject_id">
+                                                                <br/>
+                                                                <small class="text-muted">
+                                                                    <t t-esc="record.subject_id.name or ''"/>
+                                                                </small>
+                                                            </t>
+                                                        </td>
+                                                        <td>
+                                                            <t t-if="record.time_in">
+                                                                <small>
+                                                                    <t t-esc="'%02d:%02d' % (int(record.time_in), int((record.time_in * 60) % 60))"/>
+                                                                    <t t-if="record.time_out">
+                                                                        - <t t-esc="'%02d:%02d' % (int(record.time_out), int((record.time_out * 60) % 60))"/>
+                                                                    </t>
+                                                                </small>
+                                                            </t>
+                                                        </td>
+                                                        <td>
+                                                            <span t-attf-class="badge bg-#{'success' if record.state == 'present' else 'danger' if record.state == 'absent' else 'warning' if record.state == 'late' else 'info'}">
+                                                                <t t-esc="record.state.title()"/>
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <t t-esc="record.faculty_id.name or ''"/>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </t>
+                                <t t-else="">
+                                    <div class="alert alert-info text-center">
+                                        <i class="fa fa-info-circle fa-2x mb-3"></i>
+                                        <h5>No Attendance Records</h5>
+                                        <p class="mb-0">Attendance records will appear here once marked by faculty.</p>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Modal -->
+            <div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <i class="fa fa-filter me-2"></i>Filter Attendance
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form t-att-action="'/my/parent/student/%s/attendance' % student.id" method="get">
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label class="form-label">From Date</label>
+                                    <input type="date" name="date_from" class="form-control" t-att-value="date_from or ''"/>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">To Date</label>
+                                    <input type="date" name="date_to" class="form-control" t-att-value="date_to or ''"/>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <a t-att-href="'/my/parent/student/%s/attendance' % student.id"
+                                   class="btn btn-secondary">Clear Filter</a>
+                                <button type="submit" class="btn btn-primary">Apply Filter</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Student Fees Template -->
+    <template id="parent_student_fees" name="Student Fee Payments">
+        <t t-call="portal.portal_layout">
+            <t t-set="title">Fee Payments - <t t-esc="student.name"/></t>
+
+            <div class="container mt-3">
+                <!-- Student Info Header -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb">
+                                        <li class="breadcrumb-item">
+                                            <a href="/my/parent/dashboard">Dashboard</a>
+                                        </li>
+                                        <li class="breadcrumb-item">
+                                            <a href="/my/parent/select-student">Students</a>
+                                        </li>
+                                        <li class="breadcrumb-item">
+                                            <a t-att-href="'/my/parent/student/%s/progress' % student.id">
+                                                <t t-esc="student.name"/>
+                                            </a>
+                                        </li>
+                                        <li class="breadcrumb-item active">Fee Payments</li>
+                                    </ol>
+                                </nav>
+                                <h3 class="mb-0">
+                                    <i class="fa fa-money text-success me-2"></i>
+                                    Fee Payment Records
+                                </h3>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="btn-group">
+                                    <a href="/my/parent/select-student" class="btn btn-outline-secondary">
+                                        <i class="fa fa-arrow-left"></i> Back
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fee Summary -->
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-center border-primary">
+                            <div class="card-body">
+                                <h1 class="display-6 text-primary">
+                                    <i class="fa fa-inr"></i>
+                                </h1>
+                                <h5 class="card-title">Total Fee</h5>
+                                <p class="card-text fs-4">
+                                    ₹ <t t-esc="'%.2f' % fee_summary.total_fee if fee_summary.total_fee else '0.00'"/>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-center border-success">
+                            <div class="card-body">
+                                <h1 class="display-6 text-success">
+                                    <i class="fa fa-check-circle-o"></i>
+                                </h1>
+                                <h5 class="card-title">Paid Amount</h5>
+                                <p class="card-text fs-4">
+                                    ₹ <t t-esc="'%.2f' % fee_summary.paid if fee_summary.paid else '0.00'"/>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-center border-danger">
+                            <div class="card-body">
+                                <h1 class="display-6 text-danger">
+                                    <i class="fa fa-exclamation-circle"></i>
+                                </h1>
+                                <h5 class="card-title">Due Amount</h5>
+                                <p class="card-text fs-4">
+                                    ₹ <t t-esc="'%.2f' % fee_summary.due if fee_summary.due else '0.00'"/>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-center"
+                             t-attf-class="border-#{'success' if fee_summary.percentage_paid >= 90 else 'warning' if fee_summary.percentage_paid >= 50 else 'danger'}">
+                            <div class="card-body">
+                                <h1 class="display-6"
+                                    t-attf-class="text-#{'success' if fee_summary.percentage_paid >= 90 else 'warning' if fee_summary.percentage_paid >= 50 else 'danger'}">
+                                    <i class="fa fa-percent"></i>
+                                </h1>
+                                <h5 class="card-title">Paid %</h5>
+                                <p class="card-text fs-4">
+                                    <t t-esc="'%.1f' % fee_summary.percentage_paid if fee_summary.percentage_paid else '0.0'"/>%
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Progress -->
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">
+                                    <i class="fa fa-bar-chart me-2"></i>Payment Progress
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="progress mb-3" style="height: 30px;">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                                         role="progressbar"
+                                         t-attf-style="width: #{fee_summary.percentage_paid or 0}%"
+                                         t-attf-aria-valuenow="#{fee_summary.percentage_paid or 0}"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100">
+                                        <strong><t t-esc="'%.1f' % fee_summary.percentage_paid if fee_summary.percentage_paid else '0.0'"/>% Paid</strong>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <small class="text-muted">₹0</small>
+                                    <small class="text-muted">
+                                        Total: ₹<t t-esc="'%.2f' % fee_summary.total_fee if fee_summary.total_fee else '0.00'"/>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment History -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h6 class="mb-0">
+                                    <i class="fa fa-history me-2"></i>Payment History
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <t t-if="fee_payments">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Receipt No.</th>
+                                                    <th>Date</th>
+                                                    <th>Fee Structure</th>
+                                                    <th>Amount (₹)</th>
+                                                    <th>Payment Method</th>
+                                                    <th>Reference</th>
+                                                    <th>Status</th>
+                                                    <th>Receipt</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-foreach="fee_payments" t-as="payment">
+                                                    <tr>
+                                                        <td>
+                                                            <strong><t t-esc="payment.name"/></strong>
+                                                        </td>
+                                                        <td>
+                                                            <t t-esc="payment.payment_date"/>
+                                                        </td>
+                                                        <td>
+                                                            <t t-esc="payment.fee_structure_id.name or ''"/>
+                                                        </td>
+                                                        <td>
+                                                            <strong>₹ <t t-esc="'%.2f' % payment.amount if payment.amount else '0.00'"/></strong>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge bg-info">
+                                                                <t t-esc="payment.payment_method or ''"/>
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <small class="text-muted">
+                                                                <t t-esc="payment.payment_reference or '-'"/>
+                                                            </small>
+                                                        </td>
+                                                        <td>
+                                                            <span t-attf-class="badge bg-#{'success' if payment.state == 'paid' else 'warning' if payment.state == 'pending' else 'secondary' if payment.state == 'draft' else 'danger'}">
+                                                                <t t-esc="payment.state.title()"/>
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <t t-if="payment.state == 'paid'">
+                                                                <a href="#" class="btn btn-sm btn-outline-primary">
+                                                                    <i class="fa fa-print"></i> Print
+                                                                </a>
+                                                            </t>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr class="table-dark">
+                                                    <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                                    <td>
+                                                        <strong>
+                                                            ₹ <t t-esc="'%.2f' % sum(p.amount for p in fee_payments)"/>
+                                                        </strong>
+                                                    </td>
+                                                    <td colspan="4"></td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </t>
+                                <t t-else="">
+                                    <div class="alert alert-info text-center">
+                                        <i class="fa fa-info-circle fa-2x mb-3"></i>
+                                        <h5>No Payment Records</h5>
+                                        <p class="mb-0">Fee payment records will appear here once payments are made.</p>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Student Results Template -->
+    <template id="parent_student_results" name="Student Exam Results">
+        <t t-call="portal.portal_layout">
+            <t t-set="title">Exam Results - <t t-esc="student.name"/></t>
+
+            <div class="container mt-3">
+                <!-- Student Info Header -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb">
+                                        <li class="breadcrumb-item">
+                                            <a href="/my/parent/dashboard">Dashboard</a>
+                                        </li>
+                                        <li class="breadcrumb-item">
+                                            <a href="/my/parent/select-student">Students</a>
+                                        </li>
+                                        <li class="breadcrumb-item">
+                                            <a t-att-href="'/my/parent/student/%s/progress' % student.id">
+                                                <t t-esc="student.name"/>
+                                            </a>
+                                        </li>
+                                        <li class="breadcrumb-item active">Exam Results</li>
+                                    </ol>
+                                </nav>
+                                <h3 class="mb-0">
+                                    <i class="fa fa-graduation-cap text-primary me-2"></i>
+                                    Examination Results
+                                </h3>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="btn-group">
+                                    <a href="/my/parent/select-student" class="btn btn-outline-secondary">
+                                        <i class="fa fa-arrow-left"></i> Back
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Summary -->
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-center"
+                             t-attf-class="border-#{'success' if performance.cgpa >= 8.5 else 'warning' if performance.cgpa >= 6.0 else 'danger'}">
+                            <div class="card-body">
+                                <h1 class="display-6"
+                                    t-attf-class="text-#{'success' if performance.cgpa >= 8.5 else 'warning' if performance.cgpa >= 6.0 else 'danger'}">
+                                    <i class="fa fa-star"></i>
+                                </h1>
+                                <h5 class="card-title">CGPA</h5>
+                                <p class="card-text fs-4">
+                                    <t t-esc="'%.2f' % performance.cgpa if performance.cgpa else '0.00'"/>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-center border-info">
+                            <div class="card-body">
+                                <h1 class="display-6 text-info">
+                                    <i class="fa fa-percent"></i>
+                                </h1>
+                                <h5 class="card-title">Percentage</h5>
+                                <p class="card-text fs-4">
+                                    <t t-esc="'%.1f' % performance.percentage if performance.percentage else '0.0'"/>%
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-center border-success">
+                            <div class="card-body">
+                                <h1 class="display-6 text-success">
+                                    <i class="fa fa-credit-card"></i>
+                                </h1>
+                                <h5 class="card-title">Credits Earned</h5>
+                                <p class="card-text fs-4">
+                                    <t t-esc="performance.total_credits or 0"/>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exam Results Table -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h6 class="mb-0">
+                                    <i class="fa fa-list me-2"></i>Detailed Results
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <t t-if="results">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Exam</th>
+                                                    <th>Subject</th>
+                                                    <th>Internal</th>
+                                                    <th>External</th>
+                                                    <th>Total</th>
+                                                    <th>Max</th>
+                                                    <th>Percentage</th>
+                                                    <th>Grade</th>
+                                                    <th>Grade Point</th>
+                                                    <th>Result</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-foreach="results" t-as="result">
+                                                    <tr>
+                                                        <td>
+                                                            <strong><t t-esc="result.examination_id.name or ''"/></strong>
+                                                        </td>
+                                                        <td>
+                                                            <t t-esc="result.subject_id.name or ''"/>
+                                                        </td>
+                                                        <td>
+                                                            <t t-esc="result.internal_marks or 0"/>/
+                                                            <t t-esc="result.internal_max or 30"/>
+                                                        </td>
+                                                        <td>
+                                                            <t t-esc="result.external_marks or 0"/>/
+                                                            <t t-esc="result.external_max or 70"/>
+                                                        </td>
+                                                        <td>
+                                                            <strong>
+                                                                <t t-esc="result.total_marks or 0"/>
+                                                            </strong>
+                                                        </td>
+                                                        <td>
+                                                            <t t-esc="result.max_marks or 100"/>
+                                                        </td>
+                                                        <td>
+                                                            <span t-attf-class="badge bg-#{'success' if result.percentage >= 75 else 'info' if result.percentage >= 60 else 'warning' if result.percentage >= 50 else 'secondary' if result.percentage >= 40 else 'danger'}">
+                                                                <t t-esc="'%.1f' % result.percentage if result.percentage else '0.0'"/>%
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <span t-attf-class="badge bg-#{'success' if result.grade_letter in ['A+', 'A', 'B+'] else 'info' if result.grade_letter in ['B', 'C+'] else 'warning' if result.grade_letter in ['C', 'D+'] else 'secondary'}">
+                                                                <t t-esc="result.grade_letter or '-'"/>
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <t t-esc="result.grade_point or '0.0'"/>
+                                                        </td>
+                                                        <td>
+                                                            <span t-attf-class="badge bg-#{'success' if result.is_pass else 'danger'}">
+                                                                <t t-esc="'Pass' if result.is_pass else 'Fail'"/>
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <span t-attf-class="badge bg-#{'success' if result.state == 'published' else 'info' if result.state == 'verified' else 'warning' if result.state == 'submitted' else 'secondary'}">
+                                                                <t t-esc="result.state.title()"/>
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </t>
+                                <t t-else="">
+                                    <div class="alert alert-info text-center">
+                                        <i class="fa fa-info-circle fa-2x mb-3"></i>
+                                        <h5>No Results Available</h5>
+                                        <p class="mb-0">Exam results will appear here once published by the examination department.</p>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Student Timetable Template -->
+    <template id="parent_student_timetable" name="Student Timetable">
+        <t t-call="portal.portal_layout">
+            <t t-set="title">Timetable - <t t-esc="student.name"/></t>
+
+            <div class="container mt-3">
+                <!-- Student Info Header -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb">
+                                        <li class="breadcrumb-item">
+                                            <a href="/my/parent/dashboard">Dashboard</a>
+                                        </li>
+                                        <li class="breadcrumb-item">
+                                            <a href="/my/parent/select-student">Students</a>
+                                        </li>
+                                        <li class="breadcrumb-item">
+                                            <a t-att-href="'/my/parent/student/%s/progress' % student.id">
+                                                <t t-esc="student.name"/>
+                                            </a>
+                                        </li>
+                                        <li class="breadcrumb-item active">Timetable</li>
+                                    </ol>
+                                </nav>
+                                <h3 class="mb-0">
+                                    <i class="fa fa-calendar text-primary me-2"></i>
+                                    Class Timetable
+                                </h3>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="btn-group">
+                                    <a href="/my/parent/select-student" class="btn btn-outline-secondary">
+                                        <i class="fa fa-arrow-left"></i> Back
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timetable -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h6 class="mb-0">
+                                    <i class="fa fa-table me-2"></i>
+                                    Semester <t t-esc="student.current_semester or '1'"/> Timetable
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <t t-if="timetable_by_day">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th width="12%">Time</th>
+                                                    <th width="14.6%">Monday</th>
+                                                    <th width="14.6%">Tuesday</th>
+                                                    <th width="14.6%">Wednesday</th>
+                                                    <th width="14.6%">Thursday</th>
+                                                    <th width="14.6%">Friday</th>
+                                                    <th width="14.6%">Saturday</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <!-- Define time slots -->
+                                                <t t-set="time_slots" t-value="[
+                                                    (9.0, 10.0), (10.0, 11.0), (11.0, 12.0),
+                                                    (12.0, 13.0), (13.0, 14.0), (14.0, 15.0),
+                                                    (15.0, 16.0), (16.0, 17.0)
+                                                ]"/>
+
+                                                <t t-foreach="time_slots" t-as="slot">
+                                                    <tr>
+                                                        <td class="bg-light">
+                                                            <strong>
+                                                                <t t-esc="'%02d:%02d' % (int(slot[0]), int((slot[0] * 60) % 60))"/>
+                                                                -
+                                                                <t t-esc="'%02d:%02d' % (int(slot[1]), int((slot[1] * 60) % 60))"/>
+                                                            </strong>
+                                                        </td>
+                                                        <!-- Monday -->
+                                                        <td>
+                                                            <t t-set="found_class" t-value="False"/>
+                                                            <t t-foreach="timetable_by_day.get('0', [])" t-as="class">
+                                                                <t t-if="class.start_time &lt;= slot[0] and class.end_time &gt; slot[0]">
+                                                                    <div class="timetable-class p-2 mb-2 rounded"
+                                                                         t-attf-class="bg-#{'info' if class.class_type == 'theory' else 'success' if class.class_type == 'practical' else 'warning' if class.class_type == 'lab' else 'secondary'} text-white">
+                                                                        <strong><t t-esc="class.subject_id.name or class.course_id.name"/></strong>
+                                                                        <br/>
+                                                                        <small>
+                                                                            <i class="fa fa-user"></i>
+                                                                            <t t-esc="class.faculty_id.name or ''"/>
+                                                                        </small>
+                                                                        <br/>
+                                                                        <small>
+                                                                            <i class="fa fa-map-marker"></i>
+                                                                            <t t-esc="class.room_number or class.classroom_id.name or ''"/>
+                                                                        </small>
+                                                                        <br/>
+                                                                        <small>
+                                                                            <span class="badge bg-light text-dark">
+                                                                                <t t-esc="class.class_type.title()"/>
+                                                                            </span>
+                                                                        </small>
+                                                                    </div>
+                                                                    <t t-set="found_class" t-value="True"/>
+                                                                </t>
+                                                            </t>
+                                                            <t t-if="not found_class">
+                                                                <div class="text-center text-muted py-4">
+                                                                    <i class="fa fa-clock-o"></i><br/>
+                                                                    Free
+                                                                </div>
+                                                            </t>
+                                                        </td>
+                                                        <!-- Tuesday -->
+                                                        <td>
+                                                            <t t-set="found_class" t-value="False"/>
+                                                            <t t-foreach="timetable_by_day.get('1', [])" t-as="class">
+                                                                <t t-if="class.start_time &lt;= slot[0] and class.end_time &gt; slot[0]">
+                                                                    <div class="timetable-class p-2 mb-2 rounded"
+                                                                         t-attf-class="bg-#{'info' if class.class_type == 'theory' else 'success' if class.class_type == 'practical' else 'warning' if class.class_type == 'lab' else 'secondary'} text-white">
+                                                                        <strong><t t-esc="class.subject_id.name or class.course_id.name"/></strong>
+                                                                        <br/>
+                                                                        <small>
+                                                                            <i class="fa fa-user"></i>
+                                                                            <t t-esc="class.faculty_id.name or ''"/>
+                                                                        </small>
+                                                                        <br/>
+                                                                        <small>
+                                                                            <i class="fa fa-map-marker"></i>
+                                                                            <t t-esc="class.room_number or class.classroom_id.name or ''"/>
+                                                                        </small>
+                                                                        <br/>
+                                                                        <small>
+                                                                            <span class="badge bg-light text-dark">
+                                                                                <t t-esc="class.class_type.title()"/>
+                                                                            </span>
+                                                                        </small>
+                                                                    </div>
+                                                                    <t t-set="found_class" t-value="True"/>
+                                                                </t>
+                                                            </t>
+                                                            <t t-if="not found_class">
+                                                                <div class="text-center text-muted py-4">
+                                                                    <i class="fa fa-clock-o"></i><br/>
+                                                                    Free
+                                                                </div>
+                                                            </t>
+                                                        </td>
+                                                        <!-- Wednesday -->
+                                                        <td>
+                                                            <t t-set="found_class" t-value="False"/>
+                                                            <t t-foreach="timetable_by_day.get('2', [])" t-as="class">
+                                                                <t t-if="class.start_time &lt;= slot[0] and class.end_time &gt; slot[0]">
+                                                                    <div class="timetable-class p-2 mb-2 rounded"
+                                                                         t-attf-class="bg-#{'info' if class.class_type == 'theory' else 'success' if class.class_type == 'practical' else 'warning' if class.class_type == 'lab' else 'secondary'} text-white">
+                                                                        <strong><t t-esc="class.subject_id.name or class.course_id.name"/></strong>
+                                                                        <br/>
+                                                                        <small>
+                                                                            <i class="fa fa-user"></i>
+                                                                            <t t-esc="class.faculty_id.name or ''"/>
+                                                                        </small>
+                                                                        <br/>
+                                                                        <small>
+                                                                            <i class="fa fa-map-marker"></i>
+                                                                            <t t-esc="class.room_number or class.classroom_id.name or ''"/>
+                                                                        </small>
+                                                                        <br/>
+                                                                        <small>
+                                                                            <span class="badge bg-light text-dark">
+                                                                                <t t-esc="class.class_type.title()"/>
+                                                                            </span>
+                                                                        </small>
+                                                                    </div>
+                                                                    <t t-set="found_class" t-value="True"/>
+                                                                </t>
+                                                            </t>
+                                                            <t t-if="not found_class">
+                                                                <div class="text-center text-muted py-4">
+                                                                    <i class="fa fa-clock-o"></i><br/>
+                                                                    Free
+                                                                </div>
+                                                            </t>
+                                                        </td>
+                                                        <!-- Thursday -->
+                                                        <td>
+                                                            <t t-set="found_class" t-value="False"/>
+                                                            <t t-foreach="timetable_by_day.get('3', [])" t-as="class">
+                                                                <t t-if="class.start_time &lt;= slot[0] and class.end_time &gt; slot[0]">
+                                                                    <div class="timetable-class p-2 mb-2 rounded"
+                                                                         t-attf-class="bg-#{'info' if class.class_type == 'theory' else 'success' if class.class_type == 'practical' else 'warning' if class.class_type == 'lab' else 'secondary'} text-white">
+                                                                        <strong><t t-esc="class.subject_id.name or class.course_id.name"/></strong>
+                                                                        <br/>
+                                                                        <small>
+                                                                            <i class="fa fa-user"></i>
+                                                                            <t t-esc="class.faculty_id.name or ''"/>
+                                                                        </small>
+                                                                        <br/>
+                                                                        <small>
+                                                                            <i class="fa fa-map-marker"></i>
+                                                                            <t t-esc="class.room_number or class.classroom_id.name or ''"/>
+                                                                        </small>
+                                                                        <br/>
+                                                                        <small>
+                                                                            <span class="badge bg-light text-dark">
+                                                                                <t t-esc="class.class_type.title()"/>
+                                                                            </span>
+                                                                        </small>
+                                                                    </div>
+                                                                    <t t-set="found_class" t-value="True"/>
+                                                                </t>
+                                                            </t>
+                                                            <t t-if="not found_class">
+                                                                <div class="text-center text-muted py-4">
+                                                                    <i class="fa fa-clock-o"></i><br/>
+                                                                    Free
+                                                                </div>
+                                                            </t>
+                                                        </td>
+                                                        <!-- Friday -->
+                                                        <td>
+                                                            <t t-set="found_class" t-value="False"/>
+                                                            <t t-foreach="timetable_by_day.get('4', [])" t-as="class">
+                                                                <t t-if="class.start_time &lt;= slot[0] and class.end_time &gt; slot[0]">
+                                                                    <div class="timetable-class p-2 mb-2 rounded"
+                                                                         t-attf-class="bg-#{'info' if class.class_type == 'theory' else 'success' if class.class_type == 'practical' else 'warning' if class.class_type == 'lab' else 'secondary'} text-white">
+                                                                        <strong><t t-esc="class.subject_id.name or class.course_id.name"/></strong>
+                                                                        <br/>
+                                                                        <small>
+                                                                            <i class="fa fa-user"></i>
+                                                                            <t t-esc="class.faculty_id.name or ''"/>
+                                                                        </small>
+                                                                        <br/>
+                                                                        <small>
+                                                                            <i class="fa fa-map-marker"></i>
+                                                                            <t t-esc="class.room_number or class.classroom_id.name or ''"/>
+                                                                        </small>
+                                                                        <br/>
+                                                                        <small>
+                                                                            <span class="badge bg-light text-dark">
+                                                                                <t t-esc="class.class_type.title()"/>
+                                                                            </span>
+                                                                        </small>
+                                                                    </div>
+                                                                    <t t-set="found_class" t-value="True"/>
+                                                                </t>
+                                                            </t>
+                                                            <t t-if="not found_class">
+                                                                <div class="text-center text-muted py-4">
+                                                                    <i class="fa fa-clock-o"></i><br/>
+                                                                    Free
+                                                                </div>
+                                                            </t>
+                                                        </td>
+                                                        <!-- Saturday -->
+                                                        <td>
+                                                            <t t-set="found_class" t-value="False"/>
+                                                            <t t-foreach="timetable_by_day.get('5', [])" t-as="class">
+                                                                <t t-if="class.start_time &lt;= slot[0] and class.end_time &gt; slot[0]">
+                                                                    <div class="timetable-class p-2 mb-2 rounded"
+                                                                         t-attf-class="bg-#{'info' if class.class_type == 'theory' else 'success' if class.class_type == 'practical' else 'warning' if class.class_type == 'lab' else 'secondary'} text-white">
+                                                                        <strong><t t-esc="class.subject_id.name or class.course_id.name"/></strong>
+                                                                        <br/>
+                                                                        <small>
+                                                                            <i class="fa fa-user"></i>
+                                                                            <t t-esc="class.faculty_id.name or ''"/>
+                                                                        </small>
+                                                                        <br/>
+                                                                        <small>
+                                                                            <i class="fa fa-map-marker"></i>
+                                                                            <t t-esc="class.room_number or class.classroom_id.name or ''"/>
+                                                                        </small>
+                                                                        <br/>
+                                                                        <small>
+                                                                            <span class="badge bg-light text-dark">
+                                                                                <t t-esc="class.class_type.title()"/>
+                                                                            </span>
+                                                                        </small>
+                                                                    </div>
+                                                                    <t t-set="found_class" t-value="True"/>
+                                                                </t>
+                                                            </t>
+                                                            <t t-if="not found_class">
+                                                                <div class="text-center text-muted py-4">
+                                                                    <i class="fa fa-clock-o"></i><br/>
+                                                                    Free
+                                                                </div>
+                                                            </t>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- Legend -->
+                                    <div class="row mt-4">
+                                        <div class="col-md-12">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <h6 class="mb-3">
+                                                        <i class="fa fa-key me-2"></i>Color Legend
+                                                    </h6>
+                                                    <div class="d-flex flex-wrap gap-3">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="color-box bg-info me-2" style="width: 20px; height: 20px;"></div>
+                                                            <span>Theory Class</span>
+                                                        </div>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="color-box bg-success me-2" style="width: 20px; height: 20px;"></div>
+                                                            <span>Practical Class</span>
+                                                        </div>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="color-box bg-warning me-2" style="width: 20px; height: 20px;"></div>
+                                                            <span>Laboratory Session</span>
+                                                        </div>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="color-box bg-secondary me-2" style="width: 20px; height: 20px;"></div>
+                                                            <span>Other Sessions</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                                <t t-else="">
+                                    <div class="alert alert-info text-center">
+                                        <i class="fa fa-info-circle fa-2x mb-3"></i>
+                                        <h5>No Timetable Available</h5>
+                                        <p class="mb-0">Timetable will be available once the semester schedule is published.</p>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Leave Request Template -->
+    <template id="parent_leave_request" name="Student Leave Request">
+        <t t-call="portal.portal_layout">
+            <t t-set="title">Leave Request - <t t-esc="student.name"/></t>
+
+            <div class="container mt-3">
+                <!-- Student Info Header -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb">
+                                        <li class="breadcrumb-item">
+                                            <a href="/my/parent/dashboard">Dashboard</a>
+                                        </li>
+                                        <li class="breadcrumb-item">
+                                            <a href="/my/parent/select-student">Students</a>
+                                        </li>
+                                        <li class="breadcrumb-item">
+                                            <a t-att-href="'/my/parent/student/%s/progress' % student.id">
+                                                <t t-esc="student.name"/>
+                                            </a>
+                                        </li>
+                                        <li class="breadcrumb-item active">Leave Request</li>
+                                    </ol>
+                                </nav>
+                                <h3 class="mb-0">
+                                    <i class="fa fa-calendar-plus-o text-warning me-2"></i>
+                                    Apply for Leave
+                                </h3>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="btn-group">
+                                    <a href="/my/parent/select-student" class="btn btn-outline-secondary">
+                                        <i class="fa fa-arrow-left"></i> Back
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Success/Error Messages -->
+                <t t-if="request.params.get('success')">
+                    <div class="alert alert-success alert-dismissible fade show">
+                        <i class="fa fa-check-circle-o me-2"></i>
+                        Leave request submitted successfully!
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                </t>
+                <t t-if="request.params.get('error')">
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        <i class="fa fa-exclamation-circle me-2"></i>
+                        Error submitting leave request. Please try again.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                </t>
+
+                <div class="row">
+                    <!-- Left Column: New Leave Request -->
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h6 class="mb-0">
+                                    <i class="fa fa-plus-circle me-2"></i>New Leave Request
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <form t-att-action="'/my/parent/student/%s/leave/submit' % student.id"
+                                      method="post" id="leaveForm">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Student</label>
+                                        <input type="text" class="form-control"
+                                               t-att-value="student.name" readonly="readonly"/>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">From Date <span class="text-danger">*</span></label>
+                                            <input type="date" name="date_from" class="form-control" required="required"/>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">To Date <span class="text-danger">*</span></label>
+                                            <input type="date" name="date_to" class="form-control" required="required"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Leave Type <span class="text-danger">*</span></label>
+                                        <select name="leave_type" class="form-select" required="required">
+                                            <option value="">Select Leave Type</option>
+                                            <option value="sick_leave">Sick Leave</option>
+                                            <option value="casual_leave">Casual Leave</option>
+                                            <option value="emergency_leave">Emergency Leave</option>
+                                            <option value="vacation">Vacation</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Reason <span class="text-danger">*</span></label>
+                                        <textarea name="reason" class="form-control" rows="4"
+                                                  placeholder="Please provide a detailed reason for leave..." required="reuired"></textarea>
+                                    </div>
+
+                                    <div class="alert alert-info">
+                                        <i class="fa fa-info-circle me-2"></i>
+                                        <strong>Note:</strong> Leave requests are subject to approval by the class coordinator.
+                                    </div>
+
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fa fa-paper-plane-o me-2"></i>Submit Leave Request
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Previous Leave Requests -->
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-info text-white">
+                                <h6 class="mb-0">
+                                    <i class="fa fa-history me-2"></i>Previous Leave Requests
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <t t-if="leave_requests">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Period</th>
+                                                    <th>Type</th>
+                                                    <th>Reason</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-foreach="leave_requests" t-as="leave">
+                                                    <tr>
+                                                        <td>
+                                                            <small>
+                                                                <t t-esc="leave.date_from"/>
+                                                                <br/>
+                                                                to
+                                                                <br/>
+                                                                <t t-esc="leave.date_to"/>
+                                                            </small>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge bg-info">
+                                                                <t t-esc="leave.leave_type.replace('_', ' ').title()"/>
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <small>
+                                                                <t t-esc="leave.reason[:50]"/>
+                                                                <t t-if="len(leave.reason) > 50">...</t>
+                                                            </small>
+                                                        </td>
+                                                        <td>
+                                                            <span t-attf-class="badge bg-#{'success' if leave.state == 'approved' else 'warning' if leave.state in ['draft', 'submitted'] else 'danger'}">
+                                                                <t t-esc="leave.state.title()"/>
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </t>
+                                <t t-else="">
+                                    <div class="alert alert-info text-center">
+                                        <i class="fa fa-info-circle fa-2x mb-3"></i>
+                                        <h5>No Previous Leave Requests</h5>
+                                        <p class="mb-0">No leave requests have been submitted yet.</p>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Student Messages Template -->
+    <template id="parent_student_messages" name="Student Messages">
+        <t t-call="portal.portal_layout">
+            <t t-set="title">Messages - <t t-esc="student.name"/></t>
+
+            <div class="container mt-3">
+                <!-- Student Info Header -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb">
+                                        <li class="breadcrumb-item">
+                                            <a href="/my/parent/dashboard">Dashboard</a>
+                                        </li>
+                                        <li class="breadcrumb-item">
+                                            <a href="/my/parent/select-student">Students</a>
+                                        </li>
+                                        <li class="breadcrumb-item">
+                                            <a t-att-href="'/my/parent/student/%s/progress' % student.id">
+                                                <t t-esc="student.name"/>
+                                            </a>
+                                        </li>
+                                        <li class="breadcrumb-item active">Messages</li>
+                                    </ol>
+                                </nav>
+                                <h3 class="mb-0">
+                                    <i class="fa fa-comments text-info me-2"></i>
+                                    Messages &amp; Notifications
+                                </h3>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="btn-group">
+                                    <a href="/my/parent/select-student" class="btn btn-outline-secondary">
+                                        <i class="fa fa-arrow-left"></i> Back
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messages -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h6 class="mb-0">
+                                    <i class="fa fa-envelope me-2"></i>Messages
+                                    <span class="badge bg-warning ms-2">
+                                        <t t-esc="len(messages)"/> messages
+                                    </span>
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <t t-if="messages">
+                                    <div class="messages-container">
+                                        <t t-foreach="messages" t-as="message">
+                                            <div class="card mb-3">
+                                                <div class="card-body">
+                                                    <div class="d-flex justify-content-between mb-2">
+                                                        <div>
+                                                            <strong>
+                                                                <i class="fa fa-user-circle-o me-2"></i>
+                                                                <t t-esc="message.author_id.name or 'System'"/>
+                                                            </strong>
+                                                        </div>
+                                                        <div class="text-muted">
+                                                            <small>
+                                                                <i class="fa fa-clock-o me-1"></i>
+                                                                <t t-esc="message.date"/>
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="message-content">
+                                                        <p class="mb-0">
+                                                            <t t-esc="message.body or message.subject or 'No content'"/>
+                                                        </p>
+                                                    </div>
+                                                    <t t-if="message.attachment_ids">
+                                                        <div class="mt-2">
+                                                            <small class="text-muted">
+                                                                <i class="fa fa-paperclip me-1"></i>
+                                                                <t t-esc="len(message.attachment_ids)"/> attachment(s)
+                                                            </small>
+                                                        </div>
+                                                    </t>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </t>
+                                <t t-else="">
+                                    <div class="alert alert-info text-center">
+                                        <i class="fa fa-info-circle fa-2x mb-3"></i>
+                                        <h5>No Messages</h5>
+                                        <p class="mb-0">No messages or notifications available.</p>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Contact Teacher Template -->
+    <template id="parent_contact_teacher" name="Contact Teacher">
+        <t t-call="portal.portal_layout">
+            <t t-set="title">Contact Teacher</t>
+
+            <div class="container mt-3">
+                <!-- Header -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h3 class="mb-0">
+                                    <i class="fa fa-comments text-primary me-2"></i>
+                                    Contact Teacher/Coordinator
+                                </h3>
+                                <p class="text-muted mb-0">
+                                    Send a message to your child's teacher or class coordinator
+                                </p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="btn-group">
+                                    <a href="/my/parent/dashboard" class="btn btn-outline-secondary">
+                                        <i class="fa fa-arrow-left"></i> Back
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Success/Error Messages -->
+                <t t-if="request.params.get('success')">
+                    <div class="alert alert-success alert-dismissible fade show">
+                        <i class="fa fa-check-circle-o me-2"></i>
+                        Message sent successfully!
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                </t>
+                <t t-if="request.params.get('error')">
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        <i class="fa fa-exclamation-circle me-2"></i>
+                        Error sending message. Please try again.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                </t>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h6 class="mb-0">
+                                    <i class="fa fa-pencil me-2"></i>Compose Message
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <form action="/my/parent/contact-teacher/submit" method="post" id="contactForm">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Select Student <span class="text-danger">*</span></label>
+                                        <select name="student_id" class="form-select" required="required">
+                                            <option value="">-- Select Student --</option>
+                                            <t t-foreach="students" t-as="student">
+                                                <option t-att-value="student.id"
+                                                        t-att-selected="student.id == (student_id or False)">
+                                                    <t t-esc="student.name"/>
+                                                    <t t-if="student.program_id"> - <t t-esc="student.program_id.name or ''"/></t>
+                                                </option>
+                                            </t>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Subject <span class="text-danger">*</span></label>
+                                        <input type="text" name="subject" class="form-control"
+                                               placeholder="Enter message subject..." required="required"/>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Message <span class="text-danger">*</span></label>
+                                        <textarea name="message" class="form-control" rows="6"
+                                                  placeholder="Type your message here..." required="required"></textarea>
+                                    </div>
+
+                                    <div class="alert alert-info">
+                                        <i class="fa fa-info-circle me-2"></i>
+                                        <strong>Note:</strong> Messages will be sent to the class coordinator or head of department.
+                                        You will receive a response via email or in your portal messages.
+                                    </div>
+
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fa fa-paper-plane-o me-2"></i>Send Message
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Student Events Template -->
+    <template id="parent_student_events" name="Student Events">
+        <t t-call="portal.portal_layout">
+            <t t-set="title">Events &amp; Activities - <t t-esc="student.name"/></t>
+
+            <div class="container mt-3">
+                <!-- Student Info Header -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb">
+                                        <li class="breadcrumb-item">
+                                            <a href="/my/parent/dashboard">Dashboard</a>
+                                        </li>
+                                        <li class="breadcrumb-item">
+                                            <a href="/my/parent/select-student">Students</a>
+                                        </li>
+                                        <li class="breadcrumb-item">
+                                            <a t-att-href="'/my/parent/student/%s/progress' % student.id">
+                                                <t t-esc="student.name"/>
+                                            </a>
+                                        </li>
+                                        <li class="breadcrumb-item active">Events</li>
+                                    </ol>
+                                </nav>
+                                <h3 class="mb-0">
+                                    <i class="fa fa-calendar text-success me-2"></i>
+                                    Events &amp; Activities
+                                </h3>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="btn-group">
+                                    <a href="/my/parent/select-student" class="btn btn-outline-secondary">
+                                        <i class="fa fa-arrow-left"></i> Back
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Events -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h6 class="mb-0">
+                                    <i class="fa fa-calendar me-2"></i>Event Registrations
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <t t-if="event_registrations">
+                                    <div class="row">
+                                        <t t-foreach="event_registrations" t-as="registration">
+                                            <div class="col-md-6 mb-4">
+                                                <div class="card h-100">
+                                                    <div class="card-header"
+                                                         t-attf-class="bg-#{'primary' if registration.event_id.event_type == 'academic' else 'success' if registration.event_id.event_type == 'cultural' else 'warning' if registration.event_id.event_type == 'sports' else 'info'} text-white">
+                                                        <h6 class="mb-0">
+                                                            <i t-attf-class="fa #{'fa-graduation-cap' if registration.event_id.event_type == 'academic' else 'fa-music' if registration.event_id.event_type == 'cultural' else 'fa-soccer-ball-o' if registration.event_id.event_type == 'sports' else 'fa-calendar'} me-2"></i>
+                                                            <t t-esc="registration.event_id.name"/>
+                                                        </h6>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="mb-3">
+                                                            <p class="card-text">
+                                                                <t t-esc="registration.event_id.description or ''"/>
+                                                            </p>
+                                                        </div>
+
+                                                        <div class="row mb-3">
+                                                            <div class="col-6">
+                                                                <small class="text-muted">
+                                                                    <i class="fa fa-calendar me-1"></i>
+                                                                    <t t-esc="registration.event_id.start.strftime('%d %b %Y') if registration.event_id.start else 'TBD'"/>
+                                                                </small>
+                                                            </div>
+                                                            <div class="col-6">
+                                                                <small class="text-muted">
+                                                                    <i class="fa fa-clock-o me-1"></i>
+                                                                    <t t-esc="registration.event_id.start.strftime('%I:%M %p') if registration.event_id.start else 'All Day'"/>
+                                                                </small>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="row mb-3">
+                                                            <div class="col-6">
+                                                                <small class="text-muted">
+                                                                    <i class="fa fa-map-marker me-1"></i>
+                                                                    <t t-esc="registration.event_id.location or 'TBD'"/>
+                                                                </small>
+                                                            </div>
+                                                            <div class="col-6">
+                                                                <small class="text-muted">
+                                                                    <i class="fa fa-inr me-1"></i>
+                                                                    Fee: <t t-esc="registration.event_id.registration_fee or '0'"/>
+                                                                </small>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="row">
+                                                            <div class="col-6">
+                                                                <span class="badge"
+                                                                      t-attf-class="bg-#{'success' if registration.state == 'registered' else 'primary' if registration.state == 'attended' else 'secondary'}">
+                                                                    <t t-esc="registration.state.title()"/>
+                                                                </span>
+                                                            </div>
+                                                            <div class="col-6 text-end">
+                                                                <span class="badge"
+                                                                      t-attf-class="bg-#{'success' if registration.fee_paid else 'warning'}">
+                                                                    <t t-esc="'Paid' if registration.fee_paid else 'Payment Pending'"/>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </t>
+                                <t t-else="">
+                                    <div class="alert alert-info text-center">
+                                        <i class="fa fa-info-circle fa-2x mb-3"></i>
+                                        <h5>No Event Registrations</h5>
+                                        <p class="mb-0">Your child is not registered for any events currently.</p>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Student Documents Template -->
+    <template id="parent_student_documents" name="Student Documents">
+        <t t-call="portal.portal_layout">
+            <t t-set="title">Documents - <t t-esc="student.name"/></t>
+
+            <div class="container mt-3">
+                <!-- Student Info Header -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb">
+                                        <li class="breadcrumb-item">
+                                            <a href="/my/parent/dashboard">Dashboard</a>
+                                        </li>
+                                        <li class="breadcrumb-item">
+                                            <a href="/my/parent/select-student">Students</a>
+                                        </li>
+                                        <li class="breadcrumb-item">
+                                            <a t-att-href="'/my/parent/student/%s/progress' % student.id">
+                                                <t t-esc="student.name"/>
+                                            </a>
+                                        </li>
+                                        <li class="breadcrumb-item active">Documents</li>
+                                    </ol>
+                                </nav>
+                                <h3 class="mb-0">
+                                    <i class="fa fa-file-text text-warning me-2"></i>
+                                    Student Documents
+                                </h3>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="btn-group">
+                                    <a href="/my/parent/select-student" class="btn btn-outline-secondary">
+                                        <i class="fa fa-arrow-left"></i> Back
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Documents -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h6 class="mb-0">
+                                    <i class="fa fa-folder me-2"></i>Available Documents
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <t t-if="documents">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Document Name</th>
+                                                    <th>Type</th>
+                                                    <th>Document Number</th>
+                                                    <th>Issue Date</th>
+                                                    <th>Expiry Date</th>
+                                                    <th>Verified</th>
+                                                    <th>Status</th>
+                                                    <th>Download</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-foreach="documents" t-as="doc">
+                                                    <tr>
+                                                        <td>
+                                                            <strong><t t-esc="doc.name"/></strong>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge bg-info">
+                                                                <t t-esc="dict(doc._fields['document_type'].selection).get(doc.document_type, doc.document_type)"/>
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <t t-esc="doc.document_number or '-'"/>
+                                                        </td>
+                                                        <td>
+                                                            <t t-esc="doc.issue_date or '-'"/>
+                                                        </td>
+                                                        <td>
+                                                            <t t-esc="doc.expiry_date or '-'"/>
+                                                        </td>
+                                                        <td>
+                                                            <span t-attf-class="badge bg-#{'success' if doc.is_verified else 'warning'}">
+                                                                <t t-esc="'Verified' if doc.is_verified else 'Pending'"/>
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <span t-attf-class="badge bg-#{'success' if doc.state == 'verified' else 'danger' if doc.state == 'rejected' else 'info' if doc.state == 'submitted' else 'secondary'}">
+                                                                <t t-esc="doc.state.title()"/>
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <t t-if="doc_download_urls.get(doc.id)">
+                                                                <a t-att-href="doc_download_urls.get(doc.id)"
+                                                                   class="btn btn-sm btn-outline-primary"
+                                                                   target="_blank">
+                                                                    <i class="fa fa-download"></i> Download
+                                                                </a>
+                                                            </t>
+                                                            <t t-else="">
+                                                                <span class="text-muted">Not Available</span>
+                                                            </t>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </t>
+                                <t t-else="">
+                                    <div class="alert alert-info text-center">
+                                        <i class="fa fa-info-circle fa-2x mb-3"></i>
+                                        <h5>No Documents Available</h5>
+                                        <p class="mb-0">No documents are available for download at this time.</p>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

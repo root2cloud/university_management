@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View - Transport Stop -->
+    <record id="transport_stop_view_form" model="ir.ui.view">
+        <field name="name">transport.stop.view.form</field>
+        <field name="model">transport.stop</field>
+        <field name="arch" type="xml">
+            <form string="Bus Stop">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button"
+                                   options="{'terminology': 'archive'}"/>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <label for="name" string="Stop Name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Metro Station Stop"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Stop Details">
+                            <field name="route_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="sequence"/>
+                            <field name="location" placeholder="Landmark or Address"/>
+                            <field name="distance_from_start" widget="float"/>
+                            <field name="student_count"/>
+                        </group>
+                        <group string="Timing">
+                            <field name="arrival_time" placeholder="07:30 AM"/>
+                            <field name="departure_time" placeholder="05:00 PM"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="GPS Coordinates">
+                            <field name="latitude" widget="float" placeholder="e.g. 28.6139"/>
+                            <field name="longitude" widget="float" placeholder="e.g. 77.2090"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View - Transport Stop -->
+    <record id="transport_stop_view_list" model="ir.ui.view">
+        <field name="name">transport.stop.view.list</field>
+        <field name="model">transport.stop</field>
+        <field name="arch" type="xml">
+            <list string="Bus Stops"
+                  default_order="route_id, sequence"
+                  multi_edit="1"
+                  sample="1">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="route_id"/>
+                <field name="location" optional="show"/>
+                <field name="arrival_time" optional="show"/>
+                <field name="departure_time" optional="show"/>
+                <field name="distance_from_start" optional="show"/>
+                <field name="student_count" optional="show"/>
+                <field name="active" widget="boolean_toggle" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View - Transport Stop -->
+    <record id="transport_stop_view_search" model="ir.ui.view">
+        <field name="name">transport.stop.view.search</field>
+        <field name="model">transport.stop</field>
+        <field name="arch" type="xml">
+            <search string="Search Bus Stops">
+                <field name="name"/>
+                <field name="location"/>
+                <field name="route_id"/>
+
+                <separator/>
+
+                <filter name="filter_active" string="Active Stops"
+                        domain="[('active', '=', True)]"/>
+                <filter name="filter_inactive" string="Archived Stops"
+                        domain="[('active', '=', False)]"/>
+
+                <separator/>
+
+                <filter name="filter_has_students" string="Has Students"
+                        domain="[('student_count', '&gt;', 0)]"/>
+                <filter name="filter_no_students" string="No Students"
+                        domain="[('student_count', '=', 0)]"/>
+
+                <separator/>
+
+                <filter name="filter_has_gps" string="Has GPS Coordinates"
+                        domain="[('latitude', '!=', False), ('longitude', '!=', False)]"/>
+                <filter name="filter_no_gps" string="No GPS Coordinates"
+                        domain="['|', ('latitude', '=', False), ('longitude', '=', False)]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_route" string="Route"
+                            context="{'group_by': 'route_id'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="route_id" string="Route"
+                           select="multi"
+                           icon="fa-bus"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View - Transport Stop -->
+    <record id="transport_stop_view_kanban" model="ir.ui.view">
+        <field name="name">transport.stop.view.kanban</field>
+        <field name="model">transport.stop</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="route_id"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="sequence"/>
+                <field name="route_id"/>
+                <field name="location"/>
+                <field name="arrival_time"/>
+                <field name="departure_time"/>
+                <field name="distance_from_start"/>
+                <field name="student_count"/>
+                <field name="latitude"/>
+                <field name="longitude"/>
+                <field name="active"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="ribbon ribbon-top-right" t-if="!record.active.raw_value">
+                                <span class="text-bg-danger">Archived</span>
+                            </div>
+
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <span class="badge bg-secondary me-2">
+                                                #<field name="sequence"/>
+                                            </span>
+                                            <i class="fa fa-map-marker"/> <field name="name"/>
+                                        </strong>
+                                        <div class="text-muted" t-if="record.location.raw_value">
+                                            <i class="fa fa-map-signs"/> <field name="location"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body mt-3">
+                                    <div class="row mb-2" t-if="record.distance_from_start.raw_value">
+                                        <div class="col-12">
+                                            <div class="card bg-primary text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h5 class="mb-0">
+                                                        <i class="fa fa-road"/> <field name="distance_from_start"/> KM
+                                                    </h5>
+                                                    <small>From Start Point</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.arrival_time.raw_value or record.departure_time.raw_value">
+                                        <div class="col-6" t-if="record.arrival_time.raw_value">
+                                            <div class="card bg-success text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <div><i class="fa fa-clock fa-lg"/></div>
+                                                    <strong><field name="arrival_time"/></strong>
+                                                    <div><small>Morning</small></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6" t-if="record.departure_time.raw_value">
+                                            <div class="card bg-warning text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <div><i class="fa fa-clock fa-lg"/></div>
+                                                    <strong><field name="departure_time"/></strong>
+                                                    <div><small>Evening</small></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded text-center">
+                                                <div class="text-info">
+                                                    <i class="fa fa-users fa-2x"/>
+                                                </div>
+                                                <h5 class="mb-0"><field name="student_count"/></h5>
+                                                <small class="text-muted">Students at this Stop</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.latitude.raw_value and record.longitude.raw_value">
+                                        <div class="col-12">
+                                            <div class="card bg-info text-white">
+                                                <div class="card-body p-2">
+                                                    <h6 class="mb-1">
+                                                        <i class="fa fa-location-arrow"/> GPS Coordinates
+                                                    </h6>
+                                                    <small>
+                                                        Lat: <field name="latitude"/> |
+                                                        Long: <field name="longitude"/>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Map View - Transport Stop (GPS) -->
+    <record id="transport_stop_view_leaflet_map" model="ir.ui.view">
+        <field name="name">transport.stop.view.leaflet_map</field>
+        <field name="model">transport.stop</field>
+        <field name="arch" type="xml">
+            <leaflet_map string="Bus Stops"
+                         field_latitude="latitude"
+                         field_longitude="longitude"
+                         field_title="name"
+                         field_address="location"
+                         default_zoom="12">
+                <field name="name"/>
+                <field name="route_id"/>
+                <field name="location"/>
+                <field name="latitude"/>
+                <field name="longitude"/>
+            </leaflet_map>
+        </field>
+    </record>
+
+    <!-- Pivot View - Transport Stop -->
+    <record id="transport_stop_view_pivot" model="ir.ui.view">
+        <field name="name">transport.stop.view.pivot</field>
+        <field name="model">transport.stop</field>
+        <field name="arch" type="xml">
+            <pivot string="Stop Analysis">
+                <field name="route_id" type="row"/>
+                <field name="student_count" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View - Transport Stop -->
+    <record id="transport_stop_view_graph" model="ir.ui.view">
+        <field name="name">transport.stop.view.graph</field>
+        <field name="model">transport.stop</field>
+        <field name="arch" type="xml">
+            <graph string="Students per Stop" type="bar">
+                <field name="name"/>
+                <field name="student_count" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_transport_stop" model="ir.actions.act_window">
+        <field name="name">Bus Stops</field>
+        <field name="res_model">transport.stop</field>
+        <field name="view_mode">kanban,list,form,leaflet_map,pivot,graph</field>
+        <field name="context">{'search_default_filter_active': 1, 'search_default_group_by_route': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add Bus Stop
+            </p>
+            <p>
+                Manage transport bus stops. Enter name (required, e.g., "Metro Station Stop"). Select
+                route_id (Many2one to transport.route, required, indexed, cascade delete, no-create).
+                Enter sequence (integer, default 10, for ordering with handle widget). Enter location
+                (landmark or address, optional). Enter distance_from_start (float widget, distance in KM
+                from route start point). Enter arrival_time (char, morning arrival time, placeholder
+                "07:30 AM", help text "e.g., 07:30 AM"). Enter departure_time (char, evening departure
+                time, placeholder "05:00 PM", help text "e.g., 05:00 PM"). Enter GPS coordinates:
+                latitude (float widget, digits (10,6), placeholder "e.g. 28.6139") and longitude (float
+                widget, digits (10,6), placeholder "e.g. 77.2090"). View student_count (computed, count
+                active transport.allocation records where stop_id = this stop and state = 'active').
+                Toggle active boolean (default true, boolean_toggle widget, archive button). List view
+                with sequence handle widget for drag-and-drop reordering, multi-edit enabled. Kanban
+                view grouped by route_id showing sequence badge (secondary), stop name (map-marker icon),
+                location (map-signs icon, conditional), distance card (primary/blue, road icon,
+                conditional if distance_from_start), timing cards (success/green morning, warning/yellow
+                evening, 6/6 grid, clock icons, conditional if arrival_time/departure_time), students
+                card (users icon 2x info color, count, light background), and GPS coordinates card
+                (info/blue, location-arrow icon, conditional if latitude and longitude). Map view for
+                GPS visualization. Pivot view for analysis (route × student_count measure). Graph view
+                for statistics (bar chart, stop name vs. student_count). Ordered by route_id and
+                sequence. Default filters: Active stops and Grouped by Route.
+            </p>
+        </field>
+    </record>
+
+</odoo>

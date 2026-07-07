@@ -1,0 +1,821 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ═══════════════════════════════════════════════════════
+         ASSET CATEGORY VIEWS
+    ═══════════════════════════════════════════════════════════ -->
+    <record id="asset_category_view_form" model="ir.ui.view">
+        <field name="name">asset.category.view.form</field>
+        <field name="model">asset.category</field>
+        <field name="arch" type="xml">
+            <form string="Asset Category">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_assets" type="object"
+                                class="oe_stat_button" icon="fa-cubes">
+                            <field name="asset_count" widget="statinfo" string="Assets"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Category Name"/></h1>
+                        <h2 class="text-muted"><field name="code" placeholder="Code"/></h2>
+                    </div>
+                    <group>
+                        <group string="Category Details">
+                            <field name="parent_id" options="{'no_create': True}"/>
+                            <field name="active" widget="boolean_toggle"/>
+                            <field name="requires_amc" widget="boolean_toggle"/>
+                            <field name="maintenance_frequency"
+                                   invisible="not requires_amc"/>
+                        </group>
+                        <group string="Depreciation Defaults">
+                            <field name="depreciation_method"/>
+                            <field name="useful_life_years"/>
+                            <field name="residual_value_pct"/>
+                        </group>
+                    </group>
+                    <!-- Accounting integration section (base_accounting_kit) -->
+                    <group string="Accounting Integration (base_accounting_kit)">
+                        <group>
+                            <field name="account_asset_category_id"
+                                   options="{'no_create': False}"
+                                   help="Link to the accounting asset type for GL depreciation posting."/>
+                            <field name="account_asset_id" readonly="1"/>
+                            <field name="account_depreciation_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="account_depreciation_expense_id" readonly="1"/>
+                            <field name="journal_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <!-- Budget integration (base_account_budget) -->
+                    <group string="Budget Tracking (base_account_budget)">
+                        <group>
+                            <field name="analytic_account_id"
+                                   help="Analytic account for cost tracking. Maintenance costs tagged here appear in budget reports."/>
+                        </group>
+                        <group>
+                            <field name="budgetary_position_id"
+                                   help="Budget position for asset-category expenditure."/>
+                        </group>
+                    </group>
+                    <!-- Inventory / Purchase Integration -->
+                    <group string="Inventory &amp; Purchase Integration">
+                        <group>
+                            <field name="product_id"
+                                   options="{'no_create': True}"
+                                   domain="[('purchase_ok','=',True)]"
+                                   help="Product used for purchase.order lines when IT team procures this category."/>
+                        </group>
+                        <group>
+                            <field name="default_location_id"
+                                   options="{'no_create': True}"
+                                   domain="[('usage','=','internal')]"
+                                   help="Default warehouse storage location for new assets of this category."/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="description" nolabel="1"
+                               placeholder="Description of assets in this category..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="asset_category_view_list" model="ir.ui.view">
+        <field name="name">asset.category.view.list</field>
+        <field name="model">asset.category</field>
+        <field name="arch" type="xml">
+            <list string="Asset Categories">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="parent_id"/>
+                <field name="depreciation_method"/>
+                <field name="useful_life_years"/>
+                <field name="requires_amc"/>
+                <field name="account_asset_category_id" optional="show"/>
+                <field name="analytic_account_id" optional="show"/>
+                <field name="asset_count" string="Assets"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_asset_category" model="ir.actions.act_window">
+        <field name="name">Asset Categories</field>
+        <field name="res_model">asset.category</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════
+         ASSET FORM VIEW
+    ═══════════════════════════════════════════════════════════ -->
+    <record id="asset_view_form" model="ir.ui.view">
+        <field name="name">asset.asset.view.form</field>
+        <field name="model">asset.asset</field>
+        <field name="arch" type="xml">
+            <form string="Asset">
+                <header>
+                    <button name="action_activate" string="Activate"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_validate_accounting_asset"
+                            string="Confirm Accounting Asset"
+                            type="object"
+                            invisible="not account_asset_id or accounting_state != 'draft'"
+                            help="Confirm the linked accounting asset to start depreciation posting."/>
+                    <button name="action_compute_depreciation_board"
+                            string="Recompute Depreciation"
+                            type="object"
+                            invisible="not account_asset_id"/>
+                    <button name="action_send_for_maintenance" string="Send for Maintenance"
+                            type="object"
+                            invisible="state not in ['active', 'audited']"
+                            confirm="Send this asset for maintenance?"/>
+                    <button name="action_return_from_maintenance" string="Return from Maintenance"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'under_maintenance'"/>
+                    <button name="action_mark_audited" string="Mark Verified"
+                            type="object"
+                            invisible="state not in ['active', 'transferred']"
+                            confirm="Mark this asset as physically verified?"
+                            groups="university_management.group_university_admin"/>
+                    <button name="action_condemn" string="Condemn"
+                            type="object"
+                            invisible="state in ['condemned', 'disposed', 'lost']"
+                            confirm="Condemn this asset? This cannot be undone."
+                            groups="university_management.group_university_admin"/>
+                    <button name="action_mark_lost" string="Mark Lost/Stolen"
+                            type="object"
+                            invisible="state in ['disposed', 'condemned', 'lost']"
+                            confirm="Mark as lost or stolen?"
+                            groups="university_management.group_university_admin"/>
+                    <button name="action_dispose" string="Dispose"
+                            type="object"
+                            invisible="state in ['disposed', 'condemned', 'lost', 'draft']"
+                            confirm="Dispose this asset? This cannot be undone."
+                            groups="university_management.group_university_admin"/>
+                    <button name="action_set_status_available" string="✓ Mark Available"
+                            type="object" class="btn-success"
+                            invisible="status == 'available'"/>
+                    <button name="action_set_status_not_available" string="Not Available"
+                            type="object" class="btn-warning"
+                            invisible="status == 'not_available'"/>
+                    <button name="action_set_status_needs_purchase" string="⚠ Needs Purchase"
+                            type="object" class="btn-danger"
+                            invisible="status != 'available'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,active,under_maintenance,audited,disposed"/>
+                </header>
+
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_maintenance" type="object"
+                                class="oe_stat_button" icon="fa-wrench">
+                            <field name="maintenance_count" widget="statinfo" string="Maintenance"/>
+                        </button>
+                        <button name="action_view_transfers" type="object"
+                                class="oe_stat_button" icon="fa-exchange">
+                            <field name="transfer_count" widget="statinfo" string="Transfers"/>
+                        </button>
+                        <!-- Purchase Order smart button -->
+                        <button name="action_view_purchase_order" type="object"
+                                class="oe_stat_button" icon="fa-shopping-cart"
+                                invisible="not purchase_order_id">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="purchase_order_state" widget="badge"
+                                           decoration-success="purchase_order_state == 'purchase'"
+                                           decoration-info="purchase_order_state == 'draft'"/>
+                                </span>
+                                <span class="o_stat_text">Purchase Order</span>
+                            </div>
+                        </button>
+                        <!-- Invoices smart button -->
+                        <button name="action_view_invoices" type="object"
+                                class="oe_stat_button" icon="fa-file-text-o"
+                                invisible="invoice_count == 0">
+                            <field name="invoice_count" widget="statinfo" string="Invoices"/>
+                        </button>
+                        <!-- Asset Requests smart button -->
+                        <button name="action_view_asset_requests" type="object"
+                                class="oe_stat_button" icon="fa-inbox"
+                                invisible="request_count == 0">
+                            <field name="request_count" widget="statinfo" string="Requests"/>
+                        </button>
+                        <!-- QR Scan Log smart button -->
+                        <button name="action_view_scan_logs" type="object"
+                                class="oe_stat_button" icon="fa-qrcode"
+                                invisible="scan_log_count == 0">
+                            <field name="scan_log_count" widget="statinfo" string="QR Scans"/>
+                        </button>
+                        <!-- Accounting entries smart button (base_accounting_kit) -->
+                        <button name="action_open_accounting_entries" type="object"
+                                class="oe_stat_button" icon="fa-pencil"
+                                invisible="not account_asset_id">
+                            <field name="accounting_entry_count" widget="statinfo" string="Entries"/>
+                        </button>
+                        <!-- Open accounting asset record -->
+                        <button name="action_open_accounting_asset" type="object"
+                                class="oe_stat_button" icon="fa-book"
+                                invisible="not account_asset_id">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Accounting</span>
+                                <span class="o_stat_text">Asset</span>
+                            </div>
+                        </button>
+                        <button type="object" name="action_view_maintenance"
+                                class="oe_stat_button" icon="fa-file"
+                                invisible="document_count == 0">
+                            <field name="document_count" widget="statinfo" string="Documents"/>
+                        </button>
+                    </div>
+
+                    <widget name="web_ribbon" title="Active" bg_color="text-bg-success"
+                            invisible="state != 'active'"/>
+                    <widget name="web_ribbon" title="Under Maintenance" bg_color="text-bg-warning"
+                            invisible="state != 'under_maintenance'"/>
+                    <widget name="web_ribbon" title="Disposed" bg_color="text-bg-danger"
+                            invisible="state != 'disposed'"/>
+                    <widget name="web_ribbon" title="Condemned" bg_color="text-bg-danger"
+                            invisible="state != 'condemned'"/>
+                    <widget name="web_ribbon" title="Lost / Stolen" bg_color="text-bg-danger"
+                            invisible="state != 'lost'"/>
+                    <widget name="web_ribbon" title="Verified" bg_color="text-bg-info"
+                            invisible="state != 'audited'"/>
+
+                    <field name="asset_photo" widget="image" class="oe_avatar"/>
+
+                    <div class="oe_title">
+                        <label for="name" string="Asset Name"/>
+                        <h1><field name="name" placeholder="Asset Name" required="1"/></h1>
+                        <h2 class="text-muted"><field name="asset_code" readonly="1"/></h2>
+                    </div>
+
+                    <group>
+                        <group string="Asset Details">
+                            <field name="category_id" options="{'no_create': True}" required="1"/>
+                            <field name="sub_category" placeholder="e.g. Desktop, Projector"/>
+                            <field name="make" placeholder="e.g. Dell, HP, Samsung"/>
+                            <field name="model_number"/>
+                            <field name="serial_number"/>
+                            <field name="asset_tag"/>
+                            <field name="condition" widget="badge"
+                                   decoration-success="condition == 'new'"
+                                   decoration-warning="condition == 'fair'"
+                                   decoration-danger="condition in ['poor', 'non_functional', 'condemned']"/>
+                        </group>
+                        <group string="Location &amp; Custodian">
+                            <field name="department_id" options="{'no_create': True}"/>
+                            <field name="hod_id" options="{'no_create': True}" string="HOD In-Charge"/>
+                            <field name="building"/>
+                            <field name="floor"/>
+                            <field name="room"/>
+                            <field name="location_id"
+                                   options="{'no_create': True}"
+                                   domain="[('usage','in',['internal','transit'])]"
+                                   help="Inventory warehouse/room location. Updated automatically on asset transfer."/>
+                            <field name="location_name" readonly="1"
+                                   invisible="not location_id"/>
+                            <field name="stock_lot_id"
+                                   options="{'no_create': True}"
+                                   invisible="not serial_number"
+                                   help="Inventory lot linked to this asset's serial number."/>
+                            <field name="assigned_to"/>
+                            <field name="faculty_id"
+                                   options="{'no_create': True}"
+                                   invisible="assigned_to != 'faculty'"/>
+                            <field name="custodian_name"/>
+                            <field name="custodian_contact"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Type, Status &amp; Stock" name="asset_type_stock">
+                            <group>
+                                <group string="Asset Type &amp; Status">
+                                    <field name="asset_type" widget="radio" options="{'horizontal': true}"/>
+                                    <field name="status" widget="badge"
+                                           decoration-success="status == 'available'"
+                                           decoration-danger="status == 'not_available'"
+                                           decoration-warning="status == 'needs_purchase'"
+                                           decoration-info="status == 'in_audit'"/>
+                                    <field name="license_expiry" invisible="asset_type != 'digital'"/>
+                                </group>
+                                <group string="Consumable Stock" invisible="asset_type != 'consumable'">
+                                    <field name="stock_qty"/>
+                                    <field name="min_stock_qty"/>
+                                    <field name="low_stock" readonly="1" widget="boolean_toggle"/>
+                                    <button name="action_open_issue_wizard" string="Issue Stock"
+                                            type="object" class="btn-primary"
+                                            invisible="asset_type != 'consumable'"/>
+                                </group>
+                            </group>
+                        </page>
+                        <!-- Purchase Details -->
+                        <page string="Purchase Details" name="purchase">
+                            <group>
+                                <group string="Purchase Info">
+                                    <field name="purchase_date" widget="date"/>
+                                    <field name="purchase_cost" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="currency_id" invisible="1"/>
+                                    <field name="vendor_id" options="{'no_create': True}"/>
+                                    <field name="purchase_order_id"
+                                           options="{'no_create': True}"
+                                           help="Actual purchase.order this asset was procured from."/>
+                                    <field name="purchase_order_no" readonly="1"
+                                           invisible="purchase_order_id"/>
+                                    <field name="purchase_order_state" readonly="1"
+                                           invisible="not purchase_order_id"
+                                           widget="badge"
+                                           decoration-success="purchase_order_state == 'purchase'"
+                                           decoration-warning="purchase_order_state == 'draft'"/>
+                                    <field name="invoice_no"/>
+                                    <field name="invoice_date" widget="date"/>
+                                    <!-- accounting invoice link -->
+                                    <field name="account_invoice_id"
+                                           options="{'no_create': True}"
+                                           domain="[('move_type','in',['in_invoice','in_refund'])]"
+                                           help="Link to vendor bill in accounting for full GL integration."/>
+                                </group>
+                                <group string="Funding">
+                                    <field name="funded_by"/>
+                                    <field name="grant_reference"
+                                           invisible="funded_by == 'institute'"
+                                           placeholder="Grant no. or scheme name"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- Warranty -->
+                        <page string="Warranty" name="warranty">
+                            <group>
+                                <group string="Warranty Details">
+                                    <field name="warranty_period_months"/>
+                                    <field name="warranty_expiry_date" widget="date" readonly="1"/>
+                                    <field name="is_under_warranty" widget="boolean_toggle" readonly="1"/>
+                                    <field name="warranty_vendor_contact"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- Depreciation / Accounting -->
+                        <page string="Depreciation &amp; Accounting" name="depreciation">
+                            <group>
+                                <group string="Depreciation Settings">
+                                    <field name="depreciation_method"/>
+                                    <field name="useful_life_years"/>
+                                    <field name="residual_value" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="depreciation_rate" widget="float" digits="[6,2]" readonly="1"/>
+                                </group>
+                                <group string="Current Values (from Accounting)">
+                                    <field name="accumulated_depreciation" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"
+                                           readonly="1"/>
+                                    <field name="current_book_value" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"
+                                           readonly="1"/>
+                                    <field name="accounting_value_residual" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"
+                                           readonly="1"
+                                           help="Residual value from the base_accounting_kit depreciation board."/>
+                                </group>
+                            </group>
+                            <!-- Linked accounting asset info -->
+                            <group string="Accounting Asset (base_accounting_kit)"
+                                   invisible="not account_asset_id">
+                                <group>
+                                    <field name="account_asset_id" readonly="1"/>
+                                    <field name="accounting_state" readonly="1" widget="badge"
+                                           decoration-success="accounting_state == 'open'"
+                                           decoration-warning="accounting_state == 'draft'"
+                                           decoration-muted="accounting_state == 'close'"/>
+                                </group>
+                            </group>
+                            <div class="alert alert-info" role="alert"
+                                 invisible="account_asset_id != False">
+                                <i class="fa fa-info-circle"/> Activate this asset to automatically
+                                create the accounting asset record and compute the depreciation board.
+                                Requires the category to have an Accounting Asset Type configured.
+                            </div>
+                        </page>
+
+                        <!-- Maintenance & AMC -->
+                        <page string="Maintenance &amp; AMC" name="maintenance">
+                            <group>
+                                <group string="AMC Details">
+                                    <field name="has_amc" widget="boolean_toggle"/>
+                                    <field name="amc_vendor_id" invisible="not has_amc"
+                                           options="{'no_create': True}"/>
+                                    <field name="amc_start_date" widget="date"
+                                           invisible="not has_amc"/>
+                                    <field name="amc_end_date" widget="date"
+                                           invisible="not has_amc"/>
+                                    <field name="amc_amount" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"
+                                           invisible="not has_amc"/>
+                                    <field name="amc_contact" invisible="not has_amc"/>
+                                </group>
+                                <group string="Service History">
+                                    <field name="last_service_date" widget="date"/>
+                                    <field name="next_service_date" widget="date"/>
+                                    <!-- Budget analytic account (base_account_budget) -->
+                                    <field name="analytic_account_id" readonly="1"
+                                           help="Analytic account from category — maintenance costs posted here appear in budget reports."/>
+                                </group>
+                            </group>
+                            <separator string="Maintenance Records"/>
+                            <field name="maintenance_ids">
+                                <list string="Maintenance History" editable="bottom"
+                                      decoration-success="state == 'completed'"
+                                      decoration-warning="state == 'in_progress'">
+                                    <field name="name" readonly="1"/>
+                                    <field name="maintenance_type"/>
+                                    <field name="request_date"/>
+                                    <field name="priority"/>
+                                    <field name="assigned_to"/>
+                                    <field name="completion_date"/>
+                                    <field name="cost" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'completed'"
+                                           decoration-warning="state == 'in_progress'"
+                                           decoration-info="state == 'assigned'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <!-- Audit -->
+                        <page string="Physical Audit" name="audit">
+                            <group>
+                                <group string="Last Verification">
+                                    <field name="last_audit_date" widget="date"/>
+                                    <field name="last_audit_by" readonly="1"/>
+                                    <field name="is_verified_this_year"
+                                           widget="boolean_toggle" readonly="1"/>
+                                    <field name="audit_remarks"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- Disposal -->
+                        <page string="Disposal" name="disposal"
+                              invisible="state not in ['disposed', 'condemned', 'lost']">
+                            <group>
+                                <group>
+                                    <field name="disposal_date" widget="date" readonly="1"/>
+                                    <field name="disposal_reason"/>
+                                    <field name="disposal_amount" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="disposal_approved_by" readonly="1"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="disposal_remarks" nolabel="1"
+                                       placeholder="Disposal remarks..."/>
+                            </group>
+                        </page>
+
+                        <!-- Documents -->
+                        <page string="Documents" name="documents">
+                            <field name="document_ids">
+                                <list string="Documents" editable="bottom">
+                                    <field name="name"/>
+                                    <field name="document_type"/>
+                                    <field name="document_date"/>
+                                    <field name="attachment_name" readonly="1"/>
+                                    <field name="attachment" widget="binary"/>
+                                    <field name="notes"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <!-- Transfer History -->
+                        <page string="Transfer History" name="transfers"
+                              invisible="transfer_count == 0">
+                            <field name="transfer_ids">
+                                <list string="Transfers">
+                                    <field name="name"/>
+                                    <field name="transfer_date"/>
+                                    <field name="transfer_type"/>
+                                    <field name="from_department_id"/>
+                                    <field name="to_department_id"/>
+                                    <field name="to_location"/>
+                                    <field name="to_location_id" optional="show"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <!-- Asset Requests -->
+                        <page string="Asset Requests" name="asset_requests"
+                              invisible="request_count == 0">
+                            <field name="request_ids">
+                                <list string="Requests" create="0">
+                                    <field name="name"/>
+                                    <field name="requester_id"/>
+                                    <field name="request_date"/>
+                                    <field name="quantity"/>
+                                    <field name="priority" widget="priority"/>
+                                    <field name="helpdesk_ticket_id"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'fulfilled'"
+                                           decoration-danger="state == 'rejected'"
+                                           decoration-warning="state == 'pending_purchase'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <!-- QR Code & Scan Log -->
+                        <page string="QR Code &amp; Scans" name="qr_code">
+                            <group>
+                                <group string="QR Code">
+                                    <field name="qr_code" widget="image"
+                                           class="o_field_image"
+                                           style="max-width:180px"
+                                           readonly="1"
+                                           invisible="not qr_code"/>
+                                    <field name="qr_scan_token" readonly="1"
+                                           string="QR Token"/>
+                                    <field name="last_scan_date" readonly="1"/>
+                                    <button name="action_regenerate_qr"
+                                            string="Regenerate QR Code"
+                                            type="object" class="btn-secondary btn-sm"
+                                            groups="university_management.group_university_admin"/>
+                                </group>
+                                <group string="Scan Summary">
+                                    <field name="scan_log_count" readonly="1" string="Total Scans"/>
+                                </group>
+                            </group>
+                            <field name="scan_log_ids">
+                                <list string="QR Scan History" create="0" edit="0" delete="0">
+                                    <field name="scan_time"/>
+                                    <field name="scanned_by"/>
+                                    <field name="action_taken" widget="badge"/>
+                                    <field name="gps_captured" widget="boolean_toggle"/>
+                                    <field name="gps_lat" optional="hide"/>
+                                    <field name="gps_lng" optional="hide"/>
+                                    <field name="scan_token_valid" widget="boolean_toggle"/>
+                                    <field name="device_info" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <!-- Notes -->
+                        <page string="Notes" name="notes">
+                            <field name="notes" nolabel="1" placeholder="Additional notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════
+         ASSET LIST VIEW
+    ═══════════════════════════════════════════════════════════ -->
+    <record id="asset_view_list" model="ir.ui.view">
+        <field name="name">asset.asset.view.list</field>
+        <field name="model">asset.asset</field>
+        <field name="arch" type="xml">
+            <list string="Assets"
+                  decoration-warning="state == 'under_maintenance'"
+                  decoration-danger="state in ['condemned', 'lost', 'disposed']">
+                <field name="asset_code"/>
+                <field name="name"/>
+                <field name="category_id"/>
+                <field name="make" optional="show"/>
+                <field name="serial_number" optional="show"/>
+                <field name="department_id"/>
+                <field name="room" optional="show"/>
+                <field name="location_id" optional="show" string="Inventory Location"/>
+                <field name="purchase_date" optional="hide"/>
+                <field name="purchase_cost" widget="monetary"
+                       options="{'currency_field': 'currency_id'}" optional="show"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="current_book_value" widget="monetary"
+                       options="{'currency_field': 'currency_id'}" optional="show"/>
+                <field name="purchase_order_id" optional="hide"/>
+                <field name="accounting_state" optional="show" widget="badge"
+                       decoration-success="accounting_state == 'open'"
+                       decoration-warning="accounting_state == 'draft'"
+                       decoration-muted="accounting_state == 'close'"
+                       string="Acctg. Status"/>
+                <field name="condition" widget="badge" optional="show"
+                       decoration-success="condition == 'new'"
+                       decoration-warning="condition == 'fair'"
+                       decoration-danger="condition in ['poor', 'non_functional']"/>
+                <field name="is_under_warranty" optional="show"/>
+                <field name="next_service_date" optional="show"/>
+                <field name="funded_by" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-success="state in ['active', 'audited']"
+                       decoration-warning="state == 'under_maintenance'"
+                       decoration-danger="state in ['disposed', 'condemned', 'lost']"
+                       decoration-info="state == 'transferred'"/>
+                <field name="asset_type" optional="show"/>
+                <field name="status" widget="badge" optional="show"
+                       decoration-success="status == 'available'"
+                       decoration-danger="status == 'not_available'"
+                       decoration-warning="status == 'needs_purchase'"/>
+                <field name="hod_id" optional="show" string="HOD"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════
+         ASSET KANBAN VIEW
+    ═══════════════════════════════════════════════════════════ -->
+    <record id="asset_view_kanban" model="ir.ui.view">
+        <field name="name">asset.asset.view.kanban</field>
+        <field name="model">asset.asset</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="category_id" quick_create="false"
+                    class="o_kanban_small_column">
+                <field name="asset_code"/>
+                <field name="name"/>
+                <field name="category_id"/>
+                <field name="state"/>
+                <field name="condition"/>
+                <field name="department_id"/>
+                <field name="room"/>
+                <field name="current_book_value"/>
+                <field name="currency_id"/>
+                <field name="is_under_warranty"/>
+                <field name="next_service_date"/>
+                <field name="asset_photo"/>
+                <field name="account_asset_id"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click o_kanban_record">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <t t-esc="record.name.value"/>
+                                    </strong>
+                                    <small class="o_kanban_record_subtitle text-muted">
+                                        <t t-esc="record.asset_code.value"/>
+                                    </small>
+                                </div>
+                                <div>
+                                    <field name="state" widget="label_selection"
+                                           options="{'classes': {'active': 'success', 'under_maintenance': 'warning', 'disposed': 'danger', 'audited': 'info'}}"/>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <div>
+                                    <i class="fa fa-map-marker me-1"/>
+                                    <t t-esc="record.department_id.value or '-'"/>
+                                    <t t-if="record.room.value"> — <t t-esc="record.room.value"/></t>
+                                </div>
+                                <div class="mt-1">
+                                    <span class="fw-bold">Book Value: </span>
+                                    <field name="current_book_value" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                </div>
+                                <div class="mt-1" t-if="record.account_asset_id.value">
+                                    <i class="fa fa-book text-muted me-1"/>
+                                    <small class="text-muted">Accounting asset linked</small>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════
+         ASSET SEARCH VIEW
+    ═══════════════════════════════════════════════════════════ -->
+    <record id="asset_view_search" model="ir.ui.view">
+        <field name="name">asset.asset.view.search</field>
+        <field name="model">asset.asset</field>
+        <field name="arch" type="xml">
+            <search string="Search Assets">
+                <field name="name"/>
+                <field name="asset_code"/>
+                <field name="serial_number"/>
+                <field name="asset_tag"/>
+                <field name="category_id"/>
+                <field name="department_id"/>
+                <field name="hod_id" string="HOD In-Charge"/>
+                <field name="make"/>
+                <field name="vendor_id"/>
+                <field name="account_asset_id"/>
+
+                <filter name="filter_available" string="Available" domain="[('status', '=', 'available')]"/>
+                <filter name="filter_not_available" string="Not Available" domain="[('status', '=', 'not_available')]"/>
+                <filter name="filter_needs_purchase" string="Needs Purchase" domain="[('status', '=', 'needs_purchase')]"/>
+                <filter name="filter_consumable" string="Consumables" domain="[('asset_type', '=', 'consumable')]"/>
+                <filter name="filter_low_stock" string="Low Stock" domain="[('low_stock', '=', True)]"/>
+                <separator/>
+                <filter string="Active" name="filter_active"
+                        domain="[('state', '=', 'active')]"/>
+                <filter string="Under Maintenance" name="filter_maintenance"
+                        domain="[('state', '=', 'under_maintenance')]"/>
+                <filter string="Not Verified This Year" name="filter_unverified"
+                        domain="[('is_verified_this_year', '=', False),
+                                 ('state', 'not in', ['disposed', 'condemned', 'lost'])]"/>
+                <filter string="AMC Expiring Soon" name="filter_amc"
+                        domain="[('has_amc', '=', True),
+                                 ('amc_end_date', '&lt;=', (context_today() + relativedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+                <filter string="Warranty Expiring Soon" name="filter_warranty"
+                        domain="[('warranty_expiry_date', '&lt;=', (context_today() + relativedelta(days=30)).strftime('%Y-%m-%d')),
+                                 ('warranty_expiry_date', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Under Warranty" name="filter_under_warranty"
+                        domain="[('is_under_warranty', '=', True)]"/>
+                <filter string="Disposed / Condemned" name="filter_disposed"
+                        domain="[('state', 'in', ['disposed', 'condemned', 'lost'])]"/>
+                <!-- Accounting-kit filters -->
+                <filter string="No Accounting Asset" name="filter_no_acct"
+                        domain="[('account_asset_id', '=', False),
+                                 ('state', 'not in', ['draft'])]"
+                        help="Assets not yet linked to an accounting asset record"/>
+                <filter string="Depreciation Running" name="filter_depr_running"
+                        domain="[('accounting_state', '=', 'open')]"/>
+                <separator/>
+                <filter string="IT Equipment" name="filter_it"
+                        domain="[('category_id.name', 'ilike', 'IT')]"/>
+                <filter string="Lab Equipment" name="filter_lab"
+                        domain="[('category_id.name', 'ilike', 'Lab')]"/>
+                <filter string="Furniture" name="filter_furniture"
+                        domain="[('category_id.name', 'ilike', 'Furniture')]"/>
+                <separator/>
+                <filter string="UGC/AICTE Funded" name="filter_grant"
+                        domain="[('funded_by', 'in', ['ugc', 'aicte', 'government'])]"/>
+
+                <group expand="0" string="Group By">
+                    <filter string="Category" name="group_category"
+                            context="{'group_by': 'category_id'}"/>
+                    <filter string="Department" name="group_department"
+                            context="{'group_by': 'department_id'}"/>
+                    <filter string="Status" name="group_state"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Accounting Status" name="group_acct_state"
+                            context="{'group_by': 'accounting_state'}"/>
+                    <filter string="Funded By" name="group_funded"
+                            context="{'group_by': 'funded_by'}"/>
+                    <filter string="Purchase Year" name="group_year"
+                            context="{'group_by': 'purchase_date:year'}"/>
+                    <filter string="Condition" name="group_condition"
+                            context="{'group_by': 'condition'}"/>
+                    <filter string="HOD" name="group_hod" context="{'group_by': 'hod_id'}"/>
+                    <filter string="Asset Type" name="group_asset_type" context="{'group_by': 'asset_type'}"/>
+                    <filter string="Op. Status" name="group_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════
+         PIVOT & GRAPH VIEWS
+    ═══════════════════════════════════════════════════════════ -->
+    <record id="asset_view_pivot" model="ir.ui.view">
+        <field name="name">asset.asset.view.pivot</field>
+        <field name="model">asset.asset</field>
+        <field name="arch" type="xml">
+            <pivot string="Asset Analysis">
+                <field name="department_id" type="row"/>
+                <field name="category_id" type="col"/>
+                <field name="purchase_cost" type="measure"/>
+                <field name="current_book_value" type="measure"/>
+                <field name="accumulated_depreciation" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="asset_view_graph" model="ir.ui.view">
+        <field name="name">asset.asset.view.graph</field>
+        <field name="model">asset.asset</field>
+        <field name="arch" type="xml">
+            <graph string="Assets by Category" type="bar">
+                <field name="category_id"/>
+                <field name="purchase_cost" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════
+         MAIN ACTION
+    ═══════════════════════════════════════════════════════════ -->
+    <record id="action_asset_asset" model="ir.actions.act_window">
+        <field name="name">Assets</field>
+        <field name="res_model">asset.asset</field>
+        <field name="view_mode">list,kanban,form,pivot,graph</field>
+        <field name="context">{'search_default_filter_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Register your first asset</p>
+            <p>Track all institutional assets — IT equipment, lab instruments,
+               furniture, vehicles and more — with full lifecycle management
+               and accounting depreciation integration.</p>
+        </field>
+    </record>
+
+</odoo>

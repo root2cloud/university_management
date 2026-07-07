@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="mcq_question_bank_view_form" model="ir.ui.view">
+        <field name="name">mcq.question.bank.view.form</field>
+        <field name="model">mcq.question.bank</field>
+        <field name="arch" type="xml">
+            <form string="Question Bank">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_mcq_questions" type="object"
+                                class="oe_stat_button" icon="fa-question-circle"
+                                context="{'default_bank_id': id, 'search_default_bank_id': id}">
+                            <field name="question_count" widget="statinfo" string="Questions"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Unit 1 – OS Fundamentals"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="subject_id"/>
+                            <field name="department_id"/>
+                        </group>
+                        <group>
+                            <field name="program_id"/>
+                            <field name="semester_id"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description" placeholder="Describe the scope and purpose of this question bank…"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="mcq_question_bank_view_list" model="ir.ui.view">
+        <field name="name">mcq.question.bank.view.list</field>
+        <field name="model">mcq.question.bank</field>
+        <field name="arch" type="xml">
+            <list string="Question Banks" decoration-muted="not active">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="subject_id"/>
+                <field name="department_id"/>
+                <field name="semester_id"/>
+                <field name="question_count" string="Questions"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="mcq_question_bank_view_search" model="ir.ui.view">
+        <field name="name">mcq.question.bank.view.search</field>
+        <field name="model">mcq.question.bank</field>
+        <field name="arch" type="xml">
+            <search string="Search Question Banks">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="subject_id"/>
+                <field name="department_id"/>
+                <separator/>
+                <filter string="Active" name="active" domain="[('active','=',True)]"/>
+                <filter string="Archived" name="archived" domain="[('active','=',False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Subject" name="grp_subject" context="{'group_by': 'subject_id'}"/>
+                    <filter string="Department" name="grp_dept" context="{'group_by': 'department_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_mcq_question_bank" model="ir.actions.act_window">
+        <field name="name">Question Banks</field>
+        <field name="res_model">mcq.question.bank</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="mcq_question_bank_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first question bank!
+            </p>
+            <p>Organise your MCQ questions into topic-based banks for easy reuse across exams.</p>
+        </field>
+    </record>
+
+</odoo>

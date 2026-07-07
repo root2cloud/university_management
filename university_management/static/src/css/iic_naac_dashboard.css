@@ -1,0 +1,983 @@
+/* ================================================================
+   IIC & NAAC DASHBOARD — ENTERPRISE GRADE
+   Design: Deep Navy + Teal accent, data-dense, executive-level
+   ================================================================ */
+
+/* ==================== CSS VARIABLES ==================== */
+:root {
+    --iic-navy:        #0f1e3c;
+    --iic-navy-mid:    #1a2f52;
+    --iic-navy-soft:   #243a61;
+    --iic-teal:        #00c9a7;
+    --iic-teal-dark:   #00a68a;
+    --iic-teal-glow:   rgba(0, 201, 167, 0.18);
+    --iic-gold:        #f5b731;
+    --iic-gold-dark:   #d4961a;
+    --iic-surface:     #f0f4f8;
+    --iic-card:        #ffffff;
+    --iic-border:      #e1e8f0;
+    --iic-text:        #1a2535;
+    --iic-text-mid:    #4a5a72;
+    --iic-text-light:  #8298b4;
+    --iic-radius:      14px;
+    --iic-radius-sm:   8px;
+    --iic-shadow:      0 4px 24px rgba(15,30,60,0.09);
+    --iic-shadow-lg:   0 12px 48px rgba(15,30,60,0.14);
+    --iic-transition:  all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Status colours */
+    --status-green:  #10b981;
+    --status-amber:  #f59e0b;
+    --status-red:    #ef4444;
+    --status-blue:   #3b82f6;
+    --status-purple: #8b5cf6;
+    --status-orange: #f97316;
+}
+
+/* ==================== IIC DASHBOARD SHELL ==================== */
+.o_iic_dashboard,
+.o_naac_dashboard {
+    background: var(--iic-surface);
+    min-height: 100vh;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: var(--iic-text);
+}
+
+/* ==================== HERO HEADER ==================== */
+.iic-hero-header {
+    background: linear-gradient(135deg, var(--iic-navy) 0%, var(--iic-navy-soft) 60%, #1e4080 100%);
+    border-radius: var(--iic-radius);
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--iic-shadow-lg);
+}
+
+.iic-hero-header::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 220px; height: 220px;
+    background: radial-gradient(circle, rgba(0,201,167,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.iic-hero-header::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: 30%;
+    width: 300px; height: 150px;
+    background: radial-gradient(ellipse, rgba(245,183,49,0.08) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.iic-hero-header h2 {
+    color: #ffffff;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 4px;
+}
+
+.iic-hero-header .subtitle {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+.iic-header-badge {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    backdrop-filter: blur(8px);
+    color: #ffffff;
+    border-radius: 40px;
+    padding: 8px 20px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.iic-header-badge .quarter-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: var(--iic-teal);
+    border-radius: 50%;
+    margin-right: 7px;
+    animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.5; transform: scale(1.3); }
+}
+
+/* ==================== KPI CARDS ==================== */
+.iic-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+@media (max-width: 1100px) { .iic-kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px)  { .iic-kpi-grid { grid-template-columns: 1fr; } }
+
+.iic-kpi-card {
+    background: var(--iic-card);
+    border-radius: var(--iic-radius);
+    padding: 22px 24px;
+    box-shadow: var(--iic-shadow);
+    border: 1px solid var(--iic-border);
+    position: relative;
+    overflow: hidden;
+    transition: var(--iic-transition);
+    cursor: default;
+}
+
+.iic-kpi-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--iic-shadow-lg);
+}
+
+.iic-kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: var(--iic-radius) var(--iic-radius) 0 0;
+}
+
+.iic-kpi-card.kpi-blue::before   { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+.iic-kpi-card.kpi-green::before  { background: linear-gradient(90deg, #10b981, #34d399); }
+.iic-kpi-card.kpi-teal::before   { background: linear-gradient(90deg, var(--iic-teal), #33e8c7); }
+.iic-kpi-card.kpi-gold::before   { background: linear-gradient(90deg, var(--iic-gold), #fcd34d); }
+.iic-kpi-card.kpi-purple::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+.iic-kpi-card.kpi-red::before    { background: linear-gradient(90deg, #ef4444, #f87171); }
+
+.iic-kpi-icon {
+    width: 44px; height: 44px;
+    border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.15rem;
+    margin-bottom: 14px;
+    flex-shrink: 0;
+}
+
+.kpi-blue   .iic-kpi-icon { background: #eff6ff; color: #3b82f6; }
+.kpi-green  .iic-kpi-icon { background: #f0fdf4; color: #10b981; }
+.kpi-teal   .iic-kpi-icon { background: var(--iic-teal-glow); color: var(--iic-teal-dark); }
+.kpi-gold   .iic-kpi-icon { background: #fffbeb; color: var(--iic-gold-dark); }
+.kpi-purple .iic-kpi-icon { background: #f5f3ff; color: #8b5cf6; }
+.kpi-red    .iic-kpi-icon { background: #fef2f2; color: #ef4444; }
+
+.iic-kpi-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--iic-text-light);
+    margin-bottom: 6px;
+}
+
+.iic-kpi-value {
+    font-size: 2.1rem;
+    font-weight: 800;
+    color: var(--iic-text);
+    line-height: 1;
+    letter-spacing: -0.03em;
+}
+
+.iic-kpi-sub {
+    font-size: 0.73rem;
+    color: var(--iic-text-light);
+    margin-top: 6px;
+}
+
+/* ==================== SECTION CARDS ==================== */
+.iic-section-card {
+    background: var(--iic-card);
+    border-radius: var(--iic-radius);
+    box-shadow: var(--iic-shadow);
+    border: 1px solid var(--iic-border);
+    overflow: hidden;
+    margin-bottom: 20px;
+    transition: var(--iic-transition);
+}
+
+.iic-section-card:hover {
+    box-shadow: var(--iic-shadow-lg);
+}
+
+.iic-card-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--iic-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fafbfc;
+}
+
+.iic-card-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--iic-text-mid);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.iic-card-title .title-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--iic-teal);
+}
+
+.iic-card-body {
+    padding: 24px;
+}
+
+/* ==================== CHARTS GRID ==================== */
+.iic-charts-grid {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 900px) { .iic-charts-grid { grid-template-columns: 1fr; } }
+
+.iic-chart-wrap {
+    position: relative;
+    height: 240px;
+}
+
+/* ==================== EVENTS TABLE ==================== */
+.iic-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.83rem;
+}
+
+.iic-table thead tr {
+    background: #f8fafc;
+}
+
+.iic-table th {
+    padding: 11px 16px;
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--iic-text-light);
+    border-bottom: 1px solid var(--iic-border);
+    white-space: nowrap;
+}
+
+.iic-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    color: var(--iic-text);
+    vertical-align: middle;
+}
+
+.iic-table tbody tr {
+    transition: background 0.15s;
+}
+
+.iic-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.iic-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Totals footer row */
+.iic-table tfoot tr td {
+    border-top: 2px solid var(--iic-border);
+    border-bottom: none;
+    background: #f8fafc;
+    font-weight: 700;
+    font-size: 0.78rem;
+    color: var(--iic-text-mid);
+    padding: 10px 16px;
+}
+
+/* Clickable rows — name cell underlines on hover */
+.iic-table tbody tr[style*="cursor:pointer"]:hover {
+    background: #f0f9ff;
+}
+.iic-table tbody tr[style*="cursor:pointer"]:hover td:first-child {
+    color: var(--iic-teal-dark);
+    text-decoration: underline;
+    text-decoration-color: rgba(0, 166, 138, 0.35);
+}
+
+/* Second KPI row (attendance row) sits closer to the first */
+.iic-kpi-grid + .iic-kpi-grid {
+    margin-top: -8px;
+}
+
+/* ==================== BADGES / STATUS PILLS ==================== */
+.iic-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.iic-badge::before {
+    content: '';
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.7;
+}
+
+.badge-planning        { background: #f1f5f9; color: #475569; }
+.badge-poster_pending  { background: #fef9c3; color: #854d0e; }
+.badge-poster_approved { background: #fef3c7; color: #92400e; }
+.badge-ongoing         { background: #fef3c7; color: #92400e; }
+.badge-completed       { background: #d1fae5; color: #065f46; }
+.badge-report_pending  { background: #dbeafe; color: #1e40af; }
+.badge-report_approved { background: #bbf7d0; color: #14532d; }
+.badge-archived        { background: #f1f5f9; color: #64748b; }
+.badge-mandatory       { background: #ede9fe; color: #5b21b6; }
+.badge-self_driven     { background: #fce7f3; color: #9d174d; }
+.badge-workshop        { background: #e0f2fe; color: #075985; }
+.badge-seminar         { background: #f0fdf4; color: #14532d; }
+.badge-innovation_talk { background: #fef9c3; color: #854d0e; }
+.badge-entrepreneurship{ background: #ffedd5; color: #9a3412; }
+.badge-hackathon       { background: #f0fdf4; color: #166534; }
+.badge-other           { background: #f8fafc; color: #64748b; }
+
+/* ==================== QUARTER PROGRESS BARS ==================== */
+.iic-quarter-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+}
+
+@media (max-width: 700px) { .iic-quarter-grid { grid-template-columns: repeat(2, 1fr); } }
+
+.iic-quarter-tile {
+    background: var(--iic-surface);
+    border-radius: var(--iic-radius-sm);
+    padding: 16px;
+    text-align: center;
+    border: 1px solid var(--iic-border);
+    transition: var(--iic-transition);
+}
+
+.iic-quarter-tile:hover {
+    background: var(--iic-card);
+    box-shadow: var(--iic-shadow);
+}
+
+.iic-quarter-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--iic-text-light);
+    margin-bottom: 8px;
+}
+
+.iic-quarter-total {
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: var(--iic-text);
+    line-height: 1;
+}
+
+.iic-quarter-sub {
+    font-size: 0.7rem;
+    color: var(--iic-text-light);
+    margin-top: 4px;
+}
+
+/* Attendance line inside quarter tile */
+.iic-quarter-attendance {
+    font-size: 0.68rem;
+    color: var(--iic-teal-dark);
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+.iic-quarter-bar {
+    height: 4px;
+    background: var(--iic-border);
+    border-radius: 4px;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+.iic-quarter-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--iic-teal), #33e8c7);
+    border-radius: 4px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==================== IIC COMPLIANCE BADGE (hero header) ==================== */
+.iic-compliance-badge {
+    text-align: center;
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 12px;
+    padding: 10px 18px;
+    min-width: 90px;
+}
+
+.iic-compliance-badge .compliance-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1;
+    letter-spacing: -0.02em;
+}
+
+.iic-compliance-badge .compliance-label {
+    font-size: 0.67rem;
+    color: rgba(255,255,255,0.55);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 3px;
+}
+
+.iic-hero-header .gap-3 { gap: 12px !important; }
+
+/* ==================== IIC ATTENDANCE BREAKDOWN TABS ==================== */
+/* Tab switcher buttons inside .iic-card-header */
+.iic-card-header .iic-tab-btn {
+    font-size: 0.72rem;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    border: 1px solid var(--iic-border);
+    background: transparent;
+    color: var(--iic-text-mid);
+    cursor: pointer;
+    transition: var(--iic-transition);
+    line-height: 1.6;
+}
+
+.iic-card-header .iic-tab-btn:hover {
+    border-color: var(--iic-teal);
+    color: var(--iic-teal-dark);
+    background: var(--iic-teal-glow);
+}
+
+.iic-card-header .iic-tab-btn.active,
+.iic-card-header .btn-primary {
+    background: var(--iic-teal);
+    border-color: var(--iic-teal);
+    color: #fff;
+}
+
+.iic-card-header .iic-tab-btn.active:hover,
+.iic-card-header .btn-primary:hover {
+    background: var(--iic-teal-dark);
+    border-color: var(--iic-teal-dark);
+}
+
+/* Odoo btn-sm resets for tab context */
+.iic-card-header .btn-sm {
+    font-size: 0.72rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    transition: var(--iic-transition);
+}
+
+.iic-card-header .btn-outline-secondary {
+    border-color: var(--iic-border);
+    color: var(--iic-text-mid);
+}
+
+.iic-card-header .btn-outline-secondary:hover {
+    background: var(--iic-teal-glow);
+    border-color: var(--iic-teal);
+    color: var(--iic-teal-dark);
+}
+
+/* ==================== IIC INLINE PROGRESS BAR (attendance table) ==================== */
+/* Used inside table cells for per-event / dept / batch participation % */
+.iic-inline-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: flex-end;
+}
+
+.iic-inline-bar-track {
+    width: 56px;
+    height: 5px;
+    background: var(--iic-border);
+    border-radius: 4px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.iic-inline-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--iic-teal), #33e8c7);
+    border-radius: 4px;
+    transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.iic-inline-bar-fill.bar-batch {
+    background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+}
+
+.iic-inline-bar-pct {
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: var(--iic-text-mid);
+    min-width: 38px;
+    text-align: right;
+}
+
+/* Department / batch breakdown bar (full width, inside card body) */
+.iic-breakdown-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.iic-breakdown-bar-track {
+    flex: 1;
+    height: 6px;
+    background: var(--iic-border);
+    border-radius: 4px;
+    overflow: hidden;
+    min-width: 80px;
+}
+
+.iic-breakdown-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(90deg, var(--iic-teal), #33e8c7);
+}
+
+.iic-breakdown-bar-fill.bar-dept  { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+.iic-breakdown-bar-fill.bar-batch { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+
+.iic-breakdown-bar-pct {
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: var(--iic-text-mid);
+    min-width: 40px;
+    text-align: right;
+}
+
+/* ==================== NAAC HERO BANNER ==================== */
+.naac-hero-header {
+    background: linear-gradient(135deg, #0a1628 0%, #12234a 50%, #1a3060 100%);
+    border-radius: var(--iic-radius);
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--iic-shadow-lg);
+}
+
+.naac-hero-header::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: 60px;
+    width: 250px; height: 250px;
+    background: radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.naac-hero-header::after {
+    content: '';
+    position: absolute;
+    bottom: -50px; left: 20%;
+    width: 320px; height: 180px;
+    background: radial-gradient(ellipse, rgba(0,201,167,0.1) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.naac-hero-header h2 {
+    color: #ffffff;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 4px;
+}
+
+.naac-hero-header .subtitle {
+    color: rgba(255,255,255,0.55);
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+/* ==================== NAAC READINESS RING ==================== */
+.naac-readiness-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 16px;
+    padding: 14px 22px;
+    min-width: 130px;
+    backdrop-filter: blur(8px);
+}
+
+.naac-readiness-pct {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1;
+    letter-spacing: -0.03em;
+}
+
+.naac-readiness-pct.good   { color: #34d399; }
+.naac-readiness-pct.avg    { color: #fbbf24; }
+.naac-readiness-pct.poor   { color: #f87171; }
+
+.naac-readiness-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+}
+
+/* ==================== NAAC KPI GRID (6 COLS) ==================== */
+.naac-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+@media (max-width: 1200px) { .naac-kpi-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 700px)  { .naac-kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+
+.naac-kpi-card {
+    background: var(--iic-card);
+    border-radius: var(--iic-radius);
+    padding: 18px 20px;
+    box-shadow: var(--iic-shadow);
+    border: 1px solid var(--iic-border);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: var(--iic-transition);
+}
+
+.naac-kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--iic-shadow-lg);
+}
+
+.naac-kpi-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--iic-radius);
+    opacity: 0.04;
+    pointer-events: none;
+}
+
+.naac-kpi-card.nc-blue   { border-top: 3px solid #3b82f6; }
+.naac-kpi-card.nc-green  { border-top: 3px solid #10b981; }
+.naac-kpi-card.nc-teal   { border-top: 3px solid var(--iic-teal); }
+.naac-kpi-card.nc-gray   { border-top: 3px solid #94a3b8; }
+.naac-kpi-card.nc-dark   { border-top: 3px solid #334155; }
+.naac-kpi-card.nc-amber  { border-top: 3px solid #f59e0b; }
+
+.naac-kpi-value {
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: var(--iic-text);
+    line-height: 1;
+    letter-spacing: -0.03em;
+}
+
+.nc-blue  .naac-kpi-value { color: #3b82f6; }
+.nc-green .naac-kpi-value { color: #10b981; }
+.nc-teal  .naac-kpi-value { color: var(--iic-teal-dark); }
+.nc-amber .naac-kpi-value { color: #d97706; }
+
+.naac-kpi-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--iic-text-light);
+    margin-top: 6px;
+}
+
+/* ==================== NAAC CRITERIA BARS ==================== */
+.naac-criteria-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.naac-criterion-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: start;
+}
+
+.naac-criterion-info {
+    min-width: 0;
+}
+
+.naac-criterion-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--iic-text);
+    margin-bottom: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.naac-criterion-bar-track {
+    height: 8px;
+    background: var(--iic-border);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+}
+
+.naac-criterion-bar-fill {
+    height: 100%;
+    border-radius: 8px;
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 2%;
+}
+
+.bar-good   { background: linear-gradient(90deg, #10b981, #34d399); }
+.bar-avg    { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.bar-poor   { background: linear-gradient(90deg, #ef4444, #f87171); }
+
+.naac-criterion-meta {
+    font-size: 0.68rem;
+    color: var(--iic-text-light);
+    margin-top: 4px;
+}
+
+.naac-criterion-score {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.naac-criterion-pct {
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.naac-criterion-pct.good  { color: #10b981; }
+.naac-criterion-pct.avg   { color: #f59e0b; }
+.naac-criterion-pct.poor  { color: #ef4444; }
+
+.naac-criterion-cnt {
+    font-size: 0.67rem;
+    color: var(--iic-text-light);
+    margin-top: 2px;
+}
+
+/* ==================== DEPT READINESS TABLE ==================== */
+.naac-dept-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.83rem;
+}
+
+.naac-dept-table th {
+    padding: 10px 16px;
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--iic-text-light);
+    border-bottom: 2px solid var(--iic-border);
+    background: #f8fafc;
+    white-space: nowrap;
+}
+
+.naac-dept-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.naac-dept-table tbody tr:hover { background: #fafbfc; }
+.naac-dept-table tbody tr:last-child td { border-bottom: none; }
+
+.naac-dept-name {
+    font-weight: 600;
+    color: var(--iic-text);
+    font-size: 0.83rem;
+}
+
+.naac-dept-progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.naac-dept-bar-track {
+    flex: 1;
+    height: 6px;
+    background: var(--iic-border);
+    border-radius: 6px;
+    overflow: hidden;
+    min-width: 80px;
+}
+
+.naac-dept-bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.8s ease;
+}
+
+.naac-dept-pct {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--iic-text-mid);
+    min-width: 36px;
+    text-align: right;
+}
+
+/* ==================== TWO-COL LAYOUT ==================== */
+.iic-two-col {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 1000px) { .iic-two-col { grid-template-columns: 1fr; } }
+
+/* ==================== EMPTY STATE ==================== */
+.iic-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--iic-text-light);
+}
+
+.iic-empty i {
+    font-size: 2.5rem;
+    opacity: 0.3;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.iic-empty p {
+    font-size: 0.82rem;
+    margin: 0;
+}
+
+/* ==================== LOADING OVERLAY ==================== */
+.iic-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    gap: 16px;
+    color: var(--iic-text-light);
+}
+
+.iic-spinner {
+    width: 36px; height: 36px;
+    border: 3px solid var(--iic-border);
+    border-top-color: var(--iic-teal);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ==================== NAAC ACTIVITY LIST ==================== */
+.naac-activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.naac-activity-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.15s;
+}
+
+.naac-activity-item:last-child { border-bottom: none; }
+.naac-activity-item:hover { background: #f8fafc; }
+
+.naac-activity-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.dot-verified   { background: #10b981; }
+.dot-submitted  { background: #3b82f6; }
+.dot-draft      { background: #94a3b8; }
+.dot-rejected   { background: #ef4444; }
+
+.naac-activity-name {
+    flex: 1;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--iic-text);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.naac-activity-meta {
+    font-size: 0.72rem;
+    color: var(--iic-text-light);
+    white-space: nowrap;
+}
+
+/* ==================== SECTION DIVIDER ==================== */
+.iic-row {
+    display: grid;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.iic-row.cols-2 { grid-template-columns: 1fr 1fr; }
+.iic-row.cols-3 { grid-template-columns: 2fr 1fr 1fr; }
+
+@media (max-width: 900px) {
+    .iic-row.cols-2,
+    .iic-row.cols-3 { grid-template-columns: 1fr; }
+}

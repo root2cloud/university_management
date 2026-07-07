@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         FORM VIEW
+    ═══════════════════════════════════════════════════════════════════ -->
+    <record id="student_counselling_session_view_form" model="ir.ui.view">
+        <field name="name">student.counselling.session.view.form</field>
+        <field name="model">student.counselling.session</field>
+        <field name="arch" type="xml">
+            <form string="Counselling Session">
+                <header>
+                    <button name="action_complete"
+                            string="Mark Completed"
+                            type="object"
+                            class="oe_highlight"
+                            invisible="state != 'scheduled'"
+                            confirm="Mark this counselling session as completed?"/>
+                    <button name="action_no_show"
+                            string="No Show"
+                            type="object"
+                            invisible="state != 'scheduled'"
+                            confirm="Mark applicant as no-show for this session?"/>
+                    <button name="action_reschedule"
+                            string="Reschedule"
+                            type="object"
+                            invisible="state not in ['no_show', 'cancelled']"/>
+                    <button name="action_cancel"
+                            string="Cancel"
+                            type="object"
+                            invisible="state in ['completed', 'cancelled']"/>
+                    <button name="action_schedule_calendar_event"
+                            string="Add to Calendar"
+                            type="object"
+                            icon="fa-calendar"
+                            invisible="calendar_event_id"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="scheduled,completed"/>
+                </header>
+
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button type="object"
+                                name="action_schedule_calendar_event"
+                                class="oe_stat_button"
+                                icon="fa-calendar"
+                                invisible="not calendar_event_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Calendar</span>
+                                <span class="o_stat_text">Event</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <widget name="web_ribbon" title="Completed"
+                            bg_color="text-bg-success"
+                            invisible="state != 'completed'"/>
+                    <widget name="web_ribbon" title="No Show"
+                            bg_color="text-bg-warning"
+                            invisible="state != 'no_show'"/>
+                    <widget name="web_ribbon" title="Cancelled"
+                            bg_color="text-bg-secondary"
+                            invisible="state != 'cancelled'"/>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="display_name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Session Details">
+                            <field name="enquiry_id"
+                                   options="{'no_create': True}"
+                                   required="1"/>
+                            <field name="applicant_name" readonly="1"/>
+                            <field name="session_number" readonly="1"/>
+                            <field name="counsellor_id"
+                                   options="{'no_create': True}"
+                                   required="1"/>
+                        </group>
+                        <group string="When &amp; How">
+                            <field name="session_date" widget="datetime" required="1"/>
+                            <field name="duration" widget="float_time"
+                                   string="Duration (hrs)"/>
+                            <field name="session_mode" required="1"/>
+                            <field name="calendar_event_id" readonly="1"
+                                   invisible="not calendar_event_id"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Program Discussed">
+                            <field name="program_discussed_id"
+                                   options="{'no_create': True}"/>
+                            <field name="alternate_program_discussed_id"
+                                   options="{'no_create': True}"/>
+                            <field name="seats_available_snapshot" readonly="1"
+                                   invisible="not program_discussed_id"/>
+                        </group>
+                        <group string="Eligibility">
+                            <field name="eligibility_status" widget="radio"/>
+                            <field name="eligibility_notes"
+                                   placeholder="Eligibility decision notes..."
+                                   invisible="eligibility_status == 'pending'"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Academic Profile" name="academic">
+                            <group>
+                                <group string="As Discussed in This Session">
+                                    <field name="qualification_discussed"/>
+                                    <field name="percentage_discussed"/>
+                                </group>
+                                <group string="Entrance Exam">
+                                    <field name="entrance_exam_name"
+                                           placeholder="JEE / KCET / COMEDK / NEET"/>
+                                    <field name="entrance_exam_score"/>
+                                    <field name="entrance_exam_rank"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Discussion &amp; Outcome" name="outcome">
+                            <group>
+                                <group string="Fee &amp; Scholarship">
+                                    <field name="fee_discussed"
+                                           widget="boolean_toggle"/>
+                                    <field name="fee_concerns"
+                                           invisible="not fee_discussed"
+                                           placeholder="Fee concerns raised..."/>
+                                    <field name="scholarship_discussed"
+                                           widget="boolean_toggle"/>
+                                </group>
+                                <group string="Outcome">
+                                    <field name="outcome"/>
+                                    <field name="follow_up_date" widget="date"
+                                           invisible="outcome not in ['needs_follow_up', 'considering', 'interested']"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="discussion_notes"
+                                       placeholder="What was discussed — program features, career scope, hostel/transport, placement record, concerns raised..."
+                                       nolabel="1"/>
+                            </group>
+                            <group string="Next Action">
+                                <field name="next_action"
+                                       placeholder="e.g. Send fee structure PDF, Call after entrance results, Schedule parent meeting..."
+                                       nolabel="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         LIST VIEW
+    ═══════════════════════════════════════════════════════════════════ -->
+    <record id="student_counselling_session_view_list" model="ir.ui.view">
+        <field name="name">student.counselling.session.view.list</field>
+        <field name="model">student.counselling.session</field>
+        <field name="arch" type="xml">
+            <list string="Counselling Sessions"
+                  decoration-success="state == 'completed'"
+                  decoration-warning="state == 'no_show'">
+                <field name="session_date" widget="datetime"/>
+                <field name="session_number" string="#"/>
+                <field name="applicant_name"/>
+                <field name="enquiry_id"/>
+                <field name="counsellor_id"/>
+                <field name="session_mode"/>
+                <field name="program_discussed_id"/>
+                <field name="eligibility_status" widget="badge"
+                       decoration-success="eligibility_status == 'eligible'"
+                       decoration-warning="eligibility_status == 'conditional'"
+                       decoration-danger="eligibility_status == 'not_eligible'"
+                       decoration-info="eligibility_status == 'pending'"/>
+                <field name="outcome" widget="badge"
+                       decoration-success="outcome in ['interested', 'seat_blocked', 'applied']"
+                       decoration-danger="outcome in ['not_interested', 'chose_competitor']"
+                       decoration-warning="outcome in ['needs_follow_up', 'considering']"
+                       optional="show"/>
+                <field name="follow_up_date" optional="show"/>
+                <field name="duration" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'completed'"
+                       decoration-warning="state == 'no_show'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         CALENDAR VIEW — counsellor's session diary
+    ═══════════════════════════════════════════════════════════════════ -->
+    <record id="student_counselling_session_view_calendar" model="ir.ui.view">
+        <field name="name">student.counselling.session.view.calendar</field>
+        <field name="model">student.counselling.session</field>
+        <field name="arch" type="xml">
+            <calendar string="Counselling Calendar"
+                      date_start="session_date"
+                      date_stop="session_date"
+                      color="counsellor_id"
+                      event_limit="5"
+                      quick_create="false">
+                <field name="applicant_name"/>
+                <field name="program_discussed_id"/>
+                <field name="session_mode"/>
+                <field name="counsellor_id" filters="1" invisible="1"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         PIVOT VIEW — counsellor performance
+    ═══════════════════════════════════════════════════════════════════ -->
+    <record id="student_counselling_session_view_pivot" model="ir.ui.view">
+        <field name="name">student.counselling.session.view.pivot</field>
+        <field name="model">student.counselling.session</field>
+        <field name="arch" type="xml">
+            <pivot string="Session Analysis">
+                <field name="counsellor_id" type="row"/>
+                <field name="outcome" type="col"/>
+                <field name="session_number" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         GRAPH VIEW
+    ═══════════════════════════════════════════════════════════════════ -->
+    <record id="student_counselling_session_view_graph" model="ir.ui.view">
+        <field name="name">student.counselling.session.view.graph</field>
+        <field name="model">student.counselling.session</field>
+        <field name="arch" type="xml">
+            <graph string="Sessions by Counsellor" type="bar">
+                <field name="counsellor_id"/>
+                <field name="state"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         SEARCH VIEW
+    ═══════════════════════════════════════════════════════════════════ -->
+    <record id="student_counselling_session_view_search" model="ir.ui.view">
+        <field name="name">student.counselling.session.view.search</field>
+        <field name="model">student.counselling.session</field>
+        <field name="arch" type="xml">
+            <search string="Search Sessions">
+                <field name="applicant_name"/>
+                <field name="enquiry_id"/>
+                <field name="counsellor_id"/>
+                <field name="program_discussed_id"/>
+
+                <filter string="Scheduled" name="filter_scheduled"
+                        domain="[('state', '=', 'scheduled')]"/>
+                <filter string="Completed" name="filter_completed"
+                        domain="[('state', '=', 'completed')]"/>
+                <filter string="No Show" name="filter_no_show"
+                        domain="[('state', '=', 'no_show')]"/>
+                <separator/>
+                <filter string="Today" name="filter_today"
+                        domain="[('session_date', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0))),
+                                 ('session_date', '&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59)))]"/>
+                <filter string="This Week" name="filter_week"
+                        domain="[('session_date', '&gt;=', (context_today() - relativedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                <filter string="Follow-up Due" name="filter_followup"
+                        domain="[('follow_up_date', '&lt;=', context_today().strftime('%Y-%m-%d')),
+                                 ('state', '=', 'completed')]"/>
+                <separator/>
+                <filter string="My Sessions" name="filter_mine"
+                        domain="[('counsellor_id', '=', uid)]"/>
+
+                <group expand="0" string="Group By">
+                    <filter string="Counsellor" name="group_counsellor"
+                            context="{'group_by': 'counsellor_id'}"/>
+                    <filter string="Program" name="group_program"
+                            context="{'group_by': 'program_discussed_id'}"/>
+                    <filter string="Outcome" name="group_outcome"
+                            context="{'group_by': 'outcome'}"/>
+                    <filter string="Status" name="group_state"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Session Date" name="group_date"
+                            context="{'group_by': 'session_date:week'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         ACTION
+    ═══════════════════════════════════════════════════════════════════ -->
+    <record id="action_student_counselling_session" model="ir.actions.act_window">
+        <field name="name">Counselling Sessions</field>
+        <field name="res_model">student.counselling.session</field>
+        <field name="view_mode">calendar,list,form,pivot,graph</field>
+        <field name="context">{'search_default_filter_mine': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No counselling sessions yet
+            </p>
+            <p>
+                Record every counselling session with prospective students.
+                Track program discussions, eligibility assessments, and
+                outcomes to build a complete picture of each applicant's journey.
+            </p>
+        </field>
+    </record>
+
+</odoo>

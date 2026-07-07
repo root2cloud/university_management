@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- ══════════════════════════════════════════════
+         HR LEAVE TYPES — one per faculty leave type
+    ══════════════════════════════════════════════ -->
+    <record id="hr_leave_type_casual" model="hr.leave.type">
+        <field name="name">Casual Leave</field>
+        <field name="request_unit">day</field>
+        <field name="leave_validation_type">both</field>
+        <field name="requires_allocation">no</field>
+        <field name="active">True</field>
+    </record>
+    <record id="hr_leave_type_sick" model="hr.leave.type">
+        <field name="name">Sick Leave</field>
+        <field name="request_unit">day</field>
+        <field name="leave_validation_type">both</field>
+        <field name="requires_allocation">no</field>
+        <field name="active">True</field>
+    </record>
+    <record id="hr_leave_type_earned" model="hr.leave.type">
+        <field name="name">Earned Leave</field>
+        <field name="request_unit">day</field>
+        <field name="leave_validation_type">both</field>
+        <field name="requires_allocation">yes</field>
+        <field name="active">True</field>
+    </record>
+    <record id="hr_leave_type_maternity" model="hr.leave.type">
+        <field name="name">Maternity Leave</field>
+        <field name="request_unit">day</field>
+        <field name="leave_validation_type">both</field>
+        <field name="requires_allocation">no</field>
+        <field name="active">True</field>
+    </record>
+    <record id="hr_leave_type_paternity" model="hr.leave.type">
+        <field name="name">Paternity Leave</field>
+        <field name="request_unit">day</field>
+        <field name="leave_validation_type">both</field>
+        <field name="requires_allocation">no</field>
+        <field name="active">True</field>
+    </record>
+    <record id="hr_leave_type_compensatory" model="hr.leave.type">
+        <field name="name">Compensatory Off</field>
+        <field name="request_unit">day</field>
+        <field name="leave_validation_type">both</field>
+        <field name="requires_allocation">yes</field>
+        <field name="active">True</field>
+    </record>
+    <record id="hr_leave_type_unpaid" model="hr.leave.type">
+        <field name="name">Leave Without Pay</field>
+        <field name="request_unit">day</field>
+        <field name="leave_validation_type">both</field>
+        <field name="requires_allocation">no</field>
+        <field name="active">True</field>
+    </record>
+    <record id="hr_leave_type_sabbatical" model="hr.leave.type">
+        <field name="name">Sabbatical Leave</field>
+        <field name="request_unit">day</field>
+        <field name="leave_validation_type">both</field>
+        <field name="requires_allocation">no</field>
+        <field name="active">True</field>
+    </record>
+    <record id="hr_leave_type_study" model="hr.leave.type">
+        <field name="name">Study Leave</field>
+        <field name="request_unit">day</field>
+        <field name="leave_validation_type">both</field>
+        <field name="requires_allocation">no</field>
+        <field name="active">True</field>
+    </record>
+    <record id="hr_leave_type_emergency" model="hr.leave.type">
+        <field name="name">Emergency Leave</field>
+        <field name="request_unit">day</field>
+        <field name="leave_validation_type">both</field>
+        <field name="requires_allocation">no</field>
+        <field name="active">True</field>
+    </record>
+
+
+        <!-- ══════════════════════════════════════════════
+         PAYROLL STRUCTURE TYPE
+    ══════════════════════════════════════════════ -->
+    <record id="faculty_payroll_structure_type" model="hr.payroll.structure.type">
+        <field name="name">Faculty</field>
+        <field name="wage_type">monthly</field>
+    </record>
+
+    <!-- ══════════════════════════════════════════════
+         PAYROLL STRUCTURE
+    ══════════════════════════════════════════════ -->
+    <record id="faculty_payroll_structure" model="hr.payroll.structure">
+        <field name="name">Faculty Salary Structure</field>
+        <field name="type_id" ref="faculty_payroll_structure_type"/>
+    </record>
+
+    <!-- ══════════════════════════════════════════════
+         PAYSLIP INPUT TYPES — one per salary component code
+    ══════════════════════════════════════════════ -->
+    <record id="input_type_basic" model="hr.payslip.input.type">
+        <field name="name">Basic Salary</field>
+        <field name="code">BASIC</field>
+    </record>
+    <record id="input_type_hra" model="hr.payslip.input.type">
+        <field name="name">House Rent Allowance</field>
+        <field name="code">HRA</field>
+    </record>
+    <record id="input_type_da" model="hr.payslip.input.type">
+        <field name="name">Dearness Allowance</field>
+        <field name="code">DA</field>
+    </record>
+    <record id="input_type_special_allowance" model="hr.payslip.input.type">
+        <field name="name">Special Allowance</field>
+        <field name="code">SP_ALLOW</field>
+    </record>
+    <record id="input_type_transport" model="hr.payslip.input.type">
+        <field name="name">Transport Allowance</field>
+        <field name="code">TRANS</field>
+    </record>
+    <record id="input_type_medical" model="hr.payslip.input.type">
+        <field name="name">Medical Allowance</field>
+        <field name="code">MED</field>
+    </record>
+    <record id="input_type_other_allowances" model="hr.payslip.input.type">
+        <field name="name">Other Allowances</field>
+        <field name="code">OTHER_ALL</field>
+    </record>
+    <record id="input_type_bonus" model="hr.payslip.input.type">
+        <field name="name">Performance Bonus</field>
+        <field name="code">BONUS</field>
+    </record>
+    <record id="input_type_overtime" model="hr.payslip.input.type">
+        <field name="name">Overtime Pay</field>
+        <field name="code">OT_PAY</field>
+    </record>
+    <record id="input_type_pf" model="hr.payslip.input.type">
+        <field name="name">Provident Fund</field>
+        <field name="code">PF</field>
+    </record>
+    <record id="input_type_esi" model="hr.payslip.input.type">
+        <field name="name">ESI</field>
+        <field name="code">ESI</field>
+    </record>
+    <record id="input_type_pt" model="hr.payslip.input.type">
+        <field name="name">Professional Tax</field>
+        <field name="code">PT</field>
+    </record>
+    <record id="input_type_tds" model="hr.payslip.input.type">
+        <field name="name">Income Tax (TDS)</field>
+        <field name="code">TDS</field>
+    </record>
+    <record id="input_type_lwp" model="hr.payslip.input.type">
+        <field name="name">Leave Without Pay Deduction</field>
+        <field name="code">LWP_DED</field>
+    </record>
+
+</odoo>

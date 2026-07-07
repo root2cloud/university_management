@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- REPORT ACTION — NAAC Department Activity Report              -->
+    <!-- ============================================================ -->
+    <record id="action_report_naac_activity_full" model="ir.actions.report">
+        <field name="name">NAAC Department Activity Report (Full)</field>
+        <field name="model">naac.department.activity</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">university_management.report_naac_activity_full_template</field>
+        <field name="report_file">university_management.report_naac_activity_full_template</field>
+        <field name="print_report_name">'NAAC_Activity_%s' % (object.reference)</field>
+        <field name="binding_model_id" ref="model_naac_department_activity"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_naac_activity_full_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="text-center mb-3">
+                            <h3 class="fw-bold">NAAC DEPARTMENT ACTIVITY REPORT</h3>
+                            <p class="text-muted">For NAAC Accreditation Documentation</p>
+                            <hr/>
+                        </div>
+
+                        <table class="table table-bordered mb-4">
+                            <tbody>
+                                <tr>
+                                    <td class="fw-bold bg-light" style="width:30%">Reference</td>
+                                    <td><t t-esc="doc.reference"/></td>
+                                    <td class="fw-bold bg-light" style="width:30%">Activity Date</td>
+                                    <td><t t-esc="doc.activity_date"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold bg-light">Activity Title</td>
+                                    <td colspan="3"><strong><t t-esc="doc.name"/></strong></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold bg-light">Activity Type</td>
+                                    <td><t t-esc="doc.activity_type.replace('_',' ').title() if doc.activity_type else '-'"/></td>
+                                    <td class="fw-bold bg-light">Department</td>
+                                    <td><t t-esc="doc.department_id.name if doc.department_id else '-'"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold bg-light">NAAC Criterion</td>
+                                    <td><t t-esc="doc.criterion_id.display_name if doc.criterion_id else '-'"/></td>
+                                    <td class="fw-bold bg-light">Metric</td>
+                                    <td><t t-esc="doc.metric_id.display_name if doc.metric_id else '-'"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold bg-light">Faculty In-charge</td>
+                                    <td><t t-esc="doc.faculty_id.name if doc.faculty_id else '-'"/></td>
+                                    <td class="fw-bold bg-light">Academic Year</td>
+                                    <td><t t-esc="doc.academic_year_id or '-'"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold bg-light">Participants</td>
+                                    <td><t t-esc="doc.participants_count"/></td>
+                                    <td class="fw-bold bg-light">Venue</td>
+                                    <td><t t-esc="doc.venue or '-'"/></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold bg-light">Status</td>
+                                    <td colspan="3">
+                                        <span t-attf-class="badge bg-{{ doc.state == 'verified' and 'success' or doc.state == 'submitted' and 'warning' or 'secondary' }}">
+                                            <t t-esc="doc.state.capitalize()"/>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="mb-3" t-if="doc.description">
+                            <h5 class="fw-bold border-bottom pb-1">Description</h5>
+                            <div t-raw="doc.description"/>
+                        </div>
+
+                        <div class="mb-3" t-if="doc.outcomes">
+                            <h5 class="fw-bold border-bottom pb-1">Outcome / Impact</h5>
+                            <p><t t-esc="doc.outcomes"/></p>
+                        </div>
+
+                        <div class="mb-3" t-if="doc.evidence_ids">
+                            <h5 class="fw-bold border-bottom pb-1">Supporting Evidence (<t t-esc="doc.evidence_count"/> files)</h5>
+                            <table class="table table-sm table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Title</th>
+                                        <th>Document Type</th>
+                                        <th>Verified</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="doc.evidence_ids" t-as="ev">
+                                        <tr>
+                                            <td><t t-esc="ev_index + 1"/></td>
+                                            <td><t t-esc="ev.name"/></td>
+                                            <td><t t-esc="ev.doc_type.replace('_',' ').title() if ev.doc_type else '-'"/></td>
+                                            <td><t t-if="ev.is_verified">&#10003; Yes</t><t t-else="">Pending</t></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-4 text-center">
+                                <div style="border-top:1px solid #000; padding-top:5px;">Faculty In-charge</div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div style="border-top:1px solid #000; padding-top:5px;">HOD</div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div style="border-top:1px solid #000; padding-top:5px;">NAAC Coordinator</div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- ============================================================ -->
+    <!-- REPORT ACTION — NAAC AQAR PDF                                -->
+    <!-- ============================================================ -->
+    <record id="action_report_naac_aqar_full" model="ir.actions.report">
+        <field name="name">NAAC AQAR Report (Full)</field>
+        <field name="model">naac.aqar</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">university_management.report_naac_aqar_full_template</field>
+        <field name="report_file">university_management.report_naac_aqar_full_template</field>
+        <field name="print_report_name">'NAAC_AQAR_%s' % (object.academic_year_id.name or object.name)</field>
+        <field name="binding_model_id" ref="model_naac_aqar"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_naac_aqar_full_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <!-- Cover Page -->
+                        <div class="text-center mb-5" style="padding-top:80px;">
+                            <h1 class="display-5 fw-bold">ANNUAL QUALITY ASSURANCE REPORT</h1>
+                            <h2>(AQAR)</h2>
+                            <h3 class="mt-3">Academic Year: <t t-esc="doc.academic_year_id or '-'"/></h3>
+                            <p class="lead mt-4"><t t-esc="doc.institute_name or 'Institution'"/></p>
+                            <p>Submitted to NAAC, Bengaluru</p>
+                            <p class="text-muted">Reference: <t t-esc="doc.name"/></p>
+                        </div>
+                        <hr/>
+
+                        <!-- Key Institutional Data -->
+                        <div class="mb-4">
+                            <h4 class="fw-bold">Key Institutional Data</h4>
+                            <table class="table table-bordered">
+                                <tbody>
+                                    <tr>
+                                        <td class="fw-bold bg-light" style="width:40%">NAAC ID</td>
+                                        <td><t t-esc="doc.naac_id or '-'"/></td>
+                                        <td class="fw-bold bg-light" style="width:40%">Accreditation Grade</td>
+                                        <td><t t-esc="doc.accreditation_grade or '-'"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold bg-light">Total Faculty</td>
+                                        <td><t t-esc="doc.total_faculty"/></td>
+                                        <td class="fw-bold bg-light">Total Students</td>
+                                        <td><t t-esc="doc.total_students"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold bg-light">Total Programs</td>
+                                        <td><t t-esc="doc.total_programs"/></td>
+                                        <td class="fw-bold bg-light">Placement %</td>
+                                        <td><t t-esc="'%.1f%%' % doc.placement_percentage"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold bg-light">Research Papers Published</td>
+                                        <td><t t-esc="doc.research_papers"/></td>
+                                        <td class="fw-bold bg-light">Patents Filed</td>
+                                        <td><t t-esc="doc.patents_filed"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold bg-light">IQAC Coordinator</td>
+                                        <td colspan="3"><t t-esc="doc.iqac_coordinator.name if doc.iqac_coordinator else '-'"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Criterion 1 -->
+                        <t t-if="doc.criterion1_summary">
+                            <div class="page-break"/>
+                            <h4 class="fw-bold border-bottom pb-2">Criterion 1: Curricular Aspects</h4>
+                            <div class="mb-4" t-raw="doc.criterion1_summary"/>
+                        </t>
+
+                        <!-- Criterion 2 -->
+                        <t t-if="doc.criterion2_summary">
+                            <h4 class="fw-bold border-bottom pb-2">Criterion 2: Teaching Learning &amp; Evaluation</h4>
+                            <div class="mb-4" t-raw="doc.criterion2_summary"/>
+                        </t>
+
+                        <!-- Criterion 3 -->
+                        <t t-if="doc.criterion3_summary">
+                            <h4 class="fw-bold border-bottom pb-2">Criterion 3: Research, Innovation &amp; Extension</h4>
+                            <div class="mb-4" t-raw="doc.criterion3_summary"/>
+                        </t>
+
+                        <!-- Criterion 4 -->
+                        <t t-if="doc.criterion4_summary">
+                            <h4 class="fw-bold border-bottom pb-2">Criterion 4: Infrastructure &amp; Learning Resources</h4>
+                            <div class="mb-4" t-raw="doc.criterion4_summary"/>
+                        </t>
+
+                        <!-- Criterion 5 -->
+                        <t t-if="doc.criterion5_summary">
+                            <h4 class="fw-bold border-bottom pb-2">Criterion 5: Student Support &amp; Progression</h4>
+                            <div class="mb-4" t-raw="doc.criterion5_summary"/>
+                        </t>
+
+                        <!-- Criterion 6 -->
+                        <t t-if="doc.criterion6_summary">
+                            <h4 class="fw-bold border-bottom pb-2">Criterion 6: Governance, Leadership &amp; Management</h4>
+                            <div class="mb-4" t-raw="doc.criterion6_summary"/>
+                        </t>
+
+                        <!-- Criterion 7 -->
+                        <t t-if="doc.criterion7_summary">
+                            <h4 class="fw-bold border-bottom pb-2">Criterion 7: Institutional Values &amp; Best Practices</h4>
+                            <div class="mb-4" t-raw="doc.criterion7_summary"/>
+                        </t>
+
+                        <!-- Notes -->
+                        <t t-if="doc.notes">
+                            <h4 class="fw-bold border-bottom pb-2">Additional Notes</h4>
+                            <div class="mb-4"><t t-esc="doc.notes"/></div>
+                        </t>
+
+                        <!-- Sign off -->
+                        <div class="row mt-5">
+                            <div class="col-4 text-center">
+                                <div style="border-top:1px solid #000; padding-top:5px;">IQAC Director</div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div style="border-top:1px solid #000; padding-top:5px;">Principal / Director</div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div style="border-top:1px solid #000; padding-top:5px;">Coordinator NAAC</div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

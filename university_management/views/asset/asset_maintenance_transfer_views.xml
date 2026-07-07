@@ -1,0 +1,438 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ═══════════════════════════════════════════════════════
+         MAINTENANCE VIEWS
+    ═══════════════════════════════════════════════════════════ -->
+    <record id="asset_maintenance_view_form" model="ir.ui.view">
+        <field name="name">asset.maintenance.view.form</field>
+        <field name="model">asset.maintenance</field>
+        <field name="arch" type="xml">
+            <form string="Maintenance Request">
+                <header>
+                    <button name="action_assign" string="Assign" type="object"
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_start" string="Start Work" type="object"
+                            class="oe_highlight" invisible="state != 'assigned'"/>
+                    <button name="action_complete" string="Mark Completed" type="object"
+                            class="oe_highlight" invisible="state != 'in_progress'"
+                            confirm="Mark maintenance as completed?"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state in ['completed', 'cancelled']"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,assigned,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <!-- Open linked vendor bill (base_accounting_kit) -->
+                        <button name="action_open_vendor_bill" type="object"
+                                class="oe_stat_button" icon="fa-file-text-o"
+                                invisible="not maintenance_invoice_id">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Vendor</span>
+                                <span class="o_stat_text">Bill</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Asset">
+                            <field name="asset_id" options="{'no_create': True}" required="1"/>
+                            <field name="asset_code" readonly="1"/>
+                            <field name="category_id" readonly="1"/>
+                            <field name="department_id" readonly="1"/>
+                            <!-- Budget analytic account (base_account_budget) -->
+                            <field name="analytic_account_id" readonly="1"
+                                   help="Analytic account from asset category — costs tagged here appear in budget reports."/>
+                        </group>
+                        <group string="Request Details">
+                            <field name="maintenance_type" required="1"/>
+                            <field name="priority" widget="priority"/>
+                            <field name="request_date" widget="date" required="1"/>
+                            <field name="requested_by" options="{'no_create': True}"/>
+                            <field name="faculty_id" options="{'no_create': True}"/>
+                        </group>
+                    </group>
+                    <group string="Problem Description">
+                        <field name="problem_description" nolabel="1"
+                               placeholder="Describe the problem or work required..."
+                               required="1"/>
+                    </group>
+                    <group>
+                        <group string="Assignment">
+                            <field name="assigned_to" options="{'no_create': True}"/>
+                            <field name="vendor_id" options="{'no_create': True}"/>
+                            <field name="scheduled_date" widget="date"/>
+                        </group>
+                        <group string="Completion">
+                            <field name="completion_date" widget="date" readonly="1"/>
+                            <field name="cost" widget="monetary"
+                                   options="{'currency_field': 'currency_id'}"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="invoice_no"/>
+                            <field name="next_service_date" widget="date"/>
+                        </group>
+                    </group>
+                    <group string="Work Done">
+                        <field name="work_done" nolabel="1"
+                               placeholder="Details of work done..."/>
+                    </group>
+                    <group string="Parts Replaced">
+                        <field name="parts_replaced" nolabel="1"
+                               placeholder="List of spare parts or consumables used..."/>
+                    </group>
+
+                    <!-- Accounting integration (base_accounting_kit) -->
+                    <group string="Accounting (base_accounting_kit)">
+                        <group>
+                            <field name="maintenance_invoice_id"
+                                   options="{'no_create': True}"
+                                   domain="[('move_type','in',['in_invoice','in_refund'])]"
+                                   help="Link to the vendor bill so the cost hits the correct GL account."/>
+                            <field name="maintenance_invoice_state" readonly="1" widget="badge"
+                                   decoration-success="maintenance_invoice_state == 'posted'"
+                                   decoration-warning="maintenance_invoice_state == 'draft'"
+                                   invisible="not maintenance_invoice_id"/>
+                        </group>
+                        <group>
+                            <button name="action_create_vendor_bill"
+                                    string="Create Vendor Bill"
+                                    type="object"
+                                    class="btn btn-secondary"
+                                    invisible="maintenance_invoice_id != False or state != 'completed'"
+                                    help="Auto-create a vendor bill with the maintenance cost, analytic account, and expense GL account pre-filled."/>
+                        </group>
+                    </group>
+
+                    <group string="Faculty Feedback"
+                           invisible="state != 'completed'">
+                        <field name="feedback"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="asset_maintenance_view_list" model="ir.ui.view">
+        <field name="name">asset.maintenance.view.list</field>
+        <field name="model">asset.maintenance</field>
+        <field name="arch" type="xml">
+            <list string="Maintenance Requests"
+                  decoration-success="state == 'completed'"
+                  decoration-warning="state == 'in_progress'"
+                  decoration-danger="priority == 'critical' and state != 'completed'">
+                <field name="name"/>
+                <field name="asset_id"/>
+                <field name="category_id"/>
+                <field name="department_id"/>
+                <field name="maintenance_type"/>
+                <field name="priority" widget="priority"/>
+                <field name="request_date"/>
+                <field name="assigned_to" optional="show"/>
+                <field name="scheduled_date" optional="show"/>
+                <field name="completion_date" optional="show"/>
+                <field name="cost" widget="monetary"
+                       options="{'currency_field': 'currency_id'}" optional="show"/>
+                <field name="currency_id" column_invisible="1"/>
+                <!-- Accounting bill status -->
+                <field name="maintenance_invoice_id" optional="show" string="Vendor Bill"/>
+                <field name="maintenance_invoice_state" optional="show" widget="badge"
+                       decoration-success="maintenance_invoice_state == 'posted'"
+                       decoration-warning="maintenance_invoice_state == 'draft'"
+                       string="Bill Status"/>
+                <field name="analytic_account_id" optional="hide" string="Analytic"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'completed'"
+                       decoration-warning="state == 'in_progress'"
+                       decoration-info="state == 'assigned'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="asset_maintenance_view_search" model="ir.ui.view">
+        <field name="name">asset.maintenance.view.search</field>
+        <field name="model">asset.maintenance</field>
+        <field name="arch" type="xml">
+            <search string="Search Maintenance">
+                <field name="name"/>
+                <field name="asset_id"/>
+                <field name="category_id"/>
+                <field name="department_id"/>
+                <field name="vendor_id"/>
+                <filter string="No Vendor Bill" name="filter_no_bill"
+                        domain="[('maintenance_invoice_id','=',False),('state','=','completed')]"
+                        help="Completed maintenance with no accounting bill linked"/>
+                <filter string="Bill Not Posted" name="filter_draft_bill"
+                        domain="[('maintenance_invoice_state','=','draft')]"/>
+                <filter string="Pending" name="filter_pending"
+                        domain="[('state','in',['draft','assigned','in_progress'])]"/>
+                <filter string="Completed" name="filter_completed"
+                        domain="[('state','=','completed')]"/>
+                <separator/>
+                <filter string="Critical" name="filter_critical"
+                        domain="[('priority','=','critical')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Asset" name="group_asset"
+                        context="{'group_by': 'asset_id'}"/>
+                    <filter string="Category" name="group_category"
+                            context="{'group_by': 'category_id'}"/>
+                    <filter string="Department" name="group_department"
+                            context="{'group_by': 'department_id'}"/>
+                    <filter string="Status" name="group_state"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Type" name="group_type"
+                            context="{'group_by': 'maintenance_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_asset_maintenance" model="ir.actions.act_window">
+        <field name="name">Maintenance Requests</field>
+        <field name="res_model">asset.maintenance</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="asset_maintenance_view_search"/>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════
+         TRANSFER VIEWS
+    ═══════════════════════════════════════════════════════════ -->
+    <record id="asset_transfer_view_form" model="ir.ui.view">
+        <field name="name">asset.transfer.view.form</field>
+        <field name="model">asset.transfer</field>
+        <field name="arch" type="xml">
+            <form string="Asset Transfer">
+                <header>
+                    <button name="action_submit" string="Submit for Approval"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_approve" string="Approve" type="object"
+                            class="oe_highlight" invisible="state != 'pending'"
+                            groups="university_management.group_university_admin"/>
+                    <button name="action_complete" string="Complete Transfer"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'approved'"
+                            confirm="Complete this transfer? Asset location will be updated."/>
+                    <button name="action_return" string="Return Asset"
+                            type="object"
+                            invisible="state != 'completed' or transfer_type != 'temporary'"
+                            confirm="Mark asset as returned?"/>
+                    <button name="action_reject" string="Reject" type="object"
+                            invisible="state != 'pending'"
+                            groups="university_management.group_university_admin"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,pending,approved,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Asset">
+                            <field name="asset_id" required="1"
+                                   options="{'no_create': True}"/>
+                            <field name="transfer_type" required="1"/>
+                            <field name="transfer_date" widget="date" required="1"/>
+                            <field name="return_date" widget="date"
+                                   invisible="transfer_type != 'temporary'"
+                                   required="transfer_type == 'temporary'"/>
+                            <field name="requested_by"/>
+                        </group>
+                        <group string="Approval">
+                            <field name="approved_by" readonly="1"/>
+                            <field name="approval_date" widget="date" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="From">
+                            <field name="from_department_id" options="{'no_create': True}"/>
+                            <field name="from_location"/>
+                            <field name="from_custodian"/>
+                            <field name="from_faculty_id" options="{'no_create': True}"/>
+                        </group>
+                        <group string="To">
+                            <field name="to_department_id" options="{'no_create': True}"
+                                   required="1"/>
+                            <field name="to_location" required="1"/>
+                            <field name="to_custodian"/>
+                            <field name="to_faculty_id" options="{'no_create': True}"/>
+                        </group>
+                    </group>
+                    <group string="Reason">
+                        <field name="reason" nolabel="1" required="1"
+                               placeholder="Reason for transfer..."/>
+                    </group>
+                    <!-- Info: accounting asset note updated on complete -->
+                    <div class="alert alert-info" role="alert"
+                         invisible="state in ['completed','returned','rejected']">
+                        <i class="fa fa-info-circle"/>
+                        When this transfer is completed, the location change will also be
+                        recorded in the linked accounting asset record (base_accounting_kit).
+                    </div>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="asset_transfer_view_list" model="ir.ui.view">
+        <field name="name">asset.transfer.view.list</field>
+        <field name="model">asset.transfer</field>
+        <field name="arch" type="xml">
+            <list string="Asset Transfers">
+                <field name="name"/>
+                <field name="asset_id"/>
+                <field name="transfer_date"/>
+                <field name="transfer_type"/>
+                <field name="from_department_id"/>
+                <field name="to_department_id"/>
+                <field name="to_location"/>
+                <field name="approved_by" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'completed'"
+                       decoration-warning="state == 'pending'"
+                       decoration-info="state == 'approved'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_asset_transfer" model="ir.actions.act_window">
+        <field name="name">Asset Transfers</field>
+        <field name="res_model">asset.transfer</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════
+         AUDIT SESSION VIEWS
+    ═══════════════════════════════════════════════════════════ -->
+    <record id="asset_audit_session_view_form" model="ir.ui.view">
+        <field name="name">asset.audit.session.view.form</field>
+        <field name="model">asset.audit.session</field>
+        <field name="arch" type="xml">
+            <form string="Physical Audit Session">
+                <header>
+                    <button name="action_start" string="Start Audit"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_generate_lines" string="Load Assets"
+                            type="object"
+                            invisible="state == 'completed'"
+                            confirm="This will load all active assets for verification. Continue?"/>
+                    <button name="action_complete" string="Complete Audit"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'in_progress'"
+                            confirm="Complete audit and update all verified assets (including their accounting records)?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button type="object" name="action_start"
+                                class="oe_stat_button" icon="fa-check-circle">
+                            <div class="o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="verified_count"/>/<field name="total_assets"/>
+                                </span>
+                                <span class="o_stat_text">Verified</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Audit Details">
+                            <field name="audit_year"/>
+                            <field name="audit_type"/>
+                            <field name="start_date" widget="date" required="1"/>
+                            <field name="end_date" widget="date" readonly="1"/>
+                            <field name="conducted_by"/>
+                        </group>
+                        <group string="Statistics">
+                            <field name="total_assets" readonly="1"/>
+                            <field name="verified_count" readonly="1"/>
+                            <field name="missing_count" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="department_ids" widget="many2many_tags"
+                               options="{'no_create': True}"
+                               string="Departments to Audit"/>
+                    </group>
+                    <!-- Info about accounting sync -->
+                    <div class="alert alert-info" role="alert"
+                         invisible="state == 'completed'">
+                        <i class="fa fa-info-circle"/>
+                        On completion, verified and missing statuses are written to both
+                        <b>asset.asset</b> and the linked <b>account.asset.asset</b>
+                        records (base_accounting_kit), creating a full audit trail in accounting.
+                    </div>
+                    <separator string="Asset Verification List"/>
+                    <field name="audit_line_ids">
+                        <list string="Assets to Verify" editable="bottom"
+                              decoration-success="status == 'found'"
+                              decoration-danger="status == 'not_found'"
+                              decoration-warning="status == 'found_damaged'">
+                            <field name="asset_code" readonly="1"/>
+                            <field name="asset_id" readonly="1"/>
+                            <field name="category_id" readonly="1"/>
+                            <field name="has_accounting_asset" readonly="1"
+                                   widget="boolean" string="Acctg. Linked"
+                                   optional="show"/>
+                            <field name="expected_location"/>
+                            <field name="actual_location"/>
+                            <field name="status" widget="badge"
+                                   decoration-success="status == 'found'"
+                                   decoration-danger="status == 'not_found'"
+                                   decoration-warning="status == 'found_damaged'"/>
+                            <field name="verified_by" optional="show"/>
+                            <field name="verification_date" optional="show"/>
+                            <field name="remarks"/>
+                            <button name="action_mark_found" string="Found"
+                                    type="object" icon="fa-check"
+                                    invisible="status != 'pending'"/>
+                            <button name="action_mark_not_found" string="Missing"
+                                    type="object" icon="fa-times"
+                                    invisible="status != 'pending'"/>
+                        </list>
+                    </field>
+                    <group string="Overall Remarks">
+                        <field name="remarks" nolabel="1"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="asset_audit_session_view_list" model="ir.ui.view">
+        <field name="name">asset.audit.session.view.list</field>
+        <field name="model">asset.audit.session</field>
+        <field name="arch" type="xml">
+            <list string="Audit Sessions">
+                <field name="name"/>
+                <field name="audit_year"/>
+                <field name="audit_type"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="conducted_by"/>
+                <field name="total_assets"/>
+                <field name="verified_count"/>
+                <field name="missing_count"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'completed'"
+                       decoration-warning="state == 'in_progress'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_asset_audit_session" model="ir.actions.act_window">
+        <field name="name">Physical Audit Sessions</field>
+        <field name="res_model">asset.audit.session</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

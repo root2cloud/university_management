@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── Seat Blocking Reference Sequence ──────────────────────────
+         Format: SB/2026/00001
+         Resets every year via date_range = True
+    ─────────────────────────────────────────────────────────────────── -->
+    <record id="seq_student_seat_blocking" model="ir.sequence">
+        <field name="name">Student Seat Blocking</field>
+        <field name="code">student.seat.blocking</field>
+        <field name="prefix">%(year)s/</field>
+        <field name="padding">5</field>
+        <field name="number_increment">1</field>
+        <field name="use_date_range">True</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <!-- ── Scheduled Action: Auto-expire seat blockings ──────────────
+         Runs daily at midnight.
+         Calls StudentSeatBlocking._cron_expire_seat_blockings()
+    ─────────────────────────────────────────────────────────────────── -->
+    <record id="cron_expire_seat_blockings" model="ir.cron">
+        <field name="name">Expire Overdue Seat Blockings</field>
+        <field name="model_id" ref="model_student_seat_blocking"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_expire_seat_blockings()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+        <field name="user_id" ref="base.user_root"/>
+    </record>
+
+</odoo>

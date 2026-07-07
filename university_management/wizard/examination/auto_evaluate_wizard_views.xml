@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="wizard_auto_evaluate_exam_view_form" model="ir.ui.view">
+        <field name="name">wizard.auto.evaluate.exam.view.form</field>
+        <field name="model">wizard.auto.evaluate.exam</field>
+        <field name="arch" type="xml">
+            <form string="Auto Evaluate Exam Attempts">
+                <group>
+                    <field name="online_exam_id" readonly="done"/>
+                    <field name="state_filter" widget="radio" readonly="done"/>
+                </group>
+
+                <div class="alert alert-success" invisible="not done">
+                    <i class="fa fa-check-circle me-2"/>
+                    <strong><field name="evaluated_count" readonly="1"/></strong>
+                    attempt(s) have been evaluated successfully.
+                </div>
+
+                <footer>
+                    <button name="action_evaluate" type="object"
+                            string="Evaluate Now"
+                            class="oe_highlight"
+                            invisible="done"/>
+                    <button string="Close" class="btn-default" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_wizard_auto_evaluate_exam" model="ir.actions.act_window">
+        <field name="name">Auto Evaluate Attempts</field>
+        <field name="res_model">wizard.auto.evaluate.exam</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

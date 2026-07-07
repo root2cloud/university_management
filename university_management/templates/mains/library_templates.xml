@@ -1,0 +1,500 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Library Main Page Template -->
+        <template id="library_page" name="Library Page">
+            <t t-call="website.layout">
+                <div id="wrap" class="oe_structure">
+                    <div class="container mt-4">
+                        <!-- Header Section -->
+                        <div class="row mb-5">
+                            <div class="col-12 text-center">
+                                <h1 class="display-4 text-primary">University Library</h1>
+                                <p class="lead">Explore our vast collection of books, journals, and resources</p>
+                            </div>
+                        </div>
+
+                        <!-- Quick Stats -->
+                        <div class="row mb-5">
+                            <div class="col-md-3 mb-3">
+                                <div class="card text-center h-100 border-0">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <i class="fa fa-book fa-3x text-primary"/>
+                                        </div>
+                                        <h3 class="card-title">
+                                            <t t-set="total_books" t-value="request.env['library.book'].sudo().search_count([('active', '=', True)])"/>
+                                            <t t-esc="total_books"/>
+                                        </h3>
+                                        <p class="card-text">Total Books</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card text-center h-100 border-0">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <i class="fa fa-check-circle fa-3x text-success"/>
+                                        </div>
+                                        <h3 class="card-title">
+                                            <t t-set="available_books" t-value="request.env['library.book'].sudo().search_count([('active', '=', True), ('available_copies', '&gt;', 0)])"/>
+                                            <t t-esc="available_books"/>
+                                        </h3>
+                                        <p class="card-text">Available Now</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card text-center h-100 border-0">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <i class="fa fa-users fa-3x text-info"/>
+                                        </div>
+                                        <h3 class="card-title">
+                                            <t t-set="total_authors" t-value="request.env['library.author'].sudo().search_count([('active', '=', True)])"/>
+                                            <t t-esc="total_authors"/>
+                                        </h3>
+                                        <p class="card-text">Authors</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card text-center h-100 border-0">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <i class="fa fa-bookmark fa-3x text-warning"/>
+                                        </div>
+                                        <h3 class="card-title">
+                                            <t t-set="total_categories" t-value="request.env['library.category'].sudo().search_count([('active', '=', True)])"/>
+                                            <t t-esc="total_categories"/>
+                                        </h3>
+                                        <p class="card-text">Categories</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Featured Books -->
+                        <div class="row mb-5">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h2>Featured Books</h2>
+                                    <a href="/library/books" class="btn btn-outline-primary">
+                                        View All Books <i class="fa fa-arrow-right ms-2"/>
+                                    </a>
+                                </div>
+
+                                <t t-set="featured_books" t-value="request.env['library.book'].sudo().search([('active', '=', True), ('available_copies', '&gt;', 0)], limit=6, order='create_date desc')"/>
+
+                                <div class="row">
+                                    <t t-foreach="featured_books" t-as="book">
+                                        <t t-if="book">
+                                            <div class="col-md-4 col-lg-2 mb-4">
+                                                <div class="card h-100 shadow-sm">
+                                                    <div class="card-img-top text-center p-3 bg-light">
+                                                        <t t-if="book.cover_image">
+                                                            <img t-att-src="'data:image/png;base64,%s' % book.cover_image.decode('utf-8')"
+                                                                 alt="Book Cover"
+                                                                 style="max-height: 150px; object-fit: contain;"/>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <i class="fa fa-book fa-5x text-muted"/>
+                                                        </t>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <h6 class="card-title" style="height: 60px; overflow: hidden;">
+                                                            <t t-esc="book.title or 'Untitled'"/>
+                                                        </h6>
+                                                        <p class="card-text text-muted small">
+                                                            <t t-esc="book.primary_author or 'Unknown Author'"/>
+                                                        </p>
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <span t-att-class="book.available_copies and 'badge bg-success' or 'badge bg-danger'">
+                                                                <t t-esc="book.available_copies"/> available
+                                                            </span>
+                                                            <a t-att-href="'/library/books?search=' + (book.title or '')"
+                                                               class="btn btn-sm btn-outline-primary">
+                                                                View
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Library Services -->
+                        <div class="row mb-5">
+                            <div class="col-12">
+                                <h2 class="mb-4">Library Services</h2>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card h-100">
+                                            <div class="card-body text-center">
+                                                <div class="mb-3">
+                                                    <i class="fa fa-search fa-3x text-primary"/>
+                                                </div>
+                                                <h5 class="card-title">Book Search</h5>
+                                                <p class="card-text">Search through our extensive collection of books, journals, and digital resources</p>
+                                                <a href="/library/books" class="btn btn-primary">Search Now</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card h-100">
+                                            <div class="card-body text-center">
+                                                <div class="mb-3">
+                                                    <i class="fa fa-clock-o fa-3x text-warning"/>
+                                                </div>
+                                                <h5 class="card-title">Opening Hours</h5>
+                                                <p class="card-text">
+                                                    <strong>Mon-Fri:</strong> 8:00 AM - 10:00 PM<br/>
+                                                    <strong>Sat-Sun:</strong> 9:00 AM - 8:00 PM<br/>
+                                                    <strong>Holidays:</strong> 10:00 AM - 6:00 PM
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card h-100">
+                                            <div class="card-body text-center">
+                                                <div class="mb-3">
+                                                    <i class="fa fa-question-circle fa-3x text-info"/>
+                                                </div>
+                                                <h5 class="card-title">Need Help?</h5>
+                                                <p class="card-text">Our librarians are available to assist you with research, citations, and finding resources</p>
+                                                <a href="/contact" class="btn btn-outline-primary">Contact Us</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Call to Action -->
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <div class="jumbotron bg-light p-5 rounded">
+                                    <h3 class="mb-3">Start Exploring</h3>
+                                    <p class="lead mb-4">Browse our complete collection of books and resources</p>
+                                    <a href="/library/books" class="btn btn-primary btn-lg">
+                                        <i class="fa fa-book me-2"/>
+                                        Browse All Books
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <!-- Library Books Browse Page Template -->
+        <template id="library_books_page" name="Library Books Page">
+            <t t-call="website.layout">
+                <div id="wrap" class="oe_structure">
+                    <div class="container mt-4 mb-5">
+                        <!-- Header -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb">
+                                        <li class="breadcrumb-item">
+                                            <a href="/">Home</a>
+                                        </li>
+                                        <li class="breadcrumb-item">
+                                            <a href="/library">Library</a>
+                                        </li>
+                                        <li class="breadcrumb-item active" aria-current="page">Books</li>
+                                    </ol>
+                                </nav>
+                                <h1 class="display-5 mb-3">Browse Books</h1>
+                                <p class="lead">Explore our collection of available books</p>
+                            </div>
+                        </div>
+
+                        <!-- Search and Filter Section -->
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                <form method="get" action="/library/books" class="d-flex">
+                                    <div class="input-group">
+                                        <input type="text"
+                                               name="search"
+                                               class="form-control"
+                                               placeholder="Search by title or author..."
+                                               t-att-value="search"/>
+                                        <button class="btn btn-primary" type="submit">
+                                            <i class="fa fa-search"/>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <form method="get" action="/library/books" class="d-flex">
+                                    <input type="hidden" name="search" t-att-value="search"/>
+                                    <select name="category" class="form-select" onchange="this.form.submit()">
+                                        <option value="">All Categories</option>
+                                        <t t-foreach="categories" t-as="category">
+                                            <option t-att-value="category.id" t-att-selected="selected_category == category.id">
+                                                <t t-esc="category.name or ''"/>
+                                                <t t-if="category.total_books &gt; 0">
+                                                    (<t t-esc="category.total_books"/>)
+                                                </t>
+                                            </option>
+                                        </t>
+                                    </select>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Results Count -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <div class="alert alert-light" role="alert">
+                                    <t t-if="search">
+                                        <strong><t t-esc="len(books)"/></strong> results for "<t t-esc="search"/>"
+                                        <t t-if="selected_category">
+                                            <t t-set="selected_category_name" t-value="False"/>
+                                            <t t-foreach="categories" t-as="cat">
+                                                <t t-if="cat.id == selected_category">
+                                                    <t t-set="selected_category_name" t-value="cat.name"/>
+                                                </t>
+                                            </t>
+                                            <t t-if="selected_category_name">
+                                                in <t t-esc="selected_category_name"/>
+                                            </t>
+                                        </t>
+                                    </t>
+                                    <t t-else="">
+                                        Showing <strong><t t-esc="len(books)"/></strong> books
+                                        <t t-if="selected_category">
+                                            <t t-set="selected_category_name" t-value="False"/>
+                                            <t t-foreach="categories" t-as="cat">
+                                                <t t-if="cat.id == selected_category">
+                                                    <t t-set="selected_category_name" t-value="cat.name"/>
+                                                </t>
+                                            </t>
+                                            <t t-if="selected_category_name">
+                                                in <t t-esc="selected_category_name"/>
+                                            </t>
+                                        </t>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Books Grid -->
+                        <div class="row">
+                            <t t-foreach="books" t-as="book">
+                                <t t-if="book">
+                                    <div class="col-md-6 col-lg-4 mb-4">
+                                        <div class="card h-100 shadow-sm">
+                                            <div class="row g-0">
+                                                <!-- Book Cover -->
+                                                <div class="col-md-4">
+                                                    <div class="card-img h-100 d-flex align-items-center justify-content-center p-3 bg-light">
+                                                        <t t-if="book.cover_image">
+                                                            <img t-att-src="'data:image/png;base64,%s' % book.cover_image.decode('utf-8')"
+                                                                 alt="Book Cover"
+                                                                 style="max-height: 180px; object-fit: contain;"/>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <i class="fa fa-book fa-4x text-muted"/>
+                                                        </t>
+                                                    </div>
+                                                </div>
+                                                <!-- Book Details -->
+                                                <div class="col-md-8">
+                                                    <div class="card-body">
+                                                        <h5 class="card-title">
+                                                            <t t-esc="book.title or 'Untitled'"/>
+                                                        </h5>
+                                                        <h6 class="card-subtitle mb-2 text-muted">
+                                                            <t t-esc="book.primary_author or 'Unknown Author'"/>
+                                                        </h6>
+
+                                                        <!-- Book Info -->
+                                                        <div class="mb-2">
+                                                            <small class="text-muted">
+                                                                <t t-if="book.publication_year">
+                                                                    <t t-esc="book.publication_year"/> •
+                                                                </t>
+                                                                <t t-if="book.category_id">
+                                                                    <t t-esc="book.category_id.name or ''"/> •
+                                                                </t>
+                                                                <t t-esc="book.language or 'English'"/>
+                                                            </small>
+                                                        </div>
+
+                                                        <!-- ISBN -->
+                                                        <div class="mb-2">
+                                                            <t t-if="book.isbn">
+                                                                <small class="text-muted">
+                                                                    <i class="fa fa-barcode"/>
+                                                                    ISBN: <t t-esc="book.isbn"/>
+                                                                </small>
+                                                            </t>
+                                                        </div>
+
+                                                        <!-- Availability -->
+                                                        <div class="mb-3">
+                                                            <span t-att-class="book.available_copies and 'badge bg-success' or 'badge bg-danger'">
+                                                                <i class="fa fa-check-circle"/>
+                                                                <t t-esc="book.available_copies"/> copies available
+                                                            </span>
+                                                            <t t-if="book.issued_copies &gt; 0">
+                                                                <span class="badge bg-primary ms-1">
+                                                                    <i class="fa fa-bookmark"/>
+                                                                    <t t-esc="book.issued_copies"/> issued
+                                                                </span>
+                                                            </t>
+                                                        </div>
+
+                                                        <!-- Book Status -->
+                                                        <div class="mb-3">
+                                                            <small>
+                                                                Status:
+                                                                <span t-att-class="{
+                                                                    'badge bg-success': book.state == 'available',
+                                                                    'badge bg-info': book.state == 'reserved',
+                                                                    'badge bg-warning': book.state in ['issued', 'maintenance'],
+                                                                    'badge bg-danger': book.state in ['lost', 'damaged']
+                                                                }">
+                                                                    <t t-esc="(book.state or 'available').title()"/>
+                                                                </span>
+                                                            </small>
+                                                        </div>
+
+                                                        <!-- Location -->
+                                                        <div class="mb-3">
+                                                            <t t-if="book.rack_id">
+                                                                <small class="text-muted">
+                                                                    <i class="fa fa-map-marker"/>
+                                                                    <t t-esc="book.rack_id.name or ''"/>
+                                                                    <t t-if="book.code_id">
+                                                                        - <t t-esc="book.code_id"/>
+                                                                    </t>
+                                                                </small>
+                                                            </t>
+                                                        </div>
+
+                                                        <!-- More Info Button -->
+                                                        <a href="#" class="btn btn-outline-primary btn-sm">
+                                                            <i class="fa fa-info-circle"/> More Details
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </t>
+                        </div>
+
+                        <!-- No Results Message -->
+                        <t t-if="not books">
+                            <div class="row">
+                                <div class="col-12 text-center py-5">
+                                    <div class="display-1 text-muted mb-3">
+                                        <i class="fa fa-book"/>
+                                    </div>
+                                    <h3>No Books Found</h3>
+                                    <p class="lead">
+                                        <t t-if="search or selected_category">
+                                            No books match your search criteria. Try different keywords or categories.
+                                        </t>
+                                        <t t-else="">
+                                            No books are currently available in the library.
+                                        </t>
+                                    </p>
+                                    <a href="/library/books" class="btn btn-primary">
+                                        <i class="fa fa-refresh"/> Clear Search
+                                    </a>
+                                </div>
+                            </div>
+                        </t>
+
+                        <!-- Pagination -->
+                        <t t-if="books and pager['page_count'] &gt; 1">
+                            <div class="row">
+                                <div class="col-12">
+                                    <nav aria-label="Page navigation">
+                                        <ul class="pagination justify-content-center">
+                                            <!-- Previous Page -->
+                                            <li t-att-class="'page-item disabled' if pager['page'] == 1 else 'page-item'">
+                                                <a class="page-link"
+                                                   t-att-href="pager['previous']['url'] if pager['page'] &gt; 1 else '#'">
+                                                    <i class="fa fa-chevron-left"/>
+                                                </a>
+                                            </li>
+
+                                            <!-- Page Numbers -->
+                                            <t t-foreach="range(1, pager['page_count'] + 1)" t-as="page_num">
+                                                <li t-att-class="'page-item active' if page_num == pager['page'] else 'page-item'">
+                                                    <a class="page-link"
+                                                       t-att-href="'/library/books/page/' + str(page_num) + '?search=' + search + (selected_category and '&amp;category=' + str(selected_category) or '')">
+                                                        <t t-esc="page_num"/>
+                                                    </a>
+                                                </li>
+                                            </t>
+
+                                            <!-- Next Page -->
+                                            <li t-att-class="'page-item disabled' if pager['page'] == pager['page_count'] else 'page-item'">
+                                                <a class="page-link"
+                                                   t-att-href="pager['next']['url'] if pager['page'] &lt; pager['page_count'] else '#'">
+                                                    <i class="fa fa-chevron-right"/>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </nav>
+
+                                    <div class="text-center text-muted">
+                                        Page <t t-esc="pager['page']"/> of <t t-esc="pager['page_count']"/>
+                                        • Showing <t t-esc="pager['offset'] + 1"/>-<t t-esc="min(pager['offset'] + 20, pager['total'])"/>
+                                        of <t t-esc="pager['total']"/> books
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+
+                        <!-- Quick Links -->
+                        <div class="row mt-5">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Need Help Finding a Book?</h5>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <ul class="list-unstyled">
+                                                    <li><i class="fa fa-check text-success me-2"/>Use specific keywords</li>
+                                                    <li><i class="fa fa-check text-success me-2"/>Try author's full name</li>
+                                                    <li><i class="fa fa-check text-success me-2"/>Check spelling</li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <ul class="list-unstyled">
+                                                    <li><i class="fa fa-check text-success me-2"/>Browse by category</li>
+                                                    <li><i class="fa fa-check text-success me-2"/>Filter by availability</li>
+                                                    <li><i class="fa fa-check text-success me-2"/>Sort by publication year</li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-4 text-center">
+                                                <p class="mb-2">Can't find what you're looking for?</p>
+                                                <a href="/contact" class="btn btn-outline-primary">
+                                                    <i class="fa fa-envelope me-2"/>Ask Librarian
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+    </data>
+</odoo>

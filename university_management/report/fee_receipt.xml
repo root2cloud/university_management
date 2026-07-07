@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Report Action -->
+    <record id="action_report_fee_receipt" model="ir.actions.report">
+        <field name="name">Fee Payment Receipt</field>
+        <field name="model">fee.payment</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">university_management.report_fee_receipt</field>
+        <field name="report_file">university_management.report_fee_receipt</field>
+        <field name="binding_model_id" ref="model_fee_payment"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Report Template -->
+    <template id="report_fee_receipt">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+
+                        <!-- Header -->
+                        <div class="row" style="border: 3px double #4CAF50; padding: 15px; margin-bottom: 20px; background: #f9fff9;">
+                            <div class="col-3 text-center">
+                                <img t-if="env.company.logo" t-att-src="image_data_uri(env.company.logo)" style="max-height: 80px;"/>
+                            </div>
+                            <div class="col-6 text-center">
+                                <h2 style="color: #4CAF50; margin: 0; font-weight: bold;">
+                                    <t t-esc="env.company.name"/>
+                                </h2>
+                                <p style="margin: 5px 0;">
+                                    <t t-esc="env.company.street"/>, <t t-esc="env.company.city"/>
+                                </p>
+                                <p style="margin: 0;">
+                                    Phone: <t t-esc="env.company.phone"/> | Email: <t t-esc="env.company.email"/>
+                                </p>
+                            </div>
+                            <div class="col-3 text-right">
+                                <h3 style="color: white; background: #4CAF50; padding: 10px; margin: 0;">
+                                    RECEIPT
+                                </h3>
+                                <p style="margin: 10px 0 0 0; font-size: 10pt;">
+                                    <strong>No:</strong> <span style="color: #4CAF50; font-size: 12pt;"><t t-esc="o.name"/></span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Student Details -->
+                        <div style="margin-bottom: 20px;">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <td style="width: 25%; background: #f5f5f5; font-weight: bold;">Student Name</td>
+                                    <td style="width: 25%;"><t t-esc="o.student_id.name"/></td>
+                                    <td style="width: 25%; background: #f5f5f5; font-weight: bold;">Registration No.</td>
+                                    <td style="width: 25%;">
+                                        <t t-if="o.student_id.usn_mapped">
+                                            <t t-esc="o.student_id.university_usn"/>
+                                        </t>
+                                        <t t-else="">
+                                            <t t-esc="o.student_id.registration_number"/>
+                                        </t>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Program</td>
+                                    <td><t t-esc="o.student_id.program_id.name"/></td>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Semester</td>
+                                    <td><t t-esc="o.semester_id.name if o.semester_id else 'N/A'"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Payment Date</td>
+                                    <td><t t-esc="o.payment_date"/></td>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Academic Year</td>
+                                    <td><t t-esc="o.academic_year_id.name"/></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Fee Details -->
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="background: #4CAF50; color: white; padding: 8px; margin-bottom: 10px;">
+                                FEE DETAILS
+                            </h4>
+                            <table class="table table-bordered">
+                                <thead style="background: #f5f5f5;">
+                                    <tr>
+                                        <th style="width: 10%;">S.No</th>
+                                        <th style="width: 50%;">Particulars</th>
+                                        <th style="width: 20%; text-align: right;">Amount (₹)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="counter" t-value="1"/>
+                                    <!-- Fee lines from the linked fee structure -->
+                                    <t t-foreach="o.fee_structure_id.fee_line_ids" t-as="line">
+                                        <tr>
+                                            <td class="text-center"><t t-esc="counter"/></td>
+                                            <td><t t-esc="line.name"/></td>
+                                            <td class="text-right">
+                                                <t t-esc="'{:,.2f}'.format(line.amount)"/>
+                                            </td>
+                                        </tr>
+                                        <t t-set="counter" t-value="counter + 1"/>
+                                    </t>
+
+                                    <!-- Subtotal (amount before late fee / discount) -->
+                                    <tr style="background: #f9f9f9;">
+                                        <td colspan="2" class="text-right"><strong>Subtotal:</strong></td>
+                                        <td class="text-right">
+                                            <strong><t t-esc="'{:,.2f}'.format(o.amount)"/></strong>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Discount -->
+                                    <t t-if="o.discount_amount > 0">
+                                        <tr style="color: #4CAF50;">
+                                            <td colspan="2" class="text-right">
+                                                Discount
+                                                <t t-if="o.amount">
+                                                    (<t t-esc="'{:.1f}'.format(o.discount_amount / o.amount * 100)"/>%)
+                                                </t>:
+                                            </td>
+                                            <td class="text-right">
+                                                - <t t-esc="'{:,.2f}'.format(o.discount_amount)"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+
+                                    <!-- Late Fee -->
+                                    <t t-if="o.late_fee > 0">
+                                        <tr style="color: #F44336;">
+                                            <td colspan="2" class="text-right">Late Fee:</td>
+                                            <td class="text-right">
+                                                + <t t-esc="'{:,.2f}'.format(o.late_fee)"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+
+                                    <!-- Total -->
+                                    <tr style="background: #4CAF50; color: white; font-size: 14pt;">
+                                        <td colspan="2" class="text-right"><strong>Total Amount Paid:</strong></td>
+                                        <td class="text-right">
+                                            <strong>₹ <t t-esc="'{:,.2f}'.format(o.total_amount)"/></strong>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Amount in Words -->
+                        <div style="background: #f5f5f5; padding: 10px; margin-bottom: 20px; border-left: 4px solid #4CAF50;">
+                            <p style="margin: 0;">
+                                <strong>Amount in Words:</strong>
+                                <span style="text-transform: capitalize;">
+                                    <t t-esc="o.currency_id.amount_to_text(o.total_amount)"/> Only
+                                </span>
+                            </p>
+                        </div>
+
+                        <!-- Payment Details -->
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="background: #4CAF50; color: white; padding: 8px; margin-bottom: 10px;">
+                                PAYMENT DETAILS
+                            </h4>
+                            <table class="table table-bordered">
+                                <tr>
+                                    <td style="width: 25%; background: #f5f5f5; font-weight: bold;">Payment Method</td>
+                                    <td style="width: 25%;">
+                                        <t t-if="o.payment_method == 'cash'">Cash</t>
+                                        <t t-elif="o.payment_method == 'online'">Online Payment</t>
+                                        <t t-elif="o.payment_method == 'cheque'">Cheque</t>
+                                        <t t-elif="o.payment_method == 'dd'">Demand Draft</t>
+                                        <t t-elif="o.payment_method == 'upi'">UPI</t>
+                                        <t t-elif="o.payment_method == 'bank_transfer'">Bank Transfer</t>
+                                        <t t-elif="o.payment_method == 'credit_card'">Credit Card</t>
+                                        <t t-elif="o.payment_method == 'debit_card'">Debit Card</t>
+                                        <t t-elif="o.payment_method == 'netbanking'">Net Banking</t>
+                                        <t t-else=""><t t-esc="o.payment_method"/></t>
+                                    </td>
+                                    <td style="width: 25%; background: #f5f5f5; font-weight: bold;">Transaction / Ref ID</td>
+                                    <td style="width: 25%;"><t t-esc="o.payment_reference or 'N/A'"/></td>
+                                </tr>
+                                <t t-if="o.payment_method in ('cheque', 'dd')">
+                                    <tr>
+                                        <td style="background: #f5f5f5; font-weight: bold;">Instrument No.</td>
+                                        <td><t t-esc="o.payment_reference or 'N/A'"/></td>
+                                        <td style="background: #f5f5f5; font-weight: bold;">Bank Name</td>
+                                        <td><t t-esc="o.bank_name or 'N/A'"/></td>
+                                    </tr>
+                                </t>
+                            </table>
+                        </div>
+
+                        <!-- Note -->
+                        <div style="background: #FFF9C4; border-left: 4px solid #FFC107; padding: 10px; margin-bottom: 20px;">
+                            <p style="margin: 0; font-size: 10pt;">
+                                <strong>Note:</strong> This receipt is valid subject to realization of cheque/online payment.
+                                Please preserve this receipt for future reference. No duplicate receipt will be issued.
+                            </p>
+                        </div>
+
+                        <!-- Signatures -->
+                        <div class="row" style="margin-top: 50px;">
+                            <div class="col-4">
+                                <div style="border-top: 1px solid #333; padding-top: 5px; text-align: center;">
+                                    Student Signature
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div style="border-top: 1px solid #333; padding-top: 5px; text-align: center;">
+                                    Cashier
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div style="border-top: 1px solid #333; padding-top: 5px; text-align: center;">
+                                    Accounts Officer
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="text-center" style="margin-top: 30px; padding-top: 10px; border-top: 2px dashed #ddd;">
+                            <p style="margin: 0; font-size: 9pt; color: #666;">
+                                This is a computer-generated receipt and is valid without signature and seal.
+                            </p>
+                            <p style="margin: 5px 0 0 0; font-size: 9pt; color: #666;">
+                                For any queries, contact Accounts Department: <t t-esc="env.company.phone"/>
+                            </p>
+                        </div>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

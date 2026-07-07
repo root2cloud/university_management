@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="naac_faculty_research_view_form" model="ir.ui.view">
+        <field name="name">naac.faculty.research.view.form</field>
+        <field name="model">naac.faculty.research</field>
+        <field name="arch" type="xml">
+            <form string="Faculty Research / Contribution">
+                <header>
+                    <button name="action_submit" string="Submit" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_verify" string="Verify" type="object"
+                            class="btn-success" invisible="state != 'submitted'"
+                            groups="university_management.group_university_admin"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,verified"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Publication / Research Title"/></h1>
+                    </div>
+                    <group>
+                        <group string="Faculty">
+                            <field name="faculty_id" options="{'no_create': True}"/>
+                            <field name="department_id"/>
+                            <field name="co_author_ids" widget="many2many_tags"/>
+                            <field name="student_author_ids" widget="many2many_tags"/>
+                        </group>
+                        <group string="Research Details">
+                            <field name="research_type"/>
+                            <field name="date"/>
+                            <field name="academic_year_id"/>
+                            <field name="criterion_id"/>
+                            <field name="metric_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Publication Details" name="publication">
+                            <group>
+                                <group>
+                                    <field name="journal_conference"/>
+                                    <field name="publisher"/>
+                                    <field name="issn_isbn"/>
+                                    <field name="doi"/>
+                                    <field name="impact_factor"/>
+                                </group>
+                                <group>
+                                    <field name="scopus_indexed"/>
+                                    <field name="wos_indexed"/>
+                                    <field name="ugc_listed"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Funding / Grant" name="funding">
+                            <group>
+                                <field name="funding_agency"/>
+                                <field name="amount"/>
+                            </group>
+                        </page>
+                        <page string="Patent" name="patent">
+                            <group>
+                                <field name="patent_number"/>
+                                <field name="patent_office"/>
+                            </group>
+                        </page>
+                        <page string="Evidence" name="evidence">
+                            <field name="evidence_document" widget="binary"
+                                   filename="evidence_filename"/>
+                            <field name="evidence_filename"/>
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="naac_faculty_research_view_list" model="ir.ui.view">
+        <field name="name">naac.faculty.research.view.list</field>
+        <field name="model">naac.faculty.research</field>
+        <field name="arch" type="xml">
+            <list string="Faculty Research" decoration-success="state == 'verified'">
+                <field name="name"/>
+                <field name="faculty_id"/>
+                <field name="department_id"/>
+                <field name="research_type"/>
+                <field name="journal_conference"/>
+                <field name="date"/>
+                <field name="academic_year_id"/>
+                <field name="scopus_indexed"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'verified'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="naac_faculty_research_view_search" model="ir.ui.view">
+        <field name="name">naac.faculty.research.view.search</field>
+        <field name="model">naac.faculty.research</field>
+        <field name="arch" type="xml">
+            <search string="Search Research">
+                <field name="name"/>
+                <field name="faculty_id"/>
+                <field name="department_id"/>
+                <field name="academic_year_id"/>
+                <separator/>
+                <filter string="Journal Papers" name="journal"
+                        domain="[('research_type', '=', 'journal_paper')]"/>
+                <filter string="Patents" name="patents"
+                        domain="[('research_type', 'in', ['patent_filed', 'patent_granted'])]"/>
+                <filter string="Research Grants" name="grants"
+                        domain="[('research_type', '=', 'research_grant')]"/>
+                <filter string="Scopus Indexed" name="scopus" domain="[('scopus_indexed', '=', True)]"/>
+                <separator/>
+                <filter string="Verified" name="verified" domain="[('state', '=', 'verified')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Faculty" name="group_faculty" context="{'group_by': 'faculty_id'}"/>
+                    <filter string="Department" name="group_dept" context="{'group_by': 'department_id'}"/>
+                    <filter string="Research Type" name="group_type" context="{'group_by': 'research_type'}"/>
+                    <filter string="Academic Year" name="group_year" context="{'group_by': 'academic_year_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="naac_faculty_research_view_graph" model="ir.ui.view">
+        <field name="name">naac.faculty.research.view.graph</field>
+        <field name="model">naac.faculty.research</field>
+        <field name="arch" type="xml">
+            <graph string="Research by Department" type="bar">
+                <field name="department_id" type="row"/>
+                <field name="research_type" type="col"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="naac_faculty_research_view_pivot" model="ir.ui.view">
+        <field name="name">naac.faculty.research.view.pivot</field>
+        <field name="model">naac.faculty.research</field>
+        <field name="arch" type="xml">
+            <pivot string="Research Pivot">
+                <field name="department_id" type="row"/>
+                <field name="research_type" type="col"/>
+                <field name="amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_naac_faculty_research" model="ir.actions.act_window">
+        <field name="name">Faculty Research</field>
+        <field name="res_model">naac.faculty.research</field>
+        <field name="view_mode">list,graph,pivot,form</field>
+        <field name="search_view_id" ref="naac_faculty_research_view_search"/>
+    </record>
+
+</odoo>

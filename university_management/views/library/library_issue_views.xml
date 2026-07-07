@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View - Library Issue -->
+    <record id="library_issue_view_form" model="ir.ui.view">
+        <field name="name">library.issue.view.form</field>
+        <field name="model">library.issue</field>
+        <field name="arch" type="xml">
+            <form string="Book Issue/Return">
+                <header>
+                    <button name="action_confirm" string="Confirm Issue"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_return_book" type="object" string="Return Book"
+                            class="oe_highlight"
+                            invisible="state not in ['issued', 'overdue']"
+                            confirm="Are you sure you want to return this book?"/>
+                    <button name="action_mark_lost" type="object" string="Mark as Lost"
+                            invisible="state not in ['issued', 'overdue']"
+                            confirm="Are you sure you want to mark this book as lost?"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft"
+                            type="object" class="btn-default"
+                            invisible="state == 'draft'"
+                            confirm="Are you sure you want to reset this issue to draft?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,issued,overdue,returned,lost,damaged"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Draft" bg_color="text-bg-secondary"
+                            invisible="state != 'draft'"/>
+                    <widget name="web_ribbon" title="Returned" bg_color="text-bg-success"
+                            invisible="state != 'returned'"/>
+                    <widget name="web_ribbon" title="OVERDUE" bg_color="text-bg-danger"
+                            invisible="state != 'overdue'"/>
+                    <widget name="web_ribbon" title="Lost" bg_color="text-bg-dark"
+                            invisible="state != 'lost'"/>
+                    <widget name="web_ribbon" title="Damaged" bg_color="text-bg-warning"
+                            invisible="state != 'damaged'"/>
+                    <widget name="web_ribbon" title="Issued" bg_color="text-bg-info"
+                            invisible="state != 'issued'"/>
+
+                    <div class="oe_title">
+                        <label for="name" string="Issue Number"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Member Details">
+                            <field name="member_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="member_name" readonly="1"/>
+                            <field name="member_type" readonly="1"/>
+                        </group>
+                        <group string="Book Details">
+                            <field name="book_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"
+                                   domain="[('state', '=', 'available')]"/>
+                            <field name="isbn" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Issue Information">
+                            <field name="issue_date" widget="date"/>
+                            <field name="due_date" widget="date"/>
+                            <field name="return_date" widget="date"
+                                   readonly="1"
+                                   invisible="not return_date"/>
+                            <field name="issue_days" readonly="1"/>
+                            <field name="overdue_days" readonly="1"
+                                   decoration-danger="overdue_days &gt; 0"/>
+                        </group>
+                        <group string="Issued/Returned By">
+                            <field name="issued_by" readonly="1"/>
+                            <field name="returned_by" readonly="1"
+                                   invisible="not returned_by"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Book Condition">
+                            <field name="issue_condition"/>
+                            <field name="return_condition"
+                                   invisible="state not in ['returned', 'damaged']"/>
+                        </group>
+                        <group string="Fine Details"
+                               invisible="not fine_id and not fine_amount">
+                            <field name="fine_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="fine_amount" widget="monetary"/>
+                            <field name="fine_paid" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Remarks" name="remarks">
+                            <field name="remarks" nolabel="1"
+                                   placeholder="Enter any remarks or notes about this issue..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View - Library Issue -->
+    <record id="library_issue_view_list" model="ir.ui.view">
+        <field name="name">library.issue.view.list</field>
+        <field name="model">library.issue</field>
+        <field name="arch" type="xml">
+            <list string="Book Issues"
+                  default_order="issue_date desc"
+                  multi_edit="1"
+                  sample="1"
+                  decoration-danger="state == 'overdue'"
+                  decoration-success="state == 'returned'"
+                  decoration-warning="state in ['lost', 'damaged']"
+                  decoration-info="state == 'issued'">
+                <field name="name"/>
+                <field name="member_id"/>
+                <field name="member_name" optional="show"/>
+                <field name="member_type" optional="hide"/>
+                <field name="book_id"/>
+                <field name="isbn" optional="hide"/>
+                <field name="issue_date"/>
+                <field name="due_date"/>
+                <field name="return_date" optional="show"/>
+                <field name="issue_days" optional="hide"/>
+                <field name="overdue_days" optional="show"
+                       decoration-danger="overdue_days &gt; 0"/>
+                <field name="issued_by" optional="hide"/>
+                <field name="returned_by" optional="hide"/>
+                <field name="issue_condition" optional="hide"/>
+                <field name="return_condition" optional="hide"/>
+                <field name="fine_amount" widget="monetary" optional="show"/>
+                <field name="fine_paid" widget="boolean_toggle" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-danger="state == 'overdue'"
+                       decoration-success="state == 'returned'"
+                       decoration-warning="state in ['lost', 'damaged']"
+                       decoration-info="state == 'issued'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View - Library Issue -->
+    <record id="library_issue_view_search" model="ir.ui.view">
+        <field name="name">library.issue.view.search</field>
+        <field name="model">library.issue</field>
+        <field name="arch" type="xml">
+            <search string="Search Issues">
+                <field name="name"/>
+                <field name="member_id"/>
+                <field name="member_name"/>
+                <field name="book_id"/>
+                <field name="isbn"/>
+
+                <separator/>
+
+                <filter name="filter_issued" string="Issued"
+                        domain="[('state', '=', 'issued')]"/>
+                <filter name="filter_overdue" string="Overdue"
+                        domain="[('state', '=', 'overdue')]"/>
+                <filter name="filter_returned" string="Returned"
+                        domain="[('state', '=', 'returned')]"/>
+                <filter name="filter_lost" string="Lost"
+                        domain="[('state', '=', 'lost')]"/>
+                <filter name="filter_damaged" string="Damaged"
+                        domain="[('state', '=', 'damaged')]"/>
+
+                <separator/>
+
+                <filter name="filter_pending_return" string="Pending Return"
+                        domain="[('state', 'in', ['issued', 'overdue'])]"/>
+                <filter name="filter_with_fine" string="With Fine"
+                        domain="[('fine_amount', '&gt;', 0)]"/>
+                <filter name="filter_fine_unpaid" string="Fine Unpaid"
+                        domain="[('fine_amount', '&gt;', 0), ('fine_paid', '=', False)]"/>
+
+                <separator/>
+
+                <filter name="filter_today" string="Issued Today"
+                        domain="[('issue_date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_this_week" string="Issued This Week"
+                        domain="[('issue_date', '&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d')),
+                                 ('issue_date', '&lt;=', (context_today() + datetime.timedelta(days=6-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_this_month" string="Issued This Month"
+                        domain="[('issue_date', '&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d')),
+                                 ('issue_date', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d'))]"/>
+
+                <separator/>
+
+                <filter name="filter_due_today" string="Due Today"
+                        domain="[('due_date', '=', context_today().strftime('%Y-%m-%d')), ('state', 'in', ['issued', 'overdue'])]"/>
+                <filter name="filter_due_this_week" string="Due This Week"
+                        domain="[('due_date', '&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d')),
+                                 ('due_date', '&lt;=', (context_today() + datetime.timedelta(days=6-context_today().weekday())).strftime('%Y-%m-%d')),
+                                 ('state', 'in', ['issued', 'overdue'])]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_member" string="Member"
+                            context="{'group_by': 'member_id'}"/>
+                    <filter name="group_by_book" string="Book"
+                            context="{'group_by': 'book_id'}"/>
+                    <filter name="group_by_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_by_issue_date" string="Issue Date"
+                            context="{'group_by': 'issue_date'}"/>
+                    <filter name="group_by_due_date" string="Due Date"
+                            context="{'group_by': 'due_date'}"/>
+                    <filter name="group_by_member_type" string="Member Type"
+                            context="{'group_by': 'member_type'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="state" string="Status"
+                           select="multi"
+                           icon="fa-filter"/>
+                    <field name="member_type" string="Member Type"
+                           select="multi"
+                           icon="fa-users"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View - Library Issue -->
+    <record id="library_issue_view_kanban" model="ir.ui.view">
+        <field name="name">library.issue.view.kanban</field>
+        <field name="model">library.issue</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="state"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="member_id"/>
+                <field name="member_name"/>
+                <field name="member_type"/>
+                <field name="book_id"/>
+                <field name="isbn"/>
+                <field name="issue_date"/>
+                <field name="due_date"/>
+                <field name="return_date"/>
+                <field name="issue_days"/>
+                <field name="overdue_days"/>
+                <field name="fine_amount"/>
+                <field name="fine_paid"/>
+                <field name="state"/>
+
+                <progressbar field="state"
+                             colors='{"draft": "secondary", "issued": "info", "overdue": "danger", "returned": "success", "lost": "muted", "damaged": "warning"}'/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="ribbon ribbon-top-right" t-if="record.state.raw_value == 'draft'">
+                            <span class="text-bg-secondary">Draft</span>
+                        </div>
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="ribbon ribbon-top-right" t-if="record.state.raw_value == 'returned'">
+                                <span class="text-bg-success">Returned</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.state.raw_value == 'overdue'">
+                                <span class="text-bg-danger">OVERDUE</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.state.raw_value == 'lost'">
+                                <span class="text-bg-dark">Lost</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.state.raw_value == 'damaged'">
+                                <span class="text-bg-warning">Damaged</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.state.raw_value == 'issued'">
+                                <span class="text-bg-info">Issued</span>
+                            </div>
+
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="member_name"/>
+                                        </strong>
+                                        <div class="text-muted">
+                                            <field name="name"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body mt-3">
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded">
+                                                <div class="mb-1">
+                                                    <i class="fa fa-book text-primary"/>
+                                                    <strong>Book:</strong> <field name="book_id"/>
+                                                </div>
+                                                <div class="mb-1" t-if="record.isbn.raw_value">
+                                                    <i class="fa fa-barcode text-info"/>
+                                                    <strong>ISBN:</strong> <field name="isbn"/>
+                                                </div>
+                                                <div class="mb-1">
+                                                    <i class="fa fa-calendar text-success"/>
+                                                    <strong>Issued:</strong> <field name="issue_date"/>
+                                                </div>
+                                                <div class="mb-1">
+                                                    <i class="fa fa-calendar-times-o text-warning"/>
+                                                    <strong>Due:</strong> <field name="due_date"/>
+                                                </div>
+                                                <div class="mb-1" t-if="record.return_date.raw_value">
+                                                    <i class="fa fa-calendar-check-o text-success"/>
+                                                    <strong>Returned:</strong> <field name="return_date"/>
+                                                </div>
+                                                <div class="mb-1" t-if="record.overdue_days.raw_value &gt; 0">
+                                                    <i class="fa fa-exclamation-triangle text-danger"/>
+                                                    <strong class="text-danger">Overdue:</strong>
+                                                    <span class="text-danger"><field name="overdue_days"/> days</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row" t-if="record.fine_amount.raw_value &gt; 0">
+                                        <div class="col-12">
+                                            <div t-attf-class="card text-white #{record.fine_paid.raw_value ? 'bg-success' : 'bg-danger'}">
+                                                <div class="card-body p-2">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <div>
+                                                            <h5 class="mb-0">₹<field name="fine_amount"/></h5>
+                                                            <small>Fine Amount</small>
+                                                        </div>
+                                                        <div>
+                                                            <span t-if="record.fine_paid.raw_value" class="badge bg-light text-success">
+                                                                <i class="fa fa-check"/> Paid
+                                                            </span>
+                                                            <span t-if="!record.fine_paid.raw_value" class="badge bg-light text-danger">
+                                                                <i class="fa fa-times"/> Unpaid
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom mt-2">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="state" widget="badge"
+                                               decoration-danger="state == 'overdue'"
+                                               decoration-success="state == 'returned'"
+                                               decoration-warning="state in ['lost', 'damaged']"
+                                               decoration-info="state == 'issued'"/>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Calendar View - Library Issue -->
+    <record id="library_issue_view_calendar" model="ir.ui.view">
+        <field name="name">library.issue.view.calendar</field>
+        <field name="model">library.issue</field>
+        <field name="arch" type="xml">
+            <calendar string="Issue Calendar"
+                      date_start="issue_date"
+                      date_stop="due_date"
+                      color="state"
+                      mode="month"
+                      quick_create="0"
+                      event_open_popup="1">
+                <field name="member_id"/>
+                <field name="book_id"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_library_issue" model="ir.actions.act_window">
+        <field name="name">Book Issues</field>
+        <field name="res_model">library.issue</field>
+        <field name="view_mode">list,kanban,form,calendar</field>
+        <field name="context">{'search_default_filter_pending_return': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Issue New Book
+            </p>
+            <p>
+                Manage library book issue/return operations with complete tracking. System automatically
+                assigns unique issue numbers using sequence. Select member (library.member, required,
+                tracked, indexed) - displays member_name and member_type. Select book (library.book,
+                required, tracked, indexed) - domain restricted to available books only, shows ISBN.
+                Enter issue_date (default today, required, tracked). System auto-calculates due_date
+                based on member.max_issue_days via onchange when member and issue_date selected. Track
+                issue_days (computed: days from issue to return or today) and overdue_days (computed:
+                days past due_date). System records issued_by (current user, readonly). Track book
+                condition at issue (excellent/good/fair/poor, default 'good') and at return (adds
+                'damaged' option). 5-state computed system: Issued (default), Overdue (auto-set by cron
+                or computed when today > due_date), Returned (set by action_return_book), Lost (set by
+                action_mark_lost), Damaged (set by action_mark_damaged). Three action buttons: "Return
+                Book" (highlight, sets return_date=today, returned_by=current_user, state='returned',
+                auto-creates library.fine if overdue_days > 0 with ₹5/day rate, confirmation required),
+                "Mark as Lost" (confirmation required), "Mark as Damaged" (confirmation required).
+                System validates: member hasn't exceeded max_books_allowed (_check_issue_limit), member
+                has no pending fines (_check_pending_fines). Track fine_id (Many2one to library.fine,
+                readonly), fine_amount (monetary), fine_paid (boolean toggle). Scheduled cron job
+                (_cron_check_overdue_books) auto-updates issued → overdue and sends reminder emails.
+                Full chatter support for communication and tracking.
+            </p>
+        </field>
+    </record>
+
+</odoo>

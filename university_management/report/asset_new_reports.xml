@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  PURCHASE REQUEST — PRINTABLE APPROVAL CHAIN REPORT            -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+
+    <template id="asset_purchase_request_report_template" name="Asset Purchase Request Report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="pr">
+                <t t-call="web.internal_layout">
+                    <div class="page">
+                        <!-- Header -->
+                        <div style="border-bottom:3px solid #4361ee; padding-bottom:12px; margin-bottom:20px;">
+                            <table style="width:100%; border-collapse:collapse;">
+                                <tr>
+                                    <td style="width:70%;">
+                                        <h2 style="margin:0; color:#1a1a2e; font-size:18pt;">Asset Purchase Request</h2>
+                                        <div style="font-size:11pt; color:#4361ee; font-weight:bold; margin-top:4px;">
+                                            <t t-esc="pr.name"/>
+                                        </div>
+                                    </td>
+                                    <td style="text-align:right;">
+                                        <div style="font-size:9pt; color:#888;">
+                                            Date: <span style="color:#333;"><t t-esc="pr.request_date"/></span><br/>
+                                            Status: <span style="font-weight:bold; color:#4361ee;"><t t-esc="pr.state.upper()"/></span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Request Details -->
+                        <table style="width:100%; border-collapse:collapse; margin-bottom:20px;">
+                            <tr style="background:#f8f9fa;">
+                                <td colspan="4" style="padding:8px 10px; font-weight:bold; font-size:10pt; color:#1a1a2e; border-bottom:1px solid #dee2e6;">Request Details</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:8px 10px; color:#888; font-size:9pt; width:20%;">Requested By</td>
+                                <td style="padding:8px 10px; font-weight:500; font-size:9pt; width:30%;"><t t-esc="pr.requested_by.name"/></td>
+                                <td style="padding:8px 10px; color:#888; font-size:9pt; width:20%;">Department</td>
+                                <td style="padding:8px 10px; font-weight:500; font-size:9pt;"><t t-esc="pr.department_id.name or '—'"/></td>
+                            </tr>
+                            <tr style="background:#f8f9fa;">
+                                <td style="padding:8px 10px; color:#888; font-size:9pt;">Asset (Replacement)</td>
+                                <td style="padding:8px 10px; font-weight:500; font-size:9pt;"><t t-esc="pr.asset_id.name if pr.asset_id else '—'"/></td>
+                                <td style="padding:8px 10px; color:#888; font-size:9pt;">Priority</td>
+                                <td style="padding:8px 10px; font-weight:500; font-size:9pt;"><t t-esc="pr.priority.upper()"/></td>
+                            </tr>
+                            <tr>
+                                <td style="padding:8px 10px; color:#888; font-size:9pt;">Estimated Cost</td>
+                                <td style="padding:8px 10px; font-weight:700; font-size:10pt; color:#4361ee;">₹<t t-esc="pr.estimated_cost or 0"/></td>
+                                <td style="padding:8px 10px; color:#888; font-size:9pt;">Quantity</td>
+                                <td style="padding:8px 10px; font-weight:500; font-size:9pt;"><t t-esc="pr.quantity"/></td>
+                            </tr>
+                        </table>
+
+                        <!-- Description -->
+                        <table style="width:100%; border-collapse:collapse; margin-bottom:20px;">
+                            <tr style="background:#f8f9fa;">
+                                <td style="padding:8px 10px; font-weight:bold; font-size:10pt; border-bottom:1px solid #dee2e6;">Item Description &amp; Specification</td>
+                            </tr>
+                            <tr><td style="padding:10px; font-size:9pt; line-height:1.5;"><t t-esc="pr.item_description"/></td></tr>
+                            <tr style="background:#f8f9fa;">
+                                <td style="padding:8px 10px; font-weight:bold; font-size:10pt; border-bottom:1px solid #dee2e6;">Justification / Business Need</td>
+                            </tr>
+                            <tr><td style="padding:10px; font-size:9pt; line-height:1.5;"><t t-esc="pr.justification"/></td></tr>
+                        </table>
+
+                        <!-- Vendor Quotes -->
+                        <t t-if="pr.vendor_quote_1_vendor or pr.vendor_quote_2_vendor or pr.vendor_quote_3_vendor">
+                            <table style="width:100%; border-collapse:collapse; margin-bottom:20px;">
+                                <tr style="background:#4361ee; color:white;">
+                                    <td colspan="3" style="padding:8px 10px; font-weight:bold; font-size:10pt;">Vendor Quotation Comparison</td>
+                                </tr>
+                                <tr style="background:#f8f9fa;">
+                                    <td style="padding:8px 10px; font-weight:bold; font-size:9pt; border:1px solid #dee2e6; width:33%;">Vendor 1</td>
+                                    <td style="padding:8px 10px; font-weight:bold; font-size:9pt; border:1px solid #dee2e6; width:33%;">Vendor 2</td>
+                                    <td style="padding:8px 10px; font-weight:bold; font-size:9pt; border:1px solid #dee2e6; width:33%;">Vendor 3</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:8px 10px; border:1px solid #dee2e6; font-size:9pt;">
+                                        <div style="font-weight:600;"><t t-esc="pr.vendor_quote_1_vendor or '—'"/></div>
+                                        <div style="color:#4361ee; font-weight:700; font-size:10pt;">₹<t t-esc="pr.vendor_quote_1_amount or 0"/></div>
+                                    </td>
+                                    <td style="padding:8px 10px; border:1px solid #dee2e6; font-size:9pt;">
+                                        <div style="font-weight:600;"><t t-esc="pr.vendor_quote_2_vendor or '—'"/></div>
+                                        <div style="color:#4361ee; font-weight:700; font-size:10pt;">₹<t t-esc="pr.vendor_quote_2_amount or 0"/></div>
+                                    </td>
+                                    <td style="padding:8px 10px; border:1px solid #dee2e6; font-size:9pt;">
+                                        <div style="font-weight:600;"><t t-esc="pr.vendor_quote_3_vendor or '—'"/></div>
+                                        <div style="color:#4361ee; font-weight:700; font-size:10pt;">₹<t t-esc="pr.vendor_quote_3_amount or 0"/></div>
+                                    </td>
+                                </tr>
+                                <t t-if="pr.selected_vendor or pr.selected_vendor_name">
+                                    <tr style="background:#e8f5e9;">
+                                        <td colspan="3" style="padding:8px 10px; font-size:9pt; border:1px solid #dee2e6;">
+                                            <strong>ACC Preferred Vendor:</strong>
+                                            <t t-esc="pr.selected_vendor.name if pr.selected_vendor else pr.selected_vendor_name"/>
+                                            — ₹<t t-esc="pr.selected_quote_amount or 0"/>
+                                            <t t-if="pr.acc_notes"><br/><strong>ACC Notes:</strong> <t t-esc="pr.acc_notes"/></t>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </table>
+                        </t>
+
+                        <!-- Approval Chain -->
+                        <table style="width:100%; border-collapse:collapse; margin-bottom:20px;">
+                            <tr style="background:#1a1a2e; color:white;">
+                                <td colspan="4" style="padding:8px 10px; font-weight:bold; font-size:10pt;">Approval Chain</td>
+                            </tr>
+                            <tr style="background:#f8f9fa;">
+                                <td style="padding:6px 10px; font-size:8.5pt; font-weight:bold; border:1px solid #dee2e6; width:25%;">Stage</td>
+                                <td style="padding:6px 10px; font-size:8.5pt; font-weight:bold; border:1px solid #dee2e6; width:25%;">Authority</td>
+                                <td style="padding:6px 10px; font-size:8.5pt; font-weight:bold; border:1px solid #dee2e6; width:25%;">Date</td>
+                                <td style="padding:6px 10px; font-size:8.5pt; font-weight:bold; border:1px solid #dee2e6; width:25%;">Remarks</td>
+                            </tr>
+                            <!-- Principal -->
+                            <tr t-att-style="'background:' + ('#e8f5e9' if pr.principal_approved else '#fff8e1')">
+                                <td style="padding:6px 10px; font-size:8.5pt; border:1px solid #dee2e6;">Principal Review</td>
+                                <td style="padding:6px 10px; font-size:8.5pt; border:1px solid #dee2e6;"><t t-esc="pr.principal_approved_by.name if pr.principal_approved_by else '—'"/></td>
+                                <td style="padding:6px 10px; font-size:8.5pt; border:1px solid #dee2e6;"><t t-esc="pr.principal_date or '—'"/></td>
+                                <td style="padding:6px 10px; font-size:8.5pt; border:1px solid #dee2e6;"><t t-esc="pr.principal_remarks or '—'"/></td>
+                            </tr>
+                            <!-- ACC -->
+                            <tr t-att-style="'background:' + ('#e8f5e9' if pr.acc_reviewed else '#fff8e1')">
+                                <td style="padding:6px 10px; font-size:8.5pt; border:1px solid #dee2e6;">ACC Review</td>
+                                <td style="padding:6px 10px; font-size:8.5pt; border:1px solid #dee2e6;"><t t-esc="pr.acc_reviewed_by.name if pr.acc_reviewed_by else '—'"/></td>
+                                <td style="padding:6px 10px; font-size:8.5pt; border:1px solid #dee2e6;"><t t-esc="pr.acc_review_date or '—'"/></td>
+                                <td style="padding:6px 10px; font-size:8.5pt; border:1px solid #dee2e6;"><t t-esc="pr.acc_notes or '—'"/></td>
+                            </tr>
+                            <!-- Secretary -->
+                            <tr t-att-style="'background:' + ('#e8f5e9' if pr.secretary_approved else '#fff8e1')">
+                                <td style="padding:6px 10px; font-size:8.5pt; border:1px solid #dee2e6; font-weight:bold;">Trust Secretary (FINAL)</td>
+                                <td style="padding:6px 10px; font-size:8.5pt; border:1px solid #dee2e6;"><t t-esc="pr.secretary_approved_by.name if pr.secretary_approved_by else '—'"/></td>
+                                <td style="padding:6px 10px; font-size:8.5pt; border:1px solid #dee2e6;"><t t-esc="pr.final_approval_date or '—'"/></td>
+                                <td style="padding:6px 10px; font-size:8.5pt; border:1px solid #dee2e6;"><t t-esc="pr.secretary_remarks or '—'"/></td>
+                            </tr>
+                            <!-- Trust Manager -->
+                            <tr t-att-style="'background:' + ('#e8f5e9' if pr.trust_manager_executed else '#fff8e1')">
+                                <td style="padding:6px 10px; font-size:8.5pt; border:1px solid #dee2e6;">Trust Manager Execution</td>
+                                <td style="padding:6px 10px; font-size:8.5pt; border:1px solid #dee2e6;"><t t-esc="pr.trust_manager_executed_by.name if pr.trust_manager_executed_by else '—'"/></td>
+                                <td style="padding:6px 10px; font-size:8.5pt; border:1px solid #dee2e6;"><t t-esc="pr.trust_manager_execution_date or '—'"/></td>
+                                <td style="padding:6px 10px; font-size:8.5pt; border:1px solid #dee2e6;">PO: <t t-esc="pr.po_reference or '—'"/></td>
+                            </tr>
+                        </table>
+
+                        <!-- Rejection notice -->
+                        <t t-if="pr.state == 'rejected'">
+                            <div style="background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; padding:12px; margin-bottom:16px;">
+                                <strong style="color:#dc2626;">REJECTED</strong> by
+                                <t t-esc="pr.rejected_by.name if pr.rejected_by else '—'"/>
+                                on <t t-esc="pr.rejection_date"/>.<br/>
+                                <strong>Reason:</strong> <t t-esc="pr.rejection_reason"/>
+                            </div>
+                        </t>
+
+                        <!-- Footer signature block -->
+                        <div style="margin-top:40px; border-top:1px solid #dee2e6; padding-top:20px;">
+                            <table style="width:100%;">
+                                <tr>
+                                    <td style="text-align:center; width:25%; font-size:8.5pt; color:#888;">
+                                        <div style="border-top:1px solid #333; margin-top:30px; padding-top:4px;">Faculty Signature</div>
+                                    </td>
+                                    <td style="text-align:center; width:25%; font-size:8.5pt; color:#888;">
+                                        <div style="border-top:1px solid #333; margin-top:30px; padding-top:4px;">HOD Signature</div>
+                                    </td>
+                                    <td style="text-align:center; width:25%; font-size:8.5pt; color:#888;">
+                                        <div style="border-top:1px solid #333; margin-top:30px; padding-top:4px;">Principal Signature</div>
+                                    </td>
+                                    <td style="text-align:center; width:25%; font-size:8.5pt; color:#888;">
+                                        <div style="border-top:1px solid #333; margin-top:30px; padding-top:4px;">Trust Secretary Signature</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_asset_purchase_request" model="ir.actions.report">
+        <field name="name">Purchase Request — Approval Sheet</field>
+        <field name="model">asset.purchase.request</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">university_management.asset_purchase_request_report_template</field>
+        <field name="report_file">university_management.asset_purchase_request_report_template</field>
+        <field name="binding_model_id" ref="model_asset_purchase_request"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  ASSET REGISTER REPORT — institute-wide asset listing          -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+
+    <template id="asset_register_report_template" name="Asset Register">
+        <t t-call="web.html_container">
+            <t t-call="web.internal_layout">
+                <div class="page">
+                    <div style="border-bottom:3px solid #1a1a2e; padding-bottom:12px; margin-bottom:20px;">
+                        <h2 style="margin:0; color:#1a1a2e;">Asset Register</h2>
+                        <small style="color:#888;">Generated on: <t t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')"/></small>
+                    </div>
+
+                    <table style="width:100%; border-collapse:collapse; font-size:8pt;">
+                        <thead>
+                            <tr style="background:#1a1a2e; color:white;">
+                                <th style="padding:6px 8px; text-align:left;">Asset Code</th>
+                                <th style="padding:6px 8px; text-align:left;">Asset Name</th>
+                                <th style="padding:6px 8px; text-align:left;">Category</th>
+                                <th style="padding:6px 8px; text-align:left;">Department</th>
+                                <th style="padding:6px 8px; text-align:left;">Location</th>
+                                <th style="padding:6px 8px; text-align:left;">Custodian</th>
+                                <th style="padding:6px 8px; text-align:right;">Purchase Cost</th>
+                                <th style="padding:6px 8px; text-align:left;">Status</th>
+                                <th style="padding:6px 8px; text-align:left;">Last Scanned</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="docs" t-as="asset">
+                                <tr t-att-style="'background:' + ('#f9fafb' if asset_index % 2 == 0 else 'white')">
+                                    <td style="padding:5px 8px; border-bottom:1px solid #f0f0f0; font-family:monospace; color:#4361ee;"><t t-esc="asset.asset_code"/></td>
+                                    <td style="padding:5px 8px; border-bottom:1px solid #f0f0f0; font-weight:500;"><t t-esc="asset.name"/></td>
+                                    <td style="padding:5px 8px; border-bottom:1px solid #f0f0f0;"><t t-esc="asset.category_id.name or '—'"/></td>
+                                    <td style="padding:5px 8px; border-bottom:1px solid #f0f0f0;"><t t-esc="asset.department_id.name or '—'"/></td>
+                                    <td style="padding:5px 8px; border-bottom:1px solid #f0f0f0;"><t t-esc="(asset.building or '') + ' ' + (asset.room or '')"/></td>
+                                    <td style="padding:5px 8px; border-bottom:1px solid #f0f0f0;"><t t-esc="asset.custodian_name or (asset.faculty_id.name if asset.faculty_id else '—')"/></td>
+                                    <td style="padding:5px 8px; border-bottom:1px solid #f0f0f0; text-align:right;">₹<t t-esc="'%.0f' % (asset.purchase_cost or 0)"/></td>
+                                    <td style="padding:5px 8px; border-bottom:1px solid #f0f0f0;"><t t-esc="asset.state"/></td>
+                                    <td style="padding:5px 8px; border-bottom:1px solid #f0f0f0; color:#888;"><t t-esc="asset.last_scan_date.strftime('%d/%m/%y') if asset.last_scan_date else 'Never'"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+
+                    <div style="margin-top:16px; font-size:8.5pt; color:#888;">
+                        Total assets in this report: <strong><t t-esc="len(docs)"/></strong>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_asset_register" model="ir.actions.report">
+        <field name="name">Asset Register</field>
+        <field name="model">asset.asset</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">university_management.asset_register_report_template</field>
+        <field name="report_file">university_management.asset_register_report_template</field>
+        <field name="binding_model_id" ref="model_asset_asset"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  HANDOVER REPORT — printable transfer record                   -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+
+    <template id="asset_handover_report_template" name="Asset Handover Report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="h">
+                <t t-call="web.internal_layout">
+                    <div class="page">
+                        <div style="border-bottom:3px solid #4361ee; padding-bottom:12px; margin-bottom:20px;">
+                            <h2 style="margin:0;">Asset Handover Certificate</h2>
+                            <div style="color:#4361ee; font-weight:bold; margin-top:4px;"><t t-esc="h.name"/></div>
+                        </div>
+
+                        <table style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:9pt;">
+                            <tr style="background:#f8f9fa;">
+                                <td style="padding:8px; color:#888; width:25%;">Asset</td>
+                                <td style="padding:8px; font-weight:600;" colspan="3"><t t-esc="h.asset_id.name"/> (<t t-esc="h.asset_code"/>)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:8px; color:#888;">From Department</td>
+                                <td style="padding:8px;"><t t-esc="h.from_department_id.name or '—'"/></td>
+                                <td style="padding:8px; color:#888;">To Department</td>
+                                <td style="padding:8px; font-weight:600;"><t t-esc="h.to_department_id.name or '—'"/></td>
+                            </tr>
+                            <tr style="background:#f8f9fa;">
+                                <td style="padding:8px; color:#888;">From Location</td>
+                                <td style="padding:8px;"><t t-esc="h.from_location or '—'"/></td>
+                                <td style="padding:8px; color:#888;">To Location</td>
+                                <td style="padding:8px;"><t t-esc="h.to_location or '—'"/></td>
+                            </tr>
+                            <tr>
+                                <td style="padding:8px; color:#888;">Receiving Person</td>
+                                <td style="padding:8px; font-weight:600;"><t t-esc="h.to_faculty_id.name if h.to_faculty_id else '—'"/></td>
+                                <td style="padding:8px; color:#888;">Handover Type</td>
+                                <td style="padding:8px;"><t t-esc="h.handover_type.upper()"/></td>
+                            </tr>
+                            <tr style="background:#f8f9fa;">
+                                <td style="padding:8px; color:#888;">Requested By</td>
+                                <td style="padding:8px;"><t t-esc="h.requested_by.name"/></td>
+                                <td style="padding:8px; color:#888;">Request Date</td>
+                                <td style="padding:8px;"><t t-esc="h.request_date"/></td>
+                            </tr>
+                            <tr>
+                                <td style="padding:8px; color:#888; vertical-align:top;">Purpose</td>
+                                <td style="padding:8px;" colspan="3"><t t-esc="h.purpose"/></td>
+                            </tr>
+                        </table>
+
+                        <!-- Approval -->
+                        <table style="width:100%; border-collapse:collapse; font-size:9pt;">
+                            <tr style="background:#4361ee; color:white;">
+                                <td colspan="3" style="padding:8px; font-weight:bold;">Approval Record</td>
+                            </tr>
+                            <tr><td style="padding:8px; border:1px solid #dee2e6; width:33%;">HOD Approval<br/><strong><t t-esc="h.hod_approved_by.name if h.hod_approved_by else 'Pending'"/></strong><br/><small><t t-esc="h.hod_approval_date or ''"/></small></td>
+                            <td style="padding:8px; border:1px solid #dee2e6; width:33%;">Principal Approval<br/><strong><t t-esc="h.principal_approved_by.name if h.principal_approved_by else 'Pending'"/></strong><br/><small><t t-esc="h.principal_approval_date or ''"/></small></td>
+                            <td style="padding:8px; border:1px solid #dee2e6; width:33%;">Status<br/><strong><t t-esc="h.state.upper()"/></strong></td></tr>
+                        </table>
+
+                        <div style="margin-top:50px;">
+                            <table style="width:100%;">
+                                <tr>
+                                    <td style="text-align:center; width:33%; font-size:8.5pt; color:#888;"><div style="border-top:1px solid #333; margin-top:30px; padding-top:4px;">Handed Over By</div></td>
+                                    <td style="text-align:center; width:33%; font-size:8.5pt; color:#888;"><div style="border-top:1px solid #333; margin-top:30px; padding-top:4px;">Received By</div></td>
+                                    <td style="text-align:center; width:33%; font-size:8.5pt; color:#888;"><div style="border-top:1px solid #333; margin-top:30px; padding-top:4px;">Principal</div></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_asset_handover" model="ir.actions.report">
+        <field name="name">Handover Certificate</field>
+        <field name="model">asset.handover</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">university_management.asset_handover_report_template</field>
+        <field name="report_file">university_management.asset_handover_report_template</field>
+        <field name="binding_model_id" ref="model_asset_handover"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  AUDIT REPORT — printable audit completion certificate         -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+
+    <template id="asset_audit_report_template" name="Asset Audit Report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="audit">
+                <t t-call="web.internal_layout">
+                    <div class="page">
+                        <div style="border-bottom:3px solid #2d6a4f; padding-bottom:12px; margin-bottom:20px;">
+                            <h2 style="margin:0; color:#1a1a2e;">Asset Audit Report</h2>
+                            <div style="color:#2d6a4f; font-weight:bold; margin-top:4px;"><t t-esc="audit.name"/></div>
+                        </div>
+
+                        <table style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:9pt;">
+                            <tr style="background:#f8f9fa;">
+                                <td style="padding:8px; color:#888; width:25%;">Scope</td>
+                                <td style="padding:8px;"><t t-esc="audit.audit_scope"/></td>
+                                <td style="padding:8px; color:#888; width:25%;">Department</td>
+                                <td style="padding:8px;"><t t-esc="audit.department_id.name if audit.department_id else 'All'"/></td>
+                            </tr>
+                            <tr>
+                                <td style="padding:8px; color:#888;">Initiated By</td>
+                                <td style="padding:8px;"><t t-esc="audit.initiated_by.name"/></td>
+                                <td style="padding:8px; color:#888;">Assigned Auditor</td>
+                                <td style="padding:8px; font-weight:600;"><t t-esc="audit.assigned_to.name"/></td>
+                            </tr>
+                            <tr style="background:#f8f9fa;">
+                                <td style="padding:8px; color:#888;">Start Date</td>
+                                <td style="padding:8px;"><t t-esc="audit.start_date"/></td>
+                                <td style="padding:8px; color:#888;">Completed On</td>
+                                <td style="padding:8px;"><t t-esc="audit.end_date or '—'"/></td>
+                            </tr>
+                            <tr>
+                                <td style="padding:8px; color:#888;">Total Assets</td>
+                                <td style="padding:8px; font-weight:700;"><t t-esc="audit.total_assets"/></td>
+                                <td style="padding:8px; color:#888;">Missing</td>
+                                <td style="padding:8px; font-weight:700;" t-att-style="'color:' + ('#dc2626' if audit.missing_count else '#16a34a')">
+                                    <t t-esc="audit.missing_count"/>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Asset Checklist -->
+                        <h4 style="margin-bottom:10px; color:#1a1a2e;">Asset Verification Checklist</h4>
+                        <table style="width:100%; border-collapse:collapse; font-size:8pt;">
+                            <thead>
+                                <tr style="background:#1a1a2e; color:white;">
+                                    <th style="padding:5px 8px; text-align:left;">Asset Code</th>
+                                    <th style="padding:5px 8px; text-align:left;">Asset Name</th>
+                                    <th style="padding:5px 8px; text-align:left;">Expected Location</th>
+                                    <th style="padding:5px 8px; text-align:left;">Scan Status</th>
+                                    <th style="padding:5px 8px; text-align:left;">Condition</th>
+                                    <th style="padding:5px 8px; text-align:left;">Actual Location</th>
+                                    <th style="padding:5px 8px; text-align:left;">Auditor Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="audit.audit_line_ids" t-as="line">
+                                    <tr t-att-style="'background:' + ('#fef2f2' if line.scan_status == 'missing' else ('#f0fdf4' if line.scan_status == 'present' else ('#fefce8' if line.has_discrepancy else ('white' if line_index % 2 else '#f9fafb'))))">
+                                        <td style="padding:4px 8px; border-bottom:1px solid #f0f0f0; font-family:monospace; color:#4361ee;"><t t-esc="line.asset_code"/></td>
+                                        <td style="padding:4px 8px; border-bottom:1px solid #f0f0f0;"><t t-esc="line.asset_id.name"/></td>
+                                        <td style="padding:4px 8px; border-bottom:1px solid #f0f0f0;"><t t-esc="line.expected_location or '—'"/></td>
+                                        <td style="padding:4px 8px; border-bottom:1px solid #f0f0f0; font-weight:600;"
+                                            t-att-style="'color:' + ('#dc2626' if line.scan_status == 'missing' else ('#16a34a' if line.scan_status == 'present' else '#d97706'))">
+                                            <t t-esc="line.scan_status.replace('_', ' ').upper()"/>
+                                        </td>
+                                        <td style="padding:4px 8px; border-bottom:1px solid #f0f0f0;"><t t-esc="line.physical_condition or '—'"/></td>
+                                        <td style="padding:4px 8px; border-bottom:1px solid #f0f0f0;"><t t-esc="line.actual_location or '—'"/></td>
+                                        <td style="padding:4px 8px; border-bottom:1px solid #f0f0f0; color:#666;"><t t-esc="line.auditor_notes or ''"/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <div style="margin-top:20px; background:#f8f9fa; padding:12px; border-radius:6px; font-size:8.5pt;">
+                            <strong>Summary:</strong>
+                            Total: <t t-esc="audit.total_assets"/> |
+                            Present: <t t-esc="audit.scanned_count - audit.missing_count"/> |
+                            Missing: <span t-att-style="'color:' + ('#dc2626' if audit.missing_count else '#16a34a'); font-weight:bold;"><t t-esc="audit.missing_count"/></span> |
+                            Discrepancies: <t t-esc="audit.discrepancy_count"/> |
+                            Completion: <t t-esc="audit.completion_pct"/>%
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_asset_audit" model="ir.actions.report">
+        <field name="name">Audit Report</field>
+        <field name="model">asset.audit</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">university_management.asset_audit_report_template</field>
+        <field name="report_file">university_management.asset_audit_report_template</field>
+        <field name="binding_model_id" ref="model_asset_audit"/>
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>

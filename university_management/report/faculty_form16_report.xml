@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Report Action -->
+    <record id="action_report_faculty_form16" model="ir.actions.report">
+        <field name="name">Form 16 – TDS Certificate</field>
+        <field name="model">faculty.form16</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">university_management.report_faculty_form16</field>
+        <field name="report_file">university_management.report_faculty_form16</field>
+        <field name="binding_model_id" ref="model_faculty_form16"/>
+        <field name="print_report_name">'Form16 - %s - %s' % (object.faculty_id.name, object.financial_year)</field>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- QWeb Template -->
+    <template id="report_faculty_form16">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page" style="font-family: Arial, sans-serif; font-size: 11px; color: #000;">
+
+                        <!-- ══ HEADER ══ -->
+                        <div style="text-align:center; border-bottom: 2px solid #000; padding-bottom:8px; margin-bottom:10px;">
+                            <h2 style="margin:0; font-size:14px; letter-spacing:1px;">FORM NO. 16</h2>
+                            <p style="margin:2px 0; font-size:10px;">
+                                [See Rule 31(1)(a)]<br/>
+                                Certificate under Section 203 of the Income Tax Act, 1961 for Tax Deducted at Source<br/>
+                                from Income Chargeable under the Head <strong>"SALARIES"</strong>
+                            </p>
+                            <p style="margin:4px 0; font-size:10px;">
+                                <strong>Financial Year: <t t-esc="o.financial_year"/></strong>
+                                &amp;nbsp;&amp;nbsp;|&amp;nbsp;&amp;nbsp;
+                                <strong>Assessment Year: <t t-esc="o.assessment_year"/></strong>
+                            </p>
+                        </div>
+
+                        <!-- ══ PART A ══ -->
+                        <table width="100%" style="border-collapse:collapse; margin-bottom:10px;">
+                            <tr style="background:#1a3a5c; color:#fff;">
+                                <td colspan="4" style="padding:5px 8px; font-weight:bold; font-size:11px;">
+                                    PART A — Details of Tax Deducted and Deposited in the Central Government Account
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="25%" style="border:1px solid #999; padding:5px 8px; font-weight:bold; background:#f5f5f5;">Name and Address of Employer</td>
+                                <td width="25%" style="border:1px solid #999; padding:5px 8px;">
+                                    <strong><t t-esc="o.employer_name"/></strong><br/>
+                                    <t t-esc="o.employer_address"/>
+                                </td>
+                                <td width="25%" style="border:1px solid #999; padding:5px 8px; font-weight:bold; background:#f5f5f5;">TAN of Employer</td>
+                                <td width="25%" style="border:1px solid #999; padding:5px 8px;"><t t-esc="o.employer_tan or 'N/A'"/></td>
+                            </tr>
+                            <tr>
+                                <td style="border:1px solid #999; padding:5px 8px; font-weight:bold; background:#f5f5f5;">PAN of Employer</td>
+                                <td style="border:1px solid #999; padding:5px 8px;"><t t-esc="o.employer_pan or 'N/A'"/></td>
+                                <td style="border:1px solid #999; padding:5px 8px; font-weight:bold; background:#f5f5f5;">Period</td>
+                                <td style="border:1px solid #999; padding:5px 8px;">
+                                    From: <t t-esc="o.period_from"/> &amp;nbsp; To: <t t-esc="o.period_to"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border:1px solid #999; padding:5px 8px; font-weight:bold; background:#f5f5f5;">Name of Employee</td>
+                                <td style="border:1px solid #999; padding:5px 8px;"><strong><t t-esc="o.faculty_id.name"/></strong></td>
+                                <td style="border:1px solid #999; padding:5px 8px; font-weight:bold; background:#f5f5f5;">PAN of Employee</td>
+                                <td style="border:1px solid #999; padding:5px 8px;"><t t-esc="o.pan_number or 'N/A'"/></td>
+                            </tr>
+                            <tr>
+                                <td style="border:1px solid #999; padding:5px 8px; font-weight:bold; background:#f5f5f5;">Designation</td>
+                                <td style="border:1px solid #999; padding:5px 8px;"><t t-esc="o.designation_id.name if o.designation_id else ''"/></td>
+                                <td style="border:1px solid #999; padding:5px 8px; font-weight:bold; background:#f5f5f5;">Department</td>
+                                <td style="border:1px solid #999; padding:5px 8px;"><t t-esc="o.department_id.name if o.department_id else ''"/></td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" style="border:1px solid #999; padding:5px 8px; font-weight:bold; background:#f5f5f5;">Residential Address of Employee</td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" style="border:1px solid #999; padding:5px 8px;"><t t-esc="o.residential_address or ''"/></td>
+                            </tr>
+
+                            <!-- TDS Summary table -->
+                            <tr style="background:#e8ecf0;">
+                                <td colspan="2" style="border:1px solid #999; padding:5px 8px; font-weight:bold; text-align:center;">Gross Salary</td>
+                                <td colspan="2" style="border:1px solid #999; padding:5px 8px; font-weight:bold; text-align:center;">TDS Deducted &amp; Deposited</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" style="border:1px solid #999; padding:5px 8px; text-align:center; font-size:13px; font-weight:bold;">
+                                    ₹ <t t-esc="'{:,.2f}'.format(o.gross_salary)"/>
+                                </td>
+                                <td colspan="2" style="border:1px solid #999; padding:5px 8px; text-align:center; font-size:13px; font-weight:bold;">
+                                    ₹ <t t-esc="'{:,.2f}'.format(o.tds_deposited)"/>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- ══ PART B ══ -->
+                        <table width="100%" style="border-collapse:collapse; margin-bottom:10px;">
+                            <tr style="background:#1a3a5c; color:#fff;">
+                                <td colspan="4" style="padding:5px 8px; font-weight:bold; font-size:11px;">
+                                    PART B — Details of Salary Paid and Tax Computation
+                                </td>
+                            </tr>
+
+                            <!-- Earnings -->
+                            <tr style="background:#dce8f5;">
+                                <td colspan="3" style="border:1px solid #999; padding:4px 8px; font-weight:bold;">Particulars of Salary</td>
+                                <td style="border:1px solid #999; padding:4px 8px; font-weight:bold; text-align:right;">Amount (₹)</td>
+                            </tr>
+                            <t t-set="rows" t-value="[
+                                ('Basic Salary', o.basic_salary),
+                                ('House Rent Allowance (HRA)', o.hra),
+                                ('Dearness Allowance (DA)', o.da),
+                                ('Special Allowance', o.special_allowance),
+                                ('Transport Allowance', o.transport_allow),
+                                ('Medical Allowance', o.medical_allow),
+                                ('Other Allowances', o.other_allowances),
+                                ('Performance Bonus / Incentive', o.performance_bonus),
+                            ]"/>
+                            <t t-foreach="rows" t-as="row" t-key="row_index">
+                                <tr>
+                                    <td colspan="3" style="border:1px solid #ccc; padding:3px 8px;"><t t-esc="row[0]"/></td>
+                                    <td style="border:1px solid #ccc; padding:3px 8px; text-align:right;"><t t-esc="'{:,.2f}'.format(row[1])"/></td>
+                                </tr>
+                            </t>
+                            <tr style="background:#f0f0f0; font-weight:bold;">
+                                <td colspan="3" style="border:1px solid #999; padding:4px 8px;">(a) Gross Salary</td>
+                                <td style="border:1px solid #999; padding:4px 8px; text-align:right;"><t t-esc="'{:,.2f}'.format(o.gross_salary)"/></td>
+                            </tr>
+
+                            <!-- Deductions u/s 16 -->
+                            <tr style="background:#dce8f5;">
+                                <td colspan="4" style="border:1px solid #999; padding:4px 8px; font-weight:bold;">Less: Deductions u/s 16</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" style="border:1px solid #ccc; padding:3px 8px;">Standard Deduction u/s 16(ia)</td>
+                                <td style="border:1px solid #ccc; padding:3px 8px; text-align:right;"><t t-esc="'{:,.2f}'.format(o.standard_deduction)"/></td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" style="border:1px solid #ccc; padding:3px 8px;">Entertainment Allowance u/s 16(ii)</td>
+                                <td style="border:1px solid #ccc; padding:3px 8px; text-align:right;"><t t-esc="'{:,.2f}'.format(o.entertainment_allow_deduction)"/></td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" style="border:1px solid #ccc; padding:3px 8px;">Professional Tax u/s 16(iii)</td>
+                                <td style="border:1px solid #ccc; padding:3px 8px; text-align:right;"><t t-esc="'{:,.2f}'.format(o.professional_tax_deduction)"/></td>
+                            </tr>
+                            <tr style="background:#f0f0f0; font-weight:bold;">
+                                <td colspan="3" style="border:1px solid #999; padding:4px 8px;">(b) Income Chargeable under "Salaries" [a - deductions]</td>
+                                <td style="border:1px solid #999; padding:4px 8px; text-align:right;"><t t-esc="'{:,.2f}'.format(o.income_chargeable)"/></td>
+                            </tr>
+
+                            <!-- Chapter VI-A -->
+                            <tr style="background:#dce8f5;">
+                                <td colspan="4" style="border:1px solid #999; padding:4px 8px; font-weight:bold;">Less: Chapter VI-A Deductions</td>
+                            </tr>
+                            <t t-set="via_rows" t-value="[
+                                ('80C – PF / LIC / PPF / ELSS etc.', o.deduction_80c),
+                                ('80D – Medical Insurance Premium', o.deduction_80d),
+                                ('80E – Interest on Education Loan', o.deduction_80e),
+                                ('80G – Donations', o.deduction_80g),
+                                ('80TTA – Savings Bank Interest', o.deduction_80tta),
+                                ('Other Deductions (Chapter VI-A)', o.other_deductions_vi),
+                            ]"/>
+                            <t t-foreach="via_rows" t-as="vrow" t-key="vrow_index">
+                                <tr>
+                                    <td colspan="3" style="border:1px solid #ccc; padding:3px 8px;"><t t-esc="vrow[0]"/></td>
+                                    <td style="border:1px solid #ccc; padding:3px 8px; text-align:right;"><t t-esc="'{:,.2f}'.format(vrow[1])"/></td>
+                                </tr>
+                            </t>
+                            <tr style="background:#f0f0f0; font-weight:bold;">
+                                <td colspan="3" style="border:1px solid #999; padding:4px 8px;">Total Chapter VI-A Deductions</td>
+                                <td style="border:1px solid #999; padding:4px 8px; text-align:right;"><t t-esc="'{:,.2f}'.format(o.total_vi_a_deductions)"/></td>
+                            </tr>
+
+                            <!-- Tax Computation -->
+                            <tr style="background:#dce8f5;">
+                                <td colspan="4" style="border:1px solid #999; padding:4px 8px; font-weight:bold;">Tax Computation</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" style="border:1px solid #ccc; padding:3px 8px;">Net Taxable Income</td>
+                                <td style="border:1px solid #ccc; padding:3px 8px; text-align:right; font-weight:bold;"><t t-esc="'{:,.2f}'.format(o.net_taxable_income)"/></td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" style="border:1px solid #ccc; padding:3px 8px;">Tax on Total Income (as per applicable slab)</td>
+                                <td style="border:1px solid #ccc; padding:3px 8px; text-align:right;"><t t-esc="'{:,.2f}'.format(o.tax_on_income)"/></td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" style="border:1px solid #ccc; padding:3px 8px;">Less: Rebate u/s 87A</td>
+                                <td style="border:1px solid #ccc; padding:3px 8px; text-align:right;"><t t-esc="'{:,.2f}'.format(o.rebate_87a)"/></td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" style="border:1px solid #ccc; padding:3px 8px;">Surcharge</td>
+                                <td style="border:1px solid #ccc; padding:3px 8px; text-align:right;"><t t-esc="'{:,.2f}'.format(o.surcharge)"/></td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" style="border:1px solid #ccc; padding:3px 8px;">Health and Education Cess @ 4%</td>
+                                <td style="border:1px solid #ccc; padding:3px 8px; text-align:right;"><t t-esc="'{:,.2f}'.format(o.health_edu_cess)"/></td>
+                            </tr>
+                            <tr style="background:#f0f0f0; font-weight:bold;">
+                                <td colspan="3" style="border:1px solid #999; padding:4px 8px;">Total Tax Payable</td>
+                                <td style="border:1px solid #999; padding:4px 8px; text-align:right;"><t t-esc="'{:,.2f}'.format(o.total_tax_payable)"/></td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" style="border:1px solid #ccc; padding:3px 8px;">Less: Relief u/s 89</td>
+                                <td style="border:1px solid #ccc; padding:3px 8px; text-align:right;"><t t-esc="'{:,.2f}'.format(o.relief_89)"/></td>
+                            </tr>
+                            <tr style="background:#1a3a5c; color:#fff; font-weight:bold; font-size:12px;">
+                                <td colspan="3" style="border:1px solid #999; padding:5px 8px;">Net Tax Payable / TDS to be Deducted</td>
+                                <td style="border:1px solid #999; padding:5px 8px; text-align:right;">₹ <t t-esc="'{:,.2f}'.format(o.net_tax_payable)"/></td>
+                            </tr>
+                        </table>
+
+                        <!-- ══ VERIFICATION ══ -->
+                        <table width="100%" style="border-collapse:collapse; margin-top:14px;">
+                            <tr style="background:#1a3a5c; color:#fff;">
+                                <td colspan="2" style="padding:5px 8px; font-weight:bold;">Verification</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" style="border:1px solid #999; padding:8px; font-size:10px;">
+                                    I, <strong><t t-esc="o.authorised_signatory or '___________________________'"/></strong>,
+                                    son/daughter of ________________, working in the capacity of
+                                    <strong><t t-esc="o.designation_signatory or '___________________________'"/></strong>
+                                    do hereby certify that a sum of
+                                    <strong>₹ <t t-esc="'{:,.2f}'.format(o.tds_deposited)"/></strong>
+                                    [Rupees <t t-esc="o.tds_deposited"/>] has been deducted at source and
+                                    deposited to the credit of the Central Government. I further certify that
+                                    the information given above is true and correct based on the books of account,
+                                    documents and other available records.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="50%" style="border:1px solid #999; padding:8px; font-size:10px;">
+                                    Place: <t t-esc="o.place_issued or ''"/><br/><br/>
+                                    Date: <t t-esc="o.date_issued or ''"/>
+                                </td>
+                                <td width="50%" style="border:1px solid #999; padding:8px; font-size:10px; text-align:center;">
+                                    <br/><br/>
+                                    _________________________<br/>
+                                    <strong>Signature of person responsible for deduction of tax</strong><br/>
+                                    <t t-esc="o.authorised_signatory or ''"/><br/>
+                                    <t t-esc="o.designation_signatory or ''"/>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Remarks -->
+                        <t t-if="o.notes">
+                            <div style="margin-top:10px; font-size:10px; border:1px solid #ccc; padding:6px;">
+                                <strong>Remarks:</strong> <t t-esc="o.notes"/>
+                            </div>
+                        </t>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

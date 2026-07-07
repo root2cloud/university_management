@@ -1,0 +1,467 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View - Internship Evaluation -->
+    <record id="internship_evaluation_view_form" model="ir.ui.view">
+        <field name="name">internship.evaluation.view.form</field>
+        <field name="model">internship.evaluation</field>
+        <field name="arch" type="xml">
+            <form string="Internship Evaluation">
+                <header>
+                    <button name="action_submit" string="Submit Evaluation" type="object"
+                            class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft"
+                            type="object"
+                            invisible="state == 'draft'"
+                            confirm="Are you sure you want to reset this Evaluation to draft?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="Evaluation"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Internship Details">
+                            <field name="internship_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="student_id" readonly="1"/>
+                            <field name="evaluation_date"/>
+                        </group>
+                        <group string="Evaluator Details">
+                            <field name="evaluator_type" widget="radio"/>
+                            <field name="evaluator_id"
+                                   invisible="evaluator_type != 'faculty'"
+                                   required="evaluator_type == 'faculty'"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="external_evaluator"
+                                   invisible="evaluator_type != 'external'"
+                                   required="evaluator_type == 'external'"
+                                   placeholder="External Evaluator Name"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Evaluation Criteria" name="criteria">
+                            <group>
+                                <group string="Technical Competencies">
+                                    <label for="technical_skills"/>
+                                    <div class="o_row">
+                                        <field name="technical_skills" class="oe_inline"/>
+                                        <span class="oe_inline"> / 20</span>
+                                    </div>
+                                    <label for="work_quality"/>
+                                    <div class="o_row">
+                                        <field name="work_quality" class="oe_inline"/>
+                                        <span class="oe_inline"> / 20</span>
+                                    </div>
+                                </group>
+                                <group string="Soft Skills">
+                                    <label for="communication"/>
+                                    <div class="o_row">
+                                        <field name="communication" class="oe_inline"/>
+                                        <span class="oe_inline"> / 15</span>
+                                    </div>
+                                    <label for="initiative"/>
+                                    <div class="o_row">
+                                        <field name="initiative" class="oe_inline"/>
+                                        <span class="oe_inline"> / 15</span>
+                                    </div>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Behavioral Skills">
+                                    <label for="teamwork"/>
+                                    <div class="o_row">
+                                        <field name="teamwork" class="oe_inline"/>
+                                        <span class="oe_inline"> / 15</span>
+                                    </div>
+                                    <label for="professionalism"/>
+                                    <div class="o_row">
+                                        <field name="professionalism" class="oe_inline"/>
+                                        <span class="oe_inline"> / 15</span>
+                                    </div>
+                                </group>
+                                <group string="Total Score">
+                                    <label for="total_marks"/>
+                                    <div class="o_row">
+                                        <field name="total_marks" readonly="1" class="oe_inline"/>
+                                        <span class="oe_inline"> / </span>
+                                        <field name="max_marks" readonly="1" class="oe_inline"/>
+                                    </div>
+                                    <field name="overall_rating" widget="priority"/>
+                                </group>
+                            </group>
+
+                            <div class="alert alert-info mt-3" role="alert">
+                                <strong>Evaluation Criteria:</strong>
+                                <ul class="mb-0">
+                                    <li>Technical Skills: 0-20 marks</li>
+                                    <li>Work Quality: 0-20 marks</li>
+                                    <li>Communication: 0-15 marks</li>
+                                    <li>Initiative &amp; Creativity: 0-15 marks</li>
+                                    <li>Teamwork: 0-15 marks</li>
+                                    <li>Professionalism: 0-15 marks</li>
+                                </ul>
+                            </div>
+                        </page>
+
+                        <page string="Feedback" name="feedback">
+                            <group>
+                                <group string="Strengths">
+                                    <field name="strengths" nolabel="1"
+                                           placeholder="Describe the student's key strengths and achievements during internship..."/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Areas of Improvement">
+                                    <field name="areas_of_improvement" nolabel="1"
+                                           placeholder="Mention areas where the student can improve..."/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Overall Comments">
+                                    <field name="comments" nolabel="1"
+                                           placeholder="Provide overall evaluation comments and recommendations..."/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View - Internship Evaluation -->
+    <record id="internship_evaluation_view_list" model="ir.ui.view">
+        <field name="name">internship.evaluation.view.list</field>
+        <field name="model">internship.evaluation</field>
+        <field name="arch" type="xml">
+            <list string="Internship Evaluations"
+                  default_order="evaluation_date desc"
+                  multi_edit="1"
+                  sample="1"
+                  decoration-info="state == 'draft'"
+                  decoration-success="state == 'submitted'">
+                <field name="name"/>
+                <field name="internship_id"/>
+                <field name="student_id"/>
+                <field name="evaluator_type" widget="badge"
+                       decoration-primary="evaluator_type == 'faculty'"
+                       decoration-info="evaluator_type == 'company'"
+                       decoration-warning="evaluator_type == 'external'"
+                       optional="show"/>
+                <field name="evaluator_id" optional="hide"/>
+                <field name="evaluation_date"/>
+                <field name="technical_skills" optional="hide"/>
+                <field name="work_quality" optional="hide"/>
+                <field name="communication" optional="hide"/>
+                <field name="initiative" optional="hide"/>
+                <field name="teamwork" optional="hide"/>
+                <field name="professionalism" optional="hide"/>
+                <field name="total_marks" optional="show"/>
+                <field name="max_marks" optional="hide"/>
+                <field name="overall_rating" widget="priority" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-success="state == 'submitted'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View - Internship Evaluation -->
+    <record id="internship_evaluation_view_search" model="ir.ui.view">
+        <field name="name">internship.evaluation.view.search</field>
+        <field name="model">internship.evaluation</field>
+        <field name="arch" type="xml">
+            <search string="Search Evaluations">
+                <field name="name"/>
+                <field name="internship_id"/>
+                <field name="student_id"/>
+                <field name="evaluator_id"/>
+
+                <separator/>
+
+                <filter name="filter_draft" string="Draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_submitted" string="Submitted"
+                        domain="[('state', '=', 'submitted')]"/>
+
+                <separator/>
+
+                <filter name="filter_faculty" string="Faculty Evaluation"
+                        domain="[('evaluator_type', '=', 'faculty')]"/>
+                <filter name="filter_company" string="Company Evaluation"
+                        domain="[('evaluator_type', '=', 'company')]"/>
+                <filter name="filter_external" string="External Evaluation"
+                        domain="[('evaluator_type', '=', 'external')]"/>
+
+                <separator/>
+
+                <filter name="filter_excellent" string="Excellent (5 Stars)"
+                        domain="[('overall_rating', '=', '5')]"/>
+                <filter name="filter_good" string="Good (4 Stars)"
+                        domain="[('overall_rating', '=', '4')]"/>
+                <filter name="filter_average" string="Average (3 Stars)"
+                        domain="[('overall_rating', '=', '3')]"/>
+
+                <separator/>
+
+                <filter name="filter_high_marks" string="High Marks (&gt;75%)"
+                        domain="[('total_marks', '&gt;=', 75)]"/>
+                <filter name="filter_medium_marks" string="Medium Marks (50-75%)"
+                        domain="[('total_marks', '&gt;=', 50), ('total_marks', '&lt;', 75)]"/>
+                <filter name="filter_low_marks" string="Low Marks (&lt;50%)"
+                        domain="[('total_marks', '&lt;', 50)]"/>
+
+                <separator/>
+
+                <filter name="filter_this_month" string="This Month"
+                        domain="[('evaluation_date', '&gt;=', (context_today().replace(day=1)).strftime('%Y-%m-%d')),
+                                 ('evaluation_date', '&lt;=', ((context_today().replace(day=1) + datetime.timedelta(days=32)).replace(day=1) - datetime.timedelta(days=1)).strftime('%Y-%m-%d'))]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_by_evaluator_type" string="Evaluator Type"
+                            context="{'group_by': 'evaluator_type'}"/>
+                    <filter name="group_by_evaluator" string="Evaluator"
+                            context="{'group_by': 'evaluator_id'}"/>
+                    <filter name="group_by_student" string="Student"
+                            context="{'group_by': 'student_id'}"/>
+                    <filter name="group_by_overall_rating" string="Overall Rating"
+                            context="{'group_by': 'overall_rating'}"/>
+                    <filter name="group_by_evaluation_date" string="Evaluation Date"
+                            context="{'group_by': 'evaluation_date'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="state" string="Status"
+                           select="multi"
+                           operator="in"
+                           icon="fa-flag"/>
+                    <field name="evaluator_type" string="Evaluator Type"
+                           select="multi"
+                           icon="fa-user"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View - Internship Evaluation -->
+    <record id="internship_evaluation_view_kanban" model="ir.ui.view">
+        <field name="name">internship.evaluation.view.kanban</field>
+        <field name="model">internship.evaluation</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="state"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="internship_id"/>
+                <field name="student_id"/>
+                <field name="evaluator_type"/>
+                <field name="evaluator_id"/>
+                <field name="external_evaluator"/>
+                <field name="evaluation_date"/>
+                <field name="technical_skills"/>
+                <field name="work_quality"/>
+                <field name="communication"/>
+                <field name="initiative"/>
+                <field name="teamwork"/>
+                <field name="professionalism"/>
+                <field name="total_marks"/>
+                <field name="max_marks"/>
+                <field name="overall_rating"/>
+                <field name="state"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                        <div class="text-muted mt-1">
+                                            <small>
+                                                <i class="fa fa-calendar"/> <field name="evaluation_date"/>
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_record_top_right">
+                                        <field name="overall_rating" widget="priority"/>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body mt-3">
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded">
+                                                <h6 class="mb-0">
+                                                    <i class="fa fa-briefcase text-primary"/> <field name="internship_id"/>
+                                                </h6>
+                                                <small class="text-muted">
+                                                    <i class="fa fa-user"/> <field name="student_id"/>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="card"
+                                                 t-attf-class="{{
+                                                    record.evaluator_type.raw_value == 'faculty' ? 'bg-primary' :
+                                                    (record.evaluator_type.raw_value == 'company' ? 'bg-info' : 'bg-warning')
+                                                 }} text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h6 class="mb-0">
+                                                        <field name="evaluator_type"/>
+                                                    </h6>
+                                                    <small t-if="record.evaluator_id.raw_value and record.evaluator_type.raw_value == 'faculty'">
+                                                        <field name="evaluator_id"/>
+                                                    </small>
+                                                    <small t-if="record.external_evaluator.raw_value and record.evaluator_type.raw_value == 'external'">
+                                                        <field name="external_evaluator"/>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-6">
+                                            <div class="bg-light p-2 rounded text-center">
+                                                <small class="text-muted">Technical</small>
+                                                <h6 class="mb-0"><field name="technical_skills"/> / 20</h6>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="bg-light p-2 rounded text-center">
+                                                <small class="text-muted">Work Quality</small>
+                                                <h6 class="mb-0"><field name="work_quality"/> / 20</h6>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-4">
+                                            <div class="bg-light p-2 rounded text-center">
+                                                <small class="text-muted">Comm.</small>
+                                                <h6 class="mb-0"><field name="communication"/>/15</h6>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="bg-light p-2 rounded text-center">
+                                                <small class="text-muted">Initiative</small>
+                                                <h6 class="mb-0"><field name="initiative"/>/15</h6>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="bg-light p-2 rounded text-center">
+                                                <small class="text-muted">Team</small>
+                                                <h6 class="mb-0"><field name="teamwork"/>/15</h6>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="alert"
+                                                 t-attf-class="{{
+                                                    record.total_marks.raw_value &gt;= 75 ? 'alert-success' :
+                                                    (record.total_marks.raw_value &gt;= 50 ? 'alert-warning' : 'alert-danger')
+                                                 }} mb-0 p-2 text-center">
+                                                <h4 class="mb-0">
+                                                    <strong><field name="total_marks"/> / <field name="max_marks"/></strong>
+                                                </h4>
+                                                <small>Total Score</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom mt-2">
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_internship_evaluation" model="ir.actions.act_window">
+        <field name="name">Evaluations</field>
+        <field name="res_model">internship.evaluation</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_filter_submitted': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create Internship Evaluation
+            </p>
+            <p>
+                Manage internship evaluations with comprehensive criteria-based assessment. Auto-generated
+                unique name (Evaluation Number, readonly sequence). Select internship_id (Many2one to
+                internship.internship required tracked indexed no-create). View student_id (Many2one
+                related from internship_id.student_id readonly stored). Enter evaluation_date (date
+                default today required). Select evaluator_type (3 options required, radio widget): faculty
+                (Faculty Mentor - primary/blue badge), company (Company Supervisor - info badge), external
+                (External Examiner - warning/yellow badge). Conditional fields: evaluator_id (Many2one to
+                faculty.faculty, visible and required only if evaluator_type is faculty, no-create),
+                external_evaluator (char with placeholder "External Evaluator Name", visible and required
+                only if evaluator_type is external). Enter 6 evaluation criteria (all float default 0.0
+                with inline "/ max" display and validation constraints via _check_marks): technical_skills
+                (0-20 marks, inline " / 20" span), work_quality (0-20 marks, inline " / 20" span),
+                communication (0-15 marks, inline " / 15" span), initiative (Initiative &amp; Creativity, 0-15
+                marks, inline " / 15" span), teamwork (0-15 marks, inline " / 15" span), professionalism
+                (0-15 marks, inline " / 15" span). View total_marks (float computed readonly stored via
+                _compute_total with api.depends('technical_skills','work_quality','communication',
+                'initiative','teamwork','professionalism') summing all 6 criteria, inline with " / " span
+                and max_marks). View max_marks (float default 100.0 readonly inline after total_marks).
+                Select overall_rating (5 options, priority widget): 1-Poor/2-Below Average/3-Average/
+                4-Good/5-Excellent. Enter feedback: strengths (text, placeholder "Describe the student's
+                key strengths and achievements during internship..."), areas_of_improvement (text,
+                placeholder "Mention areas where the student can improve..."), comments (text, placeholder
+                "Provide overall evaluation comments and recommendations..."). Select state (2 options
+                default draft tracked): draft/submitted. Header has Submit Evaluation button (draft only,
+                primary). Statusbar widget for state (visible draft,submitted). Info alert box listing all
+                criteria with their mark ranges. List view with 2-color row decorations: Info (draft),
+                Success/Green (submitted). Badge widgets for evaluator_type (3-color decorations
+                primary/info/warning) and state (2-color decorations). Priority widget for overall_rating.
+                Optional field controls. Kanban view grouped by state showing name as title, calendar icon
+                with evaluation_date small text, overall_rating priority widget at top-right,
+                internship_id/student_id card (light background, briefcase icon primary/blue for
+                internship, user icon for student), evaluator_type card (dynamic 3-color background:
+                primary/faculty, info/company, warning/external, centered, showing evaluator_id if faculty
+                or external_evaluator if external), 2-card grid (6/6) for technical_skills and work_quality
+                (both light background, centered, showing marks/20), 3-card grid (4/4/4) for communication/
+                initiative/teamwork (all light background, centered, abbreviated labels, showing marks/15),
+                total_marks alert card (dynamic 3-color based on score: success if ≥75, warning if 50-74,
+                danger if &lt;50, centered, h4 bold showing total_marks / max_marks with "Total Score"
+                small text). Ordered by evaluation_date desc (most recent first). Default filter for
+                submitted evaluations. Comprehensive search filters for draft/submitted states, 3 evaluator
+                types, 3 top ratings, 3 marks ranges (high/medium/low), this month, group by state/
+                evaluator_type/evaluator/student/overall_rating/evaluation_date. Searchpanel for state and
+                evaluator_type multi-select. Full chatter and activity support. SQL constraint for unique
+                name. Validation constraints ensuring all 6 criteria within their respective valid ranges
+                (technical_skills/work_quality: 0-20, communication/initiative/teamwork/professionalism:
+                0-15) via _check_marks method raising ValidationError.
+            </p>
+        </field>
+    </record>
+
+</odoo>

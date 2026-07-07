@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Report Action -->
+    <record id="action_report_salary_slip" model="ir.actions.report">
+        <field name="name">Salary Slip</field>
+        <field name="model">faculty.salary</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">university_management.report_salary_slip</field>
+        <field name="report_file">university_management.report_salary_slip</field>
+        <field name="binding_model_id" ref="model_faculty_salary"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Report Template -->
+    <template id="report_salary_slip">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+
+                        <!-- Watermark for Draft -->
+                        <div t-if="o.state == 'draft'" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 100pt; color: rgba(0,0,0,0.05); font-weight: bold; z-index: -1;">
+                            DRAFT
+                        </div>
+
+                        <!-- Header -->
+                        <div class="row" style="border: 2px solid #9C27B0; padding: 15px; margin-bottom: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 5%, white 5%);">
+                            <div class="col-3 text-center">
+                                <img t-if="env.company.logo" t-att-src="image_data_uri(env.company.logo)" style="max-height: 70px;"/>
+                            </div>
+                            <div class="col-6 text-center">
+                                <h2 style="color: #9C27B0; margin: 0; font-weight: bold;">
+                                    <t t-esc="env.company.name"/>
+                                </h2>
+                                <p style="margin: 5px 0; font-size: 10pt;">
+                                    <t t-esc="env.company.street or ''"/>
+                                    <t t-if="env.company.city">, <t t-esc="env.company.city"/></t>
+                                </p>
+                                <h3 style="margin: 10px 0 0 0; background: #9C27B0; color: white; padding: 8px; text-transform: uppercase;">
+                                    SALARY SLIP
+                                </h3>
+                            </div>
+                            <div class="col-3 text-right">
+                                <div style="background: white; border: 2px solid #9C27B0; padding: 10px; border-radius: 5px;">
+                                    <p style="margin: 0; font-size: 10pt;"><strong>Slip No:</strong></p>
+                                    <p style="margin: 0; color: #9C27B0; font-size: 12pt; font-weight: bold;">
+                                        <t t-esc="o.name"/>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Salary Period -->
+                        <div style="text-align: center; background: #F3E5F5; padding: 10px; margin-bottom: 20px; border-radius: 5px;">
+                            <h4 style="margin: 0; color: #9C27B0;">
+                                Salary for the Month of
+                                <t t-esc="dict(o._fields['month'].selection)[o.month]"/>
+                                <t t-esc="o.year"/>
+                            </h4>
+                        </div>
+
+                        <!-- Employee Details -->
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="background: #9C27B0; color: white; padding: 6px; margin-bottom: 10px;">
+                                EMPLOYEE DETAILS
+                            </h4>
+                            <table class="table table-bordered table-sm">
+                                <tr>
+                                    <td style="width: 25%; background: #f5f5f5; font-weight: bold;">Employee Name</td>
+                                    <td style="width: 25%;"><t t-esc="o.faculty_id.name"/></td>
+                                    <td style="width: 25%; background: #f5f5f5; font-weight: bold;">Employee ID</td>
+                                    <td style="width: 25%;"><t t-esc="o.faculty_id.faculty_code or 'N/A'"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Designation</td>
+                                    <td><t t-esc="o.faculty_id.designation_id.name or 'N/A'"/></td>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Department</td>
+                                    <td><t t-esc="o.faculty_id.department_id.name or 'N/A'"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Date of Joining</td>
+                                    <td><t t-esc="o.faculty_id.date_of_joining or 'N/A'"/></td>
+                                    <td style="background: #f5f5f5; font-weight: bold;">PAN Number</td>
+                                    <td><t t-esc="o.faculty_id.pan_number or 'N/A'"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Bank Account</td>
+                                    <td><t t-esc="o.faculty_id.bank_account_number or 'N/A'"/></td>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Bank Name</td>
+                                    <td><t t-esc="o.faculty_id.bank_name or 'N/A'"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Payment Method</td>
+                                    <td><t t-esc="dict(o._fields['payment_method'].selection).get(o.payment_method, 'N/A')"/></td>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Payment Date</td>
+                                    <td><t t-esc="o.payment_date or 'N/A'"/></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Salary Breakdown -->
+                        <div class="row" style="margin-bottom: 20px;">
+                            <!-- Earnings -->
+                            <div class="col-6">
+                                <h4 style="background: #4CAF50; color: white; padding: 6px; margin-bottom: 0;">
+                                    EARNINGS
+                                </h4>
+                                <table class="table table-bordered table-sm" style="margin-bottom: 0;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="background: #f5f5f5; font-weight: bold;">Basic Salary</td>
+                                            <td class="text-right">&#8377; <t t-esc="'{:,.2f}'.format(o.basic_salary)"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background: #f5f5f5; font-weight: bold;">HRA</td>
+                                            <td class="text-right">&#8377; <t t-esc="'{:,.2f}'.format(o.hra)"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background: #f5f5f5; font-weight: bold;">DA (Dearness Allowance)</td>
+                                            <td class="text-right">&#8377; <t t-esc="'{:,.2f}'.format(o.da)"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background: #f5f5f5; font-weight: bold;">Transport Allowance</td>
+                                            <td class="text-right">&#8377; <t t-esc="'{:,.2f}'.format(o.transport_allowance)"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background: #f5f5f5; font-weight: bold;">Medical Allowance</td>
+                                            <td class="text-right">&#8377; <t t-esc="'{:,.2f}'.format(o.medical_allowance)"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background: #f5f5f5; font-weight: bold;">Special Allowance</td>
+                                            <td class="text-right">&#8377; <t t-esc="'{:,.2f}'.format(o.special_allowance)"/></td>
+                                        </tr>
+                                        <tr t-if="o.other_allowances > 0">
+                                            <td style="background: #f5f5f5; font-weight: bold;">Other Allowances</td>
+                                            <td class="text-right">&#8377; <t t-esc="'{:,.2f}'.format(o.other_allowances)"/></td>
+                                        </tr>
+                                        <tr t-if="o.performance_bonus > 0">
+                                            <td style="background: #f5f5f5; font-weight: bold;">Performance Bonus</td>
+                                            <td class="text-right">&#8377; <t t-esc="'{:,.2f}'.format(o.performance_bonus)"/></td>
+                                        </tr>
+                                        <tr t-if="o.overtime_pay > 0">
+                                            <td style="background: #f5f5f5; font-weight: bold;">Overtime Pay</td>
+                                            <td class="text-right">&#8377; <t t-esc="'{:,.2f}'.format(o.overtime_pay)"/></td>
+                                        </tr>
+                                        <tr style="background: #C8E6C9; font-weight: bold; font-size: 11pt;">
+                                            <td>GROSS EARNINGS</td>
+                                            <td class="text-right">&#8377; <t t-esc="'{:,.2f}'.format(o.total_earnings)"/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Deductions -->
+                            <div class="col-6">
+                                <h4 style="background: #F44336; color: white; padding: 6px; margin-bottom: 0;">
+                                    DEDUCTIONS
+                                </h4>
+                                <table class="table table-bordered table-sm" style="margin-bottom: 0;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="background: #f5f5f5; font-weight: bold;">Provident Fund (PF)</td>
+                                            <td class="text-right">&#8377; <t t-esc="'{:,.2f}'.format(o.pf)"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background: #f5f5f5; font-weight: bold;">ESI</td>
+                                            <td class="text-right">&#8377; <t t-esc="'{:,.2f}'.format(o.esi)"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background: #f5f5f5; font-weight: bold;">Professional Tax</td>
+                                            <td class="text-right">&#8377; <t t-esc="'{:,.2f}'.format(o.professional_tax)"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background: #f5f5f5; font-weight: bold;">Income Tax (TDS)</td>
+                                            <td class="text-right">&#8377; <t t-esc="'{:,.2f}'.format(o.income_tax)"/></td>
+                                        </tr>
+                                        <tr t-if="o.leave_deduction > 0">
+                                            <td style="background: #f5f5f5; font-weight: bold;">LWP Deduction (<t t-esc="o.leave_without_pay_days"/> days)</td>
+                                            <td class="text-right">&#8377; <t t-esc="'{:,.2f}'.format(o.leave_deduction)"/></td>
+                                        </tr>
+                                        <tr t-if="o.advance_deduction > 0">
+                                            <td style="background: #f5f5f5; font-weight: bold;">Advance Deduction</td>
+                                            <td class="text-right">&#8377; <t t-esc="'{:,.2f}'.format(o.advance_deduction)"/></td>
+                                        </tr>
+                                        <tr t-if="o.loan_deduction > 0">
+                                            <td style="background: #f5f5f5; font-weight: bold;">Loan Deduction</td>
+                                            <td class="text-right">&#8377; <t t-esc="'{:,.2f}'.format(o.loan_deduction)"/></td>
+                                        </tr>
+                                        <tr t-if="o.other_deductions > 0">
+                                            <td style="background: #f5f5f5; font-weight: bold;">Other Deductions</td>
+                                            <td class="text-right">&#8377; <t t-esc="'{:,.2f}'.format(o.other_deductions)"/></td>
+                                        </tr>
+                                        <tr style="background: #FFCDD2; font-weight: bold; font-size: 11pt;">
+                                            <td>TOTAL DEDUCTIONS</td>
+                                            <td class="text-right">&#8377; <t t-esc="'{:,.2f}'.format(o.total_deductions)"/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Net Salary -->
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+                            <div class="row">
+                                <div class="col-8">
+                                    <h3 style="margin: 0;">NET SALARY PAYABLE</h3>
+                                    <p style="margin: 5px 0 0 0; font-size: 10pt; opacity: 0.9;">
+                                        (Gross Earnings - Total Deductions)
+                                    </p>
+                                </div>
+                                <div class="col-4 text-right">
+                                    <h2 style="margin: 0; font-size: 24pt;">
+                                        &#8377; <t t-esc="'{:,.2f}'.format(o.net_salary)"/>
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Important Note -->
+                        <div style="background: #FFF9C4; border-left: 4px solid #FFC107; padding: 10px; margin-bottom: 30px; font-size: 9pt;">
+                            <p style="margin: 0;">
+                                <strong>Note:</strong> This is a computer-generated salary slip and does not require signature.
+                                For any queries regarding salary, please contact the HR Department.
+                            </p>
+                        </div>
+
+                        <!-- Signatures -->
+                        <div class="row" style="margin-top: 60px;">
+                            <div class="col-6">
+                                <div style="border-top: 2px solid #333; padding-top: 5px; text-align: center;">
+                                    <strong>Prepared By</strong><br/>
+                                    <span style="font-size: 9pt;">Accounts Department</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div style="border-top: 2px solid #333; padding-top: 5px; text-align: center;">
+                                    <strong>Authorized Signatory</strong><br/>
+                                    <span style="font-size: 9pt;">HR Manager</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="text-center" style="margin-top: 20px; font-size: 9pt; color: #666;">
+                            <p style="margin: 0;">
+                                This is a system-generated document. For queries: <t t-esc="env.company.email or ''"/>
+                            </p>
+                        </div>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

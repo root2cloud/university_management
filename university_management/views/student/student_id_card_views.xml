@@ -1,0 +1,1016 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="student_id_card_view_form" model="ir.ui.view">
+        <field name="name">student.id.card.view.form</field>
+        <field name="model">student.id.card</field>
+        <field name="arch" type="xml">
+            <form string="Student ID Card">
+                <header>
+                    <button name="action_print" string="Print ID Card"
+                            type="object" class="oe_highlight"
+                            invisible="state not in ['draft', 'printed']"/>
+                    <button name="action_issue" string="Issue Card"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'printed'"
+                            groups="base.group_user"/>
+                    <button name="action_report_lost" string="Report Lost"
+                            type="object"
+                            invisible="state not in ['issued', 'printed']"
+                            confirm="Are you sure this ID card is lost or stolen?"/>
+                    <button name="action_generate_duplicate" string="Generate Duplicate"
+                            type="object"
+                            invisible="state != 'lost'"/>
+                    <button name="action_cancel" string="Cancel"
+                            type="object"
+                            invisible="state in ['cancelled', 'lost']"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft"
+                            type="object"
+                            invisible="state == 'draft'"
+                            confirm="Are you sure you want to reset this id card to draft?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,printed,issued"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Issued"
+                            bg_color="text-bg-success"
+                            invisible="state != 'issued'"/>
+                    <widget name="web_ribbon" title="Expired"
+                            bg_color="text-bg-danger"
+                            invisible="state != 'expired'"/>
+                    <widget name="web_ribbon" title="Lost/Stolen"
+                            bg_color="text-bg-warning"
+                            invisible="state != 'lost'"/>
+                    <widget name="web_ribbon" title="Duplicate"
+                            bg_color="text-bg-info"
+                            invisible="not is_duplicate"/>
+
+                    <field name="student_photo" widget="image" class="oe_avatar"/>
+
+                    <div class="oe_title">
+                        <label for="student_id" string="Student"/>
+                        <h1>
+                            <field name="student_id"
+                                   placeholder="Select Student"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                        </h1>
+                        <h2>
+                            <field name="name" readonly="1"/>
+                        </h2>
+                    </div>
+
+                    <group>
+                        <group string="Student Information">
+                            <field name="student_name" readonly="1"/>
+                            <field name="registration_number" readonly="1"/>
+                            <field name="program_id" readonly="1"/>
+                            <field name="department_id" readonly="1"/>
+                            <field name="batch_id" readonly="1"/>
+                        </group>
+                        <group string="Card Details">
+                            <field name="card_type"/>
+                            <field name="issue_date" widget="date"/>
+                            <field name="expiry_date" widget="date"/>
+                            <field name="is_valid" widget="boolean" readonly="1"/>
+                            <field name="issued_by" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Emergency Information">
+                            <field name="blood_group" readonly="1"/>
+                            <field name="emergency_contact" readonly="1" widget="phone"/>
+                        </group>
+                        <group string="QR Code &amp; Barcode">
+                            <field name="qr_code" widget="image" readonly="1"/>
+                            <field name="qr_data" readonly="1"/>
+                            <field name="barcode"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Duplicate/Lost Details" name="duplicate"
+                              invisible="not is_duplicate and state != 'lost'">
+                            <group>
+                                <group>
+                                    <field name="is_duplicate" widget="boolean_toggle" readonly="1"/>
+                                    <field name="original_card_id"
+                                           invisible="not is_duplicate"
+                                           options="{'no_create': True}"/>
+                                </group>
+                                <group>
+                                    <field name="lost_date" widget="date"
+                                           invisible="state != 'lost'"/>
+                                </group>
+                            </group>
+                            <group invisible="state != 'lost'">
+                                <field name="lost_reason"
+                                       placeholder="Describe how/where the card was lost..."
+                                       nolabel="1"/>
+                            </group>
+
+                            <separator string="Duplicate Card Fee"
+                                       invisible="not is_duplicate"/>
+                            <group invisible="not is_duplicate">
+                                <group>
+                                    <field name="duplicate_fee" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="currency_id" invisible="1"/>
+                                </group>
+                                <group>
+                                    <field name="duplicate_fee_paid" widget="boolean_toggle"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Notes" name="notes">
+                            <field name="notes" placeholder="Enter any additional notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="student_id_card_view_list" model="ir.ui.view">
+        <field name="name">student.id.card.view.list</field>
+        <field name="model">student.id.card</field>
+        <field name="arch" type="xml">
+            <list string="Student ID Cards" default_order="issue_date desc" sample="1">
+                <field name="student_photo" widget="image" optional="show"/>
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="registration_number" optional="show"/>
+                <field name="program_id" optional="hide"/>
+                <field name="department_id" optional="hide"/>
+                <field name="batch_id" optional="hide"/>
+                <field name="card_type" optional="show"/>
+                <field name="issue_date"/>
+                <field name="expiry_date"/>
+                <field name="is_valid" widget="boolean_toggle" optional="show"/>
+                <field name="is_duplicate" widget="boolean_toggle" optional="hide"/>
+                <field name="blood_group" optional="hide"/>
+                <field name="issued_by" optional="hide"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="student_id_card_view_search" model="ir.ui.view">
+        <field name="name">student.id.card.view.search</field>
+        <field name="model">student.id.card</field>
+        <field name="arch" type="xml">
+            <search string="Search ID Cards">
+                <field name="name" string="ID Card"
+                       filter_domain="['|', ('name', 'ilike', self), ('student_id', 'ilike', self)]"/>
+                <field name="student_id"/>
+                <field name="registration_number"/>
+                <field name="program_id"/>
+                <field name="department_id"/>
+                <field name="batch_id"/>
+
+                <separator/>
+
+                <filter name="filter_draft" string="Draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_printed" string="Printed"
+                        domain="[('state', '=', 'printed')]"/>
+                <filter name="filter_issued" string="Issued"
+                        domain="[('state', '=', 'issued')]"/>
+                <filter name="filter_expired" string="Expired"
+                        domain="[('state', '=', 'expired')]"/>
+                <filter name="filter_lost" string="Lost/Stolen"
+                        domain="[('state', '=', 'lost')]"/>
+                <filter name="filter_cancelled" string="Cancelled"
+                        domain="[('state', '=', 'cancelled')]"/>
+
+                <separator/>
+
+                <filter name="filter_valid" string="Valid Cards"
+                        domain="[('is_valid', '=', True)]"/>
+                <filter name="filter_invalid" string="Invalid/Expired"
+                        domain="[('is_valid', '=', False)]"/>
+
+                <separator/>
+
+                <filter name="filter_regular" string="Regular"
+                        domain="[('card_type', '=', 'regular')]"/>
+                <filter name="filter_temporary" string="Temporary"
+                        domain="[('card_type', '=', 'temporary')]"/>
+                <filter name="filter_duplicate" string="Duplicate"
+                        domain="[('card_type', '=', 'duplicate')]"/>
+
+                <separator/>
+
+                <filter name="filter_expiring_soon" string="Expiring Soon (30 days)"
+                        domain="[('expiry_date', '&gt;=', context_today().strftime('%Y-%m-%d')),
+                                 ('expiry_date', '&lt;=', (context_today() + datetime.timedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+
+                <filter name="filter_this_month" string="Issued This Month"
+                        domain="[('issue_date', '&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d')),
+                                 ('issue_date', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d'))]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_student" string="Student"
+                            context="{'group_by': 'student_id'}"/>
+                    <filter name="group_by_program" string="Program"
+                            context="{'group_by': 'program_id'}"/>
+                    <filter name="group_by_department" string="Department"
+                            context="{'group_by': 'department_id'}"/>
+                    <filter name="group_by_batch" string="Batch"
+                            context="{'group_by': 'batch_id'}"/>
+                    <filter name="group_by_card_type" string="Card Type"
+                            context="{'group_by': 'card_type'}"/>
+                    <filter name="group_by_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_by_issued_by" string="Issued By"
+                            context="{'group_by': 'issued_by'}"/>
+                    <filter name="group_by_issue_date" string="Issue Date"
+                            context="{'group_by': 'issue_date'}"/>
+                    <filter name="group_by_expiry_date" string="Expiry Date"
+                            context="{'group_by': 'expiry_date'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="program_id" string="Program"
+                           select="multi"
+                           icon="fa-graduation-cap"/>
+                    <field name="department_id" string="Department"
+                           select="multi"
+                           icon="fa-building"/>
+                    <field name="card_type" string="Card Type"
+                           select="multi"
+                           icon="fa-id-card"/>
+                    <field name="state" string="Status"
+                           select="multi"
+                           icon="fa-filter"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="student_id_card_view_kanban" model="ir.ui.view">
+        <field name="name">student.id.card.view.kanban</field>
+        <field name="model">student.id.card</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="state"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="student_photo"/>
+                <field name="registration_number"/>
+                <field name="card_type"/>
+                <field name="issue_date"/>
+                <field name="expiry_date"/>
+                <field name="is_valid"/>
+                <field name="is_duplicate"/>
+                <field name="state"/>
+                <field name="qr_code"/>
+
+                <progressbar field="state"
+                             colors='{"draft": "muted", "printed": "info", "issued": "success", "expired": "danger", "lost": "warning", "cancelled": "secondary"}'/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <img t-att-src="kanban_image('student.id.card', 'student_photo', record.id.raw_value)"
+                                     alt="Student Photo"
+                                     class="o_image_128_max"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="student_id"/>
+                                        </strong>
+                                        <div class="text-muted">
+                                            <field name="name"/>
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_record_top_right">
+                                        <field name="state" widget="badge"
+                                               decoration-muted="state == 'draft'"
+                                               decoration-info="state == 'printed'"
+                                               decoration-success="state == 'issued'"
+                                               decoration-danger="state in ['expired', 'lost']"
+                                               decoration-secondary="state == 'cancelled'"/>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body">
+                                    <div class="row mb-2">
+                                        <div class="col-6">
+                                            <i class="fa fa-id-card text-primary"/>
+                                            <field name="card_type"/>
+                                        </div>
+                                        <div class="col-6">
+                                            <field name="registration_number"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-6">
+                                            <i class="fa fa-calendar text-info"/>
+                                            Issued: <field name="issue_date"/>
+                                        </div>
+                                        <div class="col-6">
+                                            <i class="fa fa-calendar-times-o text-warning"/>
+                                            Expires: <field name="expiry_date"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-6">
+                                            <span t-if="record.is_valid.raw_value"
+                                                  class="badge text-bg-success">
+                                                <i class="fa fa-check"/> Valid
+                                            </span>
+                                            <span t-else="" class="badge text-bg-danger">
+                                                <i class="fa fa-times"/> Expired
+                                            </span>
+                                        </div>
+                                        <div class="col-6">
+                                            <span t-if="record.is_duplicate.raw_value"
+                                                  class="badge text-bg-info">
+                                                <i class="fa fa-clone"/> Duplicate
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-2" t-if="record.qr_code.raw_value">
+                                        <div class="col-12 text-center">
+                                            <img t-att-src="'data:image/png;base64,' + record.qr_code.raw_value"
+                                                 alt="QR Code"
+                                                 style="max-width: 100px; max-height: 100px;"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Calendar View -->
+    <record id="student_id_card_view_calendar" model="ir.ui.view">
+        <field name="name">student.id.card.view.calendar</field>
+        <field name="model">student.id.card</field>
+        <field name="arch" type="xml">
+            <calendar string="ID Card Calendar"
+                      date_start="issue_date"
+                      date_stop="expiry_date"
+                      color="card_type"
+                      mode="month"
+                      event_open_popup="true"
+                      quick_create="false">
+                <field name="student_id"/>
+                <field name="name"/>
+                <field name="registration_number"/>
+                <field name="card_type"/>
+                <field name="state"/>
+                <field name="is_valid"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="student_id_card_view_pivot" model="ir.ui.view">
+        <field name="name">student.id.card.view.pivot</field>
+        <field name="model">student.id.card</field>
+        <field name="arch" type="xml">
+            <pivot string="ID Card Analysis">
+                <field name="program_id" type="row"/>
+                <field name="card_type" type="row"/>
+                <field name="state" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View -->
+    <record id="student_id_card_view_graph" model="ir.ui.view">
+        <field name="name">student.id.card.view.graph</field>
+        <field name="model">student.id.card</field>
+        <field name="arch" type="xml">
+            <graph string="ID Card Statistics" type="bar" stacked="1">
+                <field name="card_type"/>
+                <field name="state"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_student_id_card" model="ir.actions.act_window">
+        <field name="name">Student ID Cards</field>
+        <field name="res_model">student.id.card</field>
+        <field name="view_mode">kanban,list,form,calendar,pivot,graph</field>
+        <field name="context">{
+            'search_default_filter_issued': 1,
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Generate your first Student ID Card
+            </p>
+            <p>
+                Create and manage student ID cards with QR codes, track validity periods,
+                handle lost cards, and generate duplicates with automated fee tracking.
+            </p>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="student_leave_view_form" model="ir.ui.view">
+        <field name="name">student.leave.view.form</field>
+        <field name="model">student.leave</field>
+        <field name="arch" type="xml">
+            <form string="Student Leave Application">
+                <header>
+                    <button name="action_submit" string="Submit"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'draft'"
+                            confirm="Are you sure you want to submit this leave application?"/>
+                    <button name="action_approve" string="Approve"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'submitted'"
+                            confirm="Are you sure you want to approve this leave?"/>
+                    <button name="action_reject" string="Reject"
+                            type="object"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_set_draft" string="Reset to Draft"
+                            type="object"
+                            invisible="state in ['draft']"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,approved,rejected"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="Leave Number"/>
+                        <h1>
+                            <field name="name" widget="copy" placeholder="Leave Reference"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Leave Details">
+                            <field name="student_id" widget="many2one"
+                                   options="{'no_create': True, 'no_create_edit': True}"
+                                   required="1"/>
+                            <field name="leave_type" required="1"/>
+                            <field name="date_from" widget="date" required="1"/>
+                            <field name="date_to" widget="date" required="1"/>
+                            <field name="number_of_days" readonly="1" widget="float"/>
+                        </group>
+                        <group string="Approval Information">
+                            <field name="approved_by" widget="many2one" readonly="1"
+                                   options="{'no_create': True}"/>
+                            <field name="approval_date" widget="date" readonly="1"/>
+                            <field name="state" invisible="1"/>
+                            <field name="rejection_reason" placeholder="Enter rejection reason if applicable..."
+                                   invisible="state != 'rejected'"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Reason for Leave" colspan="2">
+                            <field name="reason" placeholder="Please provide detailed reason for leave application..."
+                                   nolabel="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Documents" name="documents">
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                        </page>
+
+                        <page string="Comments" name="comments">
+                            <field name="note" nolabel="1" placeholder="Additional comments or notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="student_leave_view_list" model="ir.ui.view">
+        <field name="name">student.leave.view.list</field>
+        <field name="model">student.leave</field>
+        <field name="arch" type="xml">
+            <list string="Student Leave Applications"
+                  default_order="date_from desc"
+                  sample="1">
+                <field name="name" string="Leave Number"/>
+                <field name="student_id" string="Student"/>
+                <field name="date_from" widget="date"/>
+                <field name="date_to" widget="date"/>
+                <field name="number_of_days"
+                       decoration-success="number_of_days &lt;= 3"
+                       decoration-warning="number_of_days &gt; 3 and number_of_days &lt;= 7"
+                       decoration-danger="number_of_days &gt; 7"/>
+                <field name="leave_type"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'submitted'"
+                       decoration-success="state == 'approved'"
+                       decoration-danger="state == 'rejected'"/>
+                <field name="approved_by" optional="show"/>
+                <field name="approval_date" optional="hide" widget="date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="student_leave_view_search" model="ir.ui.view">
+        <field name="name">student.leave.view.search</field>
+        <field name="model">student.leave</field>
+        <field name="arch" type="xml">
+            <search string="Search Leave Applications">
+                <field name="name" string="Leave Number"/>
+                <field name="student_id"/>
+                <field name="leave_type"/>
+
+                <separator/>
+
+                <filter name="filter_draft" string="Draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_submitted" string="Submitted"
+                        domain="[('state', '=', 'submitted')]"/>
+                <filter name="filter_approved" string="Approved"
+                        domain="[('state', '=', 'approved')]"/>
+                <filter name="filter_rejected" string="Rejected"
+                        domain="[('state', '=', 'rejected')]"/>
+
+                <separator/>
+
+                <filter name="filter_today" string="Today"
+                        domain="[('date_from', '=', context_today())]"/>
+                <filter name="filter_this_week" string="This Week"
+                        domain="[('date_from', '&gt;=', context_today()),
+                                 ('date_from', '&lt;=', context_today() + datetime.timedelta(days=7))]"/>
+                <filter name="filter_this_month" string="This Month"
+                        domain="[('date_from', '&gt;=', context_today().replace(day=1)),
+                                 ('date_from', '&lt;=', context_today())]"/>
+                <filter name="filter_upcoming" string="Upcoming"
+                        domain="[('date_from', '&gt;', context_today())]"/>
+
+                <separator/>
+
+                <filter name="filter_short_leave" string="Short Leave (&lt;=3 days)"
+                        domain="[('number_of_days', '&lt;=', 3)]"/>
+                <filter name="filter_long_leave" string="Long Leave (&gt;7 days)"
+                        domain="[('number_of_days', '&gt;', 7)]"/>
+
+                <separator/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_student" string="Student"
+                            context="{'group_by': 'student_id'}"/>
+                    <filter name="group_by_leave_type" string="Leave Type"
+                            context="{'group_by': 'leave_type'}"/>
+                    <filter name="group_by_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_by_month" string="Month"
+                            context="{'group_by': 'date_from:month'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="student_id" string="Student"
+                           select="multi"
+                           icon="fa-user"/>
+                    <field name="leave_type" string="Leave Type"
+                           select="multi"
+                           icon="fa-calendar"/>
+                    <field name="state" string="Status"
+                           select="multi"
+                           icon="fa-filter"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Calendar View -->
+    <record id="student_leave_view_calendar" model="ir.ui.view">
+        <field name="name">student.leave.view.calendar</field>
+        <field name="model">student.leave</field>
+        <field name="arch" type="xml">
+            <calendar string="Leave Calendar"
+                      date_start="date_from"
+                      date_stop="date_to"
+                      color="student_id"
+                      mode="month"
+                      event_open_popup="true"
+                      quick_create="false">
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="leave_type"/>
+                <field name="state"/>
+                <field name="number_of_days"/>
+                <field name="reason"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="student_leave_view_pivot" model="ir.ui.view">
+        <field name="name">student.leave.view.pivot</field>
+        <field name="model">student.leave</field>
+        <field name="arch" type="xml">
+            <pivot string="Leave Analysis">
+                <field name="student_id" type="row"/>
+                <field name="leave_type" type="col"/>
+                <field name="date_from" type="col" interval="month"/>
+                <field name="state" type="col"/>
+                <field name="number_of_days" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View -->
+    <record id="student_leave_view_graph" model="ir.ui.view">
+        <field name="name">student.leave.view.graph</field>
+        <field name="model">student.leave</field>
+        <field name="arch" type="xml">
+            <graph string="Leave Statistics" type="bar" stacked="1">
+                <field name="leave_type"/>
+                <field name="state"/>
+                <field name="number_of_days" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_student_leave" model="ir.actions.act_window">
+        <field name="name">Student Leave Applications</field>
+        <field name="res_model">student.leave</field>
+        <field name="view_mode">list,form,calendar,pivot,graph</field>
+        <field name="context">{
+            'search_default_filter_submitted': 1,
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add your first Student Leave Application
+            </p>
+            <p>
+                Manage student leave applications with approval workflow.
+                Track leave history, types, and durations.
+            </p>
+        </field>
+    </record>
+
+
+    <!-- Form View -->
+    <record id="id_card_request_view_form" model="ir.ui.view">
+        <field name="name">id.card.request.view.form</field>
+        <field name="model">id.card.request</field>
+        <field name="arch" type="xml">
+            <form string="ID Card Request">
+                <header>
+                    <button name="action_submit" string="Submit"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'draft'"
+                            confirm="Are you sure you want to submit this ID card request?"/>
+                    <button name="action_approve" string="Approve"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'submitted'"
+                            confirm="Are you sure you want to approve this request?"/>
+                    <button name="action_reject" string="Reject"
+                            type="object"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_complete" string="Mark as Completed"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'approved'"/>
+                    <button name="action_set_draft" string="Reset to Draft"
+                            type="object"
+                            invisible="state in ['draft']"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,approved,rejected,completed"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Urgent" bg_color="text-bg-danger"
+                            invisible="request_type != 'lost' or state != 'submitted'"/>
+
+                    <div class="oe_title">
+                        <label for="student_id" string="Student"/>
+                        <h1>
+                            <field name="student_id" widget="many2one_avatar" placeholder="Select Student"/>
+                        </h1>
+                        <h2 class="text-muted">
+                            <field name="request_type"/>
+                            <span class="ms-2">
+                                Request Date: <field name="request_date" widget="date"/>
+                            </span>
+                        </h2>
+                    </div>
+
+                    <group>
+                        <group string="Request Information">
+                            <field name="student_id" widget="many2one" required="1"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="request_type" widget="radio" options="{'horizontal': true}" required="1"/>
+                            <field name="request_date" widget="date" readonly="1"/>
+                            <field name="urgency_level" widget="priority"
+                                   invisible="request_type != 'lost'"/>
+                        </group>
+                        <group string="Approval Information">
+                            <field name="state" invisible="1"/>
+                            <field name="approved_by" widget="many2one" readonly="1"
+                                   options="{'no_create': True}"/>
+                            <field name="approval_date" widget="date" readonly="1"/>
+                            <field name="rejection_reason" placeholder="Enter rejection reason if applicable..."
+                                   invisible="state != 'rejected'"/>
+                            <field name="completion_notes" placeholder="Enter completion notes..."
+                                   invisible="state != 'completed'"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Request Details" colspan="2">
+                            <field name="reason" placeholder="Please provide detailed reason for the ID card request..."
+                                   nolabel="1" required="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Documents" name="documents">
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                            <field name="lost_police_complaint" widget="binary"
+                                   invisible="request_type != 'lost'"
+                                   string="Police Complaint Copy"/>
+                        </page>
+
+                        <page string="Processing" name="processing" invisible="state not in ['approved', 'completed']">
+                            <group>
+                                <group string="Processing Details">
+                                    <field name="processing_fee" widget="monetary"/>
+                                    <field name="estimated_delivery_date" widget="date"/>
+                                    <field name="delivery_method"/>
+                                </group>
+                                <group string="New Card Details">
+                                    <field name="new_card_issue_date" widget="date"/>
+                                    <field name="new_card_expiry_date" widget="date"/>
+                                    <field name="new_card_number"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="id_card_request_view_list" model="ir.ui.view">
+        <field name="name">id.card.request.view.list</field>
+        <field name="model">id.card.request</field>
+        <field name="arch" type="xml">
+            <list string="ID Card Requests"
+                  default_order="request_date desc"
+                  sample="1">
+                <field name="student_id" widget="many2one_avatar"/>
+                <field name="request_type"/>
+                <field name="request_date" widget="date"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'submitted'"
+                       decoration-success="state == 'approved'"
+                       decoration-danger="state == 'rejected'"
+                       decoration-primary="state == 'completed'"/>
+                <field name="approved_by" widget="many2one_avatar" optional="show"/>
+                <field name="approval_date" widget="date" optional="hide"/>
+                <field name="estimated_delivery_date" widget="date" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="id_card_request_view_search" model="ir.ui.view">
+        <field name="name">id.card.request.view.search</field>
+        <field name="model">id.card.request</field>
+        <field name="arch" type="xml">
+            <search string="Search ID Card Requests">
+                <field name="student_id"/>
+                <field name="request_type"/>
+
+                <separator/>
+
+                <filter name="filter_draft" string="Draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_submitted" string="Submitted"
+                        domain="[('state', '=', 'submitted')]"/>
+                <filter name="filter_approved" string="Approved"
+                        domain="[('state', '=', 'approved')]"/>
+                <filter name="filter_rejected" string="Rejected"
+                        domain="[('state', '=', 'rejected')]"/>
+                <filter name="filter_completed" string="Completed"
+                        domain="[('state', '=', 'completed')]"/>
+
+                <separator/>
+
+                <filter name="filter_today" string="Today"
+                        domain="[('request_date', '=', context_today())]"/>
+                <filter name="filter_this_week" string="This Week"
+                        domain="[('request_date', '&gt;=', context_today()),
+                                 ('request_date', '&lt;=', context_today() + datetime.timedelta(days=7))]"/>
+                <filter name="filter_this_month" string="This Month"
+                        domain="[('request_date', '&gt;=', context_today().replace(day=1)),
+                                 ('request_date', '&lt;=', context_today())]"/>
+
+                <separator/>
+
+                <filter name="filter_lost_cards" string="Lost Cards"
+                        domain="[('request_type', '=', 'lost')]"/>
+                <filter name="filter_urgent" string="Urgent (Lost)"
+                        domain="[('request_type', '=', 'lost'), ('state', '=', 'submitted')]"/>
+                <filter name="filter_renewals" string="Renewals"
+                        domain="[('request_type', '=', 'renewal')]"/>
+
+                <separator/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_student" string="Student"
+                            context="{'group_by': 'student_id'}"/>
+                    <filter name="group_by_request_type" string="Request Type"
+                            context="{'group_by': 'request_type'}"/>
+                    <filter name="group_by_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_by_month" string="Month"
+                            context="{'group_by': 'request_date:month'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="student_id" string="Student"
+                           select="multi"
+                           icon="fa-user"/>
+                    <field name="request_type" string="Request Type"
+                           select="multi"
+                           icon="fa-id-card"/>
+                    <field name="state" string="Status"
+                           select="multi"
+                           icon="fa-filter"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="id_card_request_view_kanban" model="ir.ui.view">
+        <field name="name">id.card.request.view.kanban</field>
+        <field name="model">id.card.request</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="state"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="student_id"/>
+                <field name="request_type"/>
+                <field name="request_date"/>
+                <field name="state"/>
+                <field name="reason"/>
+
+                <progressbar field="state"
+                             colors='{"draft": "muted", "submitted": "warning", "approved": "info", "rejected": "danger", "completed": "success"}'/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <img t-att-src="kanban_image('student.student', 'student_photo', record.student_id.raw_value.id)"
+                                     alt="Student Photo"
+                                     class="o_image_64_max"
+                                     t-if="record.student_id.raw_value"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="student_id"/>
+                                        </strong>
+                                        <div class="text-muted">
+                                            <field name="request_type"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body">
+                                    <div class="row">
+                                        <div class="col-12 mb-1">
+                                            <i class="fa fa-calendar text-primary"/>
+                                            <field name="request_date" widget="date"/>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="text-truncate">
+                                                <i class="fa fa-file-text-o text-info"/>
+                                                <small><field name="reason"/></small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="state" widget="badge"
+                                               decoration-info="state == 'draft'"
+                                               decoration-warning="state == 'submitted'"
+                                               decoration-success="state == 'approved'"
+                                               decoration-danger="state == 'rejected'"
+                                               decoration-primary="state == 'completed'"/>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Calendar View -->
+    <record id="id_card_request_view_calendar" model="ir.ui.view">
+        <field name="name">id.card.request.view.calendar</field>
+        <field name="model">id.card.request</field>
+        <field name="arch" type="xml">
+            <calendar string="ID Card Request Calendar"
+                      date_start="request_date"
+                      color="request_type"
+                      mode="month"
+                      event_open_popup="true"
+                      quick_create="false">
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="request_type"/>
+                <field name="state"/>
+                <field name="reason"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="id_card_request_view_pivot" model="ir.ui.view">
+        <field name="name">id.card.request.view.pivot</field>
+        <field name="model">id.card.request</field>
+        <field name="arch" type="xml">
+            <pivot string="ID Card Request Analysis">
+                <field name="student_id" type="row"/>
+                <field name="request_type" type="col"/>
+                <field name="state" type="col"/>
+                <field name="request_date" type="col" interval="month"/>
+                <field name="id" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View -->
+    <record id="id_card_request_view_graph" model="ir.ui.view">
+        <field name="name">id.card.request.view.graph</field>
+        <field name="model">id.card.request</field>
+        <field name="arch" type="xml">
+            <graph string="ID Card Request Statistics" type="bar" stacked="1">
+                <field name="request_type"/>
+                <field name="state"/>
+                <field name="id" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_id_card_request" model="ir.actions.act_window">
+        <field name="name">ID Card Requests</field>
+        <field name="res_model">id.card.request</field>
+        <field name="view_mode">kanban,list,form,calendar,pivot,graph</field>
+        <field name="context">{
+            'search_default_filter_submitted': 1,
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add your first ID Card Request
+            </p>
+            <p>
+                Manage student ID card requests including duplicates, renewals, lost cards, and damages.
+                Track request status and approval workflow.
+            </p>
+        </field>
+    </record>
+
+</odoo>

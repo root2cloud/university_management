@@ -1,0 +1,598 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View - Internship -->
+    <record id="internship_view_form" model="ir.ui.view">
+        <field name="name">internship.internship.view.form</field>
+        <field name="model">internship.internship</field>
+        <field name="arch" type="xml">
+            <form string="Internship">
+                <header>
+                    <button name="action_approve" string="Approve" type="object"
+                            class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_start" string="Start Internship" type="object"
+                            class="btn-success"
+                            invisible="state != 'approved'"/>
+                    <button name="action_complete" string="Mark Completed" type="object"
+                            class="btn-info"
+                            invisible="state != 'ongoing'"/>
+                    <button name="action_evaluate" string="Mark Evaluated" type="object"
+                            class="btn-secondary"
+                            invisible="state != 'completed'"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft" type="object"
+                            invisible="state != 'draft'"
+                            confirm="Are you sure you want to reset this Internship to draft?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,approved,ongoing,completed,evaluated"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_view_reports" icon="fa-file-text-o">
+                            <field name="report_ids" widget="statinfo" string="Reports"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_view_evaluations" icon="fa-check-square-o">
+                            <field name="evaluation_ids" widget="statinfo" string="Evaluations"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_view_student" icon="fa-user">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">View</span>
+                                <span class="o_stat_text">Student</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <widget name="web_ribbon" title="PPO Received" bg_color="bg-success" invisible="not received_ppo"/>
+
+                    <div class="oe_title">
+                        <label for="name" string="Internship"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Student Details">
+                            <field name="student_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="registration_number" readonly="1"/>
+                            <field name="program_id" readonly="1"/>
+                            <field name="department_id" readonly="1"/>
+                        </group>
+                        <group string="Academic Information">
+                            <field name="academic_year_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="semester_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="internship_type" widget="radio"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Company Details">
+                            <field name="company_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="designation" placeholder="e.g. Software Development Intern"/>
+                            <field name="department" placeholder="e.g. Engineering, R&amp;D"/>
+                            <field name="location" placeholder="e.g. Bangalore, Karnataka"/>
+                        </group>
+                        <group string="Duration">
+                            <label for="start_date" string="Period"/>
+                            <div class="o_row">
+                                <field name="start_date" class="oe_inline" widget="date"/>
+                                <span class="oe_inline mx-2">to</span>
+                                <field name="end_date" class="oe_inline" widget="date"/>
+                            </div>
+                            <field name="duration_months" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Stipend Details">
+                            <field name="has_stipend" widget="boolean_toggle"/>
+                            <field name="stipend_amount"
+                                   invisible="not has_stipend"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="Faculty Mentor">
+                            <field name="faculty_mentor_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Company Supervisor" name="supervisor">
+                            <group>
+                                <field name="company_supervisor" placeholder="Supervisor Full Name"/>
+                                <field name="supervisor_email" widget="email"
+                                       placeholder="supervisor@company.com"/>
+                                <field name="supervisor_phone" widget="phone"
+                                       placeholder="+91 1234567890"/>
+                            </group>
+                        </page>
+
+                        <page string="Work Details" name="work_details">
+                            <group>
+                                <group string="Job Description">
+                                    <field name="job_description" nolabel="1"
+                                           placeholder="Describe the internship role and responsibilities..."/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Key Responsibilities">
+                                    <field name="responsibilities" nolabel="1"
+                                           placeholder="List key responsibilities and tasks..."/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Skills &amp; Technologies">
+                                    <field name="skills_learned" nolabel="1"
+                                           placeholder="List skills, technologies, and tools learned during internship..."/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Documents" name="documents">
+                            <group>
+                                <group string="Internship Documents">
+                                    <field name="offer_letter" filename="offer_letter_filename"/>
+                                    <field name="joining_report" filename="joining_report_filename"/>
+                                    <field name="completion_certificate" filename="completion_certificate_filename"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Reports" name="reports">
+                            <field name="report_ids" nolabel="1">
+                                <list string="Internship Reports" create="0" delete="0">
+                                    <field name="report_type"/>
+                                    <field name="report_date"/>
+                                    <field name="report_filename"/>
+                                    <field name="state" widget="badge"
+                                           decoration-warning="state == 'pending'"
+                                           decoration-success="state == 'approved'"
+                                           decoration-muted="state == 'rejected'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Evaluations" name="evaluations">
+                            <field name="evaluation_ids" nolabel="1">
+                                <list string="Evaluations" create="0" delete="0">
+                                    <field name="evaluator_id"/>
+                                    <field name="evaluation_date"/>
+                                    <field name="evaluator_type"/>
+                                    <field name="total_marks"/>
+                                    <field name="max_marks"/>
+                                    <field name="overall_rating"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Performance &amp; Credits" name="performance">
+                            <group>
+                                <group string="Academic Credits">
+                                    <field name="marks_obtained"/>
+                                    <field name="max_marks"/>
+                                    <field name="credits"/>
+                                </group>
+                                <group string="Company Performance Rating">
+                                    <field name="company_rating" widget="priority"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Pre-Placement Offer (PPO)">
+                                    <field name="received_ppo" widget="boolean_toggle"/>
+                                    <field name="ppo_ctc"
+                                           invisible="not received_ppo"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Remarks" name="remarks">
+                            <field name="remarks" nolabel="1"
+                                   placeholder="Enter remarks, feedback, observations..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View - Internship -->
+    <record id="internship_view_list" model="ir.ui.view">
+        <field name="name">internship.internship.view.list</field>
+        <field name="model">internship.internship</field>
+        <field name="arch" type="xml">
+            <list string="Internships"
+                  default_order="start_date desc"
+                  multi_edit="1"
+                  sample="1"
+                  decoration-info="state == 'approved'"
+                  decoration-warning="state == 'ongoing'"
+                  decoration-success="state == 'completed'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="registration_number" optional="hide"/>
+                <field name="company_id"/>
+                <field name="designation"/>
+                <field name="internship_type" widget="badge"
+                       decoration-warning="internship_type == 'mandatory'"
+                       decoration-info="internship_type in ['summer', 'winter']"
+                       decoration-success="internship_type == 'industrial'"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="duration_months" optional="show"/>
+                <field name="stipend_amount" optional="hide" widget="monetary"/>
+                <field name="faculty_mentor_id" optional="hide"/>
+                <field name="received_ppo" optional="show" widget="boolean_toggle"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'approved'"
+                       decoration-warning="state == 'ongoing'"
+                       decoration-success="state == 'completed'"
+                       decoration-muted="state == 'cancelled'"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View - Internship -->
+    <record id="internship_view_search" model="ir.ui.view">
+        <field name="name">internship.internship.view.search</field>
+        <field name="model">internship.internship</field>
+        <field name="arch" type="xml">
+            <search string="Search Internships">
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="registration_number"/>
+                <field name="company_id"/>
+                <field name="designation"/>
+                <field name="faculty_mentor_id"/>
+
+                <separator/>
+
+                <filter name="filter_draft" string="Draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_approved" string="Approved"
+                        domain="[('state', '=', 'approved')]"/>
+                <filter name="filter_ongoing" string="Ongoing"
+                        domain="[('state', '=', 'ongoing')]"/>
+                <filter name="filter_completed" string="Completed"
+                        domain="[('state', '=', 'completed')]"/>
+                <filter name="filter_evaluated" string="Evaluated"
+                        domain="[('state', '=', 'evaluated')]"/>
+                <filter name="filter_cancelled" string="Cancelled"
+                        domain="[('state', '=', 'cancelled')]"/>
+
+                <separator/>
+
+                <filter name="filter_mandatory" string="Mandatory"
+                        domain="[('internship_type', '=', 'mandatory')]"/>
+                <filter name="filter_summer" string="Summer Internship"
+                        domain="[('internship_type', '=', 'summer')]"/>
+                <filter name="filter_winter" string="Winter Internship"
+                        domain="[('internship_type', '=', 'winter')]"/>
+                <filter name="filter_industrial" string="Industrial Training"
+                        domain="[('internship_type', '=', 'industrial')]"/>
+
+                <separator/>
+
+                <filter name="filter_paid" string="Paid Internships"
+                        domain="[('has_stipend', '=', True)]"/>
+                <filter name="filter_unpaid" string="Unpaid Internships"
+                        domain="[('has_stipend', '=', False)]"/>
+
+                <separator/>
+
+                <filter name="filter_ppo_received" string="PPO Received"
+                        domain="[('received_ppo', '=', True)]"/>
+
+                <separator/>
+
+                <filter name="filter_current_month" string="Current Month"
+                        domain="[('start_date', '&gt;=', (context_today().replace(day=1)).strftime('%Y-%m-%d')),
+                                 ('start_date', '&lt;=', ((context_today().replace(day=1) + datetime.timedelta(days=32)).replace(day=1) - datetime.timedelta(days=1)).strftime('%Y-%m-%d'))]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_student" string="Student"
+                            context="{'group_by': 'student_id'}"/>
+                    <filter name="group_by_company" string="Company"
+                            context="{'group_by': 'company_id'}"/>
+                    <filter name="group_by_internship_type" string="Internship Type"
+                            context="{'group_by': 'internship_type'}"/>
+                    <filter name="group_by_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_by_department" string="Department"
+                            context="{'group_by': 'department_id'}"/>
+                    <filter name="group_by_faculty_mentor" string="Faculty Mentor"
+                            context="{'group_by': 'faculty_mentor_id'}"/>
+                    <filter name="group_by_academic_year" string="Academic Year"
+                            context="{'group_by': 'academic_year_id'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="state" string="Status"
+                           select="multi"
+                           operator="in"
+                           icon="fa-flag"/>
+                    <field name="internship_type" string="Type"
+                           select="multi"
+                           icon="fa-briefcase"/>
+                    <field name="department_id" string="Department"
+                           select="multi"
+                           operator="in"
+                           icon="fa-building"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View - Internship -->
+    <record id="internship_view_kanban" model="ir.ui.view">
+        <field name="name">internship.internship.view.kanban</field>
+        <field name="model">internship.internship</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="state"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="company_id"/>
+                <field name="designation"/>
+                <field name="internship_type"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="duration_months"/>
+                <field name="stipend_amount"/>
+                <field name="has_stipend"/>
+                <field name="received_ppo"/>
+                <field name="state"/>
+                <field name="currency_id"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="ribbon ribbon-top-right" t-if="record.received_ppo.raw_value">
+                                    <span class="bg-success">PPO</span>
+                                </div>
+
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                        <div class="text-muted mt-1">
+                                            <small>
+                                                <i class="fa fa-user"/> <field name="student_id"/>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body mt-3">
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="card"
+                                                 t-attf-class="{{
+                                                    record.internship_type.raw_value == 'mandatory' ? 'bg-warning' :
+                                                    (record.internship_type.raw_value == 'industrial' ? 'bg-success' : 'bg-info')
+                                                 }} text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h6 class="mb-0">
+                                                        <field name="internship_type"/>
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded">
+                                                <h6 class="mb-0">
+                                                    <i class="fa fa-building text-primary"/> <field name="company_id"/>
+                                                </h6>
+                                                <small class="text-muted">
+                                                    <i class="fa fa-id-badge"/> <field name="designation"/>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-6">
+                                            <div class="bg-light p-2 rounded text-center">
+                                                <div class="text-success">
+                                                    <i class="fa fa-calendar fa-lg"/>
+                                                </div>
+                                                <small class="text-muted">Start</small>
+                                                <h6 class="mb-0"><field name="start_date"/></h6>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="bg-light p-2 rounded text-center">
+                                                <div class="text-danger">
+                                                    <i class="fa fa-calendar-times-o fa-lg"/>
+                                                </div>
+                                                <small class="text-muted">End</small>
+                                                <h6 class="mb-0"><field name="end_date"/></h6>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded text-center">
+                                                <div class="text-warning">
+                                                    <i class="fa fa-hourglass-half fa-lg"/>
+                                                </div>
+                                                <h5 class="mb-0"><field name="duration_months"/> months</h5>
+                                                <small class="text-muted">Duration</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.has_stipend.raw_value">
+                                        <div class="col-12">
+                                            <div class="alert alert-success mb-0 p-2 text-center">
+                                                <small>
+                                                    <i class="fa fa-money"/> Stipend:
+                                                    <field name="stipend_amount" widget="monetary"/>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="!record.has_stipend.raw_value">
+                                        <div class="col-12">
+                                            <div class="alert alert-info mb-0 p-2 text-center">
+                                                <small>
+                                                    <i class="fa fa-info-circle"/> Unpaid Internship
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom mt-2">
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Calendar View - Internship -->
+    <record id="internship_view_calendar" model="ir.ui.view">
+        <field name="name">internship.internship.view.calendar</field>
+        <field name="model">internship.internship</field>
+        <field name="arch" type="xml">
+            <calendar string="Internship Calendar"
+                      date_start="start_date"
+                      date_stop="end_date"
+                      mode="month"
+                      color="internship_type"
+                      quick_create="0"
+                      event_limit="5">
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="company_id"/>
+                <field name="designation"/>
+                <field name="internship_type"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Pivot View - Internship -->
+    <record id="internship_view_pivot" model="ir.ui.view">
+        <field name="name">internship.internship.view.pivot</field>
+        <field name="model">internship.internship</field>
+        <field name="arch" type="xml">
+            <pivot string="Internship Analysis">
+                <field name="department_id" type="row"/>
+                <field name="internship_type" type="col"/>
+                <field name="duration_months" type="measure"/>
+                <field name="stipend_amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View - Internship -->
+    <record id="internship_view_graph" model="ir.ui.view">
+        <field name="name">internship.internship.view.graph</field>
+        <field name="model">internship.internship</field>
+        <field name="arch" type="xml">
+            <graph string="Internship Statistics" type="bar">
+                <field name="company_id"/>
+                <field name="state"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_internship" model="ir.actions.act_window">
+        <field name="name">Internships</field>
+        <field name="res_model">internship.internship</field>
+        <field name="view_mode">kanban,calendar,list,form,pivot,graph</field>
+        <field name="context">{'search_default_filter_ongoing': 1, 'search_default_group_by_state': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create Internship Record
+            </p>
+            <p>
+                Manage student internships with comprehensive tracking. Auto-generated unique name
+                (Internship Code, readonly sequence). Select student_id (Many2one to student.student
+                required tracked indexed no-create). View related fields (registration_number/program_id/
+                department_id readonly from student_id). Select academic_year_id (Many2one to
+                university.academic.year required no-create) and semester_id (Many2one to
+                university.semester no-create). Select internship_type (5 options required tracked, radio
+                widget): mandatory (Mandatory/Curriculum - warning/yellow badge), summer (Summer Internship
+                - info badge), winter (Winter Internship - info badge), industrial (Industrial Training -
+                success/green badge), voluntary (Voluntary). Select company_id (Many2one to
+                internship.company required tracked no-create). Enter designation (char required,
+                placeholder "Software Development Intern"), department (char, placeholder "Engineering,
+                R&amp;D"), location (char, placeholder "Bangalore, Karnataka"). Enter duration: start_date/
+                end_date (both date required tracked, inline o_row with "to" span), duration_months (float
+                computed readonly via _compute_duration with api.depends('start_date','end_date') showing
+                days/30.0). Toggle has_stipend (boolean_toggle "Paid Internship") to show/hide
+                stipend_amount (monetary with currency_id default company currency, conditional visible).
+                Select faculty_mentor_id (Many2one to faculty.faculty tracked no-create). Enter company
+                supervisor details: company_supervisor (char, placeholder "Supervisor Full Name"),
+                supervisor_email (char email widget, placeholder "supervisor@company.com"),
+                supervisor_phone (char phone widget, placeholder "+91 1234567890"). Enter work details:
+                job_description (html, placeholder "Describe the internship role and responsibilities..."),
+                responsibilities (html, placeholder "List key responsibilities and tasks..."),
+                skills_learned (text, placeholder "List skills, technologies, and tools learned...").
+                Upload documents: offer_letter/joining_report/completion_certificate (all binary with
+                filename fields). View report_ids (One2many to internship.report, read-only 4-field
+                embedded list: report_type/submission_date/report_filename/state with 3-color badge
+                decorations warning-pending/success-approved/muted-rejected, no create/delete, stat button
+                "Reports" file-text-o icon). View evaluation_ids (One2many to internship.evaluation,
+                read-only 6-field embedded list: evaluator_id/evaluation_date/evaluator_type/
+                marks_obtained/max_marks/grade, no create/delete, stat button "Evaluations"
+                check-square-o icon). Enter performance: marks_obtained/max_marks (float default 100.0)/
+                credits (float). Select company_rating (5 options, priority widget): 1-Poor/2-Below
+                Average/3-Average/4-Good/5-Excellent. Toggle received_ppo (boolean_toggle tracked "Received
+                PPO", shows web_ribbon "PPO Received" success/green at top-right if true) to show/hide
+                ppo_ctc (monetary conditional). Select state (6 options default draft tracked, statusbar
+                widget): draft/approved/ongoing/completed/evaluated/cancelled. Header has 4 workflow action
+                buttons with visibility rules: Approve (draft→approved, primary), Start Internship
+                (approved→ongoing, success), Mark Completed (ongoing→completed, info), Mark Evaluated
+                (completed→evaluated, secondary). Enter remarks (text, placeholder "Enter remarks,
+                feedback, observations..."). Form view has 3 stat buttons: Reports (file-text-o icon),
+                Evaluations (check-square-o icon), View Student (user icon). List view with 4-color row
+                decorations: Info (approved), Warning/Yellow (ongoing), Success/Green (completed), Muted
+                (cancelled). Badge widgets for internship_type (3-color decorations warning/info/success)
+                and state (4-color decorations). Monetary widget for stipend_amount. Boolean_toggle for
+                received_ppo. Kanban view grouped by state showing name, student name (user icon small),
+                internship_type card (dynamic 3-color background: warning/mandatory, success/industrial,
+                info/others, centered), company/designation card (light background, building icon
+                primary/blue for company, id-badge icon for designation), 2-card start/end grid (6/6):
+                start_date card (light background, centered, calendar icon success/green) and end_date card
+                (light background, centered, calendar-times-o icon danger/red), duration card (light
+                background, centered, hourglass icon warning/yellow, h5 duration_months + "months"),
+                conditional stipend alert (success/green, money icon, shows stipend_amount if has_stipend)
+                or unpaid alert (info, info-circle icon, "Unpaid Internship" if not has_stipend), ribbon
+                badge (success "PPO" at top-right if received_ppo). Calendar view for timeline (date_start:
+                start_date, date_stop: end_date, color by internship_type, month mode). Pivot view for
+                analysis (department × internship_type matrix, measures: duration_months/stipend_amount).
+                Graph view for statistics (bar chart, company vs. state). Ordered by start_date desc (most
+                recent first). Default filters: Ongoing status and grouped by State. Full chatter, activity,
+                and portal support. SQL constraint for unique name. Comprehensive internship lifecycle
+                management.
+            </p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_asset_handover_form" model="ir.ui.view">
+        <field name="name">asset.handover.form</field>
+        <field name="model">asset.handover</field>
+        <field name="arch" type="xml">
+            <form string="Handover Request">
+                <header>
+                    <button name="action_submit" string="Submit Request"
+                            type="object" class="btn-primary"
+                            invisible="state != 'draft' or not is_requester"/>
+
+                    <button name="action_hod_approve" string="✓ Approve (HOD)"
+                            type="object" class="btn-primary"
+                            invisible="state != 'pending_hod' or not is_hod_approver"/>
+
+                    <button name="action_hod_reject" string="✗ Reject (HOD)"
+                            type="object" class="btn-danger"
+                            invisible="state != 'pending_hod' or not is_hod_approver"/>
+
+                    <button name="action_principal_approve" string="✓ Final Approval"
+                            type="object" class="btn-primary"
+                            invisible="state != 'pending_principal' or not is_principal"/>
+
+                    <button name="action_principal_reject" string="✗ Reject"
+                            type="object" class="btn-danger"
+                            invisible="state != 'pending_principal' or not is_principal"/>
+
+                    <field name="state" widget="statusbar" readonly="1"
+                           statusbar_visible="draft,pending_hod,pending_principal,approved"/>
+                </header>
+
+                <!-- Hidden role flags -->
+                <field name="is_hod_approver" invisible="1"/>
+                <field name="is_principal" invisible="1"/>
+                <field name="is_requester" invisible="1"/>
+
+                <div class="alert alert-danger" role="alert" invisible="state != 'rejected'">
+                    <strong>Rejected:</strong>
+                    <field name="rejection_reason" readonly="1"/>
+                </div>
+
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <group>
+                        <group string="Asset">
+                            <field name="asset_id" readonly="state != 'draft'"/>
+                            <field name="asset_code" readonly="1"/>
+                            <field name="scan_triggered" readonly="1"/>
+                        </group>
+                        <group string="Request">
+                            <field name="requested_by" readonly="1"/>
+                            <field name="request_date" readonly="1"/>
+                            <field name="handover_type" readonly="state != 'draft'"/>
+                            <field name="expected_return_date"
+                                   invisible="handover_type != 'temporary'"
+                                   readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+
+                    <!-- APPROVERS -->
+                    <group string="Approvers">
+                        <field name="hod_user_id" readonly="state != 'draft'"/>
+                        <field name="principal_id" readonly="state != 'draft'"/>
+                    </group>
+
+                    <group string="From (Current Location)">
+                        <field name="from_department_id" readonly="1"/>
+                        <field name="from_location" readonly="1"/>
+                        <field name="from_faculty_id" readonly="1"/>
+                    </group>
+
+                    <group string="To (Destination)">
+                        <field name="to_department_id" readonly="state != 'draft'"/>
+                        <field name="to_location" readonly="state != 'draft'"/>
+                        <field name="to_faculty_id" readonly="state != 'draft'"/>
+                    </group>
+
+                    <group string="Purpose &amp; Evidence">
+                        <field name="purpose" colspan="2" readonly="state != 'draft'"/>
+                        <field name="asset_photo" widget="image" readonly="state != 'draft'"/>
+                    </group>
+
+                    <notebook>
+                        <page string="HOD Approval"
+                              invisible="state not in ['pending_hod', 'pending_principal', 'approved', 'rejected']">
+                            <group>
+                                <field name="hod_approved_by" readonly="1"/>
+                                <field name="hod_approval_date" readonly="1"/>
+                                <field name="hod_remarks" readonly="state != 'pending_hod'"/>
+                            </group>
+                        </page>
+                        <page string="Principal Approval"
+                              invisible="state not in ['pending_principal', 'approved', 'rejected']">
+                            <group>
+                                <field name="principal_approved_by" readonly="1"/>
+                                <field name="principal_approval_date" readonly="1"/>
+                                <field name="principal_remarks" readonly="state != 'pending_principal'"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_asset_handover_list" model="ir.ui.view">
+        <field name="name">asset.handover.list</field>
+        <field name="model">asset.handover</field>
+        <field name="arch" type="xml">
+            <list string="Handover Requests"
+                  decoration-success="state == 'approved'"
+                  decoration-danger="state == 'rejected'"
+                  decoration-warning="state in ('pending_hod', 'pending_principal')">
+                <field name="name"/>
+                <field name="asset_id"/>
+                <field name="asset_code"/>
+                <field name="requested_by"/>
+                <field name="from_department_id"/>
+                <field name="to_department_id"/>
+                <field name="hod_user_id"/>
+                <field name="principal_id"/>
+                <field name="handover_type"/>
+                <field name="state" widget="badge"
+                       decoration-warning="state in ('pending_hod', 'pending_principal')"
+                       decoration-success="state == 'approved'"
+                       decoration-danger="state == 'rejected'"/>
+                <field name="request_date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Single action — no duplicate HOD/Principal filtered actions needed -->
+    <record id="action_asset_handover" model="ir.actions.act_window">
+        <field name="name">Handover Requests</field>
+        <field name="res_model">asset.handover</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No handover requests yet.</p>
+            <p>Submit a handover request to transfer an asset to another department or person.</p>
+        </field>
+    </record>
+
+</odoo>

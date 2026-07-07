@@ -1,0 +1,1039 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ==================== MARKSHEET LIST TEMPLATE ==================== -->
+    <template id="marksheet_list" name="Marksheet List">
+        <t t-call="website.layout">
+            <div class="container mt-4">
+                <!-- Page Header -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h1 class="h2">
+                            <i class="fa fa-file-text text-primary me-2"></i>
+                            My Marksheets
+                        </h1>
+                        <p class="text-muted">
+                            View and download all your examination marksheets
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Marksheets Table -->
+                <div class="card">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fa fa-list me-2"></i>
+                            Available Marksheets
+                        </h5>
+                        <div>
+                            <a t-if="len(marksheets) > 0"
+                               href="/my/marksheets/download-all"
+                               class="btn btn-sm btn-light">
+                                <i class="fa fa-download me-1"></i>
+                                Download All
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Marksheet #</th>
+                                        <th>Semester</th>
+                                        <th>Academic Year</th>
+                                        <th>Issue Date</th>
+                                        <th>SGPA</th>
+                                        <th>CGPA</th>
+                                        <th>Result</th>
+                                        <th>Status</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-if="marksheets">
+                                        <t t-foreach="marksheets" t-as="marksheet">
+                                            <tr>
+                                                <td>
+                                                    <strong t-esc="marksheet.name"/>
+                                                </td>
+                                                <td>
+                                                    <span t-esc="marksheet.semester_id.name or ''"/>
+                                                </td>
+                                                <td>
+                                                    <span t-esc="marksheet.academic_year_id.name or ''"/>
+                                                </td>
+                                                <td>
+                                                    <span t-esc="marksheet.issue_date or ''"/>
+                                                </td>
+                                                <td>
+                                                    <span t-esc="'{:.2f}'.format(marksheet.sgpa)"
+                                                          t-attf-class="badge bg-{{ 'success' if marksheet.sgpa >= 7.0 else 'warning' if marksheet.sgpa >= 5.0 else 'danger' }}"/>
+                                                </td>
+                                                <td>
+                                                    <span t-esc="'{:.2f}'.format(marksheet.cgpa)"
+                                                          t-attf-class="badge bg-{{ 'success' if marksheet.cgpa >= 7.0 else 'warning' if marksheet.cgpa >= 5.0 else 'danger' }}"/>
+                                                </td>
+                                                <td>
+                                                    <span t-if="marksheet.overall_result == 'pass'"
+                                                          class="badge bg-success">
+                                                        PASS
+                                                    </span>
+                                                    <span t-else=""
+                                                          class="badge bg-danger">
+                                                        FAIL
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span t-if="marksheet.state == 'downloaded'"
+                                                          class="badge bg-success">
+                                                        Downloaded
+                                                    </span>
+                                                    <span t-elif="marksheet.state == 'issued'"
+                                                          class="badge bg-primary">
+                                                        Issued
+                                                    </span>
+                                                    <span t-elif="marksheet.state == 'verified'"
+                                                          class="badge bg-warning">
+                                                        Verified
+                                                    </span>
+                                                    <span t-elif="marksheet.state == 'cancelled'"
+                                                          class="badge bg-danger">
+                                                        Cancelled
+                                                    </span>
+                                                    <span t-else=""
+                                                          class="badge bg-secondary">
+                                                        Draft
+                                                    </span>
+                                                </td>
+                                                <td class="text-end">
+                                                    <div class="btn-group btn-group-sm">
+                                                        <a t-att-href="'/my/marksheet/' + str(marksheet.id)"
+                                                           class="btn btn-outline-primary">
+                                                            <i class="fa fa-eye"></i>
+                                                        </a>
+                                                        <a t-if="marksheet.state in ['verified', 'issued', 'downloaded']"
+                                                           t-att-href="'/my/marksheet/' + str(marksheet.id) + '/download'"
+                                                           class="btn btn-outline-success">
+                                                            <i class="fa fa-download"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                    <t t-else="">
+                                        <tr>
+                                            <td colspan="9" class="text-center py-4">
+                                                <div class="text-muted">
+                                                    <i class="fa fa-file-text fa-3x mb-3"></i>
+                                                    <p class="mb-0">No marksheets available</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card-footer text-muted">
+                        <small>
+                            <i class="fa fa-info-circle me-1"></i>
+                            Provisional marksheets are temporary. Final marksheets are issued after verification.
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Request Duplicate Section -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fa fa-copy text-warning me-2"></i>
+                            Request Duplicate Marksheet
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p>
+                            Lost your marksheet? Request a duplicate copy by submitting a formal request.
+                        </p>
+                        <a href="/my/marksheet/request-duplicate"
+                           class="btn btn-warning">
+                            <i class="fa fa-copy me-2"></i>
+                            Request Duplicate
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Verification Info -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fa fa-check-circle text-success me-2"></i>
+                            Marksheet Verification
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p>
+                            Employers or institutions can verify your marksheet authenticity using our public
+                            verification portal.
+                        </p>
+                        <a href="/marksheet/verify"
+                           target="_blank"
+                           class="btn btn-outline-success">
+                            <i class="fa fa-external-link me-2"></i>
+                            Public Verification Portal
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ==================== MARKSHEET DETAIL TEMPLATE ==================== -->
+    <template id="marksheet_detail" name="Marksheet Detail">
+        <t t-call="website.layout">
+            <div class="container mt-4">
+                <!-- Success/Error Messages -->
+                <t t-if="request.params.get('email_sent') == '1'">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fa fa-check-circle me-2"></i>
+                        Marksheet sent to your email successfully!
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                </t>
+                <t t-if="request.params.get('email_error') == '1'">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fa fa-exclamation-circle me-2"></i>
+                        Failed to send email. Please try again later.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                </t>
+
+                <!-- Page Header -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h1 class="h2">
+                                    <i class="fa fa-file-text text-primary me-2"></i>
+                                    Marksheet Details
+                                </h1>
+                                <p class="text-muted">
+                                    Marksheet Number:
+                                    <strong t-esc="marksheet.name"/>
+                                </p>
+                            </div>
+                            <div>
+                                <a href="/my/marksheets"
+                                   class="btn btn-outline-secondary">
+                                    <i class="fa fa-arrow-left me-2"></i>
+                                    Back to List
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Student Info Card -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fa fa-user-graduate me-2"></i>
+                            Student Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <div class="text-center">
+                                    <t t-if="student.student_photo">
+                                        <img t-att-src="image_data_uri(student.student_photo)"
+                                             class="img-thumbnail mb-2"
+                                             style="width: 120px; height: 150px; object-fit: cover;"/>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="img-thumbnail mb-2 d-flex align-items-center justify-content-center"
+                                             style="width: 120px; height: 150px; background: #f8f9fa;">
+                                            <i class="fa fa-user fa-3x text-muted"></i>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                            <div class="col-md-10">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p>
+                                            <strong>Name:</strong>
+                                            <span t-esc="student.name"/>
+                                        </p>
+                                        <p>
+                                            <strong>Registration Number:</strong>
+                                            <span t-esc="student.registration_number"/>
+                                        </p>
+                                        <p>
+                                            <strong>Program:</strong>
+                                            <span t-esc="student.program_id.name or ''"/>
+                                        </p>
+                                        <p>
+                                            <strong>Department:</strong>
+                                            <span t-esc="student.department_id.name or ''"/>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p>
+                                            <strong>Semester:</strong>
+                                            <span t-esc="marksheet.semester_id.name or ''"/>
+                                        </p>
+                                        <p>
+                                            <strong>Academic Year:</strong>
+                                            <span t-esc="marksheet.academic_year_id.name or ''"/>
+                                        </p>
+                                        <p>
+                                            <strong>Issue Date:</strong>
+                                            <span t-esc="marksheet.issue_date or ''"/>
+                                        </p>
+                                        <p>
+                                            <strong>Status:</strong>
+                                            <span t-if="marksheet.state == 'downloaded'"
+                                                  class="badge bg-success ms-2">Downloaded
+                                            </span>
+                                            <span t-elif="marksheet.state == 'issued'"
+                                                  class="badge bg-primary ms-2">Issued
+                                            </span>
+                                            <span t-elif="marksheet.state == 'verified'"
+                                                  class="badge bg-warning ms-2">Verified
+                                            </span>
+                                            <span t-elif="marksheet.state == 'cancelled'"
+                                                  class="badge bg-danger ms-2">Cancelled
+                                            </span>
+                                            <span t-else=""
+                                                  class="badge bg-secondary ms-2">Draft
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Summary -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card text-white bg-success h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="fa fa-chart-line me-2"></i>
+                                    SGPA
+                                </h5>
+                                <h1 class="display-4" t-esc="'{:.2f}'.format(marksheet.sgpa)"/>
+                                <p class="card-text">Semester Grade Point Average</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-white bg-info h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="fa fa-chart-bar me-2"></i>
+                                    CGPA
+                                </h5>
+                                <h1 class="display-4" t-esc="'{:.2f}'.format(marksheet.cgpa)"/>
+                                <p class="card-text">Cumulative Grade Point Average</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-white bg-warning h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="fa fa-percentage me-2"></i>
+                                    Percentage
+                                </h5>
+                                <h1 class="display-4" t-esc="'{:.1f}'.format(marksheet.percentage)"/>%
+                                <p class="card-text">Overall Percentage</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-center">
+                            <t t-if="marksheet.state in ['verified', 'issued', 'downloaded']">
+                                <a t-att-href="'/my/marksheet/' + str(marksheet.id) + '/download'"
+                                   class="btn btn-primary btn-lg mx-2">
+                                    <i class="fa fa-download me-2"></i>
+                                    Download PDF
+                                </a>
+                            </t>
+                            <t t-else="">
+                                <div class="alert alert-warning w-100 text-center">
+                                    <i class="fa fa-clock me-2"></i>
+                                    This marksheet is not yet published for download.
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Marks Details -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fa fa-table me-2"></i>
+                            Subject-wise Marks
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Subject Code</th>
+                                        <th>Subject Name</th>
+                                        <th class="text-center">Credits</th>
+                                        <th class="text-center">Max Marks</th>
+                                        <th class="text-center">Marks Obtained</th>
+                                        <th class="text-center">Grade</th>
+                                        <th class="text-center">Grade Points</th>
+                                        <th class="text-center">Result</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-if="marksheet.result_ids">
+                                        <t t-foreach="marksheet.result_ids" t-as="line">
+                                            <tr>
+                                                <td t-esc="line_index + 1"/>
+                                                <td>
+                                                    <code t-esc="line.subject_id.code or ''"/>
+                                                </td>
+                                                <td t-esc="line.subject_id.name or ''"/>
+                                                <td class="text-center" t-esc="line.credits"/>
+                                                <td class="text-center" t-esc="line.max_marks"/>
+                                                <td class="text-center">
+                                                    <strong t-esc="line.total_marks"/>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span t-esc="line.grade_letter"
+                                                          t-attf-class="badge bg-{{ 'success' if line.is_pass else 'danger' }}"/>
+                                                </td>
+                                                <td class="text-center" t-esc="line.grade_point"/>
+                                                <td class="text-center">
+                                                    <t t-if="line.is_pass">
+                                                        <span class="badge bg-success">Pass</span>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span class="badge bg-danger">Fail</span>
+                                                    </t>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                    <t t-else="">
+                                        <tr>
+                                            <td colspan="9" class="text-center py-4 text-muted">
+                                                No subject details available
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                                <tfoot t-if="marksheet.result_ids">
+                                    <tr class="table-active">
+                                        <td colspan="3" class="text-end">
+                                            <strong>Total</strong>
+                                        </td>
+                                        <td class="text-center">
+                                            <strong t-esc="sum(line.credits for line in marksheet.result_ids)"/>
+                                        </td>
+                                        <td colspan="5"></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Result Summary -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fa fa-trophy me-2"></i>
+                            Result Summary
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <h6>Overall Result</h6>
+                                    <t t-if="marksheet.overall_result == 'pass'">
+                                        <div class="alert alert-success">
+                                            <i class="fa fa-check-circle me-2"></i>
+                                            <strong>PASSED</strong>
+                                            - Congratulations!
+                                        </div>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="alert alert-danger">
+                                            <i class="fa fa-times-circle me-2"></i>
+                                            <strong>FAILED</strong>
+                                            - Please contact examination department
+                                        </div>
+                                    </t>
+                                </div>
+
+                                <div>
+                                    <h6>Backlogs</h6>
+                                    <p class="h4" t-esc="marksheet.subjects_failed"/>
+                                    <p class="text-muted">Number of subjects to clear</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <h6>Overall Grade</h6>
+                                    <p class="h3 text-primary" t-esc="dict(marksheet._fields['classification'].selection).get(marksheet.classification, 'N/A')"/>
+                                </div>
+
+                                <div>
+                                    <h6>Classification</h6>
+                                    <t t-if="marksheet.classification == 'distinction'">
+                                        <span class="badge bg-success fs-6">First Class with Distinction</span>
+                                    </t>
+                                    <t t-elif="marksheet.classification == 'first'">
+                                        <span class="badge bg-primary fs-6">First Class</span>
+                                    </t>
+                                    <t t-elif="marksheet.classification == 'second'">
+                                        <span class="badge bg-info fs-6">Second Class</span>
+                                    </t>
+                                    <t t-elif="marksheet.classification == 'third'">
+                                        <span class="badge bg-warning fs-6">Third Class</span>
+                                    </t>
+                                    <t t-else="">
+                                        <span class="badge bg-secondary fs-6">Pass</span>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Verification Note -->
+                <div class="alert alert-secondary mt-4">
+                    <h6>
+                        <i class="fa fa-info-circle me-2"></i>
+                        Verification Information
+                    </h6>
+                    <p class="mb-0">
+                        This marksheet can be verified online using the Marksheet Number and Registration Number.
+                        Share this link for verification:
+                        <a t-att-href="request.httprequest.host_url + 'marksheet/verify'"
+                           target="_blank">
+                            t-att-href="request.httprequest.host_url + 'marksheet/verify'"
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ==================== MARKSHEET VERIFICATION PAGE ==================== -->
+    <template id="marksheet_verify_page" name="Marksheet Verification">
+        <t t-call="website.layout">
+            <div class="container mt-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-8 col-lg-6">
+                        <!-- Header -->
+                        <div class="text-center mb-5">
+                            <div class="mb-4">
+                                <i class="fa fa-check-circle fa-4x text-success"></i>
+                            </div>
+                            <h1 class="h2 mb-3">Marksheet Verification</h1>
+                            <p class="text-muted">
+                                Verify the authenticity of university marksheets using the marksheet number and
+                                registration number
+                            </p>
+                        </div>
+
+                        <!-- Verification Form -->
+                        <div class="card shadow">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">
+                                    <i class="fa fa-search me-2"></i>
+                                    Verify Marksheet
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Error Message -->
+                                <t t-if="error">
+                                    <div class="alert alert-danger">
+                                        <i class="fa fa-exclamation-circle me-2"></i>
+                                        <t t-esc="error"/>
+                                    </div>
+                                </t>
+
+                                <form method="post" action="/marksheet/verify/check">
+                                    <div class="mb-4">
+                                        <label for="marksheet_number" class="form-label">
+                                            <strong>Marksheet Number *</strong>
+                                        </label>
+                                        <input type="text"
+                                               class="form-control form-control-lg"
+                                               id="marksheet_number"
+                                               name="marksheet_number"
+                                               placeholder="Enter marksheet number"
+                                               required="True"/>
+                                        <div class="form-text">
+                                            Example: MS/2023/001234
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label for="registration_number" class="form-label">
+                                            <strong>Registration Number *</strong>
+                                        </label>
+                                        <input type="text"
+                                               class="form-control form-control-lg"
+                                               id="registration_number"
+                                               name="registration_number"
+                                               placeholder="Enter registration number"
+                                               required="True"/>
+                                        <div class="form-text">
+                                            Example: REG/2020/00123
+                                        </div>
+                                    </div>
+
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary btn-lg">
+                                            <i class="fa fa-search me-2"></i>
+                                            Verify Marksheet
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="card-footer text-center text-muted">
+                                <small>
+                                    <i class="fa fa-shield-alt me-1"></i>
+                                    This verification is powered by the University's official database
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Information -->
+                        <div class="card mt-4">
+                            <div class="card-body">
+                                <h6>
+                                    <i class="fa fa-question-circle text-info me-2"></i>
+                                    How to verify?
+                                </h6>
+                                <ol class="mb-0">
+                                    <li>Enter the marksheet number (found at the top of the marksheet)</li>
+                                    <li>Enter the student's registration number</li>
+                                    <li>Click "Verify Marksheet" to check authenticity</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="text-center mt-4">
+                            <p class="text-muted">
+                                Need help? Contact the Examination Department
+                                <br/>
+                                <small>
+                                    <i class="fa fa-phone me-1"></i>
+                                    +1-234-567-8900 |
+                                    <i class="fa fa-envelope ms-2 me-1"></i>
+                                    exams@university.edu
+                                </small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ==================== MARKSHEET VERIFICATION RESULT ==================== -->
+    <template id="marksheet_verify_result" name="Marksheet Verification Result">
+        <t t-call="website.layout">
+            <div class="container mt-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-10 col-lg-8">
+                        <!-- Verification Status -->
+                        <div class="card mb-4" t-if="verified">
+                            <div class="card-body text-center">
+                                <div class="mb-4">
+                                    <i class="fa fa-check-circle fa-5x text-success"></i>
+                                </div>
+                                <h2 class="mb-3">Marksheet Verified Successfully!</h2>
+                                <p class="lead text-success">
+                                    This marksheet is authentic and issued by the University
+                                </p>
+                                <div class="alert alert-success">
+                                    <i class="fa fa-shield-alt me-2"></i>
+                                    Verified on
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Marksheet Details -->
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">
+                                    <i class="fa fa-file-text me-2"></i>
+                                    Marksheet Details
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6>Student Information</h6>
+                                        <p>
+                                            <strong>Name:</strong>
+                                            <span t-esc="student.name"/>
+                                        </p>
+                                        <p>
+                                            <strong>Registration Number:</strong>
+                                            <span t-esc="student.registration_number"/>
+                                        </p>
+                                        <p>
+                                            <strong>Program:</strong>
+                                            <span t-esc="marksheet.program_id.name or ''"/>
+                                        </p>
+                                        <p>
+                                            <strong>Department:</strong>
+                                            <span t-esc="marksheet.department_id.name or ''"/>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Marksheet Information</h6>
+                                        <p>
+                                            <strong>Marksheet Number:</strong>
+                                            <span t-esc="marksheet.name"/>
+                                        </p>
+                                        <p>
+                                            <strong>Semester:</strong>
+                                            <span t-esc="marksheet.semester_id.name or ''"/>
+                                        </p>
+                                        <p>
+                                            <strong>Academic Year:</strong>
+                                            <span t-esc="marksheet.academic_year_id.name or ''"/>
+                                        </p>
+                                        <p>
+                                            <strong>Issue Date:</strong>
+                                            <span t-esc="marksheet.issue_date"/>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <hr/>
+
+                                <!-- Performance -->
+                                <div class="row text-center">
+                                    <div class="col-md-4">
+                                        <div class="p-3 bg-light rounded">
+                                            <h6>SGPA</h6>
+                                            <h3 class="text-primary" t-esc="'{:.2f}'.format(marksheet.sgpa)"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="p-3 bg-light rounded">
+                                            <h6>CGPA</h6>
+                                            <h3 class="text-info" t-esc="'{:.2f}'.format(marksheet.cgpa)"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="p-3 bg-light rounded">
+                                            <h6>Percentage</h6>
+                                            <h3 class="text-success" t-esc="'{:.1f}'.format(marksheet.percentage)"/>%
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr/>
+
+                                <!-- Result -->
+                                <div class="text-center">
+                                    <h6>Overall Result</h6>
+                                    <t t-if="marksheet.overall_result == 'pass'">
+                                        <div class="alert alert-success d-inline-block">
+                                            <i class="fa fa-check-circle me-2"></i>
+                                            <strong>PASSED</strong>
+                                        </div>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="alert alert-danger d-inline-block">
+                                            <i class="fa fa-times-circle me-2"></i>
+                                            <strong>FAILED</strong>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                            <div class="card-footer text-center">
+                                <small class="text-muted">
+                                    <i class="fa fa-print me-1"></i>
+                                    This is a system-generated verification report. For official verification,
+                                    please contact the Examination Department.
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="text-center mt-4">
+                            <a href="/marksheet/verify" class="btn btn-outline-primary me-2">
+                                <i class="fa fa-search me-2"></i>
+                                Verify Another
+                            </a>
+                            <button onclick="window.print()" class="btn btn-outline-secondary">
+                                <i class="fa fa-print me-2"></i>
+                                Print Verification
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ==================== NO MARKSHEETS TEMPLATE ==================== -->
+    <template id="no_marksheets" name="No Marksheets">
+        <t t-call="website.layout">
+            <div class="container mt-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-6 text-center">
+                        <div class="mb-4">
+                            <i class="fa fa-file-text fa-5x text-muted"></i>
+                        </div>
+                        <h2 class="mb-3">No Marksheets Available</h2>
+                        <p class="lead text-muted mb-4">
+                            <t t-esc="message or 'You do not have any marksheets available for download.'"/>
+                        </p>
+                        <a href="/my" class="btn btn-primary">
+                            <i class="fa fa-home me-2"></i>
+                            Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ==================== MARKSHEET NOT READY TEMPLATE ==================== -->
+    <template id="marksheet_not_ready" name="Marksheet Not Ready">
+        <t t-call="website.layout">
+            <div class="container mt-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-6 text-center">
+                        <div class="mb-4">
+                            <i class="fa fa-clock fa-5x text-warning"></i>
+                        </div>
+                        <h2 class="mb-3">Marksheet Not Published</h2>
+                        <div class="alert alert-warning">
+                            <i class="fa fa-exclamation-triangle me-2"></i>
+                            <t t-esc="message or 'This marksheet is not yet published for download.'"/>
+                        </div>
+                        <p class="text-muted mb-4">
+                            Please check back later or contact the examination department for more information.
+                        </p>
+                        <a href="/my/marksheets" class="btn btn-outline-primary">
+                            <i class="fa fa-arrow-left me-2"></i>
+                            Back to Marksheets
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ==================== REQUEST DUPLICATE MARKSHEET ==================== -->
+    <template id="request_duplicate_marksheet" name="Request Duplicate Marksheet">
+        <t t-call="website.layout">
+            <div class="container mt-4">
+                <!-- Success/Error Messages -->
+                <t t-if="request.params.get('success') == '1'">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fa fa-check-circle me-2"></i>
+                        Duplicate marksheet request submitted successfully!
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                </t>
+                <t t-if="request.params.get('error') == '1'">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fa fa-exclamation-circle me-2"></i>
+                        Failed to submit request. Please try again.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                </t>
+
+                <!-- Page Header -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h1 class="h2">
+                                    <i class="fa fa-copy text-warning me-2"></i>
+                                    Request Duplicate Marksheet
+                                </h1>
+                                <p class="text-muted">
+                                    Request a duplicate copy of your lost or damaged marksheet
+                                </p>
+                            </div>
+                            <div>
+                                <a href="/my/marksheets"
+                                   class="btn btn-outline-secondary">
+                                    <i class="fa fa-arrow-left me-2"></i>
+                                    Back to Marksheets
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Information Alert -->
+                <div class="alert alert-info mb-4">
+                    <h6>
+                        <i class="fa fa-info-circle me-2"></i>
+                        Important Information
+                    </h6>
+                    <ul class="mb-0">
+                        <li>Duplicate marksheet requests may take 7-10 working days to process</li>
+                        <li>A nominal fee may be charged for duplicate marksheets</li>
+                        <li>You will be notified via email once your request is processed</li>
+                        <li>Only final marksheets can be duplicated</li>
+                    </ul>
+                </div>
+
+                <!-- Request Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fa fa-edit me-2"></i>
+                            Request Form
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="/my/marksheet/request-duplicate/submit">
+                            <div class="mb-4">
+                                <label for="marksheet_id" class="form-label">
+                                    <strong>Select Marksheet *</strong>
+                                </label>
+                                <select class="form-select" id="marksheet_id" name="marksheet_id" required="True">
+                                    <option value="">-- Select Marksheet --</option>
+                                    <t t-foreach="marksheets" t-as="ms">
+                                        <option t-att-value="ms.id">
+                                            <t t-esc="ms.name"/>
+                                            -
+                                            <t t-esc="ms.semester_id.name or ''"/>
+                                            -
+                                            <t t-esc="ms.academic_year_id.name or ''"/>
+                                        </option>
+                                    </t>
+                                </select>
+                                <div class="form-text">
+                                    Select the marksheet you need a duplicate copy of
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="reason" class="form-label">
+                                    <strong>Reason for Duplicate *</strong>
+                                </label>
+                                <textarea class="form-control"
+                                          id="reason"
+                                          name="reason"
+                                          rows="4"
+                                          placeholder="Please explain why you need a duplicate marksheet (e.g., lost, damaged, etc.)"
+                                          required="True"></textarea>
+                                <div class="form-text">
+                                    Be specific about why you need a duplicate copy
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="terms" required="True"/>
+                                    <label class="form-check-label" for="terms">
+                                        I declare that the information provided is true and correct.
+                                        I understand that providing false information may result in cancellation
+                                        of my request and disciplinary action.
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="/my/marksheets" class="btn btn-outline-secondary me-md-2">
+                                    Cancel
+                                </a>
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="fa fa-paper-plane me-2"></i>
+                                    Submit Request
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Available Marksheets -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fa fa-list me-2"></i>
+                            Available Final Marksheets
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Marksheet #</th>
+                                        <th>Semester</th>
+                                        <th>Academic Year</th>
+                                        <th>Issue Date</th>
+                                        <th>SGPA</th>
+                                        <th>Result</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-if="marksheets">
+                                        <t t-foreach="marksheets" t-as="ms">
+                                            <tr>
+                                                <td>
+                                                    <strong t-esc="ms.name"/>
+                                                </td>
+                                                <td t-esc="ms.semester_id.name or ''"/>
+                                                <td t-esc="ms.academic_year_id.name or ''"/>
+                                                <td t-esc="ms.issue_date"/>
+                                                <td t-esc="'{:.2f}'.format(ms.sgpa)"/>
+                                                <td>
+                                                    <t t-if="ms.overall_result == 'pass'">
+                                                        <span class="badge bg-success">Pass</span>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span class="badge bg-danger">Fail</span>
+                                                    </t>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                    <t t-else="">
+                                        <tr>
+                                            <td colspan="6" class="text-center py-4 text-muted">
+                                                No final marksheets available for duplicate request
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>

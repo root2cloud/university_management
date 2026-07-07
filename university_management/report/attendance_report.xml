@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Report Action -->
+    <record id="action_report_attendance" model="ir.actions.report">
+        <field name="name">Attendance Report</field>
+        <field name="model">student.attendance</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">university_management.report_attendance</field>
+        <field name="report_file">university_management.report_attendance</field>
+        <field name="binding_model_id" ref="model_attendance_report_wizard"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Report Template -->
+    <template id="report_attendance">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+
+                        <!-- Header -->
+                        <div class="row" style="border-bottom: 3px solid #FF5722; padding-bottom: 15px; margin-bottom: 20px;">
+                            <div class="col-3 text-center">
+                                <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="max-height: 70px;"/>
+                            </div>
+                            <div class="col-9 text-center">
+                                <h2 style="color: #FF5722; margin: 0; font-weight: bold;">
+                                    <t t-esc="o.company_id.name"/>
+                                </h2>
+                                <p style="margin: 5px 0;">
+                                    <t t-esc="o.company_id.street"/>, <t t-esc="o.company_id.city"/>
+                                </p>
+                                <h3 style="margin: 10px 0 0 0; background: #FF5722; color: white; padding: 8px;">
+                                    STUDENT ATTENDANCE REPORT
+                                </h3>
+                            </div>
+                        </div>
+
+                        <!-- Report Parameters -->
+                        <div style="background: #FFF3E0; border-left: 4px solid #FF9800; padding: 15px; margin-bottom: 20px;">
+                            <div class="row">
+                                <div class="col-3">
+                                    <strong>Report Period:</strong><br/>
+                                    <t t-esc="o.date_from"/> to <t t-esc="o.date_to"/>
+                                </div>
+                                <div class="col-3">
+                                    <strong>Program:</strong><br/>
+                                    <t t-esc="o.program_id.name if o.program_id else 'All Programs'"/>
+                                </div>
+                                <div class="col-3">
+                                    <strong>Department:</strong><br/>
+                                    <t t-esc="o.department_id.name if o.department_id else 'All Departments'"/>
+                                </div>
+                                <div class="col-3">
+                                    <strong>Semester:</strong><br/>
+                                    <t t-esc="o.semester_id.name if o.semester_id else 'All Semesters'"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Summary Statistics -->
+                        <div class="row" style="margin-bottom: 20px;">
+                            <div class="col-3">
+                                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 5px; text-align: center;">
+                                    <h1 style="margin: 0; font-size: 32pt;"><t t-esc="o.total_students"/></h1>
+                                    <p style="margin: 5px 0 0 0; font-size: 10pt;">Total Students</p>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div style="background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%); color: white; padding: 15px; border-radius: 5px; text-align: center;">
+                                    <h1 style="margin: 0; font-size: 32pt;"><t t-esc="'{:.1f}'.format(o.average_attendance)"/>%</h1>
+                                    <p style="margin: 5px 0 0 0; font-size: 10pt;">Avg Attendance</p>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div style="background: linear-gradient(135deg, #2196F3 0%, #03A9F4 100%); color: white; padding: 15px; border-radius: 5px; text-align: center;">
+                                    <h1 style="margin: 0; font-size: 32pt;"><t t-esc="o.students_above_75"/></h1>
+                                    <p style="margin: 5px 0 0 0; font-size: 10pt;">Above 75%</p>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div style="background: linear-gradient(135deg, #F44336 0%, #E91E63 100%); color: white; padding: 15px; border-radius: 5px; text-align: center;">
+                                    <h1 style="margin: 0; font-size: 32pt;"><t t-esc="o.students_below_75"/></h1>
+                                    <p style="margin: 5px 0 0 0; font-size: 10pt;">Below 75%</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Detailed Attendance Table -->
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="background: #FF5722; color: white; padding: 8px; margin-bottom: 10px;">
+                                STUDENT-WISE ATTENDANCE DETAILS
+                            </h4>
+                            <table class="table table-bordered table-sm" style="font-size: 9pt;">
+                                <thead style="background: #FFCCBC;">
+                                    <tr>
+                                        <th style="width: 5%; text-align: center;">S.No</th>
+                                        <th style="width: 12%; text-align: center;">Reg. No</th>
+                                        <th style="width: 20%;">Student Name</th>
+                                        <th style="width: 8%; text-align: center;">Program</th>
+                                        <th style="width: 8%; text-align: center;">Semester</th>
+                                        <th style="width: 8%; text-align: center;">Total Days</th>
+                                        <th style="width: 8%; text-align: center;">Present</th>
+                                        <th style="width: 8%; text-align: center;">Absent</th>
+                                        <th style="width: 8%; text-align: center;">Leave</th>
+                                        <th style="width: 10%; text-align: center;">Percentage</th>
+                                        <th style="width: 5%; text-align: center;">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="counter" t-value="1"/>
+                                    <t t-foreach="o.attendance_line_ids" t-as="line">
+                                        <tr>
+                                            <td class="text-center"><t t-esc="counter"/></td>
+                                            <td class="text-center"><t t-esc="line.student_id.registration_number"/></td>
+                                            <td><t t-esc="line.student_id.name"/></td>
+                                            <td class="text-center"><t t-esc="line.student_id.program_id.code"/></td>
+                                            <td class="text-center"><t t-esc="line.student_id.current_semester_id.name"/></td>
+                                            <td class="text-center"><t t-esc="line.total_days"/></td>
+                                            <td class="text-center" style="color: #4CAF50; font-weight: bold;">
+                                                <t t-esc="line.present_days"/>
+                                            </td>
+                                            <td class="text-center" style="color: #F44336; font-weight: bold;">
+                                                <t t-esc="line.absent_days"/>
+                                            </td>
+                                            <td class="text-center" style="color: #FF9800;">
+                                                <t t-esc="line.leave_days"/>
+                                            </td>
+                                            <td class="text-center">
+                                                <strong t-att-style="'color: %s;' % ('#4CAF50' if line.attendance_percentage &gt;= 75 else '#F44336')">
+                                                    <t t-esc="'{:.1f}'.format(line.attendance_percentage)"/>%
+                                                </strong>
+                                            </td>
+                                            <td class="text-center">
+                                                <span t-if="line.attendance_percentage &gt;= 75" style="color: #4CAF50;">✓</span>
+                                                <span t-else="" style="color: #F44336;">✗</span>
+                                            </td>
+                                        </tr>
+                                        <t t-set="counter" t-value="counter + 1"/>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Subject-wise Attendance (if applicable) -->
+                        <t t-if="o.show_subject_wise">
+                            <div style="margin-bottom: 20px; page-break-before: always;">
+                                <h4 style="background: #FF5722; color: white; padding: 8px; margin-bottom: 10px;">
+                                    SUBJECT-WISE ATTENDANCE ANALYSIS
+                                </h4>
+                                <table class="table table-bordered table-sm" style="font-size: 9pt;">
+                                    <thead style="background: #FFCCBC;">
+                                        <tr>
+                                            <th style="width: 5%; text-align: center;">S.No</th>
+                                            <th style="width: 15%;">Subject Code</th>
+                                            <th style="width: 35%;">Subject Name</th>
+                                            <th style="width: 15%;">Faculty</th>
+                                            <th style="width: 10%; text-align: center;">Total Classes</th>
+                                            <th style="width: 10%; text-align: center;">Avg Present</th>
+                                            <th style="width: 10%; text-align: center;">Attendance %</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-set="counter" t-value="1"/>
+                                        <t t-foreach="o.subject_attendance_ids" t-as="subj">
+                                            <tr>
+                                                <td class="text-center"><t t-esc="counter"/></td>
+                                                <td><t t-esc="subj.subject_id.code"/></td>
+                                                <td><t t-esc="subj.subject_id.name"/></td>
+                                                <td><t t-esc="subj.faculty_id.name"/></td>
+                                                <td class="text-center"><t t-esc="subj.total_classes"/></td>
+                                                <td class="text-center"><t t-esc="subj.average_present"/></td>
+                                                <td class="text-center">
+                                                    <strong t-att-style="'color: %s;' % ('#4CAF50' if subj.attendance_percentage &gt;= 75 else '#F44336')">
+                                                        <t t-esc="'{:.1f}'.format(subj.attendance_percentage)"/>%
+                                                    </strong>
+                                                </td>
+                                            </tr>
+                                            <t t-set="counter" t-value="counter + 1"/>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </t>
+
+                        <!-- Defaulter List -->
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="background: #F44336; color: white; padding: 8px; margin-bottom: 10px;">
+                                ⚠ DEFAULTER LIST (Below 75%)
+                            </h4>
+                            <t t-if="o.defaulter_count > 0">
+                                <table class="table table-bordered table-sm" style="font-size: 9pt;">
+                                    <thead style="background: #FFCDD2;">
+                                        <tr>
+                                            <th style="width: 5%; text-align: center;">S.No</th>
+                                            <th style="width: 15%;">Registration No</th>
+                                            <th style="width: 30%;">Student Name</th>
+                                            <th style="width: 15%;">Mobile</th>
+                                            <th style="width: 15%;">Guardian Mobile</th>
+                                            <th style="width: 10%; text-align: center;">Attendance %</th>
+                                            <th style="width: 10%; text-align: center;">Shortage</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-set="counter" t-value="1"/>
+                                        <t t-foreach="o.attendance_line_ids.filtered(lambda l: l.attendance_percentage &lt; 75)" t-as="defaulter">
+                                            <tr>
+                                                <td class="text-center"><t t-esc="counter"/></td>
+                                                <td><t t-esc="defaulter.student_id.registration_number"/></td>
+                                                <td><t t-esc="defaulter.student_id.name"/></td>
+                                                <td><t t-esc="defaulter.student_id.mobile or 'N/A'"/></td>
+                                                <td><t t-esc="defaulter.student_id.guardian_mobile or 'N/A'"/></td>
+                                                <td class="text-center" style="color: #F44336; font-weight: bold;">
+                                                    <t t-esc="'{:.1f}'.format(defaulter.attendance_percentage)"/>%
+                                                </td>
+                                                <td class="text-center" style="color: #F44336; font-weight: bold;">
+                                                    <t t-esc="'{:.1f}'.format(75 - defaulter.attendance_percentage)"/>%
+                                                </td>
+                                            </tr>
+                                            <t t-set="counter" t-value="counter + 1"/>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </t>
+                            <t t-else="">
+                                <div style="background: #C8E6C9; padding: 15px; text-align: center; border-radius: 5px;">
+                                    <p style="margin: 0; color: #4CAF50; font-weight: bold; font-size: 11pt;">
+                                        ✓ No defaulters found. All students have attendance above 75%
+                                    </p>
+                                </div>
+                            </t>
+                        </div>
+
+                        <!-- Attendance Distribution Chart -->
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="background: #FF5722; color: white; padding: 8px; margin-bottom: 10px;">
+                                ATTENDANCE DISTRIBUTION
+                            </h4>
+                            <table class="table table-bordered">
+                                <thead style="background: #FFCCBC;">
+                                    <tr>
+                                        <th>Range</th>
+                                        <th class="text-center">Count</th>
+                                        <th class="text-center">Percentage</th>
+                                        <th>Distribution</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>90% - 100%</strong></td>
+                                        <td class="text-center"><t t-esc="o.range_90_100"/></td>
+                                        <td class="text-center">
+                                            <t t-esc="'{:.1f}'.format((o.range_90_100 / o.total_students * 100) if o.total_students > 0 else 0)"/>%
+                                        </td>
+                                        <td>
+                                            <div style="background: #4CAF50; height: 20px;" t-att-style="'width: %s%%;' % ((o.range_90_100 / o.total_students * 100) if o.total_students > 0 else 0)"></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>75% - 89%</strong></td>
+                                        <td class="text-center"><t t-esc="o.range_75_89"/></td>
+                                        <td class="text-center">
+                                            <t t-esc="'{:.1f}'.format((o.range_75_89 / o.total_students * 100) if o.total_students > 0 else 0)"/>%
+                                        </td>
+                                        <td>
+                                            <div style="background: #8BC34A; height: 20px;" t-att-style="'width: %s%%;' % ((o.range_75_89 / o.total_students * 100) if o.total_students > 0 else 0)"></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>60% - 74%</strong></td>
+                                        <td class="text-center"><t t-esc="o.range_60_74"/></td>
+                                        <td class="text-center">
+                                            <t t-esc="'{:.1f}'.format((o.range_60_74 / o.total_students * 100) if o.total_students > 0 else 0)"/>%
+                                        </td>
+                                        <td>
+                                            <div style="background: #FF9800; height: 20px;" t-att-style="'width: %s%%;' % ((o.range_60_74 / o.total_students * 100) if o.total_students > 0 else 0)"></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Below 60%</strong></td>
+                                        <td class="text-center"><t t-esc="o.range_below_60"/></td>
+                                        <td class="text-center">
+                                            <t t-esc="'{:.1f}'.format((o.range_below_60 / o.total_students * 100) if o.total_students > 0 else 0)"/>%
+                                        </td>
+                                        <td>
+                                            <div style="background: #F44336; height: 20px;" t-att-style="'width: %s%%;' % ((o.range_below_60 / o.total_students * 100) if o.total_students > 0 else 0)"></div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Remarks and Recommendations -->
+                        <div style="background: #E3F2FD; border-left: 4px solid #2196F3; padding: 15px; margin-bottom: 20px;">
+                            <h5 style="color: #2196F3; margin-top: 0;">📝 REMARKS &amp; RECOMMENDATIONS</h5>
+                            <ul style="margin-bottom: 0; line-height: 1.8;">
+                                <li t-if="o.average_attendance >= 85">Overall attendance is excellent. Maintain current standards.</li>
+                                <li t-elif="o.average_attendance >= 75">Overall attendance is satisfactory. Monitor defaulters closely.</li>
+                                <li t-else="">Overall attendance is below standards. Immediate action required.</li>
+                                <li t-if="o.students_below_75 > 0">
+                                    <t t-esc="o.students_below_75"/> student(s) are below 75%. Send warning letters to parents/guardians.
+                                </li>
+                                <li>Conduct counseling sessions for students with attendance below 60%.</li>
+                                <li>Regular attendance monitoring is recommended for continued improvement.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Signatures -->
+                        <div class="row" style="margin-top: 50px;">
+                            <div class="col-4">
+                                <div style="border-top: 2px solid #333; padding-top: 5px; text-align: center;">
+                                    <strong>Prepared By</strong><br/>
+                                    <span style="font-size: 9pt;">Class Coordinator</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div style="border-top: 2px solid #333; padding-top: 5px; text-align: center;">
+                                    <strong>Verified By</strong><br/>
+                                    <span style="font-size: 9pt;">HOD</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div style="border-top: 2px solid #333; padding-top: 5px; text-align: center;">
+                                    <strong>Approved By</strong><br/>
+                                    <span style="font-size: 9pt;">Principal</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="text-center" style="margin-top: 30px; padding-top: 10px; border-top: 2px solid #FF5722; font-size: 9pt; color: #666;">
+                            <p style="margin: 0;">
+                                Report Generated on: <t t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%b-%Y %H:%M')"/>
+                            </p>
+                            <p style="margin: 5px 0 0 0;">
+                                This is a computer-generated report | Contact: <t t-esc="o.company_id.phone"/>
+                            </p>
+                        </div>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ══════════════════════════════════════════════════
+         QR SCAN LOG — LIST VIEW (read-only ledger)
+    ══════════════════════════════════════════════════════ -->
+    <record id="asset_qr_scan_log_view_list" model="ir.ui.view">
+        <field name="name">asset.qr.scan.log.view.list</field>
+        <field name="model">asset.qr.scan.log</field>
+        <field name="arch" type="xml">
+            <list string="QR Scan History" create="0" edit="0" delete="0"
+                  decoration-danger="not scan_token_valid">
+                <field name="name"/>
+                <field name="asset_id"/>
+                <field name="asset_code"/>
+                <field name="scanned_by"/>
+                <field name="scan_time"/>
+                <field name="action_taken" widget="badge"
+                       decoration-info="action_taken == 'view_only'"
+                       decoration-success="action_taken == 'request_raised'"
+                       decoration-warning="action_taken in ('handover_initiated','maintenance_reported')"/>
+                <field name="gps_captured" widget="boolean_toggle" optional="show"/>
+                <field name="gps_lat" optional="hide"/>
+                <field name="gps_lng" optional="hide"/>
+                <field name="scan_token_valid" widget="boolean_toggle" optional="show"/>
+                <field name="ip_address" optional="hide"/>
+                <field name="device_info" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ══════════════════════════════════════════════════
+         QR SCAN LOG — FORM VIEW (read-only)
+    ══════════════════════════════════════════════════════ -->
+    <record id="asset_qr_scan_log_view_form" model="ir.ui.view">
+        <field name="name">asset.qr.scan.log.view.form</field>
+        <field name="model">asset.qr.scan.log</field>
+        <field name="arch" type="xml">
+            <form string="QR Scan Event" create="0" edit="0" delete="0">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Scan Details">
+                            <field name="asset_id" readonly="1"/>
+                            <field name="asset_code" readonly="1"/>
+                            <field name="scanned_by" readonly="1"/>
+                            <field name="scan_time" readonly="1"/>
+                            <field name="action_taken" readonly="1"/>
+                            <field name="scan_token_valid" readonly="1"/>
+                        </group>
+                        <group string="Location &amp; Device">
+                            <field name="gps_lat" readonly="1"/>
+                            <field name="gps_lng" readonly="1"/>
+                            <field name="gps_captured" readonly="1"/>
+                            <field name="ip_address" readonly="1"/>
+                            <field name="device_info" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Notes" invisible="not notes">
+                        <field name="notes" readonly="1" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ══════════════════════════════════════════════════
+         QR SCAN LOG — SEARCH VIEW
+    ══════════════════════════════════════════════════════ -->
+    <record id="asset_qr_scan_log_view_search" model="ir.ui.view">
+        <field name="name">asset.qr.scan.log.view.search</field>
+        <field name="model">asset.qr.scan.log</field>
+        <field name="arch" type="xml">
+            <search string="Search Scan Logs">
+                <field name="asset_id"/>
+                <field name="scanned_by"/>
+                <filter string="Invalid Token Scans" name="invalid_token"
+                        domain="[('scan_token_valid','=',False)]"/>
+                <filter string="GPS Captured" name="gps_captured"
+                        domain="[('gps_captured','=',True)]"/>
+                <filter string="Request Raised" name="request_raised"
+                        domain="[('action_taken','=','request_raised')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Asset" name="group_asset" context="{'group_by': 'asset_id'}"/>
+                    <filter string="Scanned By" name="group_user" context="{'group_by': 'scanned_by'}"/>
+                    <filter string="Action" name="group_action" context="{'group_by': 'action_taken'}"/>
+                    <filter string="Scan Date" name="group_date" context="{'group_by': 'scan_time:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ══════════════════════════════════════════════════
+         QR SCAN LOG — ACTION
+    ══════════════════════════════════════════════════════ -->
+    <record id="action_asset_qr_scan_log" model="ir.actions.act_window">
+        <field name="name">QR Scan History</field>
+        <field name="res_model">asset.qr.scan.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'create': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No QR scan events yet</p>
+            <p>Every asset QR code scan is logged here with user, GPS, device, and action.</p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- IIC Event Report Action -->
+    <record id="action_report_iic_event_report" model="ir.actions.report">
+        <field name="name">IIC Event Report (MSME Format)</field>
+        <field name="model">iic.event.report</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">university_management.report_iic_event_template</field>
+        <field name="report_file">university_management.report_iic_event_template</field>
+        <field name="binding_model_id" ref="model_iic_event_report"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- QWeb Template -->
+    <template id="report_iic_event_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+
+                        <!-- base_url for absolute image URLs (needed by wkhtmltopdf on server) -->
+                        <t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
+
+                        <!-- Header -->
+                        <div class="text-center mb-4 border-bottom pb-3">
+                            <h2 class="text-primary">INSTITUTE INNOVATION COUNCIL</h2>
+                            <h3>POST-EVENT REPORT</h3>
+                            <p class="text-muted">MSME — Ministry of MSME, Government of India</p>
+                        </div>
+
+                        <!-- Event Title -->
+                        <div class="text-center mb-4">
+                            <h4 class="border p-3 bg-light">
+                                <strong><t t-esc="doc.event_title"/></strong>
+                            </h4>
+                        </div>
+
+                        <!-- Event Details Table -->
+                        <table class="table table-bordered mb-4">
+                            <tr>
+                                <th class="bg-light" style="width:30%">Event Name</th>
+                                <td><t t-esc="doc.event_title"/></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Activity Type</th>
+                                <td><t t-esc="doc.activity_type"/></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Date &amp; Time</th>
+                                <td><t t-esc="doc.event_date"/></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Venue</th>
+                                <td><t t-esc="doc.venue"/></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Speaker / Resource Person</th>
+                                <td>
+                                    <t t-if="doc.speaker_id">
+                                        <t t-esc="doc.speaker_id.name"/>
+                                        <t t-if="doc.speaker_id.designation">
+                                            , <t t-esc="doc.speaker_id.designation"/>
+                                        </t>
+                                        <t t-if="doc.speaker_id.organization">
+                                            , <t t-esc="doc.speaker_id.organization"/>
+                                        </t>
+                                    </t>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Faculty In-charge</th>
+                                <td><t t-esc="doc.faculty_incharge_id.name"/></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Total Participants</th>
+                                <td><t t-esc="doc.attendance_count"/></td>
+                            </tr>
+                        </table>
+
+                        <!-- Description -->
+                        <t t-if="doc.event_description">
+                            <h5 class="border-bottom pb-2">Event Description</h5>
+                            <div class="mb-3">
+                                <t t-raw="doc.event_description"/>
+                            </div>
+                        </t>
+
+                        <!-- Objectives -->
+                        <t t-if="doc.objectives">
+                            <h5 class="border-bottom pb-2">Objectives</h5>
+                            <p class="mb-3"><t t-esc="doc.objectives"/></p>
+                        </t>
+
+                        <!-- Outcomes -->
+                        <t t-if="doc.outcomes">
+                            <h5 class="border-bottom pb-2">Outcomes / Achievements</h5>
+                            <p class="mb-3"><t t-esc="doc.outcomes"/></p>
+                        </t>
+
+                        <!-- Student Feedback -->
+                        <t t-if="doc.student_feedback">
+                            <h5 class="border-bottom pb-2">Student Feedback Summary</h5>
+                            <p class="mb-3"><t t-esc="doc.student_feedback"/></p>
+                        </t>
+
+                        <!-- Event Photo Gallery -->
+                        <t t-set="all_gallery_images" t-value="doc.photo_ids.mapped('image_ids') or doc.media_ids.mapped('image_ids')"/>
+                        <t t-if="all_gallery_images">
+                            <h5 class="border-bottom pb-2">Event Photo Gallery</h5>
+                            <table style="width:100%; table-layout:fixed; border-collapse:separate; border-spacing:8px; margin-bottom:16px;">
+                                <colgroup>
+                                    <col style="width:33.33%;"/>
+                                    <col style="width:33.33%;"/>
+                                    <col style="width:33.33%;"/>
+                                </colgroup>
+                                <!-- Row 1: images 0-2 -->
+                                <tr>
+                                    <t t-foreach="all_gallery_images[:3]" t-as="img">
+                                        <td style="vertical-align:top; text-align:center;">
+                                            <img t-att-src="base_url + '/web/image/iic.media.image/' + str(img.id) + '/image'"
+                                                 style="width:100%; height:auto; display:block; border-radius:4px; border:1px solid #dee2e6;"
+                                                 t-att-alt="img.name or 'Event Photo'"/>
+                                            <t t-if="img.name">
+                                                <div style="font-size:9px; color:#6c757d; margin-top:4px;"><t t-esc="img.name"/></div>
+                                            </t>
+                                        </td>
+                                    </t>
+                                    <t t-if="len(all_gallery_images) == 1"><td/><td/></t>
+                                    <t t-elif="len(all_gallery_images) == 2"><td/></t>
+                                </tr>
+                                <!-- Row 2: images 3-5 -->
+                                <t t-if="len(all_gallery_images) &gt; 3">
+                                <tr>
+                                    <t t-foreach="all_gallery_images[3:6]" t-as="img">
+                                        <td style="vertical-align:top; text-align:center;">
+                                            <img t-att-src="base_url + '/web/image/iic.media.image/' + str(img.id) + '/image'"
+                                                 style="width:100%; height:auto; display:block; border-radius:4px; border:1px solid #dee2e6;"
+                                                 t-att-alt="img.name or 'Event Photo'"/>
+                                            <t t-if="img.name">
+                                                <div style="font-size:9px; color:#6c757d; margin-top:4px;"><t t-esc="img.name"/></div>
+                                            </t>
+                                        </td>
+                                    </t>
+                                    <t t-if="len(all_gallery_images) == 4"><td/><td/></t>
+                                    <t t-elif="len(all_gallery_images) == 5"><td/></t>
+                                </tr>
+                                </t>
+                                <!-- Row 3: images 6-8 -->
+                                <t t-if="len(all_gallery_images) &gt; 6">
+                                <tr>
+                                    <t t-foreach="all_gallery_images[6:9]" t-as="img">
+                                        <td style="vertical-align:top; text-align:center;">
+                                            <img t-att-src="base_url + '/web/image/iic.media.image/' + str(img.id) + '/image'"
+                                                 style="width:100%; height:auto; display:block; border-radius:4px; border:1px solid #dee2e6;"
+                                                 t-att-alt="img.name or 'Event Photo'"/>
+                                            <t t-if="img.name">
+                                                <div style="font-size:9px; color:#6c757d; margin-top:4px;"><t t-esc="img.name"/></div>
+                                            </t>
+                                        </td>
+                                    </t>
+                                    <t t-if="len(all_gallery_images) == 7"><td/><td/></t>
+                                    <t t-elif="len(all_gallery_images) == 8"><td/></t>
+                                </tr>
+                                </t>
+                            </table>
+                        </t>
+
+                        <!-- Signatures -->
+                        <div class="row mt-5 pt-4">
+                            <div class="col-4 text-center">
+                                <div class="border-top pt-2">Faculty In-charge</div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div class="border-top pt-2">IIC Convenor</div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div class="border-top pt-2">IIC President</div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

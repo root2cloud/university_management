@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  QR SCAN PAGE — Mobile-optimised, GPS + role-based buttons  -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+
+    <template id="asset_scan_page" name="Asset QR Scan Page">
+        <t t-call="web.layout">
+            <t t-set="title">Asset: <t t-esc="asset.name"/></t>
+            <t t-set="head">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+                <style>
+                    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                           background: #f5f5f5; margin: 0; padding: 0; }
+                    .scan-container { max-width: 480px; margin: 0 auto; padding: 16px; }
+                    .asset-card { background: white; border-radius: 12px; padding: 20px;
+                                  box-shadow: 0 2px 12px rgba(0,0,0,0.1); margin-bottom: 16px; }
+                    .asset-title { font-size: 1.4rem; font-weight: 700; color: #1a1a2e; margin: 0 0 4px; }
+                    .asset-code { font-size: 0.85rem; color: #666; margin-bottom: 12px; }
+                    .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px;
+                                    font-size: 0.8rem; font-weight: 600; text-transform: uppercase; }
+                    .status-available { background: #d4edda; color: #155724; }
+                    .status-not_available { background: #f8d7da; color: #721c24; }
+                    .status-needs_purchase { background: #fff3cd; color: #856404; }
+                    .status-in_audit { background: #cce5ff; color: #004085; }
+                    .info-row { display: flex; justify-content: space-between;
+                                padding: 8px 0; border-bottom: 1px solid #f0f0f0;
+                                font-size: 0.9rem; }
+                    .info-label { color: #888; }
+                    .info-value { font-weight: 500; color: #333; }
+                    .action-section { background: white; border-radius: 12px; padding: 20px;
+                                      box-shadow: 0 2px 12px rgba(0,0,0,0.1); margin-bottom: 16px; }
+                    .action-title { font-size: 1rem; font-weight: 600; color: #555; margin-bottom: 12px; }
+                    .btn-action { display: block; width: 100%; padding: 14px; margin-bottom: 10px;
+                                  border: none; border-radius: 8px; font-size: 1rem;
+                                  font-weight: 600; cursor: pointer; text-align: center;
+                                  text-decoration: none; transition: opacity 0.2s; }
+                    .btn-action:hover { opacity: 0.85; }
+                    .btn-primary-action { background: #4361ee; color: white; }
+                    .btn-warning-action { background: #f77f00; color: white; }
+                    .btn-danger-action { background: #d62828; color: white; }
+                    .btn-audit-action { background: #2d6a4f; color: white; }
+                    .btn-secondary-action { background: #e9ecef; color: #333; }
+                    .status-update-row { display: flex; gap: 8px; margin-bottom: 10px; }
+                    .status-update-row .btn-action { margin-bottom: 0; font-size: 0.85rem; padding: 10px 6px; }
+                    .map-container { border-radius: 12px; overflow: hidden; height: 200px;
+                                     box-shadow: 0 2px 12px rgba(0,0,0,0.1); margin-bottom: 16px; }
+                    .map-container iframe { width: 100%; height: 100%; border: none; }
+                    .scan-meta { font-size: 0.75rem; color: #aaa; text-align: center; padding: 8px; }
+                    .alert-banner { padding: 12px 16px; border-radius: 8px; margin-bottom: 16px;
+                                    font-size: 0.9rem; font-weight: 500; }
+                    .alert-audit { background: #e8f5e9; color: #1b5e20; border-left: 4px solid #4caf50; }
+                    .spinner { display: none; text-align: center; padding: 8px; color: #666; font-size: 0.8rem; }
+                </style>
+            </t>
+            <t t-set="body_classname">o_web_client</t>
+
+            <div class="scan-container">
+
+                <!-- Asset Info Card -->
+                <div class="asset-card">
+                    <div class="asset-title"><t t-esc="asset.name"/></div>
+                    <div class="asset-code"><t t-esc="asset.asset_code"/></div>
+
+                    <t t-set="status_val" t-value="asset.status or 'available'"/>
+                    <span t-attf-class="status-badge status-#{status_val}">
+                        <t t-if="status_val == 'available'">✓ Available</t>
+                        <t t-elif="status_val == 'not_available'">✗ Not Available</t>
+                        <t t-elif="status_val == 'needs_purchase'">⚠ Needs Purchase</t>
+                        <t t-elif="status_val == 'in_audit'">🔍 In Audit</t>
+                        <t t-else=""><t t-esc="status_val"/></t>
+                    </span>
+
+                    <div style="margin-top: 12px;">
+                        <div class="info-row">
+                            <span class="info-label">Category</span>
+                            <span class="info-value"><t t-esc="asset.category_id.name or '—'"/></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Location</span>
+                            <span class="info-value"><t t-esc="(asset.building or '') + ' ' + (asset.floor or '') + ' ' + (asset.room or '') or '—'"/></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Department</span>
+                            <span class="info-value"><t t-esc="asset.department_id.name or '—'"/></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Custodian</span>
+                            <span class="info-value"><t t-esc="asset.custodian_name or (asset.faculty_id.name if asset.faculty_id else '—')"/></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Last Scanned</span>
+                            <span class="info-value">
+                                <t t-if="asset.last_scan_date">
+                                    <t t-esc="asset.last_scan_date"/>
+                                </t>
+                                <t t-else="">Never</t>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audit banner if asset is in audit and user is assigned auditor -->
+                <t t-if="can_audit and active_audit">
+                    <div class="alert-banner alert-audit">
+                        🔍 <strong>Audit in progress:</strong>
+                        <t t-esc="active_audit.name"/> — You are the assigned auditor.
+                        Tap "Conduct Audit" below to verify this asset.
+                    </div>
+                </t>
+
+                <!-- Actions Section — shown based on role -->
+                <t t-if="can_update_status or can_raise_handover or can_audit or can_print_qr">
+                    <div class="action-section">
+                        <div class="action-title">Actions</div>
+
+                        <!-- Status Update (Faculty + HOD) -->
+                        <t t-if="can_update_status">
+                            <div style="margin-bottom: 6px; font-size: 0.8rem; color: #888;">
+                                Update Status:
+                            </div>
+                            <div class="status-update-row">
+                                <button class="btn-action btn-secondary-action"
+                                        onclick="updateStatus('available')">✓ Available</button>
+                                <button class="btn-action btn-warning-action"
+                                        onclick="updateStatus('not_available')">✗ Not Available</button>
+                                <button class="btn-action btn-danger-action"
+                                        onclick="updateStatus('needs_purchase')">⚠ Needs Purchase</button>
+                            </div>
+                        </t>
+
+                        <!-- Raise Handover (Faculty + HOD) -->
+                        <t t-if="can_raise_handover">
+                            <a t-attf-href="/odoo/asset-handover/new?asset_id=#{asset.id}&amp;scan=1"
+                               class="btn-action btn-primary-action">
+                                📦 Raise Handover Request
+                            </a>
+                        </t>
+
+                        <!-- Conduct Audit (Assigned auditor only) -->
+                        <t t-if="can_audit and active_audit">
+                            <button class="btn-action btn-audit-action"
+                                    t-attf-onclick="openAuditPanel(#{asset.id}, #{active_audit.id})">
+                                🔍 Conduct Audit Verification
+                            </button>
+                        </t>
+
+                        <!-- Raise Purchase Request (Faculty + HOD) -->
+                        <t t-if="can_update_status">
+                            <a t-attf-href="/odoo/asset-purchase-request/new?asset_id=#{asset.id}"
+                               class="btn-action btn-secondary-action">
+                                🛒 Raise Purchase Request
+                            </a>
+                        </t>
+
+                    </div>
+                </t>
+
+                <!-- View Details — always available -->
+                <div class="action-section">
+                    <div class="action-title">Asset Details</div>
+                    <a t-attf-href="/odoo/assets/#{asset.id}"
+                       class="btn-action btn-secondary-action">
+                        📋 View Full Asset Record
+                    </a>
+                </div>
+
+                <!-- GPS Map (last known location) -->
+                <t t-if="lat and lng and float(lat) != 0.0">
+                    <div class="map-container">
+                        <iframe t-attf-src="https://maps.google.com/maps?q=#{lat},#{lng}&amp;z=18&amp;output=embed"
+                                allowfullscreen="allowfullscreen"/>
+                    </div>
+                </t>
+
+                <!-- Scan metadata -->
+                <div class="scan-meta">
+                    Scanned by <t t-esc="user.name"/> · <t t-esc="asset.asset_code"/>
+                </div>
+
+                <!-- Audit Panel (hidden, shown via JS) -->
+                <div id="audit-panel" style="display:none;">
+                    <div class="action-section">
+                        <div class="action-title">🔍 Audit Verification</div>
+                        <div id="audit-asset-id" style="display:none;"/>
+                        <div id="audit-id" style="display:none;"/>
+
+                        <label style="font-size:0.85rem; color:#555;">Physical Condition:</label>
+                        <select id="audit-condition" class="btn-action btn-secondary-action" style="background:white; color:#333;">
+                            <option value="good">Good — Working Fine</option>
+                            <option value="fair">Fair — Minor Issues</option>
+                            <option value="poor">Poor — Needs Repair</option>
+                            <option value="damaged">Damaged</option>
+                            <option value="beyond_repair">Beyond Repair</option>
+                        </select>
+
+                        <label style="font-size:0.85rem; color:#555; margin-top:8px;">Asset Status:</label>
+                        <select id="audit-status" class="btn-action btn-secondary-action" style="background:white; color:#333;">
+                            <option value="present">Present &amp; Verified</option>
+                            <option value="location_mismatch">Found — Wrong Location</option>
+                            <option value="condition_issue">Found — Condition Issue</option>
+                            <option value="missing">Not Found / Missing</option>
+                        </select>
+
+                        <label style="font-size:0.85rem; color:#555; margin-top:8px;">Actual Location (if different):</label>
+                        <input id="audit-location" type="text" placeholder="e.g. Lab 203"
+                               style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; margin-bottom:8px;"/>
+
+                        <label style="font-size:0.85rem; color:#555;">Notes:</label>
+                        <textarea id="audit-notes" rows="2"
+                                  style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; margin-bottom:12px;"
+                                  placeholder="Any observations..."></textarea>
+
+                        <button class="btn-action btn-audit-action" onclick="submitAuditVerification()">
+                            ✓ Submit Verification
+                        </button>
+                        <button class="btn-action btn-secondary-action" onclick="closeAuditPanel()">
+                            Cancel
+                        </button>
+                        <div class="spinner" id="audit-spinner">Submitting...</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- GPS Capture + Action Scripts -->
+            <script>
+                // 1. Capture GPS as soon as page loads
+                var capturedLat = null, capturedLng = null;
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        function(pos) {
+                            capturedLat = pos.coords.latitude;
+                            capturedLng = pos.coords.longitude;
+                            // Update server with GPS
+                            fetch('/asset/update_location', {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify({
+                                    asset_id: <t t-esc="asset.id"/>,
+                                    lat: capturedLat,
+                                    lng: capturedLng
+                                })
+                            });
+                            // Update map iframe if loaded
+                            var frames = document.querySelectorAll('.map-container iframe');
+                            if (frames.length) {
+                                frames[0].src = 'https://maps.google.com/maps?q=' +
+                                    capturedLat + ',' + capturedLng + '&amp;z=18&amp;output=embed';
+                            }
+                        },
+                        function(err) { console.warn('GPS unavailable:', err); }
+                    );
+                }
+
+                // 2. Status update
+                function updateStatus(newStatus) {
+                    fetch('/asset/update_status', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            asset_id: <t t-esc="asset.id"/>,
+                            new_status: newStatus
+                        })
+                    }).then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (data.status === 'ok') {
+                            location.reload();
+                        } else {
+                            alert('Error: ' + (data.message || 'Status update failed'));
+                        }
+                    });
+                }
+
+                // 3. Audit panel
+                function openAuditPanel(assetId, auditId) {
+                    document.getElementById('audit-panel').style.display = 'block';
+                    document.getElementById('audit-asset-id').textContent = assetId;
+                    document.getElementById('audit-id').textContent = auditId;
+                    document.getElementById('audit-panel').scrollIntoView({behavior: 'smooth'});
+                }
+
+                function closeAuditPanel() {
+                    document.getElementById('audit-panel').style.display = 'none';
+                }
+
+                function submitAuditVerification() {
+                    var assetId = document.getElementById('audit-asset-id').textContent;
+                    var auditId = document.getElementById('audit-id').textContent;
+                    var condition = document.getElementById('audit-condition').value;
+                    var status = document.getElementById('audit-status').value;
+                    var location = document.getElementById('audit-location').value;
+                    var notes = document.getElementById('audit-notes').value;
+
+                    document.getElementById('audit-spinner').style.display = 'block';
+
+                    fetch('/asset/audit/scan', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            asset_id: parseInt(assetId),
+                            audit_id: parseInt(auditId),
+                            scan_status: status,
+                            physical_condition: condition,
+                            actual_location: location,
+                            auditor_notes: notes,
+                            lat: capturedLat,
+                            lng: capturedLng
+                        })
+                    }).then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        document.getElementById('audit-spinner').style.display = 'none';
+                        if (data.status === 'ok') {
+                            alert('Audit verification submitted successfully!');
+                            closeAuditPanel();
+                            location.reload();
+                        } else {
+                            alert('Error: ' + (data.message || 'Submission failed'));
+                        }
+                    });
+                }
+            </script>
+        </t>
+    </template>
+
+</odoo>

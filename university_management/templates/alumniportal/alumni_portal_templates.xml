@@ -1,0 +1,745 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         ALUMNI PROFILE  —  /my/alumni
+    ══════════════════════════════════════════════════════════════════ -->
+    <template id="portal_alumni_profile" name="Alumni – My Profile" inherit_id="portal.portal_layout">
+        <xpath expr="//div[hasclass('o_portal')]" position="inside">
+            <t t-if="alumni">
+            <div class="container mt-3">
+
+                <!-- Header banner -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card bg-primary text-white shadow-sm">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-md-2 text-center mb-3 mb-md-0">
+                                        <t t-if="alumni.photo">
+                                            <img t-attf-src="data:image/png;base64,{{ alumni.photo }}"
+                                                 class="img-thumbnail rounded-circle"
+                                                 style="width:100px;height:100px;object-fit:cover;"
+                                                 alt="Alumni Photo"/>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto"
+                                                 style="width:100px;height:100px;">
+                                                <i class="fa fa-user-graduate fa-3x text-primary"/>
+                                            </div>
+                                        </t>
+                                    </div>
+                                    <div class="col-md-10">
+                                        <h2 class="mb-1">
+                                            <t t-esc="alumni.name"/>
+                                        </h2>
+                                        <p class="mb-2">
+                                            <span class="badge bg-light text-dark me-2">
+                                                <i class="fa fa-id-card"/> <t t-esc="alumni.registration_number or 'N/A'"/>
+                                            </span>
+                                            <span class="badge bg-light text-dark me-2">
+                                                <i class="fa fa-graduation-cap"/> <t t-esc="alumni.program_id.name or ''"/>
+                                            </span>
+                                            <span class="badge bg-light text-dark me-2">
+                                                <i class="fa fa-calendar"/> Batch of <t t-esc="alumni.graduation_year"/>
+                                            </span>
+                                        </p>
+                                        <a href="/my/alumni/edit" class="btn btn-light btn-sm">
+                                            <i class="fa fa-pencil"/> Edit Profile
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Academic & Contact row -->
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-header bg-secondary text-white">
+                                <i class="fa fa-university"/> Academic Details
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-borderless mb-0">
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-muted" style="width:45%">Program</td>
+                                            <td><strong><t t-esc="alumni.program_id.name or '—'"/></strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-muted">Department</td>
+                                            <td><t t-esc="alumni.department_id.name or '—'"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-muted">Batch</td>
+                                            <td><t t-esc="alumni.batch_id.name or '—'"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-muted">Admission Year</td>
+                                            <td><t t-esc="alumni.admission_year or '—'"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-muted">Graduation Year</td>
+                                            <td><t t-esc="alumni.graduation_year"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-muted">CGPA</td>
+                                            <td><t t-esc="'%.2f' % alumni.cgpa" t-if="alumni.cgpa"/><t t-else="">—</t></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-muted">Final %</td>
+                                            <td><t t-esc="'%.2f' % alumni.final_percentage" t-if="alumni.final_percentage"/><t t-else="">—</t></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-header bg-secondary text-white">
+                                <i class="fa fa-address-book"/> Contact Information
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-borderless mb-0">
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-muted" style="width:40%">Email</td>
+                                            <td><a t-att-href="'mailto:' + alumni.email" t-if="alumni.email"><t t-esc="alumni.email"/></a><t t-else="">—</t></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-muted">Mobile</td>
+                                            <td><t t-esc="alumni.mobile or '—'"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-muted">City</td>
+                                            <td><t t-esc="alumni.city or '—'"/></td>
+                                        </tr>
+                                        <tr t-if="alumni.linkedin_profile">
+                                            <td class="text-muted">LinkedIn</td>
+                                            <td><a t-att-href="alumni.linkedin_profile" target="_blank"><i class="fa fa-linkedin"/> View Profile</a></td>
+                                        </tr>
+                                        <tr t-if="alumni.twitter_handle">
+                                            <td class="text-muted">Twitter</td>
+                                            <td><t t-esc="alumni.twitter_handle"/></td>
+                                        </tr>
+                                        <tr t-if="alumni.facebook_profile">
+                                            <td class="text-muted">Facebook</td>
+                                            <td><a t-att-href="alumni.facebook_profile" target="_blank"><i class="fa fa-facebook"/> View Profile</a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Employment -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-success text-white">
+                                <i class="fa fa-briefcase"/> Employment
+                            </div>
+                            <div class="card-body">
+                                <t t-if="alumni.is_employed">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <small class="text-muted d-block">Company</small>
+                                            <strong><t t-esc="alumni.current_company or '—'"/></strong>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <small class="text-muted d-block">Designation</small>
+                                            <strong><t t-esc="alumni.current_designation or '—'"/></strong>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <small class="text-muted d-block">Location</small>
+                                            <strong><t t-esc="alumni.current_location or '—'"/></strong>
+                                        </div>
+                                    </div>
+                                </t>
+                                <t t-else="">
+                                    <p class="text-muted mb-0"><i class="fa fa-info-circle"/> Not currently employed.</p>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Higher Education & Mentorship -->
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-header bg-info text-white">
+                                <i class="fa fa-book"/> Higher Education
+                            </div>
+                            <div class="card-body">
+                                <t t-if="alumni.pursuing_higher_education">
+                                    <p class="mb-1"><span class="badge bg-info text-white">Pursuing Higher Education</span></p>
+                                    <p class="mb-0"><t t-esc="alumni.higher_education_details or ''"/></p>
+                                </t>
+                                <t t-else="">
+                                    <p class="text-muted mb-0">Not pursuing higher education.</p>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-header bg-warning text-dark">
+                                <i class="fa fa-handshake-o"/> Mentorship
+                            </div>
+                            <div class="card-body">
+                                <t t-if="alumni.willing_to_mentor">
+                                    <p class="mb-1"><span class="badge bg-warning text-dark">Available to Mentor</span></p>
+                                    <p class="mb-0"><t t-esc="alumni.mentorship_area or ''"/></p>
+                                </t>
+                                <t t-else="">
+                                    <p class="text-muted mb-0">Not registered as mentor.</p>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Achievements -->
+                <div class="row mb-4" t-if="alumni.achievement_ids">
+                    <div class="col-12">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-primary text-white">
+                                <i class="fa fa-trophy"/> Achievements
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Achievement</th>
+                                            <th>Type</th>
+                                            <th>Date</th>
+                                            <th>Organization</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="alumni.achievement_ids" t-as="ach">
+                                            <tr>
+                                                <td><t t-esc="ach.name"/></td>
+                                                <td><t t-esc="ach.achievement_type"/></td>
+                                                <td><t t-esc="ach.achievement_date"/></td>
+                                                <td><t t-esc="ach.organization or '—'"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            </t>
+        </xpath>
+    </template>
+
+
+    <!-- ══════════════════════════════════════════════════════════════
+         ALUMNI EDIT PROFILE  —  /my/alumni/edit
+    ══════════════════════════════════════════════════════════════════ -->
+    <template id="portal_alumni_edit" name="Alumni – Edit Profile" inherit_id="portal.portal_layout">
+        <xpath expr="//div[hasclass('o_portal')]" position="inside">
+            <t t-if="alumni">
+            <div class="container mt-3">
+                <div class="row justify-content-center">
+                    <div class="col-lg-9">
+
+                        <div class="d-flex align-items-center mb-3">
+                            <a href="/my/alumni" class="btn btn-outline-secondary btn-sm me-3">
+                                <i class="fa fa-arrow-left"/> Back to Profile
+                            </a>
+                            <h3 class="mb-0">Edit My Profile</h3>
+                        </div>
+
+                        <!-- Success / Error alerts -->
+                        <t t-if="success">
+                            <div class="alert alert-success">
+                                <i class="fa fa-check-circle"/> Profile updated successfully.
+                            </div>
+                        </t>
+                        <t t-if="errors and errors.get('general')">
+                            <div class="alert alert-danger">
+                                <i class="fa fa-exclamation-triangle"/> <t t-esc="errors['general']"/>
+                            </div>
+                        </t>
+
+                        <form action="/my/alumni/edit" method="post" class="o_portal_details">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                            <!-- Contact -->
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-header bg-secondary text-white">
+                                    <i class="fa fa-phone"/> Contact &amp; Social
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Mobile</label>
+                                            <input type="text" name="mobile" class="form-control"
+                                                   t-att-value="alumni.mobile or ''"/>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">LinkedIn Profile URL</label>
+                                            <input type="url" name="linkedin_profile" class="form-control"
+                                                   placeholder="https://linkedin.com/in/username"
+                                                   t-att-value="alumni.linkedin_profile or ''"/>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Twitter Handle</label>
+                                            <input type="text" name="twitter_handle" class="form-control"
+                                                   placeholder="@username"
+                                                   t-att-value="alumni.twitter_handle or ''"/>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Facebook Profile URL</label>
+                                            <input type="url" name="facebook_profile" class="form-control"
+                                                   placeholder="https://facebook.com/username"
+                                                   t-att-value="alumni.facebook_profile or ''"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Employment -->
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-header bg-success text-white">
+                                    <i class="fa fa-briefcase"/> Employment
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3 form-check">
+                                        <input type="checkbox" class="form-check-input" id="is_employed"
+                                               name="is_employed" value="1"
+                                               t-att-checked="'checked' if alumni.is_employed else None"/>
+                                        <label class="form-check-label" for="is_employed">Currently Employed</label>
+                                    </div>
+                                    <div id="employment_fields">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Company</label>
+                                                <input type="text" name="current_company" class="form-control"
+                                                       placeholder="e.g. Tata Consultancy Services"
+                                                       t-att-value="alumni.current_company or ''"/>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Designation</label>
+                                                <input type="text" name="current_designation" class="form-control"
+                                                       placeholder="e.g. Software Engineer"
+                                                       t-att-value="alumni.current_designation or ''"/>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Location</label>
+                                                <input type="text" name="current_location" class="form-control"
+                                                       placeholder="e.g. Bangalore, Karnataka"
+                                                       t-att-value="alumni.current_location or ''"/>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Industry</label>
+                                                <select name="industry" class="form-select">
+                                                    <option value="">— Select —</option>
+                                                    <option value="it"           t-att-selected="'selected' if alumni.industry == 'it' else None">IT/Software</option>
+                                                    <option value="core"         t-att-selected="'selected' if alumni.industry == 'core' else None">Core Engineering</option>
+                                                    <option value="finance"      t-att-selected="'selected' if alumni.industry == 'finance' else None">Finance/Banking</option>
+                                                    <option value="consulting"   t-att-selected="'selected' if alumni.industry == 'consulting' else None">Consulting</option>
+                                                    <option value="manufacturing" t-att-selected="'selected' if alumni.industry == 'manufacturing' else None">Manufacturing</option>
+                                                    <option value="healthcare"   t-att-selected="'selected' if alumni.industry == 'healthcare' else None">Healthcare</option>
+                                                    <option value="education"    t-att-selected="'selected' if alumni.industry == 'education' else None">Education</option>
+                                                    <option value="government"   t-att-selected="'selected' if alumni.industry == 'government' else None">Government</option>
+                                                    <option value="business"     t-att-selected="'selected' if alumni.industry == 'business' else None">Business/Entrepreneurship</option>
+                                                    <option value="other"        t-att-selected="'selected' if alumni.industry == 'other' else None">Other</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Higher Education -->
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-header bg-info text-white">
+                                    <i class="fa fa-book"/> Higher Education
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3 form-check">
+                                        <input type="checkbox" class="form-check-input" id="pursuing_higher_education"
+                                               name="pursuing_higher_education" value="1"
+                                               t-att-checked="'checked' if alumni.pursuing_higher_education else None"/>
+                                        <label class="form-check-label" for="pursuing_higher_education">Pursuing Higher Education</label>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Details</label>
+                                        <textarea name="higher_education_details" class="form-control" rows="3"
+                                                  placeholder="University, Degree, Year, etc.">
+                                            <t t-esc="alumni.higher_education_details or ''"/>
+                                        </textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Mentorship -->
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-header bg-warning text-dark">
+                                    <i class="fa fa-handshake-o"/> Mentorship
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3 form-check">
+                                        <input type="checkbox" class="form-check-input" id="willing_to_mentor"
+                                               name="willing_to_mentor" value="1"
+                                               t-att-checked="'checked' if alumni.willing_to_mentor else None"/>
+                                        <label class="form-check-label" for="willing_to_mentor">I am willing to mentor current students</label>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Area of Expertise / Mentorship Focus</label>
+                                        <textarea name="mentorship_area" class="form-control" rows="3"
+                                                  placeholder="Describe how you can help students...">
+                                            <t t-esc="alumni.mentorship_area or ''"/>
+                                        </textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa fa-save"/> Save Changes
+                                </button>
+                                <a href="/my/alumni" class="btn btn-outline-secondary">Cancel</a>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+            </t>
+        </xpath>
+    </template>
+
+
+    <!-- ══════════════════════════════════════════════════════════════
+         PUBLIC ALUMNI DIRECTORY  —  /alumni
+    ══════════════════════════════════════════════════════════════════ -->
+    <template id="portal_alumni_directory" name="Alumni Directory">
+        <t t-call="website.layout">
+            <div class="container mt-4 mb-5">
+
+                <!-- Page title -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2><i class="fa fa-users text-primary"/> Alumni Directory</h2>
+                        <p class="text-muted">Connect with our graduates from across the years.</p>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <form method="get" action="/alumni" class="row g-3 align-items-end">
+                            <div class="col-md-4">
+                                <label class="form-label">Program</label>
+                                <select name="program" class="form-select">
+                                    <option value="">All Programs</option>
+                                    <t t-foreach="programs" t-as="prog">
+                                        <option t-att-value="prog.id"
+                                                t-att-selected="'selected' if selected_program == prog.id else None">
+                                            <t t-esc="prog.name"/>
+                                        </option>
+                                    </t>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Graduation Year</label>
+                                <select name="graduation_year" class="form-select">
+                                    <option value="">All Years</option>
+                                    <t t-foreach="graduation_years" t-as="yr">
+                                        <option t-att-value="yr"
+                                                t-att-selected="'selected' if selected_year == yr else None">
+                                            <t t-esc="yr"/>
+                                        </option>
+                                    </t>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fa fa-filter"/> Filter
+                                </button>
+                            </div>
+                            <div class="col-md-2">
+                                <a href="/alumni" class="btn btn-outline-secondary w-100">
+                                    <i class="fa fa-times"/> Clear
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Alumni cards -->
+                <div class="row">
+                    <t t-if="alumni_list">
+                        <t t-foreach="alumni_list" t-as="alum">
+                            <div class="col-md-4 col-sm-6 mb-4">
+                                <a t-attf-href="/alumni/{{ alum.id }}" class="text-decoration-none">
+                                    <div class="card h-100 shadow-sm alumni-card">
+                                        <div class="card-body text-center pt-4">
+                                            <t t-if="alum.photo">
+                                                <img t-attf-src="data:image/png;base64,{{ alum.photo }}"
+                                                     class="rounded-circle mb-3"
+                                                     style="width:80px;height:80px;object-fit:cover;"
+                                                     alt="Alumni Photo"/>
+                                            </t>
+                                            <t t-else="">
+                                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                                                     style="width:80px;height:80px;">
+                                                    <i class="fa fa-user fa-2x text-muted"/>
+                                                </div>
+                                            </t>
+                                            <h6 class="card-title text-dark mb-1"><t t-esc="alum.name"/></h6>
+                                            <p class="text-muted small mb-1">
+                                                <t t-esc="alum.program_id.name or ''"/>
+                                            </p>
+                                            <p class="text-muted small mb-2">
+                                                Batch of <t t-esc="alum.graduation_year"/>
+                                            </p>
+                                            <t t-if="alum.is_employed and alum.current_company">
+                                                <span class="badge bg-success">
+                                                    <i class="fa fa-briefcase"/> <t t-esc="alum.current_company"/>
+                                                </span>
+                                            </t>
+                                            <t t-elif="alum.pursuing_higher_education">
+                                                <span class="badge bg-info">
+                                                    <i class="fa fa-book"/> Higher Education
+                                                </span>
+                                            </t>
+                                            <t t-if="alum.willing_to_mentor">
+                                                <br/>
+                                                <span class="badge bg-warning text-dark mt-1">
+                                                    <i class="fa fa-handshake-o"/> Mentor
+                                                </span>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </t>
+                    </t>
+                    <t t-else="">
+                        <div class="col-12">
+                            <div class="alert alert-info text-center">
+                                <i class="fa fa-info-circle fa-2x mb-2 d-block"/>
+                                No alumni records found for the selected filters.
+                            </div>
+                        </div>
+                    </t>
+                </div>
+
+                <!-- Pager -->
+                <div class="row mt-2" t-if="pager and pager['pages']">
+                    <div class="col-12 text-center">
+                        <t t-call="website.pager">
+                            <t t-set="pager" t-value="pager"/>
+                        </t>
+                    </div>
+                </div>
+
+            </div>
+        </t>
+    </template>
+
+
+    <!-- ══════════════════════════════════════════════════════════════
+         PUBLIC ALUMNI DETAIL  —  /alumni/<id>
+    ══════════════════════════════════════════════════════════════════ -->
+    <template id="portal_alumni_detail" name="Alumni – Public Profile">
+        <t t-call="website.layout">
+            <div class="container mt-4 mb-5">
+
+                <div class="mb-3">
+                    <a href="/alumni" class="btn btn-outline-secondary btn-sm">
+                        <i class="fa fa-arrow-left"/> Back to Directory
+                    </a>
+                </div>
+
+                <!-- Header -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 text-center mb-3 mb-md-0">
+                                <t t-if="alumni.photo">
+                                    <img t-attf-src="data:image/png;base64,{{ alumni.photo }}"
+                                         class="rounded-circle"
+                                         style="width:100px;height:100px;object-fit:cover;"
+                                         alt="Alumni Photo"/>
+                                </t>
+                                <t t-else="">
+                                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto"
+                                         style="width:100px;height:100px;">
+                                        <i class="fa fa-user-graduate fa-3x text-muted"/>
+                                    </div>
+                                </t>
+                            </div>
+                            <div class="col-md-10">
+                                <h2 class="mb-1"><t t-esc="alumni.name"/></h2>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="badge bg-primary">
+                                        <i class="fa fa-graduation-cap"/> <t t-esc="alumni.program_id.name or ''"/>
+                                    </span>
+                                    <span class="badge bg-secondary">
+                                        <i class="fa fa-calendar"/> Batch of <t t-esc="alumni.graduation_year"/>
+                                    </span>
+                                    <span class="badge bg-secondary" t-if="alumni.registration_number">
+                                        <i class="fa fa-id-card"/> <t t-esc="alumni.registration_number"/>
+                                    </span>
+                                    <t t-if="alumni.cgpa">
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="fa fa-star"/> CGPA <t t-esc="'%.2f' % alumni.cgpa"/>
+                                        </span>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Left column -->
+                    <div class="col-md-5 mb-4">
+
+                        <!-- Employment -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-success text-white">
+                                <i class="fa fa-briefcase"/> Employment
+                            </div>
+                            <div class="card-body">
+                                <t t-if="alumni.is_employed">
+                                    <p class="mb-1"><strong><t t-esc="alumni.current_designation or 'Professional'"/></strong></p>
+                                    <p class="mb-1 text-muted"><t t-esc="alumni.current_company or ''"/></p>
+                                    <p class="mb-1 text-muted" t-if="alumni.current_location">
+                                        <i class="fa fa-map-marker"/> <t t-esc="alumni.current_location"/>
+                                    </p>
+                                    <t t-if="alumni.industry">
+                                        <span class="badge bg-light text-dark border">
+                                            <t t-esc="dict(alumni._fields['industry'].selection).get(alumni.industry, alumni.industry)"/>
+                                        </span>
+                                    </t>
+                                </t>
+                                <t t-else="">
+                                    <p class="text-muted mb-0">Not currently employed.</p>
+                                </t>
+                            </div>
+                        </div>
+
+                        <!-- Higher Education -->
+                        <div class="card shadow-sm mb-4" t-if="alumni.pursuing_higher_education">
+                            <div class="card-header bg-info text-white">
+                                <i class="fa fa-book"/> Higher Education
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-0"><t t-esc="alumni.higher_education_details or 'Pursuing higher studies.'"/></p>
+                            </div>
+                        </div>
+
+                        <!-- Mentorship -->
+                        <div class="card shadow-sm mb-4" t-if="alumni.willing_to_mentor">
+                            <div class="card-header bg-warning text-dark">
+                                <i class="fa fa-handshake-o"/> Available to Mentor
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-0"><t t-esc="alumni.mentorship_area or 'Open to mentoring students.'"/></p>
+                            </div>
+                        </div>
+
+                        <!-- Social links -->
+                        <div class="card shadow-sm" t-if="alumni.linkedin_profile or alumni.twitter_handle or alumni.facebook_profile">
+                            <div class="card-header bg-secondary text-white">
+                                <i class="fa fa-share-alt"/> Social Media
+                            </div>
+                            <div class="card-body">
+                                <a t-if="alumni.linkedin_profile" t-att-href="alumni.linkedin_profile"
+                                   target="_blank" class="btn btn-outline-primary btn-sm me-2 mb-2">
+                                    <i class="fa fa-linkedin"/> LinkedIn
+                                </a>
+                                <a t-if="alumni.facebook_profile" t-att-href="alumni.facebook_profile"
+                                   target="_blank" class="btn btn-outline-primary btn-sm me-2 mb-2">
+                                    <i class="fa fa-facebook"/> Facebook
+                                </a>
+                                <span t-if="alumni.twitter_handle" class="btn btn-outline-secondary btn-sm mb-2">
+                                    <i class="fa fa-twitter"/> <t t-esc="alumni.twitter_handle"/>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right column -->
+                    <div class="col-md-7">
+
+                        <!-- Achievements -->
+                        <div class="card shadow-sm mb-4" t-if="alumni.achievement_ids">
+                            <div class="card-header bg-primary text-white">
+                                <i class="fa fa-trophy"/> Achievements
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Achievement</th>
+                                            <th>Type</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="alumni.achievement_ids" t-as="ach">
+                                            <tr>
+                                                <td><t t-esc="ach.name"/></td>
+                                                <td><t t-esc="ach.achievement_type"/></td>
+                                                <td><t t-esc="ach.achievement_date"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Events attended -->
+                        <div class="card shadow-sm mb-4" t-if="alumni.event_registration_ids">
+                            <div class="card-header bg-secondary text-white">
+                                <i class="fa fa-calendar-check-o"/> Events Attended
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Event</th>
+                                            <th>Type</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="alumni.event_registration_ids" t-as="ev">
+                                            <tr>
+                                                <td><t t-esc="ev.name"/></td>
+                                                <td><t t-esc="ev.event_type"/></td>
+                                                <td><t t-esc="ev.start"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </t>
+    </template>
+
+</data>
+</odoo>

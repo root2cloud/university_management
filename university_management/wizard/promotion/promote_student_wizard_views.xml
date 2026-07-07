@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="promote_student_wizard_line_view_list" model="ir.ui.view">
+        <field name="name">promote.student.wizard.line.view.list</field>
+        <field name="model">promote.student.wizard.line</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false" delete="false"
+                  decoration-success="eligible"
+                  decoration-danger="not eligible">
+                <field name="student_id"/>
+                <field name="current_semester"/>
+                <field name="eligible"/>
+                <field name="reason"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="promote_student_wizard_view_form" model="ir.ui.view">
+        <field name="name">promote.student.wizard.view.form</field>
+        <field name="model">promote.student.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Promote Students">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Student Promotion</h1>
+                    </div>
+                    <group>
+                        <group string="Current Details">
+                            <field name="current_program_id"/>
+                            <field name="current_batch_id"/>
+                            <field name="current_semester"/>
+                        </group>
+                        <group string="Promotion Details">
+                            <field name="promotion_type" widget="radio"/>
+                            <field name="next_semester"/>
+                            <field name="next_batch_id"/>
+                            <field name="academic_year_id"/>
+                            <field name="promotion_date"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Promotion Criteria">
+                            <group>
+                                <group>
+                                    <field name="criteria" widget="radio"/>
+                                    <field name="min_attendance_percentage"/>
+                                </group>
+                                <group>
+                                    <field name="check_backlogs"/>
+                                    <field name="auto_assign_courses"/>
+                                    <field name="send_notification"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Select Students">
+                            <field name="student_ids" nolabel="1" widget="many2many">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="registration_number"/>
+                                    <field name="current_semester"/>
+                                    <field name="program_id"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Preview">
+                            <field name="preview_lines" nolabel="1">
+                                <list>
+                                    <field name="student_id"/>
+                                    <field name="current_semester"/>
+                                    <field name="eligible"/>
+                                    <field name="reason"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <footer>
+                    <button name="action_promote_students"
+                            string="Promote Students"
+                            type="object"
+                            class="btn-primary"/>
+                    <button string="Cancel"
+                            class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_promote_student_wizard" model="ir.actions.act_window">
+        <field name="name">Promote Students</field>
+        <field name="res_model">promote.student.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

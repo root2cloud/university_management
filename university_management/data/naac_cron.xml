@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- CRON: Daily NAAC compliance check -->
+        <record id="cron_naac_compliance_alert" model="ir.cron">
+            <field name="name">NAAC: Daily Compliance Alert Check</field>
+            <field name="model_id" ref="model_naac_criterion"/>
+            <field name="state">code</field>
+            <field name="code">
+from datetime import date, timedelta
+today = date.today()
+cutoff_30 = today - timedelta(days=30)
+cutoff_7 = today - timedelta(days=7)
+
+low_criteria = env['naac.criterion'].search([('readiness_score', '&lt;', 50.0)])
+
+old_evidence = env['naac.evidence'].search([
+    ('is_verified', '=', False),
+    ('upload_date', '&lt;', cutoff_30),
+])
+
+stale_activities = env['naac.department.activity'].search([
+    ('state', '=', 'submitted'),
+    ('write_date', '&lt;', cutoff_7),
+])
+
+if low_criteria or old_evidence or stale_activities:
+    msg_lines = []
+    if low_criteria:
+        msg_lines.append('%d NAAC criteria below 50%% readiness.' % len(low_criteria))
+    if old_evidence:
+        msg_lines.append('%d evidence documents pending verification (30+ days).' % len(old_evidence))
+    if stale_activities:
+        msg_lines.append('%d activities awaiting verification (7+ days).' % len(stale_activities))
+    body_text = '\n'.join(msg_lines)
+    body_html = '&lt;p&gt;' + body_text.replace('\n', '&lt;br/&gt;') + '&lt;/p&gt;'
+    admin_users = env['res.users'].search([('groups_id.category_id.name', '=', 'University Management')])
+    for user in admin_users:
+        if user.email:
+            env['mail.mail'].sudo().create({
+                'subject': 'NAAC Compliance Alert - Action Required',
+                'body_html': body_html,
+                'email_to': user.email,
+            }).send()
+            </field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+    </data>
+</odoo>     

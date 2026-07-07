@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- University Management Module Category -->
+    <record id="module_category_university" model="ir.module.category">
+        <field name="name">University Management</field>
+        <field name="description">Manage University/College Operations</field>
+        <field name="sequence">10</field>
+    </record>
+
+    <!-- User Groups -->
+
+    <!-- Admin Group -->
+    <record id="group_university_admin" model="res.groups">
+        <field name="name">Administrator</field>
+        <field name="category_id" ref="module_category_university"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">Full access to all university management features</field>
+    </record>
+
+    <!-- General User Group -->
+    <record id="group_university_user" model="res.groups">
+        <field name="name">University User</field>
+        <field name="category_id" ref="base.module_category_usability"/>
+        <field name="comment">Basic access to university management system and personal dashboards</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- Academic Coordinator -->
+    <record id="group_academic_coordinator" model="res.groups">
+        <field name="name">Academic Coordinator</field>
+        <field name="category_id" ref="module_category_university"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">Manage academic programs, courses, and timetables</field>
+    </record>
+
+    <!-- Admission Officer -->
+    <record id="group_admission_officer" model="res.groups">
+        <field name="name">Admission Officer</field>
+        <field name="category_id" ref="module_category_university"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">Manage student admissions and registrations</field>
+    </record>
+
+    <!-- Accounts Manager -->
+    <record id="group_accounts_manager" model="res.groups">
+        <field name="name">Accounts Manager</field>
+        <field name="category_id" ref="module_category_university"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">Manage fee collection and payments</field>
+    </record>
+
+    <!-- Examination Controller -->
+    <record id="group_exam_controller" model="res.groups">
+        <field name="name">Examination Controller</field>
+        <field name="category_id" ref="module_category_university"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">Manage examinations, results, and marksheets</field>
+    </record>
+
+    <!-- Faculty -->
+    <record id="group_faculty" model="res.groups">
+        <field name="name">Faculty</field>
+        <field name="category_id" ref="module_category_university"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">Faculty access to teaching and student records</field>
+    </record>
+
+    <!-- Librarian -->
+    <record id="group_librarian" model="res.groups">
+        <field name="name">Librarian</field>
+        <field name="category_id" ref="module_category_university"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">Manage library operations</field>
+    </record>
+
+    <!-- Hostel Warden -->
+    <record id="group_hostel_warden" model="res.groups">
+        <field name="name">Hostel Warden</field>
+        <field name="category_id" ref="module_category_university"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">Manage hostel operations</field>
+    </record>
+
+    <!-- Placement Officer -->
+    <record id="group_placement_officer" model="res.groups">
+        <field name="name">Placement Officer</field>
+        <field name="category_id" ref="module_category_university"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">Manage campus placements</field>
+    </record>
+
+    <!-- Student Portal User -->
+    <record id="group_student_portal" model="res.groups">
+        <field name="name">Student (Portal)</field>
+        <field name="category_id" ref="module_category_university"/>
+        <field name="comment">Student portal access</field>
+    </record>
+
+    <!-- Parent Portal User -->
+    <record id="group_parent_portal" model="res.groups">
+        <field name="name">Parent (Portal)</field>
+        <field name="category_id" ref="module_category_university"/>
+        <field name="comment">Parent portal access</field>
+    </record>
+
+    <!-- Parents can see their children's student records -->
+    <record id="parent_student_records_rule" model="ir.rule">
+        <field name="name">Parents: Children's Records Only</field>
+        <field name="model_id" ref="model_student_student"/>
+        <field name="domain_force">
+            ['|', ('id', 'in', []),  # Always false first part
+              ('id', 'in', user._get_parent_student_ids())]  # Custom method
+        </field>
+        <field name="groups" eval="[(4, ref('group_parent_portal'))]"/>
+    </record>
+
+    <!-- Alumni Portal User -->
+    <record id="group_alumni_portal" model="res.groups">
+        <field name="name">Alumni (Portal)</field>
+        <field name="category_id" ref="module_category_university"/>
+        <field name="comment">Alumni portal access</field>
+    </record>
+
+    <!-- Record Rules -->
+
+    <!-- Students can only see their own records -->
+    <record id="student_own_records_rule" model="ir.rule">
+        <field name="name">Students: Own Records Only</field>
+        <field name="model_id" ref="model_student_student"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_student_portal'))]"/>
+    </record>
+
+    <!-- Faculty can see students in their courses -->
+    <record id="faculty_student_records_rule" model="ir.rule">
+        <field name="name">Faculty: Student Records</field>
+        <field name="model_id" ref="model_student_student"/>
+        <field name="domain_force">[('department_id', '=', user.faculty_id.department_id.id)]</field>
+        <field name="groups" eval="[(4, ref('group_faculty'))]"/>
+    </record>
+
+    <!-- Multi-company rules -->
+    <record id="university_multi_company_rule" model="ir.rule">
+        <field name="name">University: Multi-company</field>
+        <field name="model_id" ref="model_student_student"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="group_transport_manager" model="res.groups">
+        <field name="name">Transport Manager</field>
+        <field name="category_id" ref="base.module_category_human_resources"/>
+    </record>
+
+    <record id="group_transport_driver" model="res.groups">
+        <field name="name">Transport Driver</field>
+        <field name="category_id" ref="base.module_category_human_resources"/>
+    </record>
+
+    <!-- Head of Department (HOD) -->
+    <record id="group_hod" model="res.groups">
+        <field name="name">Head of Department (HOD)</field>
+        <field name="category_id" ref="module_category_university"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">HOD access: approve attendance regularization and departmental workflows</field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  IR.RULES — RECORD-LEVEL VISIBILITY FILTERS                    -->
+    <!--  Enforced at ORM level (not Python filtering)                  -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+
+    <!-- Faculty: can only see assets they registered OR assigned to them -->
+    <record id="asset_faculty_visibility_rule" model="ir.rule">
+        <field name="name">Asset: Faculty — Own Assets Only</field>
+        <field name="model_id" ref="model_asset_asset"/>
+        <field name="groups" eval="[(4, ref('group_faculty'))]"/>
+        <field name="domain_force">
+            ['|',
+                ('create_uid', '=', user.id),
+                ('faculty_id.resource_id.user_id', '=', user.id)
+            ]
+        </field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- HOD: can only see assets in their department -->
+    <record id="asset_hod_visibility_rule" model="ir.rule">
+        <field name="name">Asset: HOD — Department Assets Only</field>
+        <field name="model_id" ref="model_asset_asset"/>
+        <field name="groups" eval="[(4, ref('group_hod'))]"/>
+        <field name="domain_force">
+            [('department_id.hod_id.resource_id.user_id', '=', user.id)]
+        </field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Principal, ACC, Secretary, Trust Manager: NO ir.rule — full access -->
+    <!-- (No domain restriction record = all records visible by default) -->
+
+    <!-- Purchase Request: Faculty sees only own requests -->
+    <record id="asset_purchase_req_faculty_rule" model="ir.rule">
+        <field name="name">Asset Purchase Request: Faculty — Own Requests Only</field>
+        <field name="model_id" ref="model_asset_purchase_request"/>
+        <field name="groups" eval="[(4, ref('group_faculty'))]"/>
+        <field name="domain_force">
+            [('requested_by', '=', user.id)]
+        </field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Purchase Request: HOD read-only on dept requests -->
+    <record id="asset_purchase_req_hod_rule" model="ir.rule">
+        <field name="name">Asset Purchase Request: HOD — Department Requests Read</field>
+        <field name="model_id" ref="model_asset_purchase_request"/>
+        <field name="groups" eval="[(4, ref('group_hod'))]"/>
+        <field name="domain_force">
+            [('department_id.hod_id.resource_id.user_id', '=', user.id)]
+        </field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Handover: Faculty sees only own handover requests -->
+    <record id="asset_handover_faculty_rule" model="ir.rule">
+        <field name="name">Asset Handover: Faculty — Own Requests Only</field>
+        <field name="model_id" ref="model_asset_handover"/>
+        <field name="groups" eval="[(4, ref('group_faculty'))]"/>
+        <field name="domain_force">
+            [('requested_by', '=', user.id)]
+        </field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Audit: Assigned auditor can only see audits assigned to them -->
+    <record id="asset_audit_assigned_rule" model="ir.rule">
+        <field name="name">Asset Audit: Assigned User — Own Audits Only</field>
+        <field name="model_id" ref="model_asset_audit"/>
+        <field name="groups" eval="[(4, ref('group_faculty')), (4, ref('group_hod'))]"/>
+        <field name="domain_force">
+            ['|',
+                ('assigned_to', '=', user.id),
+                ('initiated_by', '=', user.id)
+            ]
+        </field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+
+    <!-- ================================================================ -->
+    <!-- ADMIN BYPASS RULES                                              -->
+    <!-- Separate ir.rule per model for group_university_admin.          -->
+    <!-- Odoo ORs rules for same user across different ir.rule records,  -->
+    <!-- so admin always gets full access regardless of other rules.     -->
+    <!-- ================================================================ -->
+
+    <record id="asset_admin_bypass_rule" model="ir.rule">
+        <field name="name">Asset Admin Bypass Rule</field>
+        <field name="model_id" ref="model_asset_asset"/>
+        <field name="groups" eval="[(4, ref('group_university_admin'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="asset_purchase_req_admin_bypass_rule" model="ir.rule">
+        <field name="name">Asset Purchase Req Admin Bypass Rule</field>
+        <field name="model_id" ref="model_asset_purchase_request"/>
+        <field name="groups" eval="[(4, ref('group_university_admin'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="asset_handover_admin_bypass_rule" model="ir.rule">
+        <field name="name">Asset Handover Admin Bypass Rule</field>
+        <field name="model_id" ref="model_asset_handover"/>
+        <field name="groups" eval="[(4, ref('group_university_admin'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="asset_audit_admin_bypass_rule" model="ir.rule">
+        <field name="name">Asset Audit Admin Bypass Rule</field>
+        <field name="model_id" ref="model_asset_audit"/>
+        <field name="groups" eval="[(4, ref('group_university_admin'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+</odoo>

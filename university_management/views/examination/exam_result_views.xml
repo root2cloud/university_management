@@ -1,0 +1,547 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="exam_result_view_form" model="ir.ui.view">
+        <field name="name">examination.result.view.form</field>
+        <field name="model">examination.result</field>
+        <field name="arch" type="xml">
+            <form string="Exam Result">
+                <header>
+                    <button name="action_submit" type="object" string="Submit"
+                            class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_verify" type="object" string="Verify"
+                            class="oe_highlight"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_publish" type="object" string="Publish Result"
+                            class="oe_highlight"
+                            invisible="state != 'verified'"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"
+                            confirm="Are you sure you want to reset this evaluation to draft?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,verified,published"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive" invisible="1">
+                            <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+
+                    <widget name="web_ribbon" title="Pass" bg_color="text-bg-success"
+                            invisible="not is_pass or is_absent"/>
+                    <widget name="web_ribbon" title="Fail" bg_color="text-bg-danger"
+                            invisible="is_pass or is_absent"/>
+                    <widget name="web_ribbon" title="Absent" bg_color="text-bg-warning"
+                            invisible="not is_absent"/>
+
+                    <div class="oe_title">
+                        <label for="name" string="Result Number"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Student Information">
+                            <field name="student_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="registration_number" readonly="1"/>
+                            <field name="program_id" readonly="1"/>
+                            <field name="department_id" readonly="1"/>
+                        </group>
+                        <group string="Examination Details">
+                            <field name="examination_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="academic_year_id" readonly="1"/>
+                            <field name="semester_id" readonly="1"/>
+                            <field name="course_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="subject_id" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Marks Entry" name="marks">
+                            <group>
+                                <group string="Internal Assessment">
+                                    <label for="internal_marks"/>
+                                    <div class="o_row">
+                                        <field name="internal_marks" class="oe_inline"/>
+                                        <span>/</span>
+                                        <field name="internal_max" class="oe_inline"/>
+                                    </div>
+                                </group>
+
+                                <group string="External Examination">
+                                    <label for="external_marks"/>
+                                    <div class="o_row">
+                                        <field name="external_marks" class="oe_inline"/>
+                                        <span>/</span>
+                                        <field name="external_max" class="oe_inline"/>
+                                    </div>
+                                </group>
+                            </group>
+
+                            <separator/>
+
+                            <group>
+                                <group string="Total Marks">
+                                    <label for="total_marks"/>
+                                    <div class="o_row">
+                                        <field name="total_marks" readonly="1"
+                                               class="oe_inline fw-bold"/>
+                                        <span>/</span>
+                                        <field name="max_marks" class="oe_inline"/>
+                                    </div>
+
+                                    <field name="passing_marks"/>
+                                    <field name="percentage" readonly="1"
+                                           widget="float" digits="[6,2]"/>
+                                </group>
+
+                                <group string="Grade &amp; Result">
+                                    <field name="grade_id" readonly="1"/>
+                                    <field name="grade_letter" readonly="1"/>
+                                    <field name="grade_point" readonly="1"/>
+                                    <field name="result" readonly="1"
+                                           widget="badge"
+                                           decoration-success="result == 'pass'"
+                                           decoration-danger="result == 'fail'"
+                                           decoration-warning="result == 'absent'"
+                                           decoration-muted="result == 'withheld'"/>
+                                    <field name="is_pass" readonly="1"
+                                           widget="boolean_toggle"/>
+                                </group>
+                            </group>
+
+                            <group>
+                                <group string="Absence">
+                                    <field name="is_absent" widget="boolean_toggle"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Evaluation" name="evaluation">
+                            <group>
+                                <group string="Evaluator Details">
+                                    <field name="evaluated_by"
+                                           options="{'no_create': True, 'no_create_edit': True}"/>
+                                    <field name="evaluation_date" widget="date"/>
+                                </group>
+
+                                <group string="Verification">
+                                    <field name="verified_by" readonly="1"/>
+                                    <field name="verification_date" readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Revaluation" name="revaluation">
+                            <group>
+                                <group string="Revaluation Status">
+                                    <field name="revaluation_requested"
+                                           widget="boolean_toggle"/>
+                                    <field name="revaluation_id"
+                                           invisible="not revaluation_requested"
+                                           options="{'no_create': True}"/>
+                                </group>
+                            </group>
+                            <group invisible="not revaluation_requested">
+                                <group string="Revaluator Details">
+                                    <field name="rev_revaluated_by" readonly="1"/>
+                                    <field name="rev_revaluation_date" readonly="1"/>
+                                    <field name="rev_revaluation_type" readonly="1"/>
+                                    <field name="rev_state" readonly="1"
+                                           widget="badge"
+                                           decoration-success="rev_state == 'completed'"
+                                           decoration-info="rev_state in ['under_review', 'revaluation_in_progress']"
+                                           decoration-warning="rev_state == 'submitted'"
+                                           decoration-danger="rev_state == 'rejected'"/>
+                                </group>
+                                <group string="Revaluation Result">
+                                    <field name="rev_original_marks" readonly="1"/>
+                                    <field name="rev_original_grade" readonly="1"/>
+                                    <field name="rev_revaluated_marks" readonly="1"/>
+                                    <field name="rev_revaluated_grade" readonly="1"/>
+                                    <field name="rev_marks_difference" readonly="1"
+                                           decoration-success="rev_marks_difference &gt; 0"
+                                           decoration-danger="rev_marks_difference &lt; 0"/>
+                                    <field name="rev_outcome" readonly="1"
+                                           widget="badge"
+                                           decoration-success="rev_outcome == 'increased'"
+                                           decoration-danger="rev_outcome == 'decreased'"
+                                           decoration-info="rev_outcome == 'no_change'"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Remarks" name="remarks">
+                            <field name="remarks"
+                                   placeholder="Enter any remarks or notes about the result..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="exam_result_view_list" model="ir.ui.view">
+        <field name="name">examination.result.view.list</field>
+        <field name="model">examination.result</field>
+        <field name="arch" type="xml">
+            <list string="Exam Results"
+                  default_order="examination_id, student_id"
+                  multi_edit="1"
+                  sample="1"
+                  decoration-success="result == 'pass' and state == 'published'"
+                  decoration-danger="result == 'fail'"
+                  decoration-warning="is_absent == True"
+                  decoration-muted="state == 'draft'"
+                  decoration-info="state == 'published' and result == 'pass'">
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="registration_number" optional="show"/>
+                <field name="examination_id"/>
+                <field name="subject_id"/>
+                <field name="academic_year_id" optional="hide"/>
+                <field name="semester_id" optional="show"/>
+                <field name="program_id" optional="hide"/>
+                <field name="department_id" optional="show"/>
+                <field name="internal_marks" optional="show"/>
+                <field name="internal_max" optional="hide"/>
+                <field name="external_marks" optional="show"/>
+                <field name="external_max" optional="hide"/>
+                <field name="total_marks" optional="show"/>
+                <field name="max_marks" optional="hide"/>
+                <field name="percentage" widget="float" digits="[6,2]" optional="show"/>
+                <field name="grade_letter" optional="show"/>
+                <field name="grade_point" optional="hide"/>
+                <field name="result" widget="badge"
+                       decoration-success="result == 'pass'"
+                       decoration-danger="result == 'fail'"
+                       decoration-warning="result == 'absent'"
+                       decoration-muted="result == 'withheld'"/>
+                <field name="is_pass" widget="boolean_toggle" optional="hide"/>
+                <field name="is_absent" widget="boolean_toggle" optional="hide"/>
+                <field name="revaluation_requested" widget="boolean_toggle" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'published'"
+                       decoration-info="state == 'verified'"
+                       decoration-warning="state == 'submitted'"
+                       decoration-muted="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="exam_result_view_search" model="ir.ui.view">
+        <field name="name">examination.result.view.search</field>
+        <field name="model">examination.result</field>
+        <field name="arch" type="xml">
+            <search string="Search Exam Results">
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="registration_number"/>
+                <field name="examination_id"/>
+                <field name="subject_id"/>
+                <field name="course_id"/>
+
+                <separator/>
+
+                <filter name="filter_draft" string="Draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_submitted" string="Submitted"
+                        domain="[('state', '=', 'submitted')]"/>
+                <filter name="filter_verified" string="Verified"
+                        domain="[('state', '=', 'verified')]"/>
+                <filter name="filter_published" string="Published"
+                        domain="[('state', '=', 'published')]"/>
+
+                <separator/>
+
+                <filter name="filter_pass" string="Pass"
+                        domain="[('result', '=', 'pass')]"/>
+                <filter name="filter_fail" string="Fail"
+                        domain="[('result', '=', 'fail')]"/>
+                <filter name="filter_absent" string="Absent"
+                        domain="[('result', '=', 'absent')]"/>
+                <filter name="filter_withheld" string="Result Withheld"
+                        domain="[('result', '=', 'withheld')]"/>
+
+                <separator/>
+
+                <filter name="filter_revaluation" string="Revaluation Requested"
+                        domain="[('revaluation_requested', '=', True)]"/>
+
+                <separator/>
+
+                <filter name="filter_high_percentage" string="Above 75%"
+                        domain="[('percentage', '&gt;=', 75)]"/>
+                <filter name="filter_distinction" string="Distinction (60-75%)"
+                        domain="[('percentage', '&gt;=', 60), ('percentage', '&lt;', 75)]"/>
+                <filter name="filter_first_class" string="First Class (50-60%)"
+                        domain="[('percentage', '&gt;=', 50), ('percentage', '&lt;', 60)]"/>
+                <filter name="filter_second_class" string="Second Class (40-50%)"
+                        domain="[('percentage', '&gt;=', 40), ('percentage', '&lt;', 50)]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_student" string="Student"
+                            context="{'group_by': 'student_id'}"/>
+                    <filter name="group_by_examination" string="Examination"
+                            context="{'group_by': 'examination_id'}"/>
+                    <filter name="group_by_subject" string="Subject"
+                            context="{'group_by': 'subject_id'}"/>
+                    <filter name="group_by_course" string="Course"
+                            context="{'group_by': 'course_id'}"/>
+                    <filter name="group_by_program" string="Program"
+                            context="{'group_by': 'program_id'}"/>
+                    <filter name="group_by_department" string="Department"
+                            context="{'group_by': 'department_id'}"/>
+                    <filter name="group_by_semester" string="Semester"
+                            context="{'group_by': 'semester_id'}"/>
+                    <filter name="group_by_result" string="Result"
+                            context="{'group_by': 'result'}"/>
+                    <filter name="group_by_grade" string="Grade"
+                            context="{'group_by': 'grade_id'}"/>
+                    <filter name="group_by_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="examination_id" string="Examination"
+                           select="multi"
+                           icon="fa-graduation-cap"/>
+                    <field name="program_id" string="Program"
+                           select="multi"
+                           icon="fa-book"/>
+                    <field name="department_id" string="Department"
+                           select="multi"
+                           icon="fa-building"/>
+                    <field name="semester_id" string="Semester"
+                           select="multi"
+                           icon="fa-list-ol"/>
+                    <field name="result" string="Result"
+                           select="multi"
+                           icon="fa-check-circle"/>
+                    <field name="state" string="Status"
+                           select="multi"
+                           icon="fa-filter"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="exam_result_view_kanban" model="ir.ui.view">
+        <field name="name">examination.result.view.kanban</field>
+        <field name="model">examination.result</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="result"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="registration_number"/>
+                <field name="examination_id"/>
+                <field name="subject_id"/>
+                <field name="program_id"/>
+                <field name="department_id"/>
+                <field name="semester_id"/>
+                <field name="internal_marks"/>
+                <field name="internal_max"/>
+                <field name="external_marks"/>
+                <field name="external_max"/>
+                <field name="total_marks"/>
+                <field name="max_marks"/>
+                <field name="percentage"/>
+                <field name="grade_letter"/>
+                <field name="grade_point"/>
+                <field name="result"/>
+                <field name="is_pass"/>
+                <field name="is_absent"/>
+                <field name="revaluation_requested"/>
+                <field name="rev_state"/>
+                <field name="state"/>
+
+                <progressbar field="state"
+                             colors='{"draft": "muted", "submitted": "warning", "verified": "info", "published": "success"}'/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="ribbon ribbon-top-right" t-if="record.is_pass.raw_value &amp; !record.is_absent.raw_value">
+                                <span class="text-bg-success">Pass</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="!record.is_pass.raw_value &amp; !record.is_absent.raw_value">
+                                <span class="text-bg-danger">Fail</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.is_absent.raw_value">
+                                <span class="text-bg-warning">Absent</span>
+                            </div>
+
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="student_id"/>
+                                        </strong>
+                                        <div class="text-muted">
+                                            <field name="registration_number"/>
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_record_top_right">
+                                        <field name="state" widget="badge"
+                                               decoration-success="state == 'published'"
+                                               decoration-info="state == 'verified'"
+                                               decoration-warning="state == 'submitted'"
+                                               decoration-muted="state == 'draft'"/>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body">
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <i class="fa fa-graduation-cap text-primary"/>
+                                            <strong><field name="examination_id"/></strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <i class="fa fa-book text-info"/>
+                                            <field name="subject_id"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-6">
+                                            <i class="fa fa-building text-secondary"/>
+                                            <field name="department_id"/>
+                                        </div>
+                                        <div class="col-6">
+                                            <i class="fa fa-list-ol text-warning"/>
+                                            <field name="semester_id"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row" t-if="!record.is_absent.raw_value">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded">
+                                                <div class="d-flex justify-content-between mb-1">
+                                                    <small class="text-muted">Internal:</small>
+                                                    <strong><field name="internal_marks"/> / <field name="internal_max"/></strong>
+                                                </div>
+                                                <div class="d-flex justify-content-between mb-1">
+                                                    <small class="text-muted">External:</small>
+                                                    <strong><field name="external_marks"/> / <field name="external_max"/></strong>
+                                                </div>
+                                                <hr class="my-1"/>
+                                                <div class="d-flex justify-content-between mb-1">
+                                                    <strong>Total:</strong>
+                                                    <strong class="text-primary">
+                                                        <field name="total_marks"/> / <field name="max_marks"/>
+                                                    </strong>
+                                                </div>
+                                                <div class="d-flex justify-content-between mb-1">
+                                                    <strong>Percentage:</strong>
+                                                    <strong t-attf-class="#{record.is_pass.raw_value ? 'text-success' : 'text-danger'}">
+                                                        <t t-esc="Math.round(record.percentage.raw_value * 10) / 10"/>%
+                                                    </strong>
+                                                </div>
+                                                <div class="d-flex justify-content-between">
+                                                    <strong>Grade:</strong>
+                                                    <strong class="text-info">
+                                                        <field name="grade_letter"/> (<field name="grade_point"/>)
+                                                    </strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-2" t-if="record.revaluation_requested.raw_value">
+                                        <div class="col-12">
+                                            <t t-if="record.rev_state.raw_value == 'completed'">
+                                                <span class="badge text-bg-success">
+                                                    <i class="fa fa-check-circle"/> Revaluation Completed
+                                                </span>
+                                            </t>
+                                            <t t-elif="record.rev_state.raw_value in ['revaluation_in_progress', 'under_review']">
+                                                <span class="badge text-bg-info">
+                                                    <i class="fa fa-spinner"/> Revaluation In Progress
+                                                </span>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="badge text-bg-warning">
+                                                    <i class="fa fa-refresh"/> Revaluation Requested
+                                                </span>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="exam_result_view_pivot" model="ir.ui.view">
+        <field name="name">examination.result.view.pivot</field>
+        <field name="model">examination.result</field>
+        <field name="arch" type="xml">
+            <pivot string="Result Analysis">
+                <field name="department_id" type="row"/>
+                <field name="examination_id" type="col"/>
+                <field name="total_marks" type="measure"/>
+                <field name="percentage" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View -->
+    <record id="exam_result_view_graph" model="ir.ui.view">
+        <field name="name">examination.result.view.graph</field>
+        <field name="model">examination.result</field>
+        <field name="arch" type="xml">
+            <graph string="Result Statistics" type="bar">
+                <field name="examination_id"/>
+                <field name="percentage" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_exam_result" model="ir.actions.act_window">
+        <field name="name">Exam Results</field>
+        <field name="res_model">examination.result</field>
+        <field name="view_mode">kanban,list,form,pivot,graph</field>
+        <field name="context">{'search_default_filter_published': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create Exam Result
+            </p>
+            <p>
+                Enter exam results with internal and external marks, automatic grade calculation
+                based on percentage, pass/fail determination with minimum 40% requirement in both
+                internal and external. Track result verification, publication, and revaluation requests.
+                Automatically notifies students when results are published.
+            </p>
+        </field>
+    </record>
+
+</odoo>

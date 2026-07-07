@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="nba_evidence_bulk_wizard_view_form" model="ir.ui.view">
+        <field name="name">nba.evidence.bulk.wizard.form</field>
+        <field name="model">nba.evidence.bulk.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Bulk Upload Evidence">
+                <group>
+                    <field name="sar_id" readonly="1"/>
+                    <field name="criterion"/>
+                    <field name="sub_section"/>
+                </group>
+                <field name="line_ids" nolabel="1">
+                    <list editable="bottom">
+                        <field name="name"/>
+                        <field name="document_file" widget="binary" filename="document_filename"/>
+                        <field name="document_filename"/>
+                        <field name="document_type"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_upload" string="Upload All" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="nba_evidence_bulk_wizard_action" model="ir.actions.act_window">
+        <field name="name">Bulk Upload Evidence</field>
+        <field name="res_model">nba.evidence.bulk.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

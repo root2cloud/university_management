@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View - Transport Route -->
+    <record id="transport_route_view_form" model="ir.ui.view">
+        <field name="name">transport.route.view.form</field>
+        <field name="model">transport.route</field>
+        <field name="arch" type="xml">
+            <form string="Transport Route">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button"
+                                   options="{'terminology': 'archive'}"/>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <label for="name" string="Route Name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Route A - College to City Center"/>
+                        </h1>
+                        <field name="code" placeholder="RT-001"/>
+                    </div>
+
+                    <group>
+                        <group string="Route Information">
+                            <field name="start_location" placeholder="Starting Point"/>
+                            <field name="end_location" placeholder="Ending Point"/>
+                            <field name="distance" widget="float"/>
+                            <field name="estimated_time" widget="float"/>
+                        </group>
+                        <group string="Fee &amp; Statistics">
+                            <field name="monthly_fee" widget="monetary"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="total_stops"/>
+                            <field name="total_students"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Bus Stops" name="stops">
+                            <field name="stop_ids" nolabel="1">
+                                <list string="Bus Stops" editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="location"/>
+                                    <field name="arrival_time" widget="float_time"/>
+                                    <field name="distance_from_start"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Vehicles" name="vehicles">
+                            <field name="vehicle_ids" widget="many2many" nolabel="1">
+                                <list string="Vehicles Assigned">
+                                    <field name="name"/>
+                                    <field name="vehicle_number"/>
+                                    <field name="vehicle_type"/>
+                                    <field name="seating_capacity"/>
+                                    <field name="driver_id"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Student Allocations" name="allocations">
+                            <field name="allocation_ids" nolabel="1">
+                                <list string="Student Allocations">
+                                    <field name="name"/>
+                                    <field name="student_id"/>
+                                    <field name="stop_id"/>
+                                    <field name="from_date"/>
+                                    <field name="to_date"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View - Transport Route -->
+    <record id="transport_route_view_list" model="ir.ui.view">
+        <field name="name">transport.route.view.list</field>
+        <field name="model">transport.route</field>
+        <field name="arch" type="xml">
+            <list string="Transport Routes"
+                  default_order="name"
+                  multi_edit="1"
+                  sample="1">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="start_location"/>
+                <field name="end_location"/>
+                <field name="distance" optional="show"/>
+                <field name="estimated_time" optional="show" widget="float_time"/>
+                <field name="total_stops" optional="show"/>
+                <field name="total_students" optional="show"/>
+                <field name="monthly_fee" widget="monetary" optional="show"/>
+                <field name="active" widget="boolean_toggle" optional="hide"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View - Transport Route -->
+    <record id="transport_route_view_search" model="ir.ui.view">
+        <field name="name">transport.route.view.search</field>
+        <field name="model">transport.route</field>
+        <field name="arch" type="xml">
+            <search string="Search Routes">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="start_location"/>
+                <field name="end_location"/>
+
+                <separator/>
+
+                <filter name="filter_active" string="Active Routes"
+                        domain="[('active', '=', True)]"/>
+                <filter name="filter_inactive" string="Archived Routes"
+                        domain="[('active', '=', False)]"/>
+
+                <separator/>
+
+                <filter name="filter_has_students" string="Has Students"
+                        domain="[('total_students', '&gt;', 0)]"/>
+                <filter name="filter_no_students" string="No Students"
+                        domain="[('total_students', '=', 0)]"/>
+
+                <separator/>
+
+                <filter name="filter_has_vehicles" string="Has Vehicles"
+                        domain="[('vehicle_ids', '!=', False)]"/>
+                <filter name="filter_no_vehicles" string="No Vehicles"
+                        domain="[('vehicle_ids', '=', False)]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_start_location" string="Start Location"
+                            context="{'group_by': 'start_location'}"/>
+                    <filter name="group_by_end_location" string="End Location"
+                            context="{'group_by': 'end_location'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="vehicle_ids" string="Vehicles"
+                           select="multi"
+                           icon="fa-bus"/>
+                    <field name="currency_id" string="Currency"
+                           select="multi"
+                           icon="fa-money-bill"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View - Transport Route -->
+    <record id="transport_route_view_kanban" model="ir.ui.view">
+        <field name="name">transport.route.view.kanban</field>
+        <field name="model">transport.route</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="start_location"/>
+                <field name="end_location"/>
+                <field name="distance"/>
+                <field name="estimated_time"/>
+                <field name="total_stops"/>
+                <field name="total_students"/>
+                <field name="monthly_fee"/>
+                <field name="active"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="ribbon ribbon-top-right" t-if="!record.active.raw_value">
+                                <span class="text-bg-danger">Archived</span>
+                            </div>
+
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <i class="fa fa-bus"/> <field name="name"/>
+                                        </strong>
+                                        <div class="text-muted">
+                                            <i class="fa fa-barcode"/> <field name="code"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body mt-3">
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="card bg-primary text-white">
+                                                <div class="card-body p-2">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <div>
+                                                            <i class="fa fa-map-marker-alt fa-lg"/>
+                                                            <strong><field name="start_location"/></strong>
+                                                        </div>
+                                                        <div>
+                                                            <i class="fa fa-arrow-right fa-lg"/>
+                                                        </div>
+                                                        <div>
+                                                            <i class="fa fa-flag-checkered fa-lg"/>
+                                                            <strong><field name="end_location"/></strong>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-6">
+                                            <div class="card bg-info text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h5 class="mb-0">
+                                                        <i class="fa fa-road"/> <field name="distance"/> KM
+                                                    </h5>
+                                                    <small>Distance</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="card bg-success text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h5 class="mb-0">
+                                                        <i class="fa fa-clock"/> <field name="estimated_time"/> Hrs
+                                                    </h5>
+                                                    <small>Time</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-6">
+                                            <div class="bg-light p-2 rounded text-center">
+                                                <div class="text-primary">
+                                                    <i class="fa fa-map-pin fa-2x"/>
+                                                </div>
+                                                <strong><field name="total_stops"/></strong>
+                                                <div><small class="text-muted">Stops</small></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="bg-light p-2 rounded text-center">
+                                                <div class="text-success">
+                                                    <i class="fa fa-users fa-2x"/>
+                                                </div>
+                                                <strong><field name="total_students"/></strong>
+                                                <div><small class="text-muted">Students</small></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.monthly_fee.raw_value">
+                                        <div class="col-12">
+                                            <div class="card bg-warning text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h5 class="mb-0">
+                                                        <i class="fa fa-rupee-sign"/> <field name="monthly_fee"/>
+                                                    </h5>
+                                                    <small>Monthly Fee</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom mt-2">
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Pivot View - Transport Route -->
+    <record id="transport_route_view_pivot" model="ir.ui.view">
+        <field name="name">transport.route.view.pivot</field>
+        <field name="model">transport.route</field>
+        <field name="arch" type="xml">
+            <pivot string="Route Analysis">
+                <field name="start_location" type="row"/>
+                <field name="total_students" type="measure"/>
+                <field name="monthly_fee" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View - Transport Route -->
+    <record id="transport_route_view_graph" model="ir.ui.view">
+        <field name="name">transport.route.view.graph</field>
+        <field name="model">transport.route</field>
+        <field name="arch" type="xml">
+            <graph string="Route Statistics" type="bar">
+                <field name="name"/>
+                <field name="total_students" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_transport_route" model="ir.actions.act_window">
+        <field name="name">Transport Routes</field>
+        <field name="res_model">transport.route</field>
+        <field name="view_mode">kanban,list,form,pivot,graph</field>
+        <field name="context">{'search_default_filter_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create Transport Route
+            </p>
+            <p>
+                Manage transport bus routes. Enter name (required, tracked, e.g., "Route A - College
+                to City Center"). Enter code (required, unique constraint, e.g., "RT-001"). Enter
+                start_location (required, starting point). Enter end_location (required, ending point).
+                Enter distance (float, total distance in KM). Enter estimated_time (float, estimated
+                time in hours, float_time widget). Manage stop_ids (One2many to transport.stop "Bus Stops",
+                editable list with sequence handle): Shows total_stops (computed count). Assign vehicle_ids
+                (Many2many to transport.vehicle "Vehicles on this Route", many2many widget). View
+                allocation_ids (One2many to transport.allocation "Student Allocations"): Shows
+                total_students (computed count of active allocations). Enter monthly_fee (monetary widget,
+                monthly transport fee). Toggle active boolean (default true, boolean_toggle widget,
+                archive button). List view with multi-edit. Kanban view shows route card with start/end
+                locations (primary/blue, map-marker and flag icons, arrow between), distance card (info/blue,
+                road icon), time card (success/green, clock icon), stops card (map-pin icon, count),
+                students card (users icon, count), and fee card (warning/yellow, rupee-sign icon). Pivot
+                view for analysis (start_location × measures: total_students, monthly_fee). Graph view
+                for statistics (bar chart, route name vs. total_students). Ordered by name (alphabetical).
+                Default filter: Active routes. Full chatter support for communication. Archive button in
+                button box.
+            </p>
+        </field>
+    </record>
+
+</odoo>

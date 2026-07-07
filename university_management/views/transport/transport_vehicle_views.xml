@@ -1,0 +1,486 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View - Transport Vehicle -->
+    <record id="transport_vehicle_view_form" model="ir.ui.view">
+        <field name="name">transport.vehicle.view.form</field>
+        <field name="model">transport.vehicle</field>
+        <field name="arch" type="xml">
+            <form string="Transport Vehicle">
+                <header>
+                    <button name="action_activate" string="Activate"
+                        type="object" class="oe_highlight"
+                        invisible="state != 'draft'"/>
+                    <button name="action_maintenance" string="Under Maintenance"
+                            type="object" class="btn-warning"
+                            invisible="state not in ['active', 'breakdown']"/>
+                    <button name="action_breakdown" string="Mark Breakdown"
+                            type="object" class="btn-danger"
+                            invisible="state not in ['active', 'maintenance']"/>
+                    <button name="action_inactive" string="Set Inactive"
+                            type="object" class="btn-secondary"
+                            invisible="state in ['draft', 'inactive']"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft"
+                            type="object" class="btn-default"
+                            invisible="state == 'draft'"
+                            confirm="Are you sure you want to reset this vehicle to draft?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,active,maintenance,breakdown,inactive"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button"
+                                   options="{'terminology': 'archive'}"/>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <label for="name" string="Vehicle Name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Bus 101"/>
+                        </h1>
+                        <field name="vehicle_number" placeholder="DL-01-AB-1234"/>
+                    </div>
+
+                    <group>
+                        <group string="Vehicle Information">
+                            <field name="vehicle_type" widget="radio"/>
+                            <field name="make" placeholder="Tata/Ashok Leyland"/>
+                            <field name="model" placeholder="Starbus LP 410/35"/>
+                            <field name="year" placeholder="2024"/>
+                            <field name="color"/>
+                            <field name="fuel_type"/>
+                        </group>
+                        <group string="Capacity &amp; Driver">
+                            <field name="seating_capacity"/>
+                            <field name="occupied_seats"/>
+                            <field name="available_seats"/>
+                            <field name="driver_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="GPS Tracking">
+                            <field name="has_gps"/>
+                            <field name="gps_device_id"
+                                   invisible="not has_gps"
+                                   placeholder="GPS-123456"/>
+                        </group>
+                        <group string="Maintenance">
+                            <field name="current_km"/>
+                            <field name="service_km"/>
+                            <field name="last_service_date"/>
+                            <field name="next_service_date"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Routes" name="routes">
+                            <field name="route_ids" widget="many2many" nolabel="1">
+                                <list string="Routes Assigned">
+                                    <field name="name"/>
+                                    <field name="code"/>
+                                    <field name="start_location"/>
+                                    <field name="end_location"/>
+                                    <field name="distance"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Documents" name="documents">
+                            <group>
+                                <group string="Registration">
+                                    <field name="registration_date"/>
+                                    <field name="registration_expiry"/>
+                                </group>
+                                <group string="Insurance">
+                                    <field name="insurance_company" placeholder="ICICI Lombard"/>
+                                    <field name="insurance_number" placeholder="POL123456"/>
+                                    <field name="insurance_expiry"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Certificates">
+                                    <field name="fitness_certificate"/>
+                                    <field name="pollution_certificate"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View - Transport Vehicle -->
+    <record id="transport_vehicle_view_list" model="ir.ui.view">
+        <field name="name">transport.vehicle.view.list</field>
+        <field name="model">transport.vehicle</field>
+        <field name="arch" type="xml">
+            <list string="Transport Vehicles"
+                  default_order="name"
+                  multi_edit="1"
+                  sample="1"
+                  decoration-success="state == 'active'"
+                  decoration-warning="state == 'maintenance'"
+                  decoration-danger="state == 'breakdown'"
+                  decoration-muted="state == 'inactive'">
+                <field name="name"/>
+                <field name="vehicle_number"/>
+                <field name="vehicle_type" widget="badge"/>
+                <field name="driver_id" optional="show"/>
+                <field name="seating_capacity" optional="show"/>
+                <field name="occupied_seats" optional="show"/>
+                <field name="available_seats" optional="show"/>
+                <field name="insurance_expiry" optional="show"/>
+                <field name="fitness_certificate" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'active'"
+                       decoration-warning="state == 'maintenance'"
+                       decoration-danger="state == 'breakdown'"
+                       decoration-muted="state == 'inactive'"/>
+                <field name="active" widget="boolean_toggle" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View - Transport Vehicle -->
+    <record id="transport_vehicle_view_search" model="ir.ui.view">
+        <field name="name">transport.vehicle.view.search</field>
+        <field name="model">transport.vehicle</field>
+        <field name="arch" type="xml">
+            <search string="Search Vehicles">
+                <field name="name"/>
+                <field name="vehicle_number"/>
+                <field name="driver_id"/>
+                <field name="vehicle_type"/>
+
+                <separator/>
+
+                <filter name="filter_active_vehicles" string="Active Vehicles"
+                        domain="[('state', '=', 'active')]"/>
+                <filter name="filter_maintenance" string="Under Maintenance"
+                        domain="[('state', '=', 'maintenance')]"/>
+                <filter name="filter_breakdown" string="Breakdown"
+                        domain="[('state', '=', 'breakdown')]"/>
+                <filter name="filter_inactive" string="Inactive"
+                        domain="[('state', '=', 'inactive')]"/>
+
+                <separator/>
+
+                <filter name="filter_has_driver" string="Has Driver"
+                        domain="[('driver_id', '!=', False)]"/>
+                <filter name="filter_no_driver" string="No Driver"
+                        domain="[('driver_id', '=', False)]"/>
+
+                <separator/>
+
+                <filter name="filter_has_gps" string="GPS Enabled"
+                        domain="[('has_gps', '=', True)]"/>
+                <filter name="filter_no_gps" string="No GPS"
+                        domain="[('has_gps', '=', False)]"/>
+
+                <separator/>
+
+                <filter name="filter_insurance_expiring" string="Insurance Expiring Soon"
+                        domain="[('insurance_expiry', '&gt;=', context_today().strftime('%Y-%m-%d')),
+                                 ('insurance_expiry', '&lt;=', (context_today() + datetime.timedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_fitness_expiring" string="Fitness Expiring Soon"
+                        domain="[('fitness_certificate', '&gt;=', context_today().strftime('%Y-%m-%d')),
+                                 ('fitness_certificate', '&lt;=', (context_today() + datetime.timedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_pollution_expiring" string="Pollution Expiring Soon"
+                        domain="[('pollution_certificate', '&gt;=', context_today().strftime('%Y-%m-%d')),
+                                 ('pollution_certificate', '&lt;=', (context_today() + datetime.timedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+
+                <separator/>
+
+                <filter name="filter_available_seats" string="Has Available Seats"
+                        domain="[('available_seats', '&gt;', 0)]"/>
+                <filter name="filter_full" string="Fully Occupied"
+                        domain="[('available_seats', '=', 0)]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_vehicle_type" string="Vehicle Type"
+                            context="{'group_by': 'vehicle_type'}"/>
+                    <filter name="group_by_driver" string="Driver"
+                            context="{'group_by': 'driver_id'}"/>
+                    <filter name="group_by_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_by_fuel_type" string="Fuel Type"
+                            context="{'group_by': 'fuel_type'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="vehicle_type" string="Vehicle Type"
+                           select="multi"
+                           icon="fa-bus"/>
+                    <field name="state" string="Status"
+                           select="multi"
+                           icon="fa-flag"/>
+                    <field name="fuel_type" string="Fuel Type"
+                           select="multi"
+                           icon="fa-gas-pump"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View - Transport Vehicle -->
+    <record id="transport_vehicle_view_kanban" model="ir.ui.view">
+        <field name="name">transport.vehicle.view.kanban</field>
+        <field name="model">transport.vehicle</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="state"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="vehicle_number"/>
+                <field name="vehicle_type"/>
+                <field name="seating_capacity"/>
+                <field name="occupied_seats"/>
+                <field name="available_seats"/>
+                <field name="driver_id"/>
+                <field name="fuel_type"/>
+                <field name="has_gps"/>
+                <field name="insurance_expiry"/>
+                <field name="fitness_certificate"/>
+                <field name="pollution_certificate"/>
+                <field name="state"/>
+                <field name="active"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="ribbon ribbon-top-right" t-if="!record.active.raw_value">
+                                <span class="text-bg-danger">Archived</span>
+                            </div>
+
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <i class="fa fa-bus fa-lg"/> <field name="name"/>
+                                        </strong>
+                                        <div class="text-muted">
+                                            <i class="fa fa-id-card"/> <field name="vehicle_number"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body mt-3">
+                                    <div class="row mb-2">
+                                        <div class="col-6">
+                                            <div class="card bg-primary text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <span class="badge bg-light text-primary">
+                                                        <field name="vehicle_type"/>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6" t-if="record.fuel_type.raw_value">
+                                            <div class="card bg-secondary text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <small>
+                                                        <i class="fa fa-gas-pump"/> <field name="fuel_type"/>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.driver_id.raw_value">
+                                        <div class="col-12">
+                                            <div class="card bg-info text-white">
+                                                <div class="card-body p-2">
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="fa fa-user-circle fa-2x me-2"/>
+                                                        <div>
+                                                            <small>Driver</small>
+                                                            <div><strong><field name="driver_id"/></strong></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-4">
+                                            <div class="bg-light p-2 rounded text-center">
+                                                <div class="text-primary">
+                                                    <i class="fa fa-chair fa-lg"/>
+                                                </div>
+                                                <h6 class="mb-0"><field name="seating_capacity"/></h6>
+                                                <small class="text-muted">Total</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="bg-light p-2 rounded text-center">
+                                                <div class="text-danger">
+                                                    <i class="fa fa-users fa-lg"/>
+                                                </div>
+                                                <h6 class="mb-0"><field name="occupied_seats"/></h6>
+                                                <small class="text-muted">Occupied</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="bg-light p-2 rounded text-center">
+                                                <div class="text-success">
+                                                    <i class="fa fa-check-circle fa-lg"/>
+                                                </div>
+                                                <h6 class="mb-0"><field name="available_seats"/></h6>
+                                                <small class="text-muted">Available</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.has_gps.raw_value">
+                                        <div class="col-12">
+                                            <div class="card bg-success text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <small>
+                                                        <i class="fa fa-location-arrow"/> GPS Tracking Enabled
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="card bg-warning text-white">
+                                                <div class="card-body p-2">
+                                                    <h6 class="mb-1">
+                                                        <i class="fa fa-file-contract"/> Document Expiry
+                                                    </h6>
+                                                    <small t-if="record.insurance_expiry.raw_value">
+                                                        Insurance: <field name="insurance_expiry"/>
+                                                    </small><br t-if="record.insurance_expiry.raw_value and record.fitness_certificate.raw_value"/>
+                                                    <small t-if="record.fitness_certificate.raw_value">
+                                                        Fitness: <field name="fitness_certificate"/>
+                                                    </small><br t-if="record.fitness_certificate.raw_value and record.pollution_certificate.raw_value"/>
+                                                    <small t-if="record.pollution_certificate.raw_value">
+                                                        Pollution: <field name="pollution_certificate"/>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom mt-2">
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Calendar View - Transport Vehicle (Maintenance Schedule) -->
+    <record id="transport_vehicle_view_calendar" model="ir.ui.view">
+        <field name="name">transport.vehicle.view.calendar</field>
+        <field name="model">transport.vehicle</field>
+        <field name="arch" type="xml">
+            <calendar string="Maintenance Schedule"
+                      date_start="next_service_date"
+                      mode="month"
+                      color="state"
+                      quick_create="0"
+                      event_limit="5">
+                <field name="name"/>
+                <field name="vehicle_number"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Pivot View - Transport Vehicle -->
+    <record id="transport_vehicle_view_pivot" model="ir.ui.view">
+        <field name="name">transport.vehicle.view.pivot</field>
+        <field name="model">transport.vehicle</field>
+        <field name="arch" type="xml">
+            <pivot string="Vehicle Analysis">
+                <field name="vehicle_type" type="row"/>
+                <field name="seating_capacity" type="measure"/>
+                <field name="occupied_seats" type="measure"/>
+                <field name="available_seats" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View - Transport Vehicle -->
+    <record id="transport_vehicle_view_graph" model="ir.ui.view">
+        <field name="name">transport.vehicle.view.graph</field>
+        <field name="model">transport.vehicle</field>
+        <field name="arch" type="xml">
+            <graph string="Vehicle Occupancy" type="bar" stacked="1">
+                <field name="name"/>
+                <field name="occupied_seats" type="measure"/>
+                <field name="available_seats" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_transport_vehicle" model="ir.actions.act_window">
+        <field name="name">Transport Vehicles</field>
+        <field name="res_model">transport.vehicle</field>
+        <field name="view_mode">kanban,list,form,calendar,pivot,graph</field>
+        <field name="context">{'search_default_filter_active_vehicles': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add Transport Vehicle
+            </p>
+            <p>
+                Manage transport vehicles/buses. Enter name (required, tracked, e.g., "Bus 101"). Enter
+                vehicle_number (required, tracked, unique constraint, e.g., "DL-01-AB-1234"). Select
+                vehicle_type (3 options, required, default bus, radio widget): bus (Bus - standard bus),
+                mini_bus (Mini Bus - smaller bus), van (Van - small vehicle). Enter seating_capacity
+                (integer, required, total seats). View occupied_seats (integer, computed, count active
+                transport.allocation records where vehicle_id = this vehicle &amp; state = 'active'). View
+                available_seats (integer, computed, seating_capacity - occupied_seats). Select driver_id
+                (Many2one to transport.driver, tracked, no-create). Assign route_ids (Many2many to
+                transport.route "Routes Assigned", many2many widget). Enter vehicle details: make
+                (placeholder "Tata/Ashok Leyland"), model (placeholder "Starbus LP 410/35"), year
+                (placeholder "2024"), color. Select fuel_type (4 options): petrol (Petrol), diesel
+                (Diesel), cng (CNG), electric (Electric). GPS tracking: has_gps (boolean), gps_device_id
+                (char, invisible if not has_gps, placeholder "GPS-123456"). Maintenance tracking:
+                current_km (integer, current odometer reading), service_km (integer, service interval),
+                last_service_date (date), next_service_date (date). Documents notebook page: Registration
+                (registration_date, registration_expiry), Insurance (insurance_company placeholder "ICICI
+                Lombard", insurance_number placeholder "POL123456", insurance_expiry tracked),
+                Certificates (fitness_certificate expiry tracked, pollution_certificate expiry tracked).
+                Select state (4 options, default active, tracked, statusbar widget): active (Active -
+                operational), maintenance (Under Maintenance - servicing), breakdown (Breakdown -
+                non-operational), inactive (Inactive - not in use). Toggle active boolean (default true,
+                archive button). Document expiry validation method (_check_documents_validity) posts
+                warning messages to chatter when insurance/fitness/pollution certificates expire within
+                30 days. List view with 4-color row decorations: Green (active), Yellow (maintenance),
+                Red (breakdown), Muted (inactive). Badge widgets for vehicle_type &amp; state. Kanban view
+                grouped by state showing vehicle type badge, fuel type badge, driver card (info/blue,
+                user-circle icon 2x, conditional if driver_id), capacity cards (3 cards 4/4/4 grid: total
+                chair icon primary, occupied users icon danger, available check-circle icon success), GPS
+                card (success/green, location-arrow icon, conditional if has_gps), &amp; document expiry
+                card (warning/yellow, file-contract icon, shows insurance/fitness/pollution expiry dates).
+                Calendar view for maintenance schedule (date_start: next_service_date, color by state,
+                month mode, event_limit 5). Pivot view for analysis (vehicle_type × measures:
+                seating_capacity, occupied_seats, available_seats). Graph view for occupancy (stacked bar
+                chart, vehicle name vs. occupied_seats/available_seats). Ordered by name (alphabetical).
+                Default filter: Active Vehicles. Full chatter support for communication &amp; document expiry
+                alerts.
+            </p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,1263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Faculty Dashboard Template -->
+        <template id="faculty_dashboard" name="Faculty Dashboard">
+            <t t-call="website.layout">
+                <div class="container mt-4">
+                    <!-- Page Header -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h1 class="h2">
+                                <i class="fa fa-tachometer mr-2"></i>
+                                Faculty Dashboard
+                            </h1>
+                            <div class="text-muted">Welcome, <t t-esc="faculty.name"/>!</div>
+                        </div>
+                    </div>
+
+                    <!-- Stats Cards -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-primary text-white h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Today's Classes</h5>
+                                    <h2 class="display-4">
+                                        <t t-esc="len(today_classes)"/>
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-success text-white h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Attendance Today</h5>
+                                    <h2 class="display-4">
+                                        <t t-esc="attendance_today"/>
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-info text-white h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">My Subjects</h5>
+                                    <h2 class="display-4">
+                                        <t t-esc="len(faculty.subjects_taught_ids)"/>
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-warning text-white h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Workload Hours</h5>
+                                    <h2 class="display-4">
+                                        <t t-esc="faculty.total_workload_hours"/>
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Quick Actions</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-3 text-center mb-3">
+                                            <a href="/my/faculty/attendance" class="btn btn-outline-primary btn-lg btn-block py-3">
+                                                <i class="fa fa-check-square-o fa-2x mb-2"></i><br/>
+                                                Mark Attendance
+                                            </a>
+                                        </div>
+                                        <div class="col-md-3 text-center mb-3">
+                                            <a href="/my/faculty/classes" class="btn btn-outline-success btn-lg btn-block py-3">
+                                                <i class="fa fa-calendar fa-2x mb-2"></i><br/>
+                                                View Timetable
+                                            </a>
+                                        </div>
+                                        <div class="col-md-3 text-center mb-3">
+                                            <a href="/my/faculty/students" class="btn btn-outline-info btn-lg btn-block py-3">
+                                                <i class="fa fa-users fa-2x mb-2"></i><br/>
+                                                View Students
+                                            </a>
+                                        </div>
+                                        <div class="col-md-3 text-center mb-3">
+                                            <a href="/my/faculty/leave" class="btn btn-outline-warning btn-lg btn-block py-3">
+                                                <i class="fa fa-calendar-times-o fa-2x mb-2"></i><br/>
+                                                Apply Leave
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Today's Classes -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Today's Classes</h5>
+                                </div>
+                                <div class="card-body">
+                                    <t t-if="today_classes">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Time</th>
+                                                        <th>Subject</th>
+                                                        <th>Course</th>
+                                                        <th>Classroom</th>
+                                                        <th>Batch</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <t t-foreach="today_classes" t-as="class">
+                                                        <tr>
+                                                            <td>
+                                                                <t t-esc="'{:02.0f}:{:02.0f}'.format(*divmod(class.start_time * 60, 60))"/>
+                                                                -
+                                                                <t t-esc="'{:02.0f}:{:02.0f}'.format(*divmod(class.end_time * 60, 60))"/>
+                                                            </td>
+                                                            <td><t t-esc="class.subject_id.name"/></td>
+                                                            <td><t t-esc="class.course_id.name"/></td>
+                                                            <td>
+                                                                <t t-if="class.classroom_id">
+                                                                    <t t-esc="class.classroom_id.name"/>
+                                                                </t>
+                                                                <t t-else="">TBD</t>
+                                                            </td>
+                                                            <td><t t-esc="class.batch_id.name"/></td>
+                                                        </tr>
+                                                    </t>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="alert alert-info">
+                                            <i class="fa fa-info-circle mr-2"></i>
+                                            No classes scheduled for today.
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <!-- Faculty Classes/Timetable Template -->
+        <template id="faculty_classes" name="Faculty Classes">
+            <t t-call="website.layout">
+                <div class="container mt-4">
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h1 class="h2">
+                                <i class="fa fa-calendar mr-2"></i>
+                                My Timetable
+                            </h1>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Weekly Schedule</h5>
+                                </div>
+                                <div class="card-body">
+                                    <t t-if="timetable_by_day">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Day</th>
+                                                        <th>Time</th>
+                                                        <th>Subject</th>
+                                                        <th>Course</th>
+                                                        <th>Classroom</th>
+                                                        <th>Type</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <t t-foreach="[('0', 'Monday'), ('1', 'Tuesday'), ('2', 'Wednesday'), ('3', 'Thursday'), ('4', 'Friday'), ('5', 'Saturday'), ('6', 'Sunday')]" t-as="day">
+                                                        <t t-set="day_classes" t-value="timetable_by_day.get(day[0], [])"/>
+                                                        <t t-if="day_classes">
+                                                            <t t-foreach="day_classes" t-as="class" t-index="index">
+                                                                <tr>
+                                                                    <t t-if="index == 0">
+                                                                        <td t-att-rowspan="len(day_classes)">
+                                                                            <t t-esc="day[1]"/>
+                                                                        </td>
+                                                                    </t>
+                                                                    <td>
+                                                                        <t t-esc="'{:02.0f}:{:02.0f}'.format(*divmod(class.start_time * 60, 60))"/>
+                                                                        -
+                                                                        <t t-esc="'{:02.0f}:{:02.0f}'.format(*divmod(class.end_time * 60, 60))"/>
+                                                                    </td>
+                                                                    <td><t t-esc="class.subject_id.name"/></td>
+                                                                    <td><t t-esc="class.course_id.name"/></td>
+                                                                    <td>
+                                                                        <t t-if="class.classroom_id">
+                                                                            <t t-esc="class.classroom_id.name"/>
+                                                                        </t>
+                                                                        <t t-else="">TBD</t>
+                                                                    </td>
+                                                                    <td>
+                                                                        <t t-set="badge_class" t-value="'badge-primary'"/>
+                                                                        <t t-if="class.class_type == 'practical'">
+                                                                            <t t-set="badge_class" t-value="'badge-success'"/>
+                                                                        </t>
+                                                                        <t t-if="class.class_type == 'lab'">
+                                                                            <t t-set="badge_class" t-value="'badge-warning'"/>
+                                                                        </t>
+                                                                        <t t-if="class.class_type == 'tutorial'">
+                                                                            <t t-set="badge_class" t-value="'badge-info'"/>
+                                                                        </t>
+                                                                        <t t-if="class.class_type == 'seminar'">
+                                                                            <t t-set="badge_class" t-value="'badge-dark'"/>
+                                                                        </t>
+                                                                        <span t-att-class="badge_class">
+                                                                            <t t-esc="class.class_type"/>
+                                                                        </span>
+                                                                    </td>
+                                                                </tr>
+                                                            </t>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <tr>
+                                                                <td><t t-esc="day[1]"/></td>
+                                                                <td colspan="5" class="text-muted text-center">No classes scheduled</td>
+                                                            </tr>
+                                                        </t>
+                                                    </t>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="alert alert-info">
+                                            <i class="fa fa-info-circle mr-2"></i>
+                                            No timetable entries found.
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Subjects Section -->
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">My Subjects</h5>
+                                </div>
+                                <div class="card-body">
+                                    <t t-if="subjects">
+                                        <div class="row">
+                                            <t t-foreach="subjects" t-as="subject">
+                                                <div class="col-md-4 mb-3">
+                                                    <div class="card h-100">
+                                                        <div class="card-body">
+                                                            <h6 class="card-title">
+                                                                <t t-esc="subject.name"/>
+                                                            </h6>
+                                                            <p class="card-text">
+                                                                <small class="text-muted">Code: <t t-esc="subject.code"/></small><br/>
+                                                                <small class="text-muted">Credits: <t t-esc="subject.credits"/></small><br/>
+                                                                <small class="text-muted">Total Hours: <t t-esc="subject.total_hours"/></small>
+                                                            </p>
+                                                        </div>
+                                                        <div class="card-footer">
+                                                            <small class="text-muted">
+                                                                <t t-esc="subject.subject_type"/>
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </t>
+                                        </div>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="alert alert-warning">
+                                            <i class="fa fa-exclamation-triangle mr-2"></i>
+                                            No subjects assigned.
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <!-- Faculty Attendance Template -->
+        <template id="faculty_attendance" name="Faculty Attendance">
+            <t t-call="website.layout">
+                <div class="container mt-4">
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h1 class="h2">
+                                <i class="fa fa-check-square-o mr-2"></i>
+                                Student Attendance
+                            </h1>
+                        </div>
+                    </div>
+
+                    <!-- Filter Form -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Filter Attendance</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form method="get" action="/my/faculty/attendance" class="row">
+                                        <div class="col-md-3 mb-3">
+                                            <label for="date">Date</label>
+                                            <input type="date" id="date" name="date"
+                                                   class="form-control" t-att-value="selected_date"/>
+                                        </div>
+                                        <div class="col-md-3 mb-3">
+                                            <label for="subject">Subject</label>
+                                            <select id="subject" name="subject" class="form-control">
+                                                <option value="">All Subjects</option>
+                                                <t t-foreach="subjects" t-as="subject">
+                                                    <option t-att-value="subject.id" t-att-selected="'selected' if selected_subject == subject.id else False">
+                                                        <t t-esc="subject.name"/> (<t t-esc="subject.code"/>)
+                                                    </option>
+                                                </t>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 mb-3">
+                                            <label for="batch">Batch</label>
+                                            <select id="batch" name="batch" class="form-control">
+                                                <option value="">All Batches</option>
+                                                <t t-foreach="batches" t-as="batch">
+                                                    <option t-att-value="batch.id" t-att-selected="'selected' if selected_batch == batch.id else False">
+                                                        <t t-esc="batch.name"/>
+                                                    </option>
+                                                </t>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 mb-3 d-flex align-items-end">
+                                            <button type="submit" class="btn btn-primary w-100">
+                                                <i class="fa fa-filter mr-2"></i>Filter
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Attendance Records -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">Attendance Records</h5>
+                                        <button type="button" class="btn btn-success" style="padding: 8px 20px; font-size:14px;" data-bs-toggle="modal" data-bs-target="#markAttendanceModal">
+                                            <i class="fa fa-plus me-2"></i>Mark New Attendance
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <t t-if="attendance_records">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Student</th>
+                                                        <th>Registration No.</th>
+                                                        <th>Course</th>
+                                                        <th>Date</th>
+                                                        <th>Time In</th>
+                                                        <th>Time Out</th>
+                                                        <th>Status</th>
+                                                        <th>Remarks</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <t t-foreach="attendance_records" t-as="record">
+                                                        <tr>
+                                                            <td><t t-esc="record.student_id.name"/></td>
+                                                            <td><t t-esc="record.registration_number"/></td>
+                                                            <td>
+                                                                <t t-if="record.course_id">
+                                                                    <t t-esc="record.course_id.name"/>
+                                                                </t>
+                                                                <t t-else="">-</t>
+                                                            </td>
+                                                            <td><t t-esc="record.date"/></td>
+                                                            <td>
+                                                                <t t-if="record.time_in">
+                                                                    <t t-esc="'{:02.0f}:{:02.0f}'.format(*divmod(record.time_in * 60, 60))"/>
+                                                                </t>
+                                                                <t t-else="">-</t>
+                                                            </td>
+                                                            <td>
+                                                                <t t-if="record.time_out">
+                                                                    <t t-esc="'{:02.0f}:{:02.0f}'.format(*divmod(record.time_out * 60, 60))"/>
+                                                                </t>
+                                                                <t t-else="">-</t>
+                                                            </td>
+                                                            <td>
+                                                                <t t-set="badge_class" t-value="'badge-secondary'"/>
+                                                                <t t-if="record.state == 'present'">
+                                                                    <t t-set="badge_class" t-value="'badge-success'"/>
+                                                                </t>
+                                                                <t t-if="record.state == 'absent'">
+                                                                    <t t-set="badge_class" t-value="'badge-danger'"/>
+                                                                </t>
+                                                                <t t-if="record.state == 'late'">
+                                                                    <t t-set="badge_class" t-value="'badge-warning'"/>
+                                                                </t>
+                                                                <t t-if="record.state == 'half_day'">
+                                                                    <t t-set="badge_class" t-value="'badge-info'"/>
+                                                                </t>
+                                                                <t t-if="record.state == 'on_leave'">
+                                                                    <t t-set="badge_class" t-value="'badge-secondary'"/>
+                                                                </t>
+                                                                <t t-if="record.state == 'holiday'">
+                                                                    <t t-set="badge_class" t-value="'badge-dark'"/>
+                                                                </t>
+                                                                <span t-att-class="badge_class">
+                                                                    <t t-esc="record.state"/>
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                <t t-if="record.remarks">
+                                                                    <t t-esc="record.remarks"/>
+                                                                </t>
+                                                                <t t-else="">-</t>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="alert alert-info">
+                                            <i class="fa fa-info-circle mr-2"></i>
+                                            No attendance records found for the selected filters.
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mark Attendance Modal -->
+                <div class="modal fade" id="markAttendanceModal" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog modal-xl" role="document" style="max-height:90vh;">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title"><i class="fa fa-check-square-o me-2"/>Mark New Attendance</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form method="post" action="/my/faculty/attendance/mark" id="attendanceForm">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            </form>
+                                <div class="modal-body" style="height:65vh;overflow-y:scroll;">
+                                    <!-- Filter Row -->
+                                    <div class="row g-3 mb-4 p-3 bg-light rounded">
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-semibold">Date *</label>
+                                            <input form="attendanceForm" type="date" name="date" class="form-control" required="required"
+                                                   t-att-value="selected_date"/>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-semibold">Subject *</label>
+                                            <select form="attendanceForm" name="subject_id" class="form-select" required="required">
+                                                <option value="">-- Select Subject --</option>
+                                                <t t-foreach="subjects" t-as="subject">
+                                                    <option t-att-value="subject.id" t-att-selected="'selected' if selected_subject == subject.id else False">
+                                                        <t t-esc="subject.name"/> (<t t-esc="subject.code"/>)
+                                                    </option>
+                                                </t>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-semibold">Batch *</label>
+                                            <select form="attendanceForm" name="batch_id" class="form-select" required="required">
+                                                <option value="">-- Select Batch --</option>
+                                                <t t-foreach="batches" t-as="batch">
+                                                    <option t-att-value="batch.id" t-att-selected="'selected' if selected_batch == batch.id else False">
+                                                        <t t-esc="batch.name"/>
+                                                    </option>
+                                                </t>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <!-- Student List -->
+                                    <div id="studentList">
+                                        <div id="studentListContent">
+                                            <div class="text-center text-muted py-4">
+                                                <i class="fa fa-users fa-2x mb-2 d-block"/>
+                                                <p>Select a subject and batch to load students.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button form="attendanceForm" type="submit" class="btn btn-success px-4" id="saveAttendanceBtn" disabled="disabled">
+                                        <i class="fa fa-save me-1"/>Save Attendance
+                                    </button>
+                                </div>
+                            <script>
+                            (function() {
+                                function loadStudents() {
+                                    var subjectId = document.querySelector('[name="subject_id"]').value;
+                                    var batchId = document.querySelector('[name="batch_id"]').value;
+                                    var content = document.getElementById('studentListContent');
+                                    var saveBtn = document.getElementById('saveAttendanceBtn');
+
+                                    if (!subjectId || !batchId) {
+                                        content.innerHTML = '<p class="text-muted">Select a subject and batch to load students.</p>';
+                                        saveBtn.disabled = true;
+                                        return;
+                                    }
+
+                                    content.innerHTML = '<p class="text-muted">Loading students...</p>';
+
+                                    fetch('/my/faculty/attendance/students?subject_id=' + subjectId + '&amp;batch_id=' + batchId)
+                                        .then(function(r) { return r.json(); })
+                                        .then(function(data) {
+                                            if (!data.students || data.students.length === 0) {
+                                                content.innerHTML = '<p class="text-warning">No students found for this batch.</p>';
+                                                saveBtn.disabled = true;
+                                                return;
+                                            }
+                                            var table = document.createElement('table');
+                                            table.className = 'table table-hover table-bordered align-middle';
+                                            table.innerHTML = '<thead><tr><th>Student</th><th>Reg No</th><th>Status</th></tr></thead>';
+                                            var tbody = document.createElement('tbody');
+                                            data.students.forEach(function(s) {
+                                                var tr = document.createElement('tr');
+                                                var tdName = document.createElement('td');
+                                                tdName.textContent = s.name;
+                                                var tdReg = document.createElement('td');
+                                                tdReg.textContent = s.reg_no;
+                                                var tdStatus = document.createElement('td');
+                                                var sel = document.createElement('select');
+                                                sel.name = 'attendance_' + s.id;
+                                                sel.setAttribute('form', 'attendanceForm');
+                                                sel.className = 'form-select form-select-sm'; sel.style.minWidth = '110px';
+                                                ['present','absent','late'].forEach(function(val) {
+                                                    var opt = document.createElement('option');
+                                                    opt.value = val;
+                                                    opt.textContent = val.charAt(0).toUpperCase() + val.slice(1);
+                                                    sel.appendChild(opt);
+                                                });
+                                                tdStatus.appendChild(sel);
+                                                tr.appendChild(tdName);
+                                                tr.appendChild(tdReg);
+                                                tr.appendChild(tdStatus);
+                                                tbody.appendChild(tr);
+                                            });
+                                            table.appendChild(tbody);
+                                            content.innerHTML = '';
+                                            content.appendChild(table);
+                                            var html = '';
+                                            saveBtn.disabled = false;
+                                        })
+                                        .catch(function() {
+                                            content.innerHTML = '<p class="text-danger">Error loading students.</p>';
+                                            saveBtn.disabled = true;
+                                        });
+                                }
+
+                                document.querySelector('[name="subject_id"]').addEventListener('change', loadStudents);
+                                document.querySelector('[name="batch_id"]').addEventListener('change', loadStudents);
+
+                                // Auto-load if values already selected
+                                document.getElementById('markAttendanceModal').addEventListener('shown.bs.modal', loadStudents);
+                            })();
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <!-- Faculty Students Template -->
+        <template id="faculty_students" name="Faculty Students">
+            <t t-call="website.layout">
+                <div class="container mt-4">
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h1 class="h2">
+                                <i class="fa fa-users mr-2"></i>
+                                My Students
+                            </h1>
+                        </div>
+                    </div>
+
+                    <!-- Filter -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <form method="get" action="/my/faculty/students" class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label>Filter by Batch</label>
+                                            <select name="batch" class="form-control" onchange="this.form.submit()">
+                                                <option value="">All Batches</option>
+                                                <t t-foreach="batches" t-as="batch">
+                                                    <option t-att-value="batch.id" t-att-selected="'selected' if selected_batch == batch.id else False">
+                                                        <t t-esc="batch.name"/>
+                                                    </option>
+                                                </t>
+                                            </select>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Student List -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Student List</h5>
+                                </div>
+                                <div class="card-body">
+                                    <t t-if="students">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Photo</th>
+                                                        <th>Name</th>
+                                                        <th>Registration No.</th>
+                                                        <th>Batch</th>
+                                                        <th>Program</th>
+                                                        <th>Department</th>
+                                                        <th>Semester</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <t t-foreach="students" t-as="student">
+                                                        <tr>
+                                                            <td>
+                                                                <t t-if="student.student_photo">
+                                                                    <img t-att-src="'/web/image/res.partner/' + str(student.partner_id.id) + '/image_1920/50x50'"
+                                                                         class="rounded-circle" width="50" height="50"/>
+                                                                </t>
+                                                                <t t-else="">
+                                                                    <div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center"
+                                                                         style="width: 50px; height: 50px;">
+                                                                        <i class="fa fa-user text-white"></i>
+                                                                    </div>
+                                                                </t>
+                                                            </td>
+                                                            <td><t t-esc="student.name"/></td>
+                                                            <td><t t-esc="student.registration_number"/></td>
+                                                            <td><t t-esc="student.batch_id.name"/></td>
+                                                            <td><t t-esc="student.program_id.name"/></td>
+                                                            <td><t t-esc="student.department_id.name"/></td>
+                                                            <td><t t-esc="student.current_semester"/></td>
+                                                            <td>
+                                                                <a t-att-href="'/my/faculty/student/' + str(student.id)"
+                                                                   class="btn btn-sm btn-outline-primary">
+                                                                    <i class="fa fa-eye"></i> View
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="alert alert-info">
+                                            <i class="fa fa-info-circle mr-2"></i>
+                                            No students found.
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <!-- Student Detail Template -->
+        <template id="faculty_student_detail" name="Student Detail">
+            <t t-call="website.layout">
+                <div class="container mt-4">
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item">
+                                        <a href="/my/faculty/students">My Students</a>
+                                    </li>
+                                    <li class="breadcrumb-item active" aria-current="page">
+                                        <t t-esc="student.name"/>
+                                    </li>
+                                </ol>
+                            </nav>
+                            <h1 class="h2">
+                                <i class="fa fa-graduation-cap mr-2"></i>
+                                Student Details
+                            </h1>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Student Info Card -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <t t-if="student.student_photo">
+                                        <img t-att-src="'/web/image/res.partner/' + str(student.partner_id.id) + '/image_1920/200x200'"
+                                             class="rounded-circle mb-3" width="200" height="200"/>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center mb-3"
+                                             style="width: 200px; height: 200px;">
+                                            <i class="fa fa-user text-white fa-5x"></i>
+                                        </div>
+                                    </t>
+                                    <h4><t t-esc="student.name"/></h4>
+                                    <p class="text-muted">
+                                        <t t-esc="student.registration_number"/><br/>
+                                        <t t-esc="student.program_id.name"/>
+                                    </p>
+                                </div>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <strong>Batch:</strong> <t t-esc="student.batch_id.name"/>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>Semester:</strong> <t t-esc="student.current_semester"/>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>Email:</strong>
+                                        <t t-if="student.personal_email">
+                                            <t t-esc="student.personal_email"/>
+                                        </t>
+                                        <t t-else="">
+                                            <t t-esc="student.email"/>
+                                        </t>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>Mobile:</strong> <t t-esc="student.personal_mobile"/>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>Date of Birth:</strong> <t t-esc="student.date_of_birth"/> (Age: <t t-esc="student.age"/>)
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>Gender:</strong> <t t-esc="student.gender"/>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Attendance History -->
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Recent Attendance in My Subjects</h5>
+                                </div>
+                                <div class="card-body">
+                                    <t t-if="attendance">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Date</th>
+                                                        <th>Course</th>
+                                                        <th>Status</th>
+                                                        <th>Remarks</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <t t-foreach="attendance" t-as="record">
+                                                        <tr>
+                                                            <td><t t-esc="record.date"/></td>
+                                                            <td>
+                                                                <t t-if="record.course_id">
+                                                                    <t t-esc="record.course_id.name"/>
+                                                                </t>
+                                                                <t t-else="">-</t>
+                                                            </td>
+                                                            <td>
+                                                                <t t-set="badge_class" t-value="'badge-secondary'"/>
+                                                                <t t-if="record.state == 'present'">
+                                                                    <t t-set="badge_class" t-value="'badge-success'"/>
+                                                                </t>
+                                                                <t t-if="record.state == 'absent'">
+                                                                    <t t-set="badge_class" t-value="'badge-danger'"/>
+                                                                </t>
+                                                                <t t-if="record.state == 'late'">
+                                                                    <t t-set="badge_class" t-value="'badge-warning'"/>
+                                                                </t>
+                                                                <t t-if="record.state == 'half_day'">
+                                                                    <t t-set="badge_class" t-value="'badge-info'"/>
+                                                                </t>
+                                                                <t t-if="record.state == 'on_leave'">
+                                                                    <t t-set="badge_class" t-value="'badge-secondary'"/>
+                                                                </t>
+                                                                <t t-if="record.state == 'holiday'">
+                                                                    <t t-set="badge_class" t-value="'badge-dark'"/>
+                                                                </t>
+                                                                <span t-att-class="badge_class">
+                                                                    <t t-esc="record.state"/>
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                <t t-if="record.remarks">
+                                                                    <t t-esc="record.remarks"/>
+                                                                </t>
+                                                                <t t-else="">-</t>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="alert alert-info">
+                                            <i class="fa fa-info-circle mr-2"></i>
+                                            No attendance records found for this student in your subjects.
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+
+                            <!-- Academic Information -->
+                            <div class="card mt-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Academic Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p><strong>Attendance Percentage:</strong>
+                                                <t t-set="attendance_badge" t-value="'badge-warning'"/>
+                                                <t t-if="student.attendance_percentage and student.attendance_percentage &gt;= 75">
+                                                    <t t-set="attendance_badge" t-value="'badge-success'"/>
+                                                </t>
+                                                <span t-att-class="attendance_badge">
+                                                    <t t-esc="'{:.1f}'.format(student.attendance_percentage)"/>%
+                                                </span>
+                                            </p>
+                                            <p><strong>Current CGPA:</strong>
+                                                <t t-if="student.cgpa">
+                                                    <t t-esc="student.cgpa"/>
+                                                </t>
+                                                <t t-else="">N/A</t>
+                                            </p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>Department:</strong> <t t-esc="student.department_id.name"/></p>
+                                            <p><strong>Academic Year:</strong>
+                                                <t t-if="student.academic_year_id">
+                                                    <t t-esc="student.academic_year_id.name"/>
+                                                </t>
+                                                <t t-else="">N/A</t>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <!-- Faculty Leave Template -->
+        <template id="faculty_leave" name="Faculty Leave">
+            <t t-call="website.layout">
+                <div class="container mt-4">
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h1 class="h2">
+                                <i class="fa fa-calendar-times-o mr-2"></i>
+                                Leave Management
+                            </h1>
+                        </div>
+                    </div>
+
+                    <!-- New Leave Form -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Apply for Leave</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form method="post" action="/my/faculty/leave/request" enctype="multipart/form-data">
+                                        <div class="row">
+                                            <div class="col-md-3 mb-3">
+                                                <label>Leave Type *</label>
+                                                <select name="leave_type" class="form-control" required="required">
+                                                    <option value="">Select Type</option>
+                                                    <option value="casual">Casual Leave</option>
+                                                    <option value="sick">Sick Leave</option>
+                                                    <option value="earned">Earned Leave</option>
+                                                    <option value="maternity">Maternity Leave</option>
+                                                    <option value="paternity">Paternity Leave</option>
+                                                    <option value="compensatory">Compensatory Off</option>
+                                                    <option value="unpaid">Leave Without Pay</option>
+                                                    <option value="sabbatical">Sabbatical Leave</option>
+                                                    <option value="study">Study Leave</option>
+                                                    <option value="emergency">Emergency Leave</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label>From Date *</label>
+                                                <input type="date" name="date_from" class="form-control" required="required"/>
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label>To Date *</label>
+                                                <input type="date" name="to_date" class="form-control" required="required"/>
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label>Available Leaves</label>
+                                                <input type="text" class="form-control" readonly="readonly"
+                                                       t-att-value="faculty.available_leaves"/>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12 mb-3">
+                                                <label>Reason *</label>
+                                                <textarea name="reason" class="form-control" rows="3" required="required"
+                                                          placeholder="Please provide a reason for leave..."></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fa fa-paper-plane-o mr-2"></i>Submit Request
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Leave History -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Leave History</h5>
+                                </div>
+                                <div class="card-body">
+                                    <t t-if="leave_requests">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Leave No.</th>
+                                                        <th>Type</th>
+                                                        <th>From Date</th>
+                                                        <th>To Date</th>
+                                                        <th>Days</th>
+                                                        <th>Status</th>
+                                                        <th>Approved By</th>
+                                                        <th>Reason</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <t t-foreach="leave_requests" t-as="leave">
+                                                        <tr>
+                                                            <td><t t-esc="leave.name"/></td>
+                                                            <td><t t-esc="leave.leave_type"/></td>
+                                                            <td><t t-esc="leave.date_from"/></td>
+                                                            <td><t t-esc="leave.date_to"/></td>
+                                                            <td><t t-esc="leave.number_of_days"/></td>
+                                                            <td>
+                                                                <t t-set="badge_class" t-value="'badge-secondary'"/>
+                                                                <t t-if="leave.state == 'submitted'">
+                                                                    <t t-set="badge_class" t-value="'badge-info'"/>
+                                                                </t>
+                                                                <t t-if="leave.state == 'hod_approved'">
+                                                                    <t t-set="badge_class" t-value="'badge-warning'"/>
+                                                                </t>
+                                                                <t t-if="leave.state == 'approved'">
+                                                                    <t t-set="badge_class" t-value="'badge-success'"/>
+                                                                </t>
+                                                                <t t-if="leave.state == 'rejected'">
+                                                                    <t t-set="badge_class" t-value="'badge-danger'"/>
+                                                                </t>
+                                                                <t t-if="leave.state == 'cancelled'">
+                                                                    <t t-set="badge_class" t-value="'badge-dark'"/>
+                                                                </t>
+                                                                <span t-att-class="badge_class">
+                                                                    <t t-esc="leave.state"/>
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                <t t-if="leave.approved_by_principal">
+                                                                    Principal
+                                                                </t>
+                                                                <t t-elif="leave.approved_by_hod">
+                                                                    HOD
+                                                                </t>
+                                                                <t t-else="">
+                                                                    Pending
+                                                                </t>
+                                                            </td>
+                                                            <td>
+                                                                <small><t t-esc="leave.reason"/></small>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="alert alert-info">
+                                            <i class="fa fa-info-circle mr-2"></i>
+                                            No leave requests found.
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+</template>
+
+        <!-- Faculty Profile Template -->
+        <template id="faculty_profile" name="Faculty Profile">
+            <t t-call="website.layout">
+                <div class="container mt-4">
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h1 class="h2">
+                                <i class="fa fa-user mr-2"></i>
+                                My Profile
+                            </h1>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Profile Card -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <t t-if="faculty.faculty_photo">
+                                        <img t-att-src="'/web/image?model=faculty.faculty&amp;id=' + str(faculty.id) + '&amp;field=faculty_photo&amp;width=200&amp;height=200'"
+                                             class="rounded-circle mb-3" width="200" height="200"/>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center mb-3"
+                                             style="width: 200px; height: 200px;">
+                                            <i class="fa fa-user text-white fa-5x"></i>
+                                        </div>
+                                    </t>
+                                    <h4><t t-esc="faculty.name"/></h4>
+                                    <p class="text-muted">
+                                        <t t-esc="faculty.designation_id.name"/><br/>
+                                        <t t-esc="faculty.department_id.name"/>
+                                    </p>
+                                    <div class="mt-3">
+                                        <t t-set="badge_class" t-value="'badge-secondary'"/>
+                                        <t t-if="faculty.state == 'active'">
+                                            <t t-set="badge_class" t-value="'badge-success'"/>
+                                        </t>
+                                        <t t-if="faculty.state == 'on_leave'">
+                                            <t t-set="badge_class" t-value="'badge-warning'"/>
+                                        </t>
+                                        <t t-if="faculty.state == 'suspended'">
+                                            <t t-set="badge_class" t-value="'badge-danger'"/>
+                                        </t>
+                                        <t t-if="faculty.state == 'resigned'">
+                                            <t t-set="badge_class" t-value="'badge-secondary'"/>
+                                        </t>
+                                        <t t-if="faculty.state == 'retired'">
+                                            <t t-set="badge_class" t-value="'badge-dark'"/>
+                                        </t>
+                                        <span t-att-class="badge_class">
+                                            <t t-esc="faculty.state"/>
+                                        </span>
+                                    </div>
+                                </div>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <strong>Faculty ID:</strong> <t t-esc="faculty.faculty_id_number"/>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>Employment Type:</strong> <t t-esc="faculty.employment_type"/>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>Date of Joining:</strong> <t t-esc="faculty.date_of_joining"/>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>Workload:</strong> <t t-esc="faculty.total_workload_hours"/> hrs/week
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>Experience:</strong> <t t-esc="faculty.experience_years"/> years
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Edit Profile Form -->
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Edit Profile Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form method="post" action="/my/faculty/profile/update" enctype="multipart/form-data">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label>Mobile</label>
+                                                <input type="text" name="mobile" class="form-control"
+                                                       t-att-value="faculty.personal_mobile"/>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label>Email</label>
+                                                <input type="email" name="email" class="form-control"
+                                                       t-att-value="faculty.personal_email"/>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12 mb-3">
+                                                <label>Current Address</label>
+                                                <textarea name="current_address" class="form-control" rows="3">
+                                                    <t t-esc="faculty.current_address"/>
+                                                </textarea>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label>Highest Qualification</label>
+                                                <select name="qualification" class="form-control">
+                                                    <option value="">Select Qualification</option>
+                                                    <t t-if="faculty.highest_qualification == 'phd'">
+                                                        <option value="phd" selected="selected">Ph.D</option>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <option value="phd">Ph.D</option>
+                                                    </t>
+                                                    <t t-if="faculty.highest_qualification == 'mphil'">
+                                                        <option value="mphil" selected="selected">M.Phil</option>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <option value="mphil">M.Phil</option>
+                                                    </t>
+                                                    <t t-if="faculty.highest_qualification == 'postgraduate'">
+                                                        <option value="postgraduate" selected="selected">Post Graduate</option>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <option value="postgraduate">Post Graduate</option>
+                                                    </t>
+                                                    <t t-if="faculty.highest_qualification == 'graduate'">
+                                                        <option value="graduate" selected="selected">Graduate</option>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <option value="graduate">Graduate</option>
+                                                    </t>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label>Specialization</label>
+                                                <input type="text" name="specialization" class="form-control"
+                                                       t-att-value="faculty.specialization"/>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12 mb-3">
+                                                <label>Qualification Details</label>
+                                                <textarea name="bio" class="form-control" rows="4">
+                                                    <t t-esc="faculty.qualification_details"/>
+                                                </textarea>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12 mb-3">
+                                                <label>Update Photo</label>
+                                                <input type="file" name="photo" class="form-control-file" accept="image/*"/>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fa fa-save mr-2"></i>Update Profile
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Academic Information -->
+                            <div class="card mt-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Academic Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p><strong>Attendance Percentage:</strong>
+                                                <t t-set="attendance_badge" t-value="'badge-warning'"/>
+                                                <t t-if="faculty.attendance_percentage and faculty.attendance_percentage &gt;= 90">
+                                                    <t t-set="attendance_badge" t-value="'badge-success'"/>
+                                                </t>
+                                                <span t-att-class="attendance_badge">
+                                                    <t t-esc="'{:.1f}'.format(faculty.attendance_percentage)"/>%
+                                                </span>
+                                            </p>
+                                            <p><strong>Average Rating:</strong>
+                                                <t t-if="faculty.average_rating">
+                                                    <t t-esc="faculty.average_rating"/>
+                                                    <span class="text-warning">
+                                                        <t t-foreach="range(1, 6)" t-as="star">
+                                                            <t t-if="star &gt;= faculty.average_rating">
+                                                                <i class="fa fa-star"></i>
+                                                            </t>
+                                                            <t t-if="star > faculty.average_rating">
+                                                                <i class="fa fa-star-o"></i>
+                                                            </t>
+                                                        </t>
+                                                    </span>
+                                                </t>
+                                                <t t-else="">
+                                                    N/A
+                                                </t>
+                                            </p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>Research Papers:</strong> <t t-esc="faculty.research_papers"/></p>
+                                            <p><strong>Conferences Attended:</strong> <t t-esc="faculty.conferences_attended"/></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+    </data>
+</odoo>

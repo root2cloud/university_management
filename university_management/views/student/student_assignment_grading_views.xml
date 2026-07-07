@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ================================================================================================================ -->
+    <!-- student.assignment.criteria                                                                                         -->
+    <!-- ================================================================================================================ -->
+
+    <record id="student_assignment_criteria_view_form" model="ir.ui.view">
+        <field name="name">student.assignment.criteria.view.form</field>
+        <field name="model">student.assignment.criteria</field>
+        <field name="arch" type="xml">
+            <form string="Grading Criterion">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="Criterion name..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Assignment">
+                            <field name="assignment_id"/>
+                            <field name="subject_id" readonly="1"/>
+                            <field name="faculty_id" readonly="1"/>
+                            <field name="academic_year_id" readonly="1"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group string="Marks">
+                            <field name="max_marks"/>
+                            <field name="weightage"/>
+                        </group>
+                    </group>
+                    <group string="Description / Expectation">
+                        <field name="description" nolabel="1"
+                               placeholder="Describe what a student must demonstrate to earn full marks on this criterion..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="student_assignment_criteria_view_list" model="ir.ui.view">
+        <field name="name">student.assignment.criteria.view.list</field>
+        <field name="model">student.assignment.criteria</field>
+        <field name="arch" type="xml">
+            <list string="Grading Criteria" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="assignment_id"/>
+                <field name="subject_id" optional="show"/>
+                <field name="faculty_id" optional="show"/>
+                <field name="name"/>
+                <field name="description" optional="hide"/>
+                <field name="max_marks"/>
+                <field name="weightage"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="student_assignment_criteria_view_search" model="ir.ui.view">
+        <field name="name">student.assignment.criteria.view.search</field>
+        <field name="model">student.assignment.criteria</field>
+        <field name="arch" type="xml">
+            <search string="Search Grading Criteria">
+                <field name="name"/>
+                <field name="assignment_id"/>
+                <field name="subject_id"/>
+                <field name="faculty_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Assignment" name="group_assignment"
+                            context="{'group_by':'assignment_id'}"/>
+                    <filter string="Subject" name="group_subject"
+                            context="{'group_by':'subject_id'}"/>
+                    <filter string="Faculty" name="group_faculty"
+                            context="{'group_by':'faculty_id'}"/>
+                    <filter string="Academic Year" name="group_year"
+                            context="{'group_by':'academic_year_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_student_assignment_criteria" model="ir.actions.act_window">
+        <field name="name">Grading Criteria</field>
+        <field name="res_model">student.assignment.criteria</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id"
+               ref="student_assignment_criteria_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No grading criteria defined yet
+            </p>
+            <p>
+                Criteria are usually created from inside an assignment's
+                Grading Criteria tab.
+            </p>
+        </field>
+    </record>
+
+    <!-- ================================================================================================================ -->
+    <!-- student.assignment.submission.score                                                                                 -->
+    <!-- ================================================================================================================ -->
+
+    <record id="student_assignment_submission_score_view_form" model="ir.ui.view">
+        <field name="name">student.assignment.submission.score.view.form</field>
+        <field name="model">student.assignment.submission.score</field>
+        <field name="arch" type="xml">
+            <form string="Submission Score">
+                <sheet>
+                    <group>
+                        <group string="Score Details">
+                            <field name="submission_id"/>
+                            <field name="student_id" readonly="1"/>
+                            <field name="assignment_id" readonly="1"/>
+                            <field name="subject_id" readonly="1"/>
+                            <field name="criteria_id"/>
+                        </group>
+                        <group string="Marks">
+                            <field name="max_marks" readonly="1"/>
+                            <field name="marks_obtained"/>
+                            <field name="remarks"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="student_assignment_submission_score_view_list" model="ir.ui.view">
+        <field name="name">student.assignment.submission.score.view.list</field>
+        <field name="model">student.assignment.submission.score</field>
+        <field name="arch" type="xml">
+            <list string="Submission Scores" editable="bottom">
+                <field name="submission_id"/>
+                <field name="student_id" readonly="1" optional="show"/>
+                <field name="assignment_id" readonly="1" optional="show"/>
+                <field name="subject_id" readonly="1" optional="show"/>
+                <field name="criteria_id"/>
+                <field name="max_marks" readonly="1"/>
+                <field name="marks_obtained"/>
+                <field name="remarks"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="student_assignment_submission_score_view_search" model="ir.ui.view">
+        <field name="name">student.assignment.submission.score.view.search</field>
+        <field name="model">student.assignment.submission.score</field>
+        <field name="arch" type="xml">
+            <search string="Search Scores">
+                <field name="submission_id"/>
+                <field name="student_id"/>
+                <field name="assignment_id"/>
+                <field name="criteria_id"/>
+                <field name="subject_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Assignment" name="group_assignment"
+                            context="{'group_by':'assignment_id'}"/>
+                    <filter string="Student" name="group_student"
+                            context="{'group_by':'student_id'}"/>
+                    <filter string="Criterion" name="group_criteria"
+                            context="{'group_by':'criteria_id'}"/>
+                    <filter string="Subject" name="group_subject"
+                            context="{'group_by':'subject_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_student_assignment_submission_score"
+            model="ir.actions.act_window">
+        <field name="name">Submission Scores</field>
+        <field name="res_model">student.assignment.submission.score</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id"
+               ref="student_assignment_submission_score_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No scores recorded yet
+            </p>
+        </field>
+    </record>
+
+</odoo>

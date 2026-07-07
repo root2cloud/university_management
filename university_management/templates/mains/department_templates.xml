@@ -1,0 +1,795 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Departments List Page Template -->
+        <template id="departments_page" name="University Departments">
+            <t t-call="website.layout">
+                <t t-set="title">University Departments - Academic Excellence</t>
+
+                <div id="wrap" class="oe_structure">
+                    <div class="container mt-4">
+                        <!-- Page Header -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h1 class="display-4 mb-3">University Departments</h1>
+                                <p class="lead">
+                                    Explore our academic departments dedicated to excellence in teaching,
+                                    research, and innovation across various disciplines.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Departments Grid -->
+                        <div class="row" t-if="departments">
+                            <t t-foreach="departments" t-as="dept">
+                                <div class="col-md-6 col-lg-4 mb-4">
+                                    <div class="card h-100 border-0 shadow-sm department-card">
+                                        <!-- Department Image -->
+                                        <div t-if="dept.image_128" class="card-img-top overflow-hidden" style="height: 200px;">
+                                            <img t-attf-src="/web/image/university.department/#{dept.id}/image_128"
+                                                 class="img-fluid w-100 h-100 object-fit-cover"
+                                                 t-att-alt="dept.name"/>
+                                        </div>
+                                        <div t-else="" class="card-img-top bg-gradient-primary d-flex align-items-center justify-content-center" style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                            <i class="fa fa-university fa-4x text-white"/>
+                                        </div>
+
+                                        <!-- Accreditation Badge -->
+                                        <div t-if="dept.is_accredited" class="position-absolute top-0 end-0 m-3">
+                                            <span class="badge bg-success">
+                                                <i class="fa fa-certificate me-1"/>
+                                                Accredited
+                                            </span>
+                                        </div>
+
+                                        <!-- Card Body -->
+                                        <div class="card-body">
+                                            <h5 class="card-title">
+                                                <t t-esc="dept.name"/>
+                                            </h5>
+                                            <h6 class="card-subtitle mb-2 text-muted">
+                                                <t t-esc="dept.code"/>
+                                            </h6>
+
+                                            <!-- HOD Information -->
+                                            <div t-if="dept.hod_id" class="mb-3">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="flex-shrink-0">
+                                                        <i class="fa fa-user-circle text-primary fa-lg"/>
+                                                    </div>
+                                                    <div class="flex-grow-1 ms-2">
+                                                        <small class="text-muted d-block">Head of Department</small>
+                                                        <strong class="small"><t t-esc="dept.hod_id.name"/></strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Department Stats -->
+                                            <div class="department-stats mb-3">
+                                                <div class="row text-center">
+                                                    <div class="col-6 border-end">
+                                                        <div class="py-2">
+                                                            <div class="h5 text-primary mb-0">
+                                                                <t t-esc="dept.total_students"/>
+                                                            </div>
+                                                            <small class="text-muted">Students</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <div class="py-2">
+                                                            <div class="h5 text-success mb-0">
+                                                                <t t-esc="dept.total_faculty"/>
+                                                            </div>
+                                                            <small class="text-muted">Faculty</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row text-center border-top">
+                                                    <div class="col-6 border-end">
+                                                        <div class="py-2">
+                                                            <div class="h5 text-info mb-0">
+                                                                <t t-esc="dept.total_programs"/>
+                                                            </div>
+                                                            <small class="text-muted">Programs</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <div class="py-2">
+                                                            <div class="h5 text-warning mb-0">
+                                                                <t t-esc="dept.total_courses"/>
+                                                            </div>
+                                                            <small class="text-muted">Courses</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Research &amp; Labs -->
+                                            <div t-if="dept.lab_count &gt; 0 or dept.publications_count &gt; 0" class="mb-3">
+                                                <div class="row">
+                                                    <div t-if="dept.lab_count &gt; 0" class="col-6">
+                                                        <small class="text-muted">
+                                                            <i class="fa fa-flask text-danger me-1"/>
+                                                            <t t-esc="dept.lab_count"/> Labs
+                                                        </small>
+                                                    </div>
+                                                    <div t-if="dept.publications_count &gt; 0" class="col-6">
+                                                        <small class="text-muted">
+                                                            <i class="fa fa-file-text-o text-muted me-1"/>
+                                                            <t t-esc="dept.publications_count"/> Publications
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Location -->
+                                            <div t-if="dept.building_name_id" class="mb-2">
+                                                <small class="text-muted">
+                                                    <i class="fa fa-map-marker text-secondary me-1"/>
+                                                    <t t-esc="dept.building_name_id.name"/>
+                                                    <t t-if="dept.floor_id">, <t t-esc="dept.floor_id.name"/></t>
+                                                    <t t-if="dept.room_number_id">, <t t-esc="dept.room_number_id.name"/></t>
+                                                </small>
+                                            </div>
+
+                                            <!-- Contact -->
+                                            <div t-if="dept.email or dept.phone" class="mb-2">
+                                                <div t-if="dept.email">
+                                                    <small class="text-muted">
+                                                        <i class="fa fa-envelope me-1"/>
+                                                        <t t-esc="dept.email"/>
+                                                    </small>
+                                                </div>
+                                                <div t-if="dept.phone">
+                                                    <small class="text-muted">
+                                                        <i class="fa fa-phone me-1"/>
+                                                        <t t-esc="dept.phone"/>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Card Footer -->
+                                        <div class="card-footer bg-transparent border-top-0">
+                                            <div class="d-flex justify-content-between">
+                                                <a t-attf-href="/department/#{dept.id}"
+                                                   class="btn btn-outline-primary">
+                                                    View Details
+                                                </a>
+                                                <a t-attf-href="/programs?search=&amp;department_id=#{dept.id}"
+                                                   class="btn btn-link text-muted">
+                                                    View Programs
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+
+                        <!-- No Departments Message -->
+                        <div t-if="not departments" class="row">
+                            <div class="col-12 text-center py-5">
+                                <i class="fa fa-university fa-4x text-muted mb-3"/>
+                                <h3>No departments found</h3>
+                                <p class="text-muted">
+                                    University departments will be listed here.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom CSS -->
+                <style>
+                    .department-card {
+                        transition: transform 0.3s ease, box-shadow 0.3s ease;
+                    }
+                    .department-card:hover {
+                        transform: translateY(-5px);
+                        box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+                    }
+                    .bg-gradient-primary {
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    }
+                </style>
+            </t>
+        </template>
+
+        <!-- Department Detail Page Template -->
+        <template id="department_detail_page" name="Department Detail">
+            <t t-call="website.layout">
+                <t t-set="title" t-value="department.name + ' Department'"/>
+
+                <div id="wrap" class="oe_structure">
+                    <div class="container mt-4">
+                        <!-- Back Button -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <a href="/departments" class="btn btn-outline-secondary">
+                                    <i class="fa fa-arrow-left me-2"/>Back to Departments
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Department Header -->
+                        <div class="row mb-5">
+                            <div class="col-lg-4">
+                                <!-- Department Image -->
+                                <div class="card border-0 shadow-sm mb-4">
+                                    <div class="card-body p-4 text-center">
+                                        <div t-if="department.image_128" class="mb-4">
+                                            <img t-attf-src="/web/image/university.department/#{department.id}/image_128"
+                                                 class="img-fluid rounded shadow"
+                                                 style="max-height: 300px;"
+                                                 t-att-alt="department.name"/>
+                                        </div>
+                                        <div t-else="" class="mb-4">
+                                            <div class="bg-gradient-primary rounded p-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                                <i class="fa fa-university fa-5x text-white"/>
+                                            </div>
+                                        </div>
+
+                                        <!-- Accreditation Badge -->
+                                        <div t-if="department.is_accredited" class="mb-3">
+                                            <span class="badge bg-success fs-6 p-3">
+                                                <i class="fa fa-certificate me-2"/>
+                                                Accredited Department
+                                            </span>
+                                        </div>
+
+                                        <!-- Quick Stats -->
+                                        <div class="row text-center mt-4">
+                                            <div class="col-6 mb-3">
+                                                <div class="border rounded p-3 bg-light">
+                                                    <h4 class="text-primary mb-0">
+                                                        <t t-esc="department.total_students"/>
+                                                    </h4>
+                                                    <small class="text-muted">Students</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-6 mb-3">
+                                                <div class="border rounded p-3 bg-light">
+                                                    <h4 class="text-success mb-0">
+                                                        <t t-esc="department.total_faculty"/>
+                                                    </h4>
+                                                    <small class="text-muted">Faculty</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="border rounded p-3 bg-light">
+                                                    <h4 class="text-info mb-0">
+                                                        <t t-esc="department.total_programs"/>
+                                                    </h4>
+                                                    <small class="text-muted">Programs</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="border rounded p-3 bg-light">
+                                                    <h4 class="text-warning mb-0">
+                                                        <t t-esc="department.total_courses"/>
+                                                    </h4>
+                                                    <small class="text-muted">Courses</small>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Research Stats -->
+                                        <div t-if="department.lab_count &gt; 0 or department.publications_count &gt; 0"
+                                             class="row text-center mt-3">
+                                            <div t-if="department.lab_count &gt; 0" class="col-6">
+                                                <div class="border rounded p-3 bg-light">
+                                                    <h4 class="text-danger mb-0">
+                                                        <t t-esc="department.lab_count"/>
+                                                    </h4>
+                                                    <small class="text-muted">Labs</small>
+                                                </div>
+                                            </div>
+                                            <div t-if="department.publications_count &gt; 0" class="col-6">
+                                                <div class="border rounded p-3 bg-light">
+                                                    <h4 class="text-secondary mb-0">
+                                                        <t t-esc="department.publications_count"/>
+                                                    </h4>
+                                                    <small class="text-muted">Publications</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-8">
+                                <!-- Department Title -->
+                                <div class="mb-4">
+                                    <h1 class="display-5 mb-2">
+                                        <t t-esc="department.name"/> Department
+                                    </h1>
+                                    <h2 class="text-muted h4 mb-4">
+                                        Department Code: <span class="badge bg-primary fs-6">
+                                            <t t-esc="department.code"/>
+                                        </span>
+                                    </h2>
+
+                                    <!-- HOD Information -->
+                                    <div t-if="department.hod_id" class="card border-0 shadow-sm mb-4">
+                                        <div class="card-body">
+                                            <h5 class="card-title mb-3">
+                                                <i class="fa fa-user-circle text-primary me-2"/>Head of Department
+                                            </h5>
+                                            <div class="d-flex align-items-center">
+                                                <div t-if="department.hod_id.image_128" class="flex-shrink-0 me-3">
+                                                    <img t-attf-src="/web/image/faculty.faculty/#{department.hod_id.id}/image_128"
+                                                         class="rounded-circle"
+                                                         style="width: 80px; height: 80px; object-fit: cover;"
+                                                         t-att-alt="department.hod_id.name"/>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1"><t t-esc="department.hod_id.name"/></h6>
+                                                    <div class="text-muted small mb-2">
+                                                        <t t-esc="department.hod_id.designation_id.name or 'Head of Department'"/>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div t-if="department.hod_id.email" class="col-md-6">
+                                                            <small>
+                                                                <i class="fa fa-envelope text-primary me-1"/>
+                                                                <t t-esc="department.hod_id.email"/>
+                                                            </small>
+                                                        </div>
+                                                        <div t-if="department.hod_id.phone" class="col-md-6">
+                                                            <small>
+                                                                <i class="fa fa-phone text-success me-1"/>
+                                                                <t t-esc="department.hod_id.phone"/>
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                    <div t-if="department.hod_id.specialization" class="mt-2">
+                                                        <span class="badge bg-info">
+                                                            <t t-esc="department.hod_id.specialization"/>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Contact &amp; Location -->
+                                    <div class="row mb-4">
+                                        <div class="col-md-6">
+                                            <div class="card border-0 shadow-sm h-100">
+                                                <div class="card-body">
+                                                    <h6 class="card-title mb-3">
+                                                        <i class="fa fa-address-card text-info me-2"/>Contact Information
+                                                    </h6>
+                                                    <div t-if="department.email">
+                                                        <p class="mb-2">
+                                                            <i class="fa fa-envelope text-primary me-2"/>
+                                                            <strong>Email:</strong><br/>
+                                                            <a t-attf-href="mailto:#{department.email}">
+                                                                <t t-esc="department.email"/>
+                                                            </a>
+                                                        </p>
+                                                    </div>
+                                                    <div t-if="department.phone">
+                                                        <p class="mb-2">
+                                                            <i class="fa fa-phone text-success me-2"/>
+                                                            <strong>Phone:</strong><br/>
+                                                            <t t-esc="department.phone"/>
+                                                        </p>
+                                                    </div>
+                                                    <div t-if="department.website">
+                                                        <p class="mb-0">
+                                                            <i class="fa fa-globe text-warning me-2"/>
+                                                            <strong>Website:</strong><br/>
+                                                            <a t-attf-href="#{department.website}" target="_blank">
+                                                                <t t-esc="department.website"/>
+                                                            </a>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="card border-0 shadow-sm h-100">
+                                                <div class="card-body">
+                                                    <h6 class="card-title mb-3">
+                                                        <i class="fa fa-map-marker-alt text-danger me-2"/>Location
+                                                    </h6>
+                                                    <div t-if="department.building_name_id">
+                                                        <p class="mb-1">
+                                                            <strong>Building:</strong>
+                                                            <t t-esc="department.building_name_id.name"/>
+                                                        </p>
+                                                    </div>
+                                                    <div t-if="department.floor_id">
+                                                        <p class="mb-1">
+                                                            <strong>Floor:</strong>
+                                                            <t t-esc="department.floor_id.name"/>
+                                                        </p>
+                                                    </div>
+                                                    <div t-if="department.room_number_id">
+                                                        <p class="mb-0">
+                                                            <strong>Room:</strong>
+                                                            <t t-esc="department.room_number_id.name"/>
+                                                        </p>
+                                                    </div>
+                                                    <div t-if="not department.building_name_id and not department.floor_id and not department.room_number_id">
+                                                        <p class="text-muted mb-0">
+                                                            <i>Location information not available</i>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Department Description -->
+                        <div t-if="department.description" class="row mb-5">
+                            <div class="col-12">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body p-5">
+                                        <h3 class="card-title mb-4">
+                                            <i class="fa fa-info-circle text-primary me-2"/>About the Department
+                                        </h3>
+                                        <div class="department-description">
+                                            <t t-raw="department.description"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Vision &amp; Mission -->
+                        <div t-if="department.vision or department.mission" class="row mb-5">
+                            <div t-if="department.vision" class="col-md-6 mb-4">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body">
+                                        <h4 class="card-title mb-3">
+                                            <i class="fa fa-eye text-success me-2"/>Vision
+                                        </h4>
+                                        <div class="vision-content">
+                                            <p class="mb-0" style="white-space: pre-line;">
+                                                <t t-esc="department.vision"/>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div t-if="department.mission" class="col-md-6 mb-4">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body">
+                                        <h4 class="card-title mb-3">
+                                            <i class="fa fa-bullseye text-info me-2"/>Mission
+                                        </h4>
+                                        <div class="mission-content">
+                                            <p class="mb-0" style="white-space: pre-line;">
+                                                <t t-esc="department.mission"/>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Related Content Tabs -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-header bg-white border-0 p-0">
+                                        <ul class="nav nav-tabs nav-fill" id="departmentTabs" role="tablist">
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link active" id="programs-tab" data-bs-toggle="tab" data-bs-target="#programs" type="button" role="tab">
+                                                    <i class="fa fa-graduation-cap me-2"/>Programs
+                                                    <span class="badge bg-primary ms-2">
+                                                        <t t-esc="department.total_programs"/>
+                                                    </span>
+                                                </button>
+                                            </li>
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link" id="faculty-tab" data-bs-toggle="tab" data-bs-target="#faculty" type="button" role="tab">
+                                                    <i class="fa fa-users me-2"/>Faculty
+                                                    <span class="badge bg-success ms-2">
+                                                        <t t-esc="department.total_faculty"/>
+                                                    </span>
+                                                </button>
+                                            </li>
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link" id="courses-tab" data-bs-toggle="tab" data-bs-target="#courses" type="button" role="tab">
+                                                    <i class="fa fa-book me-2"/>Courses
+                                                    <span class="badge bg-info ms-2">
+                                                        <t t-esc="department.total_courses"/>
+                                                    </span>
+                                                </button>
+                                            </li>
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link" id="research-tab" data-bs-toggle="tab" data-bs-target="#research" type="button" role="tab">
+                                                    <i class="fa fa-flask me-2"/>Research &amp; Labs
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="tab-content" id="departmentTabContent">
+                                            <!-- Programs Tab -->
+                                            <div class="tab-pane fade show active" id="programs" role="tabpanel">
+                                                <div t-if="department.program_ids" class="row">
+                                                    <t t-foreach="department.program_ids" t-as="program">
+                                                        <div class="col-md-6 col-lg-4 mb-3">
+                                                            <div class="card h-100">
+                                                                <div class="card-body">
+                                                                    <h5 class="card-title">
+                                                                        <t t-esc="program.name"/>
+                                                                    </h5>
+                                                                    <h6 class="card-subtitle mb-2 text-muted">
+                                                                        <t t-esc="program.code"/>
+                                                                    </h6>
+                                                                    <div class="mb-3">
+                                                                        <span class="badge bg-warning text-dark me-2">
+                                                                            <t t-esc="program.duration_years"/> Years
+                                                                        </span>
+                                                                        <span class="badge bg-info text-dark">
+                                                                            <t t-esc="program.total_semesters"/> Semesters
+                                                                        </span>
+                                                                    </div>
+                                                                    <div class="text-muted small mb-3">
+                                                                        <i class="fa fa-user-graduate me-1"/>
+                                                                        <t t-esc="program.total_students"/> Students
+                                                                    </div>
+                                                                    <a t-attf-href="/program/#{program.id}" class="btn btn-sm btn-outline-primary">
+                                                                        View Program Details
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </t>
+                                                </div>
+                                                <div t-else="" class="text-center py-4">
+                                                    <i class="fa fa-graduation-cap fa-3x text-muted mb-3"/>
+                                                    <p class="text-muted">No programs available for this department</p>
+                                                </div>
+                                            </div>
+
+                                            <!-- Faculty Tab -->
+                                            <div class="tab-pane fade" id="faculty" role="tabpanel">
+                                                <div t-if="department.faculty_ids" class="row">
+                                                    <t t-foreach="department.faculty_ids" t-as="faculty">
+                                                        <div class="col-md-6 col-lg-4 mb-3">
+                                                            <div class="card h-100">
+                                                                <div class="card-body">
+                                                                    <div class="d-flex align-items-start">
+                                                                        <div t-if="faculty.image_128" class="flex-shrink-0 me-3">
+                                                                            <img t-attf-src="/web/image/faculty.faculty/#{faculty.id}/image_128"
+                                                                                 class="rounded-circle"
+                                                                                 style="width: 60px; height: 60px; object-fit: cover;"
+                                                                                 t-att-alt="faculty.name"/>
+                                                                        </div>
+                                                                        <div class="flex-grow-1">
+                                                                            <h6 class="card-title mb-1">
+                                                                                <t t-esc="faculty.name"/>
+                                                                            </h6>
+                                                                            <div class="text-muted small mb-2">
+                                                                                <t t-esc="faculty.designation_id.name or 'Faculty Member'"/>
+                                                                            </div>
+                                                                            <div class="mb-2">
+                                                                                <t t-if="faculty.specialization">
+                                                                                    <span class="badge bg-info">
+                                                                                        <t t-esc="faculty.specialization"/>
+                                                                                    </span>
+                                                                                </t>
+                                                                            </div>
+                                                                            <div class="contact-info">
+                                                                                <div t-if="faculty.email" class="small">
+                                                                                    <i class="fa fa-envelope text-primary me-1"/>
+                                                                                    <t t-esc="faculty.email"/>
+                                                                                </div>
+                                                                                <div t-if="faculty.phone" class="small">
+                                                                                    <i class="fa fa-phone text-success me-1"/>
+                                                                                    <t t-esc="faculty.phone"/>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </t>
+                                                </div>
+                                                <div t-else="" class="text-center py-4">
+                                                    <i class="fa fa-users fa-3x text-muted mb-3"/>
+                                                    <p class="text-muted">No faculty members available for this department</p>
+                                                </div>
+                                            </div>
+
+                                            <!-- Courses Tab -->
+                                            <div class="tab-pane fade" id="courses" role="tabpanel">
+                                                <div t-if="department.course_ids" class="table-responsive">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Course Code</th>
+                                                                <th>Course Name</th>
+                                                                <th>Semester</th>
+                                                                <th>Credits</th>
+                                                                <th>Faculty</th>
+                                                                <th>Type</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <t t-foreach="department.course_ids[:15]" t-as="course">
+                                                                <tr>
+                                                                    <td>
+                                                                        <strong><t t-esc="course.code"/></strong>
+                                                                    </td>
+                                                                    <td><t t-esc="course.name"/></td>
+                                                                    <td>
+                                                                        <span class="badge bg-primary">
+                                                                            <t t-esc="course.semester_id.name or 'N/A'"/>
+                                                                        </span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span class="badge bg-info">
+                                                                            <t t-esc="course.credits"/> Credits
+                                                                        </span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <t t-esc="course.faculty_id.name or 'TBA'"/>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span t-att-class="'badge bg-' + ('success' if course.course_type == 'core' else 'warning' if course.course_type == 'elective' else 'secondary')">
+                                                                            <t t-esc="course.course_type"/>
+                                                                        </span>
+                                                                    </td>
+                                                                </tr>
+                                                            </t>
+                                                        </tbody>
+                                                    </table>
+                                                    <div t-if="len(department.course_ids) &gt; 15" class="text-center mt-3">
+                                                        <a t-attf-href="/courses?department_id=#{department.id}" class="btn btn-link">
+                                                            View All <t t-esc="len(department.course_ids)"/> Courses
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div t-else="" class="text-center py-4">
+                                                    <i class="fa fa-book fa-3x text-muted mb-3"/>
+                                                    <p class="text-muted">No courses available for this department</p>
+                                                </div>
+                                            </div>
+
+                                            <!-- Research &amp; Labs Tab -->
+                                            <div class="tab-pane fade" id="research" role="tabpanel">
+                                                <div class="row">
+                                                    <!-- Labs Section -->
+                                                    <div t-if="department.lab_count &gt; 0 or department.lab_details" class="col-md-6 mb-4">
+                                                        <div class="card h-100">
+                                                            <div class="card-body">
+                                                                <h5 class="card-title mb-3">
+                                                                    <i class="fa fa-flask text-danger me-2"/>Laboratory Facilities
+                                                                </h5>
+                                                                <div t-if="department.lab_count &gt; 0" class="mb-3">
+                                                                    <div class="display-6 text-danger">
+                                                                        <t t-esc="department.lab_count"/>
+                                                                    </div>
+                                                                    <p class="text-muted">Modern Laboratories</p>
+                                                                </div>
+                                                                <div t-if="department.lab_details">
+                                                                    <h6 class="mb-2">Lab Details:</h6>
+                                                                    <div class="border rounded p-3 bg-light">
+                                                                        <p style="white-space: pre-line;" class="mb-0">
+                                                                            <t t-esc="department.lab_details"/>
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Research Section -->
+                                                    <div t-if="department.research_areas or department.publications_count &gt; 0" class="col-md-6 mb-4">
+                                                        <div class="card h-100">
+                                                            <div class="card-body">
+                                                                <h5 class="card-title mb-3">
+                                                                    <i class="fa fa-search text-info me-2"/>Research Activities
+                                                                </h5>
+                                                                <div t-if="department.publications_count &gt; 0" class="mb-3">
+                                                                    <div class="display-6 text-info">
+                                                                        <t t-esc="department.publications_count"/>
+                                                                    </div>
+                                                                    <p class="text-muted">Research Publications</p>
+                                                                </div>
+                                                                <div t-if="department.research_areas">
+                                                                    <h6 class="mb-2">Research Areas:</h6>
+                                                                    <div class="border rounded p-3 bg-light">
+                                                                        <p style="white-space: pre-line;" class="mb-0">
+                                                                            <t t-esc="department.research_areas"/>
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Accreditation Section -->
+                                                    <div t-if="department.is_accredited and department.accreditation_details" class="col-12">
+                                                        <div class="card">
+                                                            <div class="card-body">
+                                                                <h5 class="card-title mb-3">
+                                                                    <i class="fa fa-certificate text-success me-2"/>Accreditation
+                                                                </h5>
+                                                                <div class="border rounded p-3 bg-light">
+                                                                    <p style="white-space: pre-line;" class="mb-0">
+                                                                        <t t-esc="department.accreditation_details"/>
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom CSS -->
+                <style>
+                    .nav-tabs .nav-link {
+                        color: #495057;
+                        font-weight: 500;
+                        border: none;
+                        border-bottom: 3px solid transparent;
+                    }
+                    .nav-tabs .nav-link.active {
+                        color: #0d6efd;
+                        border-bottom: 3px solid #0d6efd;
+                        background-color: transparent;
+                    }
+                    .tab-content {
+                        padding-top: 20px;
+                    }
+                    .bg-gradient-primary {
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    }
+                    .vision-content, .mission-content {
+                        line-height: 1.8;
+                    }
+                    .department-description img {
+                        max-width: 100%;
+                        height: auto;
+                        border-radius: 0.375rem;
+                    }
+                </style>
+
+                <!-- Simple JavaScript for tabs -->
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // Simple tab switching
+                        const tabButtons = document.querySelectorAll('#departmentTabs button[data-bs-toggle="tab"]');
+                        const tabContents = document.querySelectorAll('.tab-pane');
+
+                        tabButtons.forEach(button => {
+                            button.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                const targetId = this.getAttribute('data-bs-target').substring(1);
+
+                                // Remove active class from all buttons and contents
+                                tabButtons.forEach(btn => btn.classList.remove('active'));
+                                tabContents.forEach(content => content.classList.remove('show', 'active'));
+
+                                // Add active class to clicked button and target content
+                                this.classList.add('active');
+                                document.getElementById(targetId).classList.add('show', 'active');
+                            });
+                        });
+                    });
+                </script>
+            </t>
+        </template>
+
+    </data>
+</odoo>

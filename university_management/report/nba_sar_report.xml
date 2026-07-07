@@ -1,0 +1,603 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         Report Action
+    ══════════════════════════════════════════════════════════════ -->
+    <record id="action_report_nba_sar" model="ir.actions.report">
+        <field name="name">NBA SAR Report</field>
+        <field name="model">nba.sar</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">university_management.report_nba_sar_document</field>
+        <field name="report_file">university_management.report_nba_sar_document</field>
+        <field name="print_report_name">'NBA_SAR_' + (object.program_id.name or '') + '_' + (object.accreditation_cycle or '')</field>
+        <field name="binding_model_id" ref="model_nba_sar"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         QWeb Template
+    ══════════════════════════════════════════════════════════════ -->
+    <template id="report_nba_sar_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page" style="font-family: Arial, sans-serif; font-size: 11px;">
+
+                        <!-- ── Cover Page ── -->
+                        <div style="text-align:center; margin-bottom:40px; page-break-after:always;">
+                            <h1 style="color:#003366; font-size:18px; margin-top:60px;">NATIONAL BOARD OF ACCREDITATION</h1>
+                            <h2 style="font-size:15px; margin-top:20px;">Self-Assessment Report (SAR)</h2>
+                            <h3 style="font-size:13px;">Undergraduate Engineering Programs</h3>
+                            <h3 style="font-size:13px;">Graduate Attributes and Professional Competencies<br/>Version 4.0 (GAPC V4.0) — TIER-I Institutions</h3>
+                            <hr style="margin:30px 80px;"/>
+                            <table style="margin:0 auto; width:60%; border-collapse:collapse;">
+                                <tr><td style="padding:6px; font-weight:bold;">Institution:</td>
+                                    <td style="padding:6px;"><t t-esc="o.department_id.name or ''"/></td></tr>
+                                <tr><td style="padding:6px; font-weight:bold;">Program:</td>
+                                    <td style="padding:6px;"><t t-esc="o.program_id.name or ''"/></td></tr>
+                                <tr><td style="padding:6px; font-weight:bold;">Department:</td>
+                                    <td style="padding:6px;"><t t-esc="o.department_id.name or ''"/></td></tr>
+                                <tr><td style="padding:6px; font-weight:bold;">Assessment Cycle:</td>
+                                    <td style="padding:6px;"><t t-esc="o.accreditation_cycle or ''"/></td></tr>
+                                <tr><td style="padding:6px; font-weight:bold;">CAY:</td>
+                                    <td style="padding:6px;"><t t-esc="o.academic_year_id.name or ''"/></td></tr>
+                                <tr><td style="padding:6px; font-weight:bold;">SAR Reference:</td>
+                                    <td style="padding:6px;"><t t-esc="o.name"/></td></tr>
+                            </table>
+                        </div>
+
+                        <!-- ── PART B: Criteria Summary ── -->
+                        <h2 style="color:#003366;">PART B: Criteria Summary</h2>
+                        <p><strong>Program:</strong> <t t-esc="o.program_id.name or ''"/></p>
+                        <table style="width:100%; border-collapse:collapse; margin-bottom:20px;">
+                            <thead>
+                                <tr style="background:#003366; color:white;">
+                                    <th style="padding:6px; border:1px solid #ccc;">Criterion No.</th>
+                                    <th style="padding:6px; border:1px solid #ccc;">Name</th>
+                                    <th style="padding:6px; border:1px solid #ccc;">Level</th>
+                                    <th style="padding:6px; border:1px solid #ccc;">Max Marks</th>
+                                    <th style="padding:6px; border:1px solid #ccc;">Score</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td style="padding:5px; border:1px solid #ccc;">C1</td><td style="padding:5px; border:1px solid #ccc;">Outcome-Based Curriculum</td><td style="padding:5px; border:1px solid #ccc;">Program</td><td style="padding:5px; border:1px solid #ccc; text-align:center;">120</td><td style="padding:5px; border:1px solid #ccc; text-align:center;"><t t-esc="'%.1f' % o.c1_score"/></td></tr>
+                                <tr><td style="padding:5px; border:1px solid #ccc;">C2</td><td style="padding:5px; border:1px solid #ccc;">Outcome-Based Teaching-Learning</td><td style="padding:5px; border:1px solid #ccc;">Program</td><td style="padding:5px; border:1px solid #ccc; text-align:center;">120</td><td style="padding:5px; border:1px solid #ccc; text-align:center;"><t t-esc="'%.1f' % o.c2_score"/></td></tr>
+                                <tr><td style="padding:5px; border:1px solid #ccc;">C3</td><td style="padding:5px; border:1px solid #ccc;">Outcome-Based Assessment</td><td style="padding:5px; border:1px solid #ccc;">Program</td><td style="padding:5px; border:1px solid #ccc; text-align:center;">120</td><td style="padding:5px; border:1px solid #ccc; text-align:center;"><t t-esc="'%.1f' % o.c3_score"/></td></tr>
+                                <tr><td style="padding:5px; border:1px solid #ccc;">C4</td><td style="padding:5px; border:1px solid #ccc;">Students' Performance</td><td style="padding:5px; border:1px solid #ccc;">Program</td><td style="padding:5px; border:1px solid #ccc; text-align:center;">120</td><td style="padding:5px; border:1px solid #ccc; text-align:center;"><t t-esc="'%.1f' % o.c4_score"/></td></tr>
+                                <tr><td style="padding:5px; border:1px solid #ccc;">C5</td><td style="padding:5px; border:1px solid #ccc;">Faculty Information</td><td style="padding:5px; border:1px solid #ccc;">Program</td><td style="padding:5px; border:1px solid #ccc; text-align:center;">100</td><td style="padding:5px; border:1px solid #ccc; text-align:center;"><t t-esc="'%.1f' % o.c5_score"/></td></tr>
+                                <tr><td style="padding:5px; border:1px solid #ccc;">C6</td><td style="padding:5px; border:1px solid #ccc;">Faculty Contributions</td><td style="padding:5px; border:1px solid #ccc;">Program</td><td style="padding:5px; border:1px solid #ccc; text-align:center;">120</td><td style="padding:5px; border:1px solid #ccc; text-align:center;"><t t-esc="'%.1f' % o.c6_score"/></td></tr>
+                                <tr><td style="padding:5px; border:1px solid #ccc;">C7</td><td style="padding:5px; border:1px solid #ccc;">Facilities &amp; Technical Support</td><td style="padding:5px; border:1px solid #ccc;">Program</td><td style="padding:5px; border:1px solid #ccc; text-align:center;">100</td><td style="padding:5px; border:1px solid #ccc; text-align:center;"><t t-esc="'%.1f' % o.c7_score"/></td></tr>
+                                <tr><td style="padding:5px; border:1px solid #ccc;">C8</td><td style="padding:5px; border:1px solid #ccc;">Continuous Improvement</td><td style="padding:5px; border:1px solid #ccc;">Program</td><td style="padding:5px; border:1px solid #ccc; text-align:center;">80</td><td style="padding:5px; border:1px solid #ccc; text-align:center;"><t t-esc="'%.1f' % o.c8_score"/></td></tr>
+                                <tr><td style="padding:5px; border:1px solid #ccc;">C9</td><td style="padding:5px; border:1px solid #ccc;">Student Support &amp; Governance</td><td style="padding:5px; border:1px solid #ccc;">Institute</td><td style="padding:5px; border:1px solid #ccc; text-align:center;">120</td><td style="padding:5px; border:1px solid #ccc; text-align:center;"><t t-esc="'%.1f' % o.c9_score"/></td></tr>
+                                <tr style="font-weight:bold; background:#f5f5f5;">
+                                    <td colspan="3" style="padding:5px; border:1px solid #ccc; text-align:right;">TOTAL</td>
+                                    <td style="padding:5px; border:1px solid #ccc; text-align:center;">1000</td>
+                                    <td style="padding:5px; border:1px solid #ccc; text-align:center;"><t t-esc="'%.1f' % o.total_score"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- ── C1 PEOs ── -->
+                        <h2 style="color:#003366; page-break-before:always;">Criterion 1: Outcome-Based Curriculum</h2>
+                        <h3>1.1 Program Educational Objectives (PEOs)</h3>
+                        <table style="width:100%; border-collapse:collapse; margin-bottom:15px;">
+                            <thead>
+                                <tr style="background:#003366; color:white;">
+                                    <th style="padding:5px; border:1px solid #ccc;">PEO</th>
+                                    <th style="padding:5px; border:1px solid #ccc;">Statement</th>
+                                    <th style="padding:5px; border:1px solid #ccc;">M1</th>
+                                    <th style="padding:5px; border:1px solid #ccc;">M2</th>
+                                    <th style="padding:5px; border:1px solid #ccc;">M3</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="o.peo_ids" t-as="peo">
+                                    <tr>
+                                        <td style="padding:4px; border:1px solid #ccc;"><t t-esc="peo.name"/></td>
+                                        <td style="padding:4px; border:1px solid #ccc;"><t t-esc="peo.statement or ''"/></td>
+                                        <td style="padding:4px; border:1px solid #ccc; text-align:center;"><t t-esc="peo.m1_corr or '-'"/></td>
+                                        <td style="padding:4px; border:1px solid #ccc; text-align:center;"><t t-esc="peo.m2_corr or '-'"/></td>
+                                        <td style="padding:4px; border:1px solid #ccc; text-align:center;"><t t-esc="peo.m3_corr or '-'"/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <!-- ── C1 Course Outcomes ── -->
+                        <h3>1.4 Course Outcomes</h3>
+                        <t t-foreach="o.co_ids.mapped('course_id')" t-as="course">
+                            <h4 style="margin-top:10px;"><t t-esc="course.code"/> – <t t-esc="course.name"/></h4>
+                            <table style="width:100%; border-collapse:collapse; margin-bottom:10px; font-size:10px;">
+                                <thead>
+                                    <tr style="background:#e8f0fe;">
+                                        <th style="padding:4px; border:1px solid #ccc;">CO</th>
+                                        <th style="padding:4px; border:1px solid #ccc;">Statement</th>
+                                        <th style="padding:4px; border:1px solid #ccc;">Bloom Level</th>
+                                        <th style="padding:4px; border:1px solid #ccc;">Target %</th>
+                                        <th style="padding:4px; border:1px solid #ccc;">Attainment</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="o.co_ids.filtered(lambda c: c.course_id.id == course.id)" t-as="co">
+                                        <tr>
+                                            <td style="padding:3px; border:1px solid #ccc;"><t t-esc="co.name"/></td>
+                                            <td style="padding:3px; border:1px solid #ccc;"><t t-esc="co.statement or ''"/></td>
+                                            <td style="padding:3px; border:1px solid #ccc; text-align:center;"><t t-esc="co.bloom_level or ''"/></td>
+                                            <td style="padding:3px; border:1px solid #ccc; text-align:center;"><t t-esc="'%.1f' % co.target_level"/></td>
+                                            <td style="padding:3px; border:1px solid #ccc; text-align:center;"><t t-esc="'%.1f' % co.attainment_overall"/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+
+                        <!-- ── C4 Student Data ── -->
+                        <h2 style="color:#003366; page-break-before:always;">Criterion 4: Students' Performance</h2>
+                        <h3>Table 4A – Admission Details</h3>
+                        <table style="width:100%; border-collapse:collapse; font-size:10px; margin-bottom:15px;">
+                            <thead>
+                                <tr style="background:#003366; color:white;">
+                                    <th style="padding:4px; border:1px solid #ccc;">Item</th>
+                                    <t t-foreach="o.c4_student_ids" t-as="yr">
+                                        <th style="padding:4px; border:1px solid #ccc; text-align:center;"><t t-esc="yr.year_label"/></th>
+                                    </t>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td style="padding:4px; border:1px solid #ccc; font-weight:bold;">N (Sanctioned Intake)</td>
+                                    <t t-foreach="o.c4_student_ids" t-as="yr"><td style="padding:4px; border:1px solid #ccc; text-align:center;"><t t-esc="yr.n_sanctioned"/></td></t></tr>
+                                <tr><td style="padding:4px; border:1px solid #ccc; font-weight:bold;">N1 (1st Year)</td>
+                                    <t t-foreach="o.c4_student_ids" t-as="yr"><td style="padding:4px; border:1px solid #ccc; text-align:center;"><t t-esc="yr.n1_first_year"/></td></t></tr>
+                                <tr><td style="padding:4px; border:1px solid #ccc; font-weight:bold;">N2 (Lateral)</td>
+                                    <t t-foreach="o.c4_student_ids" t-as="yr"><td style="padding:4px; border:1px solid #ccc; text-align:center;"><t t-esc="yr.n2_lateral"/></td></t></tr>
+                                <tr><td style="padding:4px; border:1px solid #ccc; font-weight:bold;">Total Admitted</td>
+                                    <t t-foreach="o.c4_student_ids" t-as="yr"><td style="padding:4px; border:1px solid #ccc; text-align:center;"><t t-esc="yr.total_admitted"/></td></t></tr>
+                                <tr><td style="padding:4px; border:1px solid #ccc; font-weight:bold;">Enrolment Ratio (ER)</td>
+                                    <t t-foreach="o.c4_student_ids" t-as="yr"><td style="padding:4px; border:1px solid #ccc; text-align:center;"><t t-esc="'%.2f' % yr.enrolment_ratio"/></td></t></tr>
+                                <tr><td style="padding:4px; border:1px solid #ccc; font-weight:bold;">Success Rate (%)</td>
+                                    <t t-foreach="o.c4_student_ids" t-as="yr"><td style="padding:4px; border:1px solid #ccc; text-align:center;"><t t-esc="'%.1f' % yr.success_rate"/></td></t></tr>
+                                <tr><td style="padding:4px; border:1px solid #ccc; font-weight:bold;">Placement Index (%)</td>
+                                    <t t-foreach="o.c4_student_ids" t-as="yr"><td style="padding:4px; border:1px solid #ccc; text-align:center;"><t t-esc="'%.1f' % yr.placement_index"/></td></t></tr>
+                            </tbody>
+                        </table>
+
+                        <!-- ── C5 Faculty Data ── -->
+                        <h2 style="color:#003366;">Criterion 5: Faculty Information</h2>
+                        <table style="width:100%; border-collapse:collapse; font-size:10px; margin-bottom:15px;">
+                            <thead>
+                                <tr style="background:#003366; color:white;">
+                                    <th style="padding:4px; border:1px solid #ccc;">Item</th>
+                                    <t t-foreach="o.c5_faculty_ids" t-as="yr">
+                                        <th style="padding:4px; border:1px solid #ccc; text-align:center;"><t t-esc="yr.year_label"/></th>
+                                    </t>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td style="padding:4px; border:1px solid #ccc; font-weight:bold;">Total Students (S)</td>
+                                    <t t-foreach="o.c5_faculty_ids" t-as="yr"><td style="padding:4px; border:1px solid #ccc; text-align:center;"><t t-esc="yr.s_total"/></td></t></tr>
+                                <tr><td style="padding:4px; border:1px solid #ccc; font-weight:bold;">Effective Faculty (TF)</td>
+                                    <t t-foreach="o.c5_faculty_ids" t-as="yr"><td style="padding:4px; border:1px solid #ccc; text-align:center;"><t t-esc="yr.tf_effective"/></td></t></tr>
+                                <tr><td style="padding:4px; border:1px solid #ccc; font-weight:bold;">SFR</td>
+                                    <t t-foreach="o.c5_faculty_ids" t-as="yr"><td style="padding:4px; border:1px solid #ccc; text-align:center;"><t t-esc="'%.2f' % yr.sfr_value"/></td></t></tr>
+                                <tr><td style="padding:4px; border:1px solid #ccc; font-weight:bold;">SFR Marks /30</td>
+                                    <t t-foreach="o.c5_faculty_ids" t-as="yr"><td style="padding:4px; border:1px solid #ccc; text-align:center;"><t t-esc="yr.sfr_marks"/></td></t></tr>
+                                <tr><td style="padding:4px; border:1px solid #ccc; font-weight:bold;">FQI Score /25</td>
+                                    <t t-foreach="o.c5_faculty_ids" t-as="yr"><td style="padding:4px; border:1px solid #ccc; text-align:center;"><t t-esc="'%.2f' % yr.fqi_score"/></td></t></tr>
+                                <tr><td style="padding:4px; border:1px solid #ccc; font-weight:bold;">Cadre Marks /25</td>
+                                    <t t-foreach="o.c5_faculty_ids" t-as="yr"><td style="padding:4px; border:1px solid #ccc; text-align:center;"><t t-esc="'%.2f' % yr.cadre_marks"/></td></t></tr>
+                                <tr><td style="padding:4px; border:1px solid #ccc; font-weight:bold;">Retention Marks /10</td>
+                                    <t t-foreach="o.c5_faculty_ids" t-as="yr"><td style="padding:4px; border:1px solid #ccc; text-align:center;"><t t-esc="'%.2f' % yr.retention_marks"/></td></t></tr>
+                            </tbody>
+                        </table>
+
+                        <!-- ── C2 Teaching-Learning ── -->
+                        <h2 style="color:#003366; page-break-before:always;">Criterion 2: Outcome-Based Teaching-Learning (120)</h2>
+                        <h3>2.1 Quality of Teaching &amp; Learning (20)</h3>
+                        <t t-if="o.c2_teaching_quality">
+                            <div t-out="o.c2_teaching_quality" style="margin-bottom:10px;"/>
+                        </t>
+                        <t t-else=""><p style="color:#999;font-style:italic;">Not yet filled.</p></t>
+
+                        <h3>2.2 Quality of Capstone Project (25)</h3>
+                        <t t-if="o.c2_capstone_quality"><div t-out="o.c2_capstone_quality" style="margin-bottom:10px;"/></t>
+                        <t t-else=""><p style="color:#999;font-style:italic;">Not yet filled.</p></t>
+
+                        <h3>2.3 Internship / Industrial Training (10)</h3>
+                        <t t-if="o.c2_internship_summary"><div t-out="o.c2_internship_summary" style="margin-bottom:10px;"/></t>
+                        <t t-else=""><p style="color:#999;font-style:italic;">Not yet filled.</p></t>
+
+                        <h3>2.4 Seminars &amp; Mini/Micro Projects (10)</h3>
+                        <t t-if="o.c2_seminar_projects"><div t-out="o.c2_seminar_projects" style="margin-bottom:10px;"/></t>
+                        <t t-else=""><p style="color:#999;font-style:italic;">Not yet filled.</p></t>
+
+                        <h3>2.5 Case Studies &amp; Real-Life Examples (10)</h3>
+                        <t t-if="o.c2_case_studies"><div t-out="o.c2_case_studies" style="margin-bottom:10px;"/></t>
+                        <t t-else=""><p style="color:#999;font-style:italic;">Not yet filled.</p></t>
+
+                        <h3>2.6 SWAYAM / NPTEL / MOOC / Self Learning (10)</h3>
+                        <t t-if="o.c2_mooc_summary"><div t-out="o.c2_mooc_summary" style="margin-bottom:10px;"/></t>
+                        <t t-else=""><p style="color:#999;font-style:italic;">Not yet filled.</p></t>
+
+                        <h3>2.7 Complex Engineering Problems Incorporating Sustainability Goals (20)</h3>
+                        <t t-if="o.c2_sdg_activities"><div t-out="o.c2_sdg_activities" style="margin-bottom:10px;"/></t>
+                        <t t-else=""><p style="color:#999;font-style:italic;">Not yet filled.</p></t>
+
+                        <h3>2.8 Industry-Institute Partnerships (15)</h3>
+                        <t t-if="o.c2_industry_partnerships"><div t-out="o.c2_industry_partnerships" style="margin-bottom:10px;"/></t>
+                        <t t-else=""><p style="color:#999;font-style:italic;">Not yet filled.</p></t>
+
+                        <!-- ── C3 Assessment ── -->
+                        <h2 style="color:#003366; page-break-before:always;">Criterion 3: Outcome-Based Assessment (120)</h2>
+                        <h3>3.1–3.6 Assessment Tools, Rubrics &amp; SDG Evidence</h3>
+                        <t t-if="o.c3_assessment_tools"><div t-out="o.c3_assessment_tools" style="margin-bottom:10px;"/></t>
+                        <t t-else=""><p style="color:#999;font-style:italic;">Not yet filled.</p></t>
+
+                        <h3>Table 3.8.1: PO Attainment — Direct Assessment</h3>
+                        <t t-if="o.co_ids">
+                            <table style="width:100%; border-collapse:collapse; font-size:9px; margin-bottom:12px;">
+                                <thead>
+                                    <tr style="background:#003366; color:white;">
+                                        <th style="padding:3px; border:1px solid #ccc;">Course</th>
+                                        <th style="padding:3px; border:1px solid #ccc;">PO1</th><th style="padding:3px; border:1px solid #ccc;">PO2</th>
+                                        <th style="padding:3px; border:1px solid #ccc;">PO3</th><th style="padding:3px; border:1px solid #ccc;">PO4</th>
+                                        <th style="padding:3px; border:1px solid #ccc;">PO5</th><th style="padding:3px; border:1px solid #ccc;">PO6</th>
+                                        <th style="padding:3px; border:1px solid #ccc;">PO7</th><th style="padding:3px; border:1px solid #ccc;">PO8</th>
+                                        <th style="padding:3px; border:1px solid #ccc;">PO9</th><th style="padding:3px; border:1px solid #ccc;">PO10</th>
+                                        <th style="padding:3px; border:1px solid #ccc;">PO11</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="o.co_ids.mapped('course_id')" t-as="course">
+                                        <t t-set="course_cos" t-value="o.co_ids.filtered(lambda c: c.course_id.id == course.id)"/>
+                                        <t t-foreach="[1,2,3,4,5,6,7,8,9,10,11]" t-as="po_n">
+                                            <t t-set="po_key" t-value="'po%d' % po_n"/>
+                                        </t>
+                                        <tr>
+                                            <td style="padding:3px; border:1px solid #ccc; font-size:9px;"><t t-esc="course.code"/></td>
+                                            <t t-foreach="[1,2,3,4,5,6,7,8,9,10,11]" t-as="idx">
+                                                <td style="padding:3px; border:1px solid #ccc; text-align:center; font-size:9px;">
+                                                    <t t-esc="'%.1f' % (sum(c.attainment_overall for c in course_cos) / len(course_cos) if course_cos else 0)"/>
+                                                </td>
+                                            </t>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+
+                        <h3>Table 3.8.2: PO Attainment — Indirect Assessment</h3>
+                        <t t-if="o.c3_indirect_attainment"><div t-out="o.c3_indirect_attainment" style="margin-bottom:10px;"/></t>
+                        <t t-else=""><p style="color:#999;font-style:italic;">Survey data not yet entered.</p></t>
+
+                        <!-- ── C6 Faculty Contributions ── -->
+                        <h2 style="color:#003366; page-break-before:always;">Criterion 6: Faculty Contributions (120)</h2>
+
+                        <h3>6.1.1 Professional Society Memberships (5)</h3>
+                        <t t-set="prof_soc" t-value="o.research_ids.filtered(lambda r: r.research_type == 'prof_society')"/>
+                        <t t-if="prof_soc">
+                            <table style="width:100%; border-collapse:collapse; font-size:10px; margin-bottom:12px;">
+                                <thead><tr style="background:#e8f0fe;">
+                                    <th style="padding:4px; border:1px solid #ccc;">Faculty</th>
+                                    <th style="padding:4px; border:1px solid #ccc;">Society / Body</th>
+                                    <th style="padding:4px; border:1px solid #ccc;">Title / Description</th>
+                                </tr></thead>
+                                <tbody>
+                                    <t t-foreach="prof_soc" t-as="r">
+                                        <tr><td style="padding:3px; border:1px solid #ccc;"><t t-esc="r.faculty_id.name"/></td>
+                                            <td style="padding:3px; border:1px solid #ccc;"><t t-esc="r.publisher_journal or ''"/></td>
+                                            <td style="padding:3px; border:1px solid #ccc;"><t t-esc="r.title"/></td></tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+
+                        <h3>6.1.2 FDP / STTP Participation &amp; Resource Persons (10)</h3>
+                        <t t-set="fdp_recs" t-value="o.research_ids.filtered(lambda r: r.research_type in ['fdp_attended','fdp_organized'])"/>
+                        <t t-if="fdp_recs">
+                            <table style="width:100%; border-collapse:collapse; font-size:10px; margin-bottom:12px;">
+                                <thead><tr style="background:#e8f0fe;">
+                                    <th style="padding:4px; border:1px solid #ccc;">Faculty</th>
+                                    <th style="padding:4px; border:1px solid #ccc;">FDP/STTP Name</th>
+                                    <th style="padding:4px; border:1px solid #ccc;">Type</th>
+                                    <th style="padding:4px; border:1px solid #ccc;">Duration (Days)</th>
+                                    <th style="padding:4px; border:1px solid #ccc;">Organizer</th>
+                                    <th style="padding:4px; border:1px solid #ccc;">External</th>
+                                    <th style="padding:4px; border:1px solid #ccc;">Points</th>
+                                </tr></thead>
+                                <tbody>
+                                    <t t-foreach="fdp_recs" t-as="r">
+                                        <tr><td style="padding:3px; border:1px solid #ccc;"><t t-esc="r.faculty_id.name"/></td>
+                                            <td style="padding:3px; border:1px solid #ccc;"><t t-esc="r.title"/></td>
+                                            <td style="padding:3px; border:1px solid #ccc;"><t t-esc="r.research_type"/></td>
+                                            <td style="padding:3px; border:1px solid #ccc; text-align:center;"><t t-esc="r.fdp_duration_days"/></td>
+                                            <td style="padding:3px; border:1px solid #ccc;"><t t-esc="r.fdp_organizer or ''"/></td>
+                                            <td style="padding:3px; border:1px solid #ccc; text-align:center;"><t t-esc="'Yes' if r.fdp_is_external else 'No'"/></td>
+                                            <td style="padding:3px; border:1px solid #ccc; text-align:center;"><t t-esc="r.fdp_points"/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+
+                        <h3>6.2.1 Faculty Publications (10)</h3>
+                        <t t-set="pub_recs" t-value="o.research_ids.filtered(lambda r: r.research_type in ['journal','conference','book','book_chapter'])"/>
+                        <t t-if="pub_recs">
+                            <table style="width:100%; border-collapse:collapse; font-size:9px; margin-bottom:12px;">
+                                <thead><tr style="background:#e8f0fe;">
+                                    <th style="padding:3px; border:1px solid #ccc;">Faculty</th>
+                                    <th style="padding:3px; border:1px solid #ccc;">Title</th>
+                                    <th style="padding:3px; border:1px solid #ccc;">Publisher/Journal</th>
+                                    <th style="padding:3px; border:1px solid #ccc;">Type</th>
+                                    <th style="padding:3px; border:1px solid #ccc;">Indexed</th>
+                                    <th style="padding:3px; border:1px solid #ccc;">DOI</th>
+                                    <th style="padding:3px; border:1px solid #ccc;">Year</th>
+                                </tr></thead>
+                                <tbody>
+                                    <t t-foreach="pub_recs" t-as="r">
+                                        <tr><td style="padding:2px; border:1px solid #ccc;"><t t-esc="r.faculty_id.name"/></td>
+                                            <td style="padding:2px; border:1px solid #ccc;"><t t-esc="r.title"/></td>
+                                            <td style="padding:2px; border:1px solid #ccc;"><t t-esc="r.publisher_journal or ''"/></td>
+                                            <td style="padding:2px; border:1px solid #ccc;"><t t-esc="r.research_type"/></td>
+                                            <td style="padding:2px; border:1px solid #ccc;"><t t-esc="r.indexed_in or ''"/></td>
+                                            <td style="padding:2px; border:1px solid #ccc;"><t t-esc="r.doi or ''"/></td>
+                                            <td style="padding:2px; border:1px solid #ccc;"><t t-esc="str(r.publication_date.year) if r.publication_date else ''"/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+
+                        <h3>6.2.4 Sponsored Research Projects (15)</h3>
+                        <t t-set="funded_recs" t-value="o.research_ids.filtered(lambda r: r.research_type == 'funded_project')"/>
+                        <t t-if="funded_recs">
+                            <table style="width:100%; border-collapse:collapse; font-size:10px; margin-bottom:12px;">
+                                <thead><tr style="background:#e8f0fe;">
+                                    <th style="padding:4px; border:1px solid #ccc;">PI</th>
+                                    <th style="padding:4px; border:1px solid #ccc;">Project Title</th>
+                                    <th style="padding:4px; border:1px solid #ccc;">Funding Agency</th>
+                                    <th style="padding:4px; border:1px solid #ccc;">Duration</th>
+                                    <th style="padding:4px; border:1px solid #ccc;">Amount (Lacs)</th>
+                                </tr></thead>
+                                <tbody>
+                                    <t t-foreach="funded_recs" t-as="r">
+                                        <tr><td style="padding:3px; border:1px solid #ccc;"><t t-esc="r.faculty_id.name"/></td>
+                                            <td style="padding:3px; border:1px solid #ccc;"><t t-esc="r.title"/></td>
+                                            <td style="padding:3px; border:1px solid #ccc;"><t t-esc="r.funding_agency or ''"/></td>
+                                            <td style="padding:3px; border:1px solid #ccc;"><t t-esc="'%d months' % r.duration_months if r.duration_months else ''"/></td>
+                                            <td style="padding:3px; border:1px solid #ccc; text-align:right;"><t t-esc="'%.2f' % r.amount_lacs"/></td>
+                                        </tr>
+                                    </t>
+                                    <tr style="font-weight:bold; background:#f5f5f5;">
+                                        <td colspan="4" style="padding:3px; border:1px solid #ccc; text-align:right;">Total</td>
+                                        <td style="padding:3px; border:1px solid #ccc; text-align:right;">
+                                            <t t-esc="'%.2f' % sum(r.amount_lacs for r in funded_recs)"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </t>
+
+                        <!-- ── C7 Facilities ── -->
+                        <h2 style="color:#003366; page-break-before:always;">Criterion 7: Facilities and Technical Support (100)</h2>
+                        <h3>7.1 List of Laboratories and Technical Manpower</h3>
+                        <t t-if="o.lab_ids">
+                            <table style="width:100%; border-collapse:collapse; font-size:9px; margin-bottom:12px;">
+                                <thead><tr style="background:#003366; color:white;">
+                                    <th style="padding:3px; border:1px solid #ccc;">Lab Name</th>
+                                    <th style="padding:3px; border:1px solid #ccc;">Type</th>
+                                    <th style="padding:3px; border:1px solid #ccc;">Batch Size</th>
+                                    <th style="padding:3px; border:1px solid #ccc;">Major Equipment</th>
+                                    <th style="padding:3px; border:1px solid #ccc;">Weekly Utilization</th>
+                                    <th style="padding:3px; border:1px solid #ccc;">Tech Staff</th>
+                                    <th style="padding:3px; border:1px solid #ccc;">Qualification</th>
+                                </tr></thead>
+                                <tbody>
+                                    <t t-foreach="o.lab_ids" t-as="lab">
+                                        <tr><td style="padding:2px; border:1px solid #ccc;"><t t-esc="lab.name"/></td>
+                                            <td style="padding:2px; border:1px solid #ccc;"><t t-esc="lab.lab_type"/></td>
+                                            <td style="padding:2px; border:1px solid #ccc; text-align:center;"><t t-esc="lab.batch_size"/></td>
+                                            <td style="padding:2px; border:1px solid #ccc;"><t t-esc="lab.major_equipment or ''"/></td>
+                                            <td style="padding:2px; border:1px solid #ccc;"><t t-esc="lab.weekly_utilization or ''"/></td>
+                                            <td style="padding:2px; border:1px solid #ccc;"><t t-esc="lab.tech_staff_name or ''"/></td>
+                                            <td style="padding:2px; border:1px solid #ccc;"><t t-esc="lab.tech_staff_qualification or ''"/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+                        <t t-if="o.c7_narrative"><div t-out="o.c7_narrative" style="margin-bottom:10px;"/></t>
+                        <t t-if="o.c7_safety_measures">
+                            <h3>7.4 Safety Measures</h3>
+                            <div t-out="o.c7_safety_measures" style="margin-bottom:10px;"/>
+                        </t>
+
+                        <!-- ── C8 Continuous Improvement ── -->
+                        <h2 style="color:#003366; page-break-before:always;">Criterion 8: Continuous Improvement (80)</h2>
+                        <h3>8.1.1 Actions on CO Attainment (20)</h3>
+                        <t t-if="o.c8_co_improvement_actions"><div t-out="o.c8_co_improvement_actions" style="margin-bottom:10px;"/></t>
+                        <t t-else=""><p style="color:#999;font-style:italic;">Not yet filled.</p></t>
+
+                        <h3>8.1.2 Actions on PO/PSO Attainment (20)</h3>
+                        <t t-if="o.c8_po_improvement_actions"><div t-out="o.c8_po_improvement_actions" style="margin-bottom:10px;"/></t>
+                        <t t-else=""><p style="color:#999;font-style:italic;">Not yet filled.</p></t>
+
+                        <h3>8.2 Academic Audit (15)</h3>
+                        <t t-if="o.c8_academic_audit"><div t-out="o.c8_academic_audit" style="margin-bottom:10px;"/></t>
+                        <t t-else=""><p style="color:#999;font-style:italic;">Not yet filled.</p></t>
+
+                        <h3>Table 8.3.1: Improvement in Faculty Qualification &amp; Publications</h3>
+                        <table style="width:60%; border-collapse:collapse; font-size:10px; margin-bottom:12px;">
+                            <thead><tr style="background:#e8f0fe;">
+                                <th style="padding:4px; border:1px solid #ccc;">Item</th>
+                                <th style="padding:4px; border:1px solid #ccc;">CAYm1</th>
+                                <th style="padding:4px; border:1px solid #ccc;">CAYm2</th>
+                                <th style="padding:4px; border:1px solid #ccc;">CAYm3</th>
+                            </tr></thead>
+                            <tbody>
+                                <t t-set="c6m1" t-value="o.research_ids.filtered(lambda r: r.year_label == 'CAYm1')"/>
+                                <t t-set="c6m2" t-value="o.research_ids.filtered(lambda r: r.year_label == 'CAYm2')"/>
+                                <t t-set="c6m3" t-value="o.research_ids.filtered(lambda r: r.year_label == 'CAYm3')"/>
+                                <tr><td style="padding:3px; border:1px solid #ccc;">No. of Faculty with Ph.D</td>
+                                    <td style="padding:3px; border:1px solid #ccc; text-align:center;">
+                                        <t t-if="o.c5_faculty_ids">
+                                            <t t-esc="o.c5_faculty_ids.filtered(lambda f: f.year_label == 'CAYm1') and o.c5_faculty_ids.filtered(lambda f: f.year_label == 'CAYm1')[0].x_phd or 0"/>
+                                        </t>
+                                    </td>
+                                    <td style="padding:3px; border:1px solid #ccc; text-align:center;">
+                                        <t t-if="o.c5_faculty_ids">
+                                            <t t-esc="o.c5_faculty_ids.filtered(lambda f: f.year_label == 'CAYm2') and o.c5_faculty_ids.filtered(lambda f: f.year_label == 'CAYm2')[0].x_phd or 0"/>
+                                        </t>
+                                    </td>
+                                    <td style="padding:3px; border:1px solid #ccc; text-align:center;">-</td>
+                                </tr>
+                                <tr><td style="padding:3px; border:1px solid #ccc;">Journal Publications</td>
+                                    <td style="padding:3px; border:1px solid #ccc; text-align:center;"><t t-esc="len(c6m1.filtered(lambda r: r.research_type == 'journal'))"/></td>
+                                    <td style="padding:3px; border:1px solid #ccc; text-align:center;"><t t-esc="len(c6m2.filtered(lambda r: r.research_type == 'journal'))"/></td>
+                                    <td style="padding:3px; border:1px solid #ccc; text-align:center;"><t t-esc="len(c6m3.filtered(lambda r: r.research_type == 'journal'))"/></td>
+                                </tr>
+                                <tr><td style="padding:3px; border:1px solid #ccc;">Conference Publications</td>
+                                    <td style="padding:3px; border:1px solid #ccc; text-align:center;"><t t-esc="len(c6m1.filtered(lambda r: r.research_type == 'conference'))"/></td>
+                                    <td style="padding:3px; border:1px solid #ccc; text-align:center;"><t t-esc="len(c6m2.filtered(lambda r: r.research_type == 'conference'))"/></td>
+                                    <td style="padding:3px; border:1px solid #ccc; text-align:center;"><t t-esc="len(c6m3.filtered(lambda r: r.research_type == 'conference'))"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- ── C9 Student Support & Governance ── -->
+                        <h2 style="color:#003366; page-break-before:always;">Criterion 9: Student Support System and Governance (120)</h2>
+
+                        <h3>9.1 First Year Student-Faculty Ratio (FYSFR) (5)</h3>
+                        <t t-set="c9_recs" t-value="env['nba.c9.governance'].search([('sar_id','=',o.id)])"/>
+                        <t t-if="c9_recs">
+                            <t t-set="c9" t-value="c9_recs[0]"/>
+                            <table style="width:70%; border-collapse:collapse; font-size:10px; margin-bottom:12px;">
+                                <thead><tr style="background:#e8f0fe;">
+                                    <th style="padding:4px; border:1px solid #ccc;">S4</th>
+                                    <th style="padding:4px; border:1px solid #ccc;">RF4</th>
+                                    <th style="padding:4px; border:1px solid #ccc;">NS1</th>
+                                    <th style="padding:4px; border:1px solid #ccc;">NS2</th>
+                                    <th style="padding:4px; border:1px solid #ccc;">FYSFR %</th>
+                                    <th style="padding:4px; border:1px solid #ccc;">Marks /5</th>
+                                </tr></thead>
+                                <tbody><tr>
+                                    <td style="padding:3px; border:1px solid #ccc; text-align:center;"><t t-esc="c9.fysfr_s4"/></td>
+                                    <td style="padding:3px; border:1px solid #ccc; text-align:center;"><t t-esc="'%.1f' % c9.fysfr_rf4"/></td>
+                                    <td style="padding:3px; border:1px solid #ccc; text-align:center;"><t t-esc="c9.fysfr_ns1"/></td>
+                                    <td style="padding:3px; border:1px solid #ccc; text-align:center;"><t t-esc="c9.fysfr_ns2"/></td>
+                                    <td style="padding:3px; border:1px solid #ccc; text-align:center;"><t t-esc="'%.1f' % c9.fysfr_pct"/>%</td>
+                                    <td style="padding:3px; border:1px solid #ccc; text-align:center;"><t t-esc="c9.fysfr_marks"/></td>
+                                </tr></tbody>
+                            </table>
+                        </t>
+
+                        <h3>9.2 Mentoring System (5)</h3>
+                        <t t-if="o.c9_mentoring_system"><div t-out="o.c9_mentoring_system" style="margin-bottom:10px;"/></t>
+                        <t t-else=""><p style="color:#999;font-style:italic;">Not yet filled.</p></t>
+
+                        <h3>9.3 Feedback Analysis (10)</h3>
+                        <t t-if="o.c9_feedback_analysis"><div t-out="o.c9_feedback_analysis" style="margin-bottom:10px;"/></t>
+                        <t t-else=""><p style="color:#999;font-style:italic;">Not yet filled.</p></t>
+
+                        <h3>9.4 Training and Placement Support (10)</h3>
+                        <t t-if="o.c9_training_placement"><div t-out="o.c9_training_placement" style="margin-bottom:10px;"/></t>
+                        <t t-else=""><p style="color:#999;font-style:italic;">Not yet filled.</p></t>
+
+                        <h3>9.5 Start-up and Entrepreneurship Activities (5)</h3>
+                        <t t-if="o.c9_startup_entrepreneurship"><div t-out="o.c9_startup_entrepreneurship" style="margin-bottom:10px;"/></t>
+                        <t t-else=""><p style="color:#999;font-style:italic;">Not yet filled.</p></t>
+
+                        <h3>9.6 Governance and Transparency (25)</h3>
+                        <t t-if="o.c9_governance"><div t-out="o.c9_governance" style="margin-bottom:10px;"/></t>
+                        <t t-else=""><p style="color:#999;font-style:italic;">Not yet filled.</p></t>
+
+                        <h3>9.7 Budget Allocation, Utilization (12)</h3>
+                        <t t-if="c9_recs">
+                            <t t-set="c9b" t-value="c9_recs[0]"/>
+                            <table style="width:80%; border-collapse:collapse; font-size:10px; margin-bottom:12px;">
+                                <thead><tr style="background:#e8f0fe;">
+                                    <th style="padding:4px; border:1px solid #ccc;">Financial Year</th>
+                                    <th style="padding:4px; border:1px solid #ccc;">Budget (Lacs)</th>
+                                    <th style="padding:4px; border:1px solid #ccc;">Actual (Lacs)</th>
+                                </tr></thead>
+                                <tbody>
+                                    <tr><td style="padding:3px; border:1px solid #ccc;">CFYm1</td>
+                                        <td style="padding:3px; border:1px solid #ccc; text-align:right;"><t t-esc="'%.2f' % c9b.budget_cfym1"/></td>
+                                        <td style="padding:3px; border:1px solid #ccc; text-align:right;"><t t-esc="'%.2f' % c9b.actual_cfym1"/></td>
+                                    </tr>
+                                    <tr><td style="padding:3px; border:1px solid #ccc;">CFYm2</td>
+                                        <td style="padding:3px; border:1px solid #ccc; text-align:right;"><t t-esc="'%.2f' % c9b.budget_cfym2"/></td>
+                                        <td style="padding:3px; border:1px solid #ccc; text-align:right;"><t t-esc="'%.2f' % c9b.actual_cfym2"/></td>
+                                    </tr>
+                                    <tr><td style="padding:3px; border:1px solid #ccc;">CFYm3</td>
+                                        <td style="padding:3px; border:1px solid #ccc; text-align:right;"><t t-esc="'%.2f' % c9b.budget_cfym3"/></td>
+                                        <td style="padding:3px; border:1px solid #ccc; text-align:right;"><t t-esc="'%.2f' % c9b.actual_cfym3"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </t>
+
+                        <h3>9.11 SDG Initiatives (10)</h3>
+                        <t t-if="o.c9_sdg_initiatives"><div t-out="o.c9_sdg_initiatives" style="margin-bottom:10px;"/></t>
+                        <t t-else=""><p style="color:#999;font-style:italic;">Not yet filled.</p></t>
+
+                        <h3>9.12 Innovative Educational Initiatives (5)</h3>
+                        <t t-if="o.c9_innovative_initiatives"><div t-out="o.c9_innovative_initiatives" style="margin-bottom:10px;"/></t>
+                        <t t-else=""><p style="color:#999;font-style:italic;">Not yet filled.</p></t>
+
+                        <h3>9.13 Faculty Performance Appraisal (FPADS) (10)</h3>
+                        <t t-if="o.c9_fpads"><div t-out="o.c9_fpads" style="margin-bottom:10px;"/></t>
+                        <t t-else=""><p style="color:#999;font-style:italic;">Not yet filled.</p></t>
+
+                        <h3>9.14 Outreach Activities (5)</h3>
+                        <t t-if="o.c9_outreach"><div t-out="o.c9_outreach" style="margin-bottom:10px;"/></t>
+                        <t t-else=""><p style="color:#999;font-style:italic;">Not yet filled.</p></t>
+
+                        <!-- ── Annexure I: WK Profile ── -->
+                        <h2 style="color:#003366; page-break-before:always;">Annexure I: Knowledge and Attitude Profile (WK1–WK9)</h2>
+                        <p style="font-size:10px;">WK1–WK9 as defined by Washington Accord and NBA GAPC V4.0 are embedded in the 11 Program Outcomes (PO1–PO11) listed in Annexure II.</p>
+
+                        <!-- ── Annexure II: POs & PSOs ── -->
+                        <h2 style="color:#003366;">Annexure II: Program Outcomes (POs) and Program Specific Outcomes (PSOs)</h2>
+                        <p style="font-weight:bold; font-size:10px;">PO1–PO11 (as defined by NBA):</p>
+                        <table style="width:100%; border-collapse:collapse; font-size:9px; margin-bottom:12px;">
+                            <tbody>
+                                <tr><td style="padding:3px; border:1px solid #ccc; font-weight:bold;">PO1</td><td style="padding:3px; border:1px solid #ccc;">Engineering Knowledge</td></tr>
+                                <tr><td style="padding:3px; border:1px solid #ccc; font-weight:bold;">PO2</td><td style="padding:3px; border:1px solid #ccc;">Problem Analysis</td></tr>
+                                <tr><td style="padding:3px; border:1px solid #ccc; font-weight:bold;">PO3</td><td style="padding:3px; border:1px solid #ccc;">Design / Development of Solutions</td></tr>
+                                <tr><td style="padding:3px; border:1px solid #ccc; font-weight:bold;">PO4</td><td style="padding:3px; border:1px solid #ccc;">Conduct Investigations of Complex Problems</td></tr>
+                                <tr><td style="padding:3px; border:1px solid #ccc; font-weight:bold;">PO5</td><td style="padding:3px; border:1px solid #ccc;">Engineering Tool Usage</td></tr>
+                                <tr><td style="padding:3px; border:1px solid #ccc; font-weight:bold;">PO6</td><td style="padding:3px; border:1px solid #ccc;">The Engineer and The World</td></tr>
+                                <tr><td style="padding:3px; border:1px solid #ccc; font-weight:bold;">PO7</td><td style="padding:3px; border:1px solid #ccc;">Ethics</td></tr>
+                                <tr><td style="padding:3px; border:1px solid #ccc; font-weight:bold;">PO8</td><td style="padding:3px; border:1px solid #ccc;">Individual and Collaborative Teamwork</td></tr>
+                                <tr><td style="padding:3px; border:1px solid #ccc; font-weight:bold;">PO9</td><td style="padding:3px; border:1px solid #ccc;">Communication</td></tr>
+                                <tr><td style="padding:3px; border:1px solid #ccc; font-weight:bold;">PO10</td><td style="padding:3px; border:1px solid #ccc;">Project Management and Finance</td></tr>
+                                <tr><td style="padding:3px; border:1px solid #ccc; font-weight:bold;">PO11</td><td style="padding:3px; border:1px solid #ccc;">Life-Long Learning</td></tr>
+                            </tbody>
+                        </table>
+                        <p style="font-weight:bold; font-size:10px;">Program Specific Outcomes (PSOs):</p>
+                        <t t-foreach="o.pso_ids" t-as="pso">
+                            <p style="font-size:10px;"><strong><t t-esc="pso.name"/>:</strong> <t t-esc="pso.statement or ''"/></p>
+                        </t>
+
+                        <!-- ── Declaration ── -->
+                        <div style="margin-top:40px; page-break-before:always;">
+                            <h2 style="color:#003366;">Declaration</h2>
+                            <p>I undertake that the institution is well aware about the provisions in the NBA's accreditation manual concerned for this application, rules, regulations, notifications and NBA expert visit guidelines in force as on date and the institute shall fully abide by them.</p>
+                            <p>It is submitted that information provided in this Self-Assessment Report is factually correct.</p>
+                            <br/><br/>
+                            <table style="width:100%;">
+                                <tr>
+                                    <td>Date: _______________</td>
+                                    <td style="text-align:right;">Signature &amp; Name<br/>Head of the Institution with Seal</td>
+                                </tr>
+                            </table>
+                        </div>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

@@ -1,0 +1,629 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         NBA SAR LIST VIEW
+    ═══════════════════════════════════════════════════════════════ -->
+    <record id="nba_sar_view_list" model="ir.ui.view">
+        <field name="name">nba.sar.view.list</field>
+        <field name="model">nba.sar</field>
+        <field name="arch" type="xml">
+            <list string="SAR Records" decoration-success="state == 'accredited'"
+                  decoration-info="state == 'submitted'" decoration-muted="state == 'draft'">
+                <field name="name"/>
+                <field name="program_id"/>
+                <field name="department_id"/>
+                <field name="academic_year_id"/>
+                <field name="accreditation_cycle"/>
+                <field name="total_score" widget="progressbar" options="{'max_value': 1000}"/>
+                <field name="readiness_pct" string="Readiness %"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'accredited'"
+                       decoration-info="state in ('submitted','under_review')"
+                       decoration-warning="state == 'data_entry'"
+                       decoration-muted="state == 'draft'"/>
+                <field name="last_computed_on"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         NBA SAR FORM VIEW
+    ═══════════════════════════════════════════════════════════════ -->
+    <record id="nba_sar_view_form" model="ir.ui.view">
+        <field name="name">nba.sar.view.form</field>
+        <field name="model">nba.sar</field>
+        <field name="arch" type="xml">
+            <form string="NBA Self-Assessment Report (SAR)">
+                <header>
+                    <button name="action_start_data_entry" string="Start Data Entry"
+                            type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_open_compute_wizard" string="⚙ Auto-Compute All"
+                            type="object" class="btn-primary"
+                            invisible="state not in ['data_entry','under_review']"/>
+                    <button name="action_submit_review" string="Submit for Review"
+                            type="object" invisible="state != 'data_entry'"/>
+                    <button name="action_generate_sar" string="Generate SAR PDF"
+                            type="object" class="btn-success"
+                            invisible="state not in ['under_review','submitted']"/>
+                    <button name="action_submit_nba" string="Submit to NBA"
+                            type="object" invisible="state != 'under_review'"/>
+                    <button name="action_reset_draft" string="Reset to Draft"
+                            type="object" class="btn-warning"
+                            invisible="state == 'accredited'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,data_entry,under_review,submitted,accredited"/>
+                </header>
+                <sheet>
+                    <!-- Smart Buttons -->
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object"
+                                name="action_view_scores" icon="fa-trophy">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value"><field name="total_score"/></span>
+                                <span class="o_stat_text">Score /1000</span>
+                            </div>
+                        </button>
+                        <button class="oe_stat_button" type="object"
+                                name="action_view_scores" icon="fa-pie-chart">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value"><field name="readiness_pct"/>%</span>
+                                <span class="o_stat_text">Readiness</span>
+                            </div>
+                        </button>
+                        <button class="oe_stat_button" type="object"
+                                name="action_view_evidence" icon="fa-folder-open">
+                            <field name="evidence_count" widget="statinfo" string="Evidence"/>
+                        </button>
+                        <button class="oe_stat_button" type="object"
+                                name="action_view_cos" icon="fa-list-alt">
+                            <field name="co_count" widget="statinfo" string="COs Defined"/>
+                        </button>
+                        <button class="oe_stat_button" type="object"
+                                name="action_view_research" icon="fa-flask">
+                            <field name="research_count" widget="statinfo" string="Research/FDP"/>
+                        </button>
+                        <button class="oe_stat_button" type="object"
+                                name="action_view_faculty" icon="fa-users">
+                            <field name="faculty_count" widget="statinfo" string="Faculty"/>
+                        </button>
+                        <button class="oe_stat_button" type="object"
+                                name="action_view_students" icon="fa-graduation-cap">
+                            <field name="student_count" widget="statinfo" string="Students"/>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <notebook>
+                        <!-- ── Program Details ── -->
+                        <page string="Program Details" name="program_info">
+                            <group>
+                                <group string="Program &amp; Department">
+                                    <field name="program_id"/>
+                                    <field name="department_id" readonly="1"/>
+                                    <field name="sanctioned_intake"/>
+                                    <field name="accreditation_cycle"/>
+                                    <field name="nba_coordinator_id"/>
+                                </group>
+                                <group string="Academic Years">
+                                    <field name="academic_year_id" string="CAY"/>
+                                    <field name="caym1_id" string="CAYm1"/>
+                                    <field name="caym2_id" string="CAYm2"/>
+                                    <field name="lyg_id" string="LYG"/>
+                                    <field name="lygm1_id" string="LYGm1"/>
+                                    <field name="lygm2_id" string="LYGm2"/>
+                                </group>
+                            </group>
+                            <group string="Allied Departments (for SFR Cluster)">
+                                <field name="allied_dept_ids" widget="many2many_tags" nolabel="1"/>
+                            </group>
+                            <group string="Last Computed">
+                                <field name="last_computed_on" readonly="1"/>
+                            </group>
+                        </page>
+
+                        <!-- ── C1 Curriculum ── -->
+                        <page string="C1 – Curriculum (120)" name="c1">
+                            <group>
+                                <field name="c1_score" readonly="1" string="C1 Score"
+                                       widget="progressbar" options="{'max_value': 120}"/>
+                            </group>
+                            <group string="1.1 Vision, Mission &amp; PEOs">
+                                <field name="c1_vision_mission" nolabel="1" widget="html"/>
+                            </group>
+                            <group string="Program Educational Objectives (PEOs)">
+                                <field name="peo_ids" nolabel="1">
+                                    <list editable="bottom">
+                                        <field name="sequence"/>
+                                        <field name="name" readonly="1"/>
+                                        <field name="statement"/>
+                                        <field name="m1_corr"/>
+                                        <field name="m2_corr"/>
+                                        <field name="m3_corr"/>
+                                        <field name="m4_corr"/>
+                                        <field name="m5_corr"/>
+                                    </list>
+                                </field>
+                            </group>
+                            <group string="Program Specific Outcomes (PSOs)">
+                                <field name="pso_ids" nolabel="1">
+                                    <list editable="bottom">
+                                        <field name="sequence"/>
+                                        <field name="name" readonly="1"/>
+                                        <field name="statement"/>
+                                        <field name="knowledge_domain"/>
+                                    </list>
+                                </field>
+                            </group>
+                            <group string="1.2 Curriculum Structure">
+                                <field name="c1_curriculum_structure" nolabel="1" widget="html"/>
+                            </group>
+                            <group string="1.2.2 Course Teaching &amp; Learning Scheme (Table 1.2.2.1 — L/T/P/SL Hours)">
+                                <field name="c1_course_scheme_ids" nolabel="1">
+                                    <list editable="bottom">
+                                        <field name="semester_id"/>
+                                        <field name="course_id"/>
+                                        <field name="course_code"/>
+                                        <field name="course_title"/>
+                                        <field name="ci_lecture" string="L"/>
+                                        <field name="ci_tutorial" string="T"/>
+                                        <field name="li_practical" string="P"/>
+                                        <field name="tw_term_work" string="TW"/>
+                                        <field name="sl_self_learning" string="SL"/>
+                                        <field name="total_hours_per_sem" readonly="1" string="Total Hrs"/>
+                                        <field name="total_credits" readonly="1" string="Credits"/>
+                                    </list>
+                                </field>
+                            </group>
+                            <group string="1.2.3 Curriculum Components (Table 1.3.3.1)">
+                                <field name="c1_curriculum_ids" nolabel="1">
+                                    <list editable="bottom">
+                                        <field name="component"/>
+                                        <field name="component_other" optional="hide"/>
+                                        <field name="total_credits"/>
+                                        <field name="total_contact_hours"/>
+                                        <field name="percentage_credits" readonly="1"/>
+                                    </list>
+                                </field>
+                            </group>
+                            <group string="1.2.4 Education Reforms">
+                                <field name="c1_education_reforms" nolabel="1" widget="html"/>
+                            </group>
+                            <group string="1.3 PO/PSO Mapping">
+                                <field name="c1_po_pso_mapping" nolabel="1" widget="html"/>
+                            </group>
+                            <group string="Course Outcomes (COs) — all courses">
+                                <field name="co_ids" nolabel="1">
+                                    <list editable="bottom">
+                                        <field name="course_id"/>
+                                        <field name="semester_id" readonly="1"/>
+                                        <field name="sequence"/>
+                                        <field name="name" readonly="1"/>
+                                        <field name="statement"/>
+                                        <field name="bloom_level"/>
+                                        <field name="target_level"/>
+                                        <field name="attainment_cie" readonly="1"/>
+                                        <field name="attainment_see" readonly="1"/>
+                                        <field name="attainment_overall" readonly="1"/>
+                                        <field name="target_met" readonly="1" widget="boolean_toggle"/>
+                                    </list>
+                                </field>
+                            </group>
+                        </page>
+
+                        <!-- ── C2 Teaching ── -->
+                        <page string="C2 – Teaching-Learning (120)" name="c2">
+                            <group>
+                                <field name="c2_score" readonly="1"
+                                       widget="progressbar" options="{'max_value': 120}"/>
+                            </group>
+                            <group string="2.1 Quality of Teaching &amp; Learning">
+                                <field name="c2_teaching_quality" nolabel="1" widget="html"/>
+                            </group>
+                            <group string="2.2 Capstone Project Quality">
+                                <field name="c2_capstone_quality" nolabel="1" widget="html"/>
+                            </group>
+                            <group string="2.3 Internship / Industrial Training">
+                                <field name="c2_internship_summary" nolabel="1" widget="html"/>
+                            </group>
+                            <group string="2.4 Seminars &amp; Mini Projects">
+                                <field name="c2_seminar_projects" nolabel="1" widget="html"/>
+                            </group>
+                            <group string="2.5 Case Studies &amp; Real-Life Examples">
+                                <field name="c2_case_studies" nolabel="1" widget="html"/>
+                            </group>
+                            <group string="2.6 SWAYAM / NPTEL / MOOC">
+                                <field name="c2_mooc_summary" nolabel="1" widget="html"/>
+                            </group>
+                            <group string="2.7 Complex Engineering Problems + SDGs">
+                                <field name="c2_sdg_activities" nolabel="1" widget="html"/>
+                            </group>
+                            <group string="2.8 Industry-Institute Partnerships">
+                                <field name="c2_industry_partnerships" nolabel="1" widget="html"/>
+                            </group>
+                        </page>
+
+                        <!-- ── C3 Assessment ── -->
+                        <page string="C3 – Assessment (120)" name="c3">
+                            <group>
+                                <field name="c3_score" readonly="1"
+                                       widget="progressbar" options="{'max_value': 120}"/>
+                            </group>
+                            <group string="3.1–3.6 Assessment Tools &amp; Evidence">
+                                <field name="c3_assessment_tools" nolabel="1" widget="html"/>
+                            </group>
+                            <group string="3.7 CO Attainment (from CO records above)">
+                                <p class="text-muted">CO attainment is auto-computed from the Course Outcomes in C1 tab. Navigate to each CO record to view CIE/SEE details.</p>
+                            </group>
+                            <group string="3.8.2 Indirect PO Attainment (Survey Data)">
+                                <field name="c3_indirect_attainment" nolabel="1" widget="html"/>
+                            </group>
+                        </page>
+
+                        <!-- ── C4 Students ── -->
+                        <page string="C4 – Students' Performance (120)" name="c4">
+                            <group>
+                                <field name="c4_score" readonly="1"
+                                       widget="progressbar" options="{'max_value': 120}"/>
+                            </group>
+                            <group string="Table 4A — Admission Details">
+                                <field name="c4_student_ids" nolabel="1">
+                                    <list editable="bottom" decoration-info="is_manual_override">
+                                        <field name="year_label"/>
+                                        <field name="academic_year_id"/>
+                                        <field name="n_sanctioned" string="N"/>
+                                        <field name="n1_first_year" string="N1"/>
+                                        <field name="n2_lateral" string="N2"/>
+                                        <field name="n3_separate_div" string="N3"/>
+                                        <field name="n4_supernumerary" string="N4"/>
+                                        <field name="total_admitted" readonly="1" string="Total"/>
+                                        <field name="is_manual_override"/>
+                                    </list>
+                                </field>
+                            </group>
+                            <group string="Table 4B — Multiple Entry/Exit Sub-Fields">
+                                <field name="c4_student_ids" nolabel="1">
+                                    <list editable="bottom">
+                                        <field name="year_label"/>
+                                        <field name="n52_entry_yr2" string="N52"/>
+                                        <field name="n53_entry_yr3" string="N53"/>
+                                        <field name="n54_entry_yr4" string="N54"/>
+                                        <field name="n5_multiple_entry" readonly="1" string="N5"/>
+                                        <field name="n61_exit_yr1" string="N61"/>
+                                        <field name="n62_exit_yr2" string="N62"/>
+                                        <field name="n63_exit_yr3" string="N63"/>
+                                        <field name="n6_multiple_exit" readonly="1" string="N6"/>
+                                    </list>
+                                </field>
+                            </group>
+                            <group string="Table 4C — Graduated in Stipulated Period (by year)">
+                                <field name="c4_student_ids" nolabel="1">
+                                    <list editable="bottom">
+                                        <field name="year_label"/>
+                                        <field name="graduated_yr1" string="I Year"/>
+                                        <field name="graduated_yr2" string="II Year"/>
+                                        <field name="graduated_yr3" string="III Year"/>
+                                        <field name="graduated_yr4" string="IV Year"/>
+                                        <field name="graduated_stipulated" readonly="1" string="Total"/>
+                                        <field name="success_rate" readonly="1" string="SR %"/>
+                                        <field name="enrolment_ratio" readonly="1" string="ER"/>
+                                        <field name="api_yr1" readonly="1" string="API Yr1"/>
+                                        <field name="api_yr2" readonly="1" string="API Yr2"/>
+                                        <field name="api_yr3" readonly="1" string="API Yr3"/>
+                                        <field name="placement_index" readonly="1" string="PI %"/>
+                                    </list>
+                                </field>
+                            </group>
+                            <group string="4.7.1 Active Professional Societies / Clubs (Table 4.7.1.1)">
+                                <field name="prof_society_ids" nolabel="1">
+                                    <list editable="bottom">
+                                        <field name="name"/>
+                                        <field name="society_type"/>
+                                        <field name="level"/>
+                                        <field name="year_established"/>
+                                        <field name="faculty_coordinator"/>
+                                        <field name="is_active" widget="boolean_toggle"/>
+                                    </list>
+                                </field>
+                            </group>
+                            <group string="4.7.1 Events Organized by Societies (Table 4.7.1.2)">
+                                <field name="prof_event_ids" nolabel="1">
+                                    <list editable="bottom">
+                                        <field name="year_label"/>
+                                        <field name="society_name"/>
+                                        <field name="event_name"/>
+                                        <field name="event_level"/>
+                                        <field name="event_date"/>
+                                        <field name="participants_count"/>
+                                    </list>
+                                </field>
+                            </group>
+                            <group string="4.7.2 Student Participation in Professional Events (Table 4.7.2.1)">
+                                <field name="student_event_ids" nolabel="1">
+                                    <list editable="bottom">
+                                        <field name="year_label"/>
+                                        <field name="student_name"/>
+                                        <field name="semester"/>
+                                        <field name="event_name"/>
+                                        <field name="event_type"/>
+                                        <field name="event_level"/>
+                                        <field name="event_date"/>
+                                        <field name="award_name"/>
+                                        <field name="organizer"/>
+                                    </list>
+                                </field>
+                            </group>
+                            <group string="4.7.3 Dept Journals / Newsletters (Table 4.7.3.1)">
+                                <field name="dept_publication_ids" nolabel="1">
+                                    <list editable="bottom">
+                                        <field name="year_label"/>
+                                        <field name="publication_name"/>
+                                        <field name="editor_name"/>
+                                        <field name="student_names"/>
+                                        <field name="no_of_issues"/>
+                                        <field name="volume_no"/>
+                                        <field name="format_type"/>
+                                    </list>
+                                </field>
+                            </group>
+                            <group string="4.7.4 Student Publications (Table 4.7.4.1)">
+                                <field name="student_publication_ids" nolabel="1">
+                                    <list editable="bottom">
+                                        <field name="year_label"/>
+                                        <field name="student_name"/>
+                                        <field name="publisher_name"/>
+                                        <field name="journal_conference"/>
+                                        <field name="publication_type"/>
+                                        <field name="volume_no"/>
+                                        <field name="issue_no"/>
+                                        <field name="doi"/>
+                                        <field name="publication_date"/>
+                                        <field name="indexed_in"/>
+                                        <field name="award_name"/>
+                                    </list>
+                                </field>
+                            </group>
+                        </page>
+
+                        <!-- ── C5 Faculty ── -->
+                        <page string="C5 – Faculty Information (100)" name="c5">
+                            <group>
+                                <field name="c5_score" readonly="1"
+                                       widget="progressbar" options="{'max_value': 100}"/>
+                            </group>
+                            <group string="5.1–5.5 Faculty SFR / FQI / Cadre / Retention">
+                                <field name="c5_faculty_ids" nolabel="1">
+                                    <list editable="bottom">
+                                        <field name="year_label"/>
+                                        <field name="academic_year_id"/>
+                                        <field name="s_total"/>
+                                        <field name="f_total"/>
+                                        <field name="ff_first_year_only"/>
+                                        <field name="tf_effective" readonly="1"/>
+                                        <field name="sfr_value" readonly="1"/>
+                                        <field name="sfr_marks" readonly="1"/>
+                                        <field name="x_phd"/>
+                                        <field name="y_mtech"/>
+                                        <field name="fqi_score" readonly="1"/>
+                                        <field name="cadre_marks" readonly="1"/>
+                                        <field name="retention_marks" readonly="1"/>
+                                        <field name="is_manual_override"/>
+                                    </list>
+                                </field>
+                            </group>
+                            <group string="5.4 Visiting / Adjunct Faculty / FDP (Hourly)">
+                                <field name="fdp_ids" nolabel="1">
+                                    <list editable="bottom">
+                                        <field name="year_label"/>
+                                        <field name="person_name"/>
+                                        <field name="designation"/>
+                                        <field name="course_name"/>
+                                        <field name="hours_handled"/>
+                                        <field name="interaction_type"/>
+                                    </list>
+                                </field>
+                            </group>
+                        </page>
+
+                        <!-- ── C6 Contributions ── -->
+                        <page string="C6 – Faculty Contributions (120)" name="c6">
+                            <group>
+                                <field name="c6_score" readonly="1"
+                                       widget="progressbar" options="{'max_value': 120}"/>
+                            </group>
+                            <p class="text-muted o_form_label">Add all research, publications, FDP and project records using the Research &amp; FDP smart button or menu. Scores are computed automatically.</p>
+                            <group string="Research &amp; FDP Records (Summary)">
+                                <field name="research_ids" nolabel="1">
+                                    <list>
+                                        <field name="year_label"/>
+                                        <field name="faculty_id"/>
+                                        <field name="research_type"/>
+                                        <field name="title"/>
+                                        <field name="publication_date"/>
+                                        <field name="amount_lacs"/>
+                                        <field name="fdp_duration_days"/>
+                                        <field name="fdp_points" readonly="1"/>
+                                    </list>
+                                </field>
+                            </group>
+                        </page>
+
+                        <!-- ── C7 Facilities ── -->
+                        <page string="C7 – Facilities (100)" name="c7">
+                            <group>
+                                <field name="c7_score"/>
+                            </group>
+                            <group string="7.1 Laboratory List">
+                                <field name="lab_ids" nolabel="1">
+                                    <list editable="bottom">
+                                        <field name="name"/>
+                                        <field name="lab_type"/>
+                                        <field name="batch_size"/>
+                                        <field name="major_equipment"/>
+                                        <field name="tech_staff_name"/>
+                                        <field name="safety_measures"/>
+                                    </list>
+                                </field>
+                            </group>
+                            <group string="7. Facilities Narrative">
+                                <field name="c7_narrative" nolabel="1" widget="html"/>
+                            </group>
+                            <group string="7.4 Safety Measures">
+                                <field name="c7_safety_measures" nolabel="1" widget="html"/>
+                            </group>
+                        </page>
+
+                        <!-- ── C8 Improvement ── -->
+                        <page string="C8 – Continuous Improvement (80)" name="c8">
+                            <group>
+                                <field name="c8_score"/>
+                            </group>
+                            <group string="8.1.1 Actions on CO Attainment">
+                                <field name="c8_co_improvement_actions" nolabel="1" widget="html"/>
+                            </group>
+                            <group string="8.1.2 Actions on PO/PSO Attainment">
+                                <field name="c8_po_improvement_actions" nolabel="1" widget="html"/>
+                            </group>
+                            <group string="8.2 Academic Audit">
+                                <field name="c8_academic_audit" nolabel="1" widget="html"/>
+                            </group>
+                        </page>
+
+                        <!-- ── C9 Governance ── -->
+                        <page string="C9 – Student Support &amp; Governance (120)" name="c9">
+                            <group>
+                                <field name="c9_score"/>
+                            </group>
+                            <group string="9.2 Mentoring System">
+                                <field name="c9_mentoring_system" nolabel="1" widget="html"/>
+                            </group>
+                            <group string="9.3 Feedback Analysis">
+                                <field name="c9_feedback_analysis" nolabel="1" widget="html"/>
+                            </group>
+                            <group string="9.4 Training &amp; Placement Support">
+                                <field name="c9_training_placement" nolabel="1" widget="html"/>
+                            </group>
+                            <group string="9.5 Startup &amp; Entrepreneurship">
+                                <field name="c9_startup_entrepreneurship" nolabel="1" widget="html"/>
+                            </group>
+                            <group string="9.6 Governance &amp; Transparency">
+                                <field name="c9_governance" nolabel="1" widget="html"/>
+                            </group>
+                            <group string="9.11 SDG Initiatives">
+                                <field name="c9_sdg_initiatives" nolabel="1" widget="html"/>
+                            </group>
+                            <group string="9.12 Innovative Educational Initiatives">
+                                <field name="c9_innovative_initiatives" nolabel="1" widget="html"/>
+                            </group>
+                            <group string="9.13 Faculty Performance Appraisal (FPADS)">
+                                <field name="c9_fpads" nolabel="1" widget="html"/>
+                            </group>
+                            <group string="9.14 Outreach Activities">
+                                <field name="c9_outreach" nolabel="1" widget="html"/>
+                            </group>
+                        </page>
+
+                        <!-- ── Evidence ── -->
+                        <page string="Evidence Vault" name="evidence">
+                            <div class="mb-2">
+                                <button name="action_bulk_upload_evidence"
+                                        string="Bulk Upload Evidence" type="object"
+                                        class="btn-secondary"/>
+                            </div>
+                            <field name="evidence_ids" nolabel="1">
+                                <list editable="bottom">
+                                    <field name="criterion"/>
+                                    <field name="sub_section"/>
+                                    <field name="name"/>
+                                    <field name="document_type"/>
+                                    <field name="document_file" widget="binary" filename="document_filename"/>
+                                    <field name="document_filename" invisible="1"/>
+                                    <field name="document_url"/>
+                                    <field name="verified" widget="boolean_toggle"/>
+                                    <field name="upload_date"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <!-- ── Score Summary ── -->
+                        <page string="Score Summary" name="scores">
+                            <group string="Per-Criterion Scores">
+                                <group>
+                                    <field name="c1_score" readonly="1" string="C1 – Curriculum /120"/>
+                                    <field name="c2_score" readonly="1" string="C2 – Teaching /120"/>
+                                    <field name="c3_score" readonly="1" string="C3 – Assessment /120"/>
+                                    <field name="c4_score" readonly="1" string="C4 – Students /120"/>
+                                    <field name="c5_score" readonly="1" string="C5 – Faculty /100"/>
+                                </group>
+                                <group>
+                                    <field name="c6_score" readonly="1" string="C6 – Contributions /120"/>
+                                    <field name="c7_score" string="C7 – Facilities /100"/>
+                                    <field name="c8_score" string="C8 – Improvement /80"/>
+                                    <field name="c9_score" string="C9 – Governance /120"/>
+                                </group>
+                            </group>
+                            <group string="Total">
+                                <field name="total_score" readonly="1" string="Total Score /1000"
+                                       widget="progressbar" options="{'max_value': 1000}"/>
+                                <field name="readiness_pct" readonly="1" string="Readiness %"/>
+                            </group>
+                        </page>
+
+                        <!-- ── Notes ── -->
+                        <page string="Notes" name="notes_tab">
+                            <field name="notes" nolabel="1" placeholder="Internal notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         SEARCH VIEW
+    ═══════════════════════════════════════════════════════════════ -->
+    <record id="nba_sar_view_search" model="ir.ui.view">
+        <field name="name">nba.sar.view.search</field>
+        <field name="model">nba.sar</field>
+        <field name="arch" type="xml">
+            <search string="Search SARs">
+                <field name="name"/>
+                <field name="program_id"/>
+                <field name="department_id"/>
+                <field name="academic_year_id"/>
+                <filter string="Draft" name="draft" domain="[('state','=','draft')]"/>
+                <filter string="Data Entry" name="data_entry" domain="[('state','=','data_entry')]"/>
+                <filter string="Under Review" name="review" domain="[('state','=','under_review')]"/>
+                <filter string="Submitted" name="submitted" domain="[('state','=','submitted')]"/>
+                <filter string="Accredited" name="accredited" domain="[('state','=','accredited')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Program" name="by_program" context="{'group_by': 'program_id'}"/>
+                    <filter string="Department" name="by_dept" context="{'group_by': 'department_id'}"/>
+                    <filter string="State" name="by_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         ACTION
+    ═══════════════════════════════════════════════════════════════ -->
+    <record id="action_nba_sar" model="ir.actions.act_window">
+        <field name="name">SAR Records</field>
+        <field name="res_model">nba.sar</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="nba_sar_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first NBA SAR Record
+            </p>
+            <p>Start a new Self-Assessment Report for NBA accreditation (GAPC V4.0 – Tier I).</p>
+        </field>
+    </record>
+
+</odoo>

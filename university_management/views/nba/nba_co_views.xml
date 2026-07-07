@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="nba_co_view_list" model="ir.ui.view">
+        <field name="name">nba.co.view.list</field>
+        <field name="model">nba.co</field>
+        <field name="arch" type="xml">
+            <list string="Course Outcomes" decoration-success="target_met" decoration-danger="not target_met and attainment_overall > 0">
+                <field name="sar_id"/>
+                <field name="course_id"/>
+                <field name="semester_id"/>
+                <field name="name"/>
+                <field name="statement"/>
+                <field name="bloom_level"/>
+                <field name="target_level"/>
+                <field name="attainment_cie"/>
+                <field name="attainment_see"/>
+                <field name="attainment_overall"/>
+                <field name="target_met" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="nba_co_view_form" model="ir.ui.view">
+        <field name="name">nba.co.view.form</field>
+        <field name="model">nba.co</field>
+        <field name="arch" type="xml">
+            <form string="Course Outcome">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="sar_id"/>
+                            <field name="course_id"/>
+                            <field name="semester_id" readonly="1"/>
+                            <field name="sequence"/>
+                            <field name="name" readonly="1"/>
+                            <field name="bloom_level"/>
+                        </group>
+                        <group>
+                            <field name="target_level"/>
+                            <field name="attainment_cie"/>
+                            <field name="attainment_see"/>
+                            <field name="attainment_overall" readonly="1"/>
+                            <field name="target_met" readonly="1" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+                    <group string="CO Statement">
+                        <field name="statement" nolabel="1" placeholder="Measurable outcome statement..."/>
+                    </group>
+                    <group string="CO-PO Articulation Matrix">
+                        <field name="matrix_ids" nolabel="1">
+                            <list editable="bottom">
+                                <field name="po1"/><field name="po2"/><field name="po3"/>
+                                <field name="po4"/><field name="po5"/><field name="po6"/>
+                                <field name="po7"/><field name="po8"/><field name="po9"/>
+                                <field name="po10"/><field name="po11"/>
+                                <field name="pso1"/><field name="pso2"/><field name="pso3"/>
+                            </list>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nba_co" model="ir.actions.act_window">
+        <field name="name">Course Outcomes</field>
+        <field name="res_model">nba.co</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

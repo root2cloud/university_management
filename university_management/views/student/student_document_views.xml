@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="student_document_view_form" model="ir.ui.view">
+        <field name="name">student.document.view.form</field>
+        <field name="model">student.document</field>
+        <field name="arch" type="xml">
+            <form string="Student Document">
+                <header>
+                    <button name="action_set_pending" string="Set to Pending"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_submit" string="Submit"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'pending'"/>
+                    <button name="action_verify" string="Verify"
+                            type="object" class="oe_highlight"
+                            invisible="state not in ['pending', 'submitted']"
+                            groups="base.group_user"/>
+                    <button name="action_reject" string="Reject"
+                            type="object"
+                            invisible="state not in ['pending', 'submitted']"
+                            groups="base.group_user"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft"
+                            type="object"
+                            invisible="state == 'draft'"
+                            confirm="Are you sure you want to reset this document to draft?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,pending,submitted,verified"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Verified"
+                            bg_color="text-bg-success"
+                            invisible="state != 'verified'"/>
+                    <widget name="web_ribbon" title="Rejected"
+                            bg_color="text-bg-danger"
+                            invisible="state != 'rejected'"/>
+                    <widget name="web_ribbon" title="Mandatory"
+                            bg_color="text-bg-warning"
+                            invisible="not is_mandatory or state == 'verified'"/>
+
+                    <div class="oe_title">
+                        <label for="name" string="Document Name"/>
+                        <h1>
+                            <field name="name" placeholder="Enter document name"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Document Information">
+                            <field name="document_type"/>
+                            <field name="document_number"
+                                   placeholder="Enter document number"/>
+                            <field name="is_mandatory" widget="boolean_toggle"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group string="Issuance Details">
+                            <field name="issue_date" widget="date"/>
+                            <field name="expiry_date" widget="date"/>
+                            <field name="issuing_authority"
+                                   placeholder="Enter issuing authority"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Related Records">
+                            <field name="student_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="admission_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                        </group>
+                        <group string="File Attachment">
+                            <field name="attachment_id" widget="many2one_binary"/>
+                            <field name="attachment_name" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Verification Details" name="verification">
+                            <group>
+                                <group>
+                                    <field name="is_verified" widget="boolean_toggle" readonly="1"/>
+                                    <field name="verified_by" readonly="1"
+                                           invisible="not is_verified"/>
+                                </group>
+                                <group>
+                                    <field name="verification_date" widget="date" readonly="1"
+                                           invisible="not is_verified"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="verification_notes"
+                                       placeholder="Enter verification notes or observations..."/>
+                            </group>
+
+                            <separator string="Rejection Details"
+                                       invisible="state != 'rejected'"/>
+                            <group invisible="state != 'rejected'">
+                                <field name="rejection_reason"
+                                       placeholder="Enter reason for rejection..."
+                                       nolabel="1"/>
+                            </group>
+                        </page>
+
+                        <page string="Description" name="description">
+                            <field name="description"
+                                   placeholder="Enter additional information about the document..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="student_document_view_list" model="ir.ui.view">
+        <field name="name">student.document.view.list</field>
+        <field name="model">student.document</field>
+        <field name="arch" type="xml">
+            <list string="Student Documents"
+                  default_order="sequence, name"
+                  multi_edit="1"
+                  sample="1">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="document_type"/>
+                <field name="document_number" optional="show"/>
+                <field name="student_id" optional="show"/>
+                <field name="admission_id" optional="hide"/>
+                <field name="attachment_name" optional="show"/>
+                <field name="issue_date" optional="hide"/>
+                <field name="expiry_date" optional="hide"/>
+                <field name="is_mandatory" widget="boolean_toggle" optional="show"/>
+                <field name="is_verified" widget="boolean_toggle" optional="show"/>
+                <field name="verified_by" optional="hide"/>
+                <field name="verification_date" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-muted="state == 'pending'"
+                       decoration-warning="state == 'submitted'"
+                       decoration-success="state == 'verified'"
+                       decoration-danger="state == 'rejected'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="student_document_view_search" model="ir.ui.view">
+        <field name="name">student.document.view.search</field>
+        <field name="model">student.document</field>
+        <field name="arch" type="xml">
+            <search string="Search Documents">
+                <field name="name" string="Document"
+                       filter_domain="['|', ('name', 'ilike', self), ('document_number', 'ilike', self)]"/>
+                <field name="document_type"/>
+                <field name="document_number"/>
+                <field name="student_id"/>
+                <field name="admission_id"/>
+
+                <separator/>
+
+                <filter name="filter_pending" string="Pending"
+                        domain="[('state', '=', 'pending')]"/>
+                <filter name="filter_submitted" string="Submitted"
+                        domain="[('state', '=', 'submitted')]"/>
+                <filter name="filter_verified" string="Verified"
+                        domain="[('state', '=', 'verified')]"/>
+                <filter name="filter_rejected" string="Rejected"
+                        domain="[('state', '=', 'rejected')]"/>
+
+                <separator/>
+
+                <filter name="filter_mandatory" string="Mandatory"
+                        domain="[('is_mandatory', '=', True)]"/>
+                <filter name="filter_optional" string="Optional"
+                        domain="[('is_mandatory', '=', False)]"/>
+
+                <separator/>
+
+                <filter name="filter_verified_docs" string="Verified Documents"
+                        domain="[('is_verified', '=', True)]"/>
+                <filter name="filter_unverified_docs" string="Unverified Documents"
+                        domain="[('is_verified', '=', False)]"/>
+
+                <separator/>
+
+                <filter name="filter_aadhar" string="Aadhar Card"
+                        domain="[('document_type', '=', 'aadhar')]"/>
+                <filter name="filter_pan" string="PAN Card"
+                        domain="[('document_type', '=', 'pan')]"/>
+                <filter name="filter_tc" string="Transfer Certificate"
+                        domain="[('document_type', '=', 'tc')]"/>
+                <filter name="filter_cc" string="Character Certificate"
+                        domain="[('document_type', '=', 'cc')]"/>
+                <filter name="filter_marksheet_10" string="10th Marksheet"
+                        domain="[('document_type', '=', 'marksheet_10')]"/>
+                <filter name="filter_marksheet_12" string="12th Marksheet"
+                        domain="[('document_type', '=', 'marksheet_12')]"/>
+
+                <separator/>
+
+                <filter name="filter_expiring_soon" string="Expiring Soon (30 days)"
+                        domain="[('expiry_date', '&gt;=', context_today().strftime('%Y-%m-%d')),
+                                 ('expiry_date', '&lt;=', (context_today() + datetime.timedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_expired" string="Expired"
+                        domain="[('expiry_date', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_student" string="Student"
+                            context="{'group_by': 'student_id'}"/>
+                    <filter name="group_by_admission" string="Admission Application"
+                            context="{'group_by': 'admission_id'}"/>
+                    <filter name="group_by_document_type" string="Document Type"
+                            context="{'group_by': 'document_type'}"/>
+                    <filter name="group_by_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_by_verified_by" string="Verified By"
+                            context="{'group_by': 'verified_by'}"/>
+                    <filter name="group_by_is_mandatory" string="Mandatory/Optional"
+                            context="{'group_by': 'is_mandatory'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="document_type" string="Document Type"
+                           select="multi"
+                           icon="fa-file-text"/>
+                    <field name="state" string="Status"
+                           select="multi"
+                           icon="fa-check-circle"/>
+                    <field name="verified_by" string="Verified By"
+                            select="multi"
+                            icon="fa-user-check"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="student_document_view_kanban" model="ir.ui.view">
+        <field name="name">student.document.view.kanban</field>
+        <field name="model">student.document</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="document_type"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="document_type"/>
+                <field name="document_number"/>
+                <field name="student_id"/>
+                <field name="attachment_name"/>
+                <field name="is_verified"/>
+                <field name="is_mandatory"/>
+                <field name="state"/>
+                <field name="expiry_date"/>
+
+                <progressbar field="state"
+                             colors='{"pending": "muted", "submitted": "warning", "verified": "success", "rejected": "danger"}'/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                        <div class="text-muted">
+                                            <field name="document_type"/>
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_record_top_right">
+                                        <field name="state" widget="badge"
+                                               decoration-muted="state == 'pending'"
+                                               decoration-warning="state == 'submitted'"
+                                               decoration-success="state == 'verified'"
+                                               decoration-danger="state == 'rejected'"/>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body">
+                                    <div class="row mb-2" t-if="record.student_id.raw_value">
+                                        <div class="col-12">
+                                            <i class="fa fa-user text-primary"/>
+                                            <field name="student_id"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.document_number.raw_value">
+                                        <div class="col-12">
+                                            <i class="fa fa-hashtag text-info"/>
+                                            <field name="document_number"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.attachment_name.raw_value">
+                                        <div class="col-12">
+                                            <i class="fa fa-paperclip text-success"/>
+                                            <field name="attachment_name"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <span t-if="record.is_mandatory.raw_value"
+                                                  class="badge text-bg-warning">
+                                                <i class="fa fa-exclamation"/> Mandatory
+                                            </span>
+                                            <span t-else="" class="badge text-bg-info">
+                                                Optional
+                                            </span>
+                                        </div>
+                                        <div class="col-6">
+                                            <span t-if="record.is_verified.raw_value"
+                                                  class="badge text-bg-success">
+                                                <i class="fa fa-check"/> Verified
+                                            </span>
+                                            <span t-else="" class="badge text-bg-secondary">
+                                                <i class="fa fa-clock-o"/> Unverified
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-2" t-if="record.expiry_date.raw_value">
+                                        <div class="col-12 text-muted">
+                                            <i class="fa fa-calendar"/>
+                                            Expires: <field name="expiry_date"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="student_document_view_pivot" model="ir.ui.view">
+        <field name="name">student.document.view.pivot</field>
+        <field name="model">student.document</field>
+        <field name="arch" type="xml">
+            <pivot string="Document Analysis">
+                <field name="document_type" type="row"/>
+                <field name="state" type="col"/>
+                <field name="is_verified" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View -->
+    <record id="student_document_view_graph" model="ir.ui.view">
+        <field name="name">student.document.view.graph</field>
+        <field name="model">student.document</field>
+        <field name="arch" type="xml">
+            <graph string="Document Statistics" type="bar" stacked="1">
+                <field name="document_type"/>
+                <field name="state"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_student_document" model="ir.actions.act_window">
+        <field name="name">Student Documents</field>
+        <field name="res_model">student.document</field>
+        <field name="view_mode">kanban,list,form,pivot,graph</field>
+        <field name="context">{
+            'search_default_filter_submitted': 1,
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Upload your first Student Document
+            </p>
+            <p>
+                Manage and verify student documents including Aadhar card, certificates,
+                marksheets, and other required documents for admission and enrollment.
+            </p>
+        </field>
+    </record>
+
+</odoo>

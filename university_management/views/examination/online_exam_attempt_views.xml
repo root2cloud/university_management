@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="online_exam_attempt_view_form" model="ir.ui.view">
+        <field name="name">online.exam.attempt.view.form</field>
+        <field name="model">online.exam.attempt</field>
+        <field name="arch" type="xml">
+            <form string="Exam Attempt" create="0" delete="0">
+                <header>
+                    <button name="action_submit" type="object" string="Force Submit"
+                            class="oe_highlight"
+                            invisible="state != 'in_progress'"
+                            confirm="Force submit this attempt? This cannot be undone."/>
+                    <button name="auto_evaluate" type="object" string="Re-evaluate"
+                            class="btn-secondary"
+                            invisible="state == 'in_progress'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="in_progress,submitted,evaluated"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="Attempt Reference"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Student &amp; Exam">
+                            <field name="student_id"/>
+                            <field name="registration_number"/>
+                            <field name="program_id"/>
+                            <field name="online_exam_id"/>
+                            <field name="subject_id"/>
+                            <field name="examination_id"/>
+                        </group>
+                        <group string="Timing">
+                            <field name="start_datetime"/>
+                            <field name="submit_datetime"/>
+                            <field name="expiry_datetime"/>
+                        </group>
+                    </group>
+
+                    <!-- Score Summary -->
+                    <group string="Score">
+                        <group>
+                            <field name="total_score"/>
+                            <field name="max_score"/>
+                            <field name="percentage" widget="progressbar"/>
+                        </group>
+                        <group>
+                            <field name="answered_count"/>
+                            <field name="total_questions"/>
+                            <field name="result" widget="badge"
+                                   decoration-success="result == 'pass'"
+                                   decoration-danger="result == 'fail'"
+                                   decoration-warning="result == 'pending'"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Responses">
+                            <field name="response_ids" readonly="1">
+                                <list decoration-success="is_correct == True"
+                                       decoration-danger="is_correct == False and is_evaluated"
+                                       decoration-muted="is_skipped">
+                                    <field name="sequence" string="#"/>
+                                    <field name="question_id" string="Question"/>
+                                    <field name="question_type" string="Type"/>
+                                    <field name="selected_option_ids"
+                                           widget="many2many_tags"
+                                           string="Selected Options"/>
+                                    <field name="text_answer" string="Text Answer"/>
+                                    <field name="max_marks" string="Max"/>
+                                    <field name="marks_awarded" string="Awarded"/>
+                                    <field name="is_correct" string="Correct?"/>
+                                    <field name="is_evaluated" string="Evaluated?"/>
+                                    <field name="is_skipped" string="Skipped?"/>
+                                    <field name="is_flagged" string="Flagged?"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Remarks">
+                            <field name="remarks"/>
+                            <field name="ip_address" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="online_exam_attempt_view_list" model="ir.ui.view">
+        <field name="name">online.exam.attempt.view.list</field>
+        <field name="model">online.exam.attempt</field>
+        <field name="arch" type="xml">
+            <list string="Exam Attempts" create="0"
+                  decoration-success="result == 'pass'"
+                  decoration-danger="result == 'fail'"
+                  decoration-muted="state == 'expired'">
+                <field name="name" string="Reference"/>
+                <field name="student_id"/>
+                <field name="registration_number"/>
+                <field name="online_exam_id"/>
+                <field name="subject_id"/>
+                <field name="start_datetime"/>
+                <field name="submit_datetime"/>
+                <field name="answered_count" string="Answered"/>
+                <field name="total_questions" string="Total Q"/>
+                <field name="total_score" string="Score"/>
+                <field name="max_score" string="Max"/>
+                <field name="percentage" string="%" widget="progressbar"/>
+                <field name="result" widget="badge"
+                       decoration-success="result == 'pass'"
+                       decoration-danger="result == 'fail'"
+                       decoration-warning="result == 'pending'"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'in_progress'"
+                       decoration-success="state == 'evaluated'"
+                       decoration-warning="state == 'submitted'"
+                       decoration-danger="state == 'expired'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="online_exam_attempt_view_search" model="ir.ui.view">
+        <field name="name">online.exam.attempt.view.search</field>
+        <field name="model">online.exam.attempt</field>
+        <field name="arch" type="xml">
+            <search string="Search Attempts">
+                <field name="student_id"/>
+                <field name="registration_number"/>
+                <field name="online_exam_id"/>
+                <field name="subject_id"/>
+                <separator/>
+                <filter string="In Progress" name="f_ip" domain="[('state','=','in_progress')]"/>
+                <filter string="Submitted" name="f_sub" domain="[('state','=','submitted')]"/>
+                <filter string="Evaluated" name="f_eval" domain="[('state','=','evaluated')]"/>
+                <filter string="Expired" name="f_exp" domain="[('state','=','expired')]"/>
+                <separator/>
+                <filter string="Pass" name="f_pass" domain="[('result','=','pass')]"/>
+                <filter string="Fail" name="f_fail" domain="[('result','=','fail')]"/>
+                <filter string="Pending Eval" name="f_pending" domain="[('result','=','pending')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Online Exam" name="grp_exam"
+                            context="{'group_by': 'online_exam_id'}"/>
+                    <filter string="Student" name="grp_student"
+                            context="{'group_by': 'student_id'}"/>
+                    <filter string="Result" name="grp_result"
+                            context="{'group_by': 'result'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_online_exam_attempt" model="ir.actions.act_window">
+        <field name="name">Exam Attempts</field>
+        <field name="res_model">online.exam.attempt</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="online_exam_attempt_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No attempts yet.</p>
+            <p>Student attempts will appear here once they start taking online exams.</p>
+        </field>
+    </record>
+
+</odoo>

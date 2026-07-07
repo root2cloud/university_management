@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ══════════════════════════════════════════════════════════
+         EXISTING TEMPLATES (kept as-is)
+    ══════════════════════════════════════════════════════════ -->
+
+    <template id="iic_portal_events" name="IIC Events Portal">
+        <t t-call="website.layout">
+            <div class="container mt-5">
+                <div class="row mb-4">
+                    <div class="col">
+                        <h1 class="text-primary">
+                            <i class="fa fa-lightbulb-o"/> IIC Activities
+                        </h1>
+                        <p class="lead text-muted">Institute Innovation Council — MSME Mandated Activities</p>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <form method="GET" action="/iic/events">
+                            <div class="d-flex gap-2">
+                                <select name="activity_type" class="form-control">
+                                    <option value="">All Types</option>
+                                    <t t-foreach="activity_types" t-as="at">
+                                        <option t-att-value="at[0]" t-att-selected="at[0] == selected_type">
+                                            <t t-esc="at[1]"/>
+                                        </option>
+                                    </t>
+                                </select>
+                                <select name="quarter" class="form-control">
+                                    <option value="">All Quarters</option>
+                                    <t t-foreach="quarters" t-as="q">
+                                        <option t-att-value="q[0]" t-att-selected="q[0] == selected_quarter">
+                                            <t t-esc="q[1]"/>
+                                        </option>
+                                    </t>
+                                </select>
+                                <button type="submit" class="btn btn-primary">Filter</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="row">
+                    <t t-foreach="events" t-as="event">
+                        <div class="col-md-4 mb-4">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title"><t t-esc="event.name"/></h5>
+                                    <p class="text-muted small"><t t-esc="event.venue"/> | <t t-esc="event.event_date"/></p>
+                                    <a t-attf-href="/iic/events/#{event.id}" class="btn btn-sm btn-outline-primary">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="iic_portal_event_detail" name="IIC Event Detail">
+        <t t-call="website.layout">
+            <div class="container mt-5">
+                <h1 t-esc="event.name"/>
+                <p class="text-muted"><t t-esc="event.venue"/> | <t t-esc="event.event_date"/></p>
+                <div t-raw="event.description"/>
+            </div>
+        </t>
+    </template>
+
+    <!-- ══════════════════════════════════════════════════════════
+         QR CHECK-IN SUCCESS PAGE
+         Shown after student/faculty scans QR 1 (check-in)
+    ══════════════════════════════════════════════════════════ -->
+    <template id="iic_qr_checkin_done" name="IIC QR Check-in Done">
+        <t t-call="website.layout">
+            <div class="container mt-5" style="max-width: 540px;">
+                <div class="card shadow text-center">
+
+                    <t t-if="already_checked_in">
+                        <!-- Already checked in -->
+                        <div class="card-header bg-warning text-dark py-3">
+                            <h4 class="mb-0"><i class="fa fa-exclamation-circle"/> Already Checked In</h4>
+                        </div>
+                        <div class="card-body py-4">
+                            <p class="lead">Hello, <strong><t t-esc="attendee_name"/>!</strong></p>
+                            <p>You have already checked in to this event.</p>
+                            <p class="text-muted">Event: <strong><t t-esc="event.name"/></strong></p>
+                            <hr/>
+                            <div class="alert alert-info">
+                                <i class="fa fa-info-circle"/> <strong>Remember:</strong>
+                                Scan the <strong>Check-out QR code</strong> at the END of the event to complete your attendance.
+                            </div>
+                        </div>
+                    </t>
+
+                    <t t-if="not already_checked_in">
+                        <!-- Fresh check-in success -->
+                        <div class="card-header bg-success text-white py-3">
+                            <h4 class="mb-0"><i class="fa fa-check-circle"/> Check-in Successful!</h4>
+                        </div>
+                        <div class="card-body py-4">
+                            <div style="font-size: 60px; color: #28a745;">✓</div>
+                            <p class="lead mt-2">Welcome, <strong><t t-esc="attendee_name"/>!</strong></p>
+                            <p class="text-muted">Your check-in has been recorded for:</p>
+                            <h5 t-esc="event.name"/>
+                            <p class="text-muted small">Check-in time: <t t-esc="attendance.checkin_time"/></p>
+                            <hr/>
+                            <div class="alert alert-warning">
+                                <i class="fa fa-clock-o"/> <strong>Important — What to do next:</strong>
+                                <p class="mb-0 mt-2">You must scan the <strong>Check-out QR code</strong> at the END of the event.
+                                Without check-out, your attendance will be marked <strong>Absent</strong>.</p>
+                            </div>
+                        </div>
+                    </t>
+
+                    <div class="card-footer text-muted small py-3">
+                        IIC Attendance System — <t t-esc="event.name"/>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ══════════════════════════════════════════════════════════
+         QR CHECK-OUT SUCCESS PAGE
+         Shown after student/faculty scans QR 2 (check-out)
+    ══════════════════════════════════════════════════════════ -->
+    <template id="iic_qr_checkout_done" name="IIC QR Check-out Done">
+        <t t-call="website.layout">
+            <div class="container mt-5" style="max-width: 540px;">
+                <div class="card shadow text-center">
+
+                    <t t-if="already_done">
+                        <div class="card-header bg-secondary text-white py-3">
+                            <h4 class="mb-0"><i class="fa fa-info-circle"/> Already Checked Out</h4>
+                        </div>
+                        <div class="card-body py-4">
+                            <p class="lead">Hello, <strong><t t-esc="attendee_name"/>!</strong></p>
+                            <p>Your attendance has already been recorded for this event.</p>
+                            <p class="text-muted">Event: <strong><t t-esc="event.name"/></strong></p>
+                            <p>Status: <strong><t t-esc="attendance.status"/></strong></p>
+                        </div>
+                    </t>
+
+                    <t t-if="not already_done">
+                        <!-- Determine colour based on result -->
+                        <t t-if="final_status == 'present'">
+                            <div class="card-header bg-success text-white py-3">
+                                <h4 class="mb-0"><i class="fa fa-check-circle"/> Attendance Marked — PRESENT ✅</h4>
+                            </div>
+                            <div class="card-body py-4">
+                                <div style="font-size: 60px; color: #28a745;">✓</div>
+                                <p class="lead mt-2">Well done, <strong><t t-esc="attendee_name"/>!</strong></p>
+                                <p>Your attendance has been marked as <strong class="text-success">PRESENT</strong>.</p>
+                                <p class="text-muted">You stayed for <strong><t t-esc="duration_minutes"/> minutes</strong>
+                                (minimum required: <t t-esc="min_required"/> minutes).</p>
+                                <p class="text-muted small">Event: <t t-esc="event.name"/></p>
+                            </div>
+                        </t>
+                        <t t-if="final_status == 'absent'">
+                            <div class="card-header bg-danger text-white py-3">
+                                <h4 class="mb-0"><i class="fa fa-times-circle"/> Attendance Marked — ABSENT ❌</h4>
+                            </div>
+                            <div class="card-body py-4">
+                                <div style="font-size: 60px; color: #dc3545;">✗</div>
+                                <p class="lead mt-2">Hello, <strong><t t-esc="attendee_name"/>.</strong></p>
+                                <p>Your attendance has been marked as <strong class="text-danger">ABSENT</strong>.</p>
+                                <p class="text-muted">You stayed for only <strong><t t-esc="duration_minutes"/> minutes</strong>.
+                                The minimum required duration is <strong><t t-esc="min_required"/> minutes</strong>.</p>
+                                <div class="alert alert-danger mt-3">
+                                    <i class="fa fa-exclamation-triangle"/>
+                                    You did not meet the minimum attendance duration and have been marked absent.
+                                    Please contact the event coordinator if you believe this is an error.
+                                </div>
+                            </div>
+                        </t>
+                    </t>
+
+                    <div class="card-footer text-muted small py-3">
+                        IIC Attendance System — <t t-esc="event.name"/>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ══════════════════════════════════════════════════════════
+         CHECK-OUT WITHOUT CHECK-IN
+    ══════════════════════════════════════════════════════════ -->
+    <template id="iic_qr_checkout_no_checkin" name="IIC QR Checkout No Checkin">
+        <t t-call="website.layout">
+            <div class="container mt-5" style="max-width: 540px;">
+                <div class="card shadow text-center">
+                    <div class="card-header bg-warning text-dark py-3">
+                        <h4 class="mb-0"><i class="fa fa-exclamation-triangle"/> Check-in Not Found</h4>
+                    </div>
+                    <div class="card-body py-4">
+                        <div style="font-size: 60px; color: #ffc107;">⚠</div>
+                        <p class="lead mt-2">Hello, <strong><t t-esc="attendee_name"/>.</strong></p>
+                        <p>You have not checked in to this event yet.</p>
+                        <p class="text-muted">You must scan the <strong>Check-in QR code first</strong>, then the Check-out QR code at the end.</p>
+                        <p class="text-muted small">Event: <t t-esc="event.name"/></p>
+                        <div class="alert alert-warning mt-3">
+                            <i class="fa fa-info-circle"/>
+                            Your attendance will be marked <strong>Absent</strong> as no check-in record was found.
+                            Contact the event coordinator immediately.
+                        </div>
+                    </div>
+                    <div class="card-footer text-muted small py-3">
+                        IIC Attendance System — <t t-esc="event.name"/>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ══════════════════════════════════════════════════════════
+         INVALID / EXPIRED QR
+    ══════════════════════════════════════════════════════════ -->
+    <template id="iic_qr_invalid" name="IIC QR Invalid">
+        <t t-call="website.layout">
+            <div class="container mt-5" style="max-width: 540px;">
+                <div class="card shadow text-center">
+                    <div class="card-header bg-danger text-white py-3">
+                        <h4 class="mb-0"><i class="fa fa-ban"/> Invalid QR Code</h4>
+                    </div>
+                    <div class="card-body py-4">
+                        <div style="font-size: 60px; color: #dc3545;">✗</div>
+                        <p class="lead mt-3"><t t-esc="scan_type"/> QR Code is Invalid</p>
+                        <p class="text-muted"><t t-esc="message"/></p>
+                    </div>
+                    <div class="card-footer text-muted small py-3">
+                        IIC Attendance System
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>

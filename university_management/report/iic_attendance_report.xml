@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_iic_attendance_sheet" model="ir.actions.report">
+        <field name="name">IIC Event Attendance Sheet</field>
+        <field name="model">iic.event</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">university_management.report_iic_attendance_sheet_template</field>
+        <field name="report_file">university_management.report_iic_attendance_sheet_template</field>
+        <field name="binding_model_id" ref="model_iic_event"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_iic_attendance_sheet_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="text-center mb-4">
+                            <h3>INSTITUTE INNOVATION COUNCIL</h3>
+                            <h4>ATTENDANCE SHEET</h4>
+                        </div>
+                        <table class="table table-bordered mb-4">
+                            <tr>
+                                <th class="bg-light" style="width:30%">Event Name</th>
+                                <td><t t-esc="doc.name"/></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Date</th>
+                                <td><t t-esc="doc.date_begin"/></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Venue</th>
+                                <td><t t-esc="doc.venue"/></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Activity Type</th>
+                                <td><t t-esc="doc.activity_type"/></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Faculty In-charge</th>
+                                <td><t t-esc="doc.faculty_incharge_id.name"/></td>
+                            </tr>
+                        </table>
+
+                        <h5 class="mb-3">Student Attendance</h5>
+                        <table class="table table-bordered">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th style="width:5%">#</th>
+                                    <th style="width:25%">Student Name</th>
+                                    <th style="width:15%">Reg. No.</th>
+                                    <th style="width:20%">Department</th>
+                                    <th style="width:15%">Status</th>
+                                    <th style="width:20%">Signature</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="sno" t-value="1"/>
+                                <t t-foreach="doc.attendance_ids" t-as="att">
+                                    <tr>
+                                        <td><t t-esc="sno"/><t t-set="sno" t-value="sno + 1"/></td>
+                                        <td><t t-esc="att.display_name"/></td>
+                                        <td>
+                                            <t t-if="att.student_id">
+                                                <t t-esc="att.student_id.registration_number"/>
+                                            </t>
+                                        </td>
+                                        <td><t t-esc="att.department_id.name"/></td>
+                                        <td>
+                                            <span t-attf-class="badge badge-{{ att.status == 'present' and 'success' or 'danger' }}">
+                                                <t t-esc="att.status"/>
+                                            </span>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                </t>
+                                <t t-if="not doc.attendance_ids">
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">
+                                            No attendance records yet
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <div class="row mt-4">
+                            <div class="col-6">
+                                <strong>Total Present: </strong>
+                                <t t-esc="doc.actual_participants"/>
+                            </div>
+                            <div class="col-6">
+                                <strong>Total Registered: </strong>
+                                <t t-esc="doc.attendance_count"/>
+                            </div>
+                        </div>
+
+                        <div class="row mt-5">
+                            <div class="col-4 text-center">
+                                <div class="border-top pt-2">Faculty In-charge</div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div class="border-top pt-2">IIC Convenor</div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div class="border-top pt-2">IIC President</div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

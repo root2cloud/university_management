@@ -1,0 +1,197 @@
+<odoo>
+<!--  Form View  -->
+<record id="faculty_form16_view_form" model="ir.ui.view">
+<field name="name">faculty.form16.view.form</field>
+<field name="model">faculty.form16</field>
+<field name="arch" type="xml">
+<form string="Form 16 – TDS Certificate">
+<header>
+<button name="action_compute_from_slips" type="object" string="Re-compute from Salary Slips" class="btn-secondary" invisible="state != 'draft'"/>
+<button name="action_verify" type="object" string="Verify" class="oe_highlight" invisible="state != 'draft'"/>
+<button name="action_issue" type="object" string="Issue Certificate" class="oe_highlight" invisible="state != 'verified'"/>
+<button name="action_print_form16" type="object" string="Print Form 16" class="btn-secondary" invisible="state == 'draft'"/>
+<button name="action_reset_draft" type="object" string="Reset to Draft" invisible="state == 'draft'" confirm="Reset this Form 16 to draft?"/>
+<field name="state" widget="statusbar" statusbar_visible="draft,verified,issued"/>
+</header>
+<sheet>
+<div class="oe_title">
+<label for="name" string="Certificate No."/>
+<h1>
+<field name="name" readonly="1"/>
+</h1>
+</div>
+<!--  ── CERTIFICATE HEADER ──  -->
+<div class="alert alert-info" role="alert" style="text-align:center;">
+<strong>FORM NO. 16</strong>
+— Certificate under Section 203 of the Income Tax Act, 1961 for Tax Deducted at Source from Income Chargeable under the Head "Salaries"
+</div>
+<group>
+<group string="Employer Details">
+<field name="employer_name"/>
+<field name="employer_tan"/>
+<field name="employer_pan"/>
+<field name="employer_address" widget="text"/>
+</group>
+<group string="Employee Details">
+<field name="faculty_id" options="{'no_create': True, 'no_create_edit': True}"/>
+<field name="employee_id" invisible="1"/>
+<field name="department_id" readonly="1"/>
+<field name="designation_id" readonly="1"/>
+<field name="pan_number"/>
+<field name="date_of_joining"/>
+<field name="residential_address" widget="text"/>
+</group>
+</group>
+<group>
+<group string="Period">
+<field name="financial_year"/>
+<field name="assessment_year"/>
+<field name="period_from"/>
+<field name="period_to"/>
+</group>
+<group string="Issuance">
+<field name="date_issued"/>
+<field name="place_issued"/>
+<field name="authorised_signatory"/>
+<field name="designation_signatory"/>
+</group>
+</group>
+<notebook>
+<!--  PART A  -->
+<page string="Part A – TDS Summary">
+<div class="alert alert-warning" role="alert">
+<strong>Part A</strong>
+— Details of Tax Deducted and Deposited in the Central Government Account through Book Adjustment
+</div>
+<group>
+<group string="TDS Details">
+<field name="gross_salary" widget="monetary"/>
+<field name="tds_deducted" widget="monetary"/>
+<field name="tds_deposited" widget="monetary"/>
+</group>
+</group>
+</page>
+<!--  PART B  -->
+<page string="Part B – Salary Breakup">
+<div class="alert alert-warning" role="alert">
+<strong>Part B</strong>
+— Details of Salary Paid and any other income and tax deducted
+</div>
+<group string="Earnings">
+<group>
+<field name="basic_salary" widget="monetary"/>
+<field name="hra" widget="monetary"/>
+<field name="da" widget="monetary"/>
+<field name="special_allowance" widget="monetary"/>
+<field name="transport_allow" widget="monetary"/>
+</group>
+<group>
+<field name="medical_allow" widget="monetary"/>
+<field name="other_allowances" widget="monetary"/>
+<field name="performance_bonus" widget="monetary"/>
+<field name="gross_salary" widget="monetary" readonly="1"/>
+</group>
+</group>
+<group string="Deductions u/s 16">
+<group>
+<field name="standard_deduction" widget="monetary"/>
+<field name="entertainment_allow_deduction" widget="monetary"/>
+<field name="professional_tax_deduction" widget="monetary"/>
+</group>
+<group>
+<field name="income_chargeable" widget="monetary" readonly="1"/>
+</group>
+</group>
+<group string="Chapter VI-A Deductions">
+<group>
+<field name="deduction_80c" widget="monetary"/>
+<field name="deduction_80d" widget="monetary"/>
+<field name="deduction_80e" widget="monetary"/>
+</group>
+<group>
+<field name="deduction_80g" widget="monetary"/>
+<field name="deduction_80tta" widget="monetary"/>
+<field name="other_deductions_vi" widget="monetary"/>
+<field name="total_vi_a_deductions" widget="monetary" readonly="1"/>
+</group>
+</group>
+<group string="Tax Computation">
+<group>
+<field name="net_taxable_income" widget="monetary" readonly="1"/>
+<field name="tax_on_income" widget="monetary" readonly="1"/>
+<field name="rebate_87a" widget="monetary" readonly="1"/>
+<field name="surcharge" widget="monetary"/>
+</group>
+<group>
+<field name="health_edu_cess" widget="monetary" readonly="1"/>
+<field name="total_tax_payable" widget="monetary" readonly="1"/>
+<field name="relief_89" widget="monetary"/>
+<field name="net_tax_payable" widget="monetary" readonly="1"/>
+</group>
+</group>
+</page>
+<!--  Remarks  -->
+<page string="Remarks">
+<field name="notes" widget="text" placeholder="Any additional remarks…"/>
+</page>
+</notebook>
+</sheet>
+<chatter/>
+</form>
+</field>
+</record>
+<!--  List View  -->
+<record id="faculty_form16_view_list" model="ir.ui.view">
+<field name="name">faculty.form16.view.list</field>
+<field name="model">faculty.form16</field>
+<field name="arch" type="xml">
+<list string="Form 16" decoration-success="state == 'issued'" decoration-info="state == 'verified'" decoration-muted="state == 'draft'">
+<field name="name"/>
+<field name="faculty_id"/>
+<field name="department_id"/>
+<field name="financial_year"/>
+<field name="assessment_year"/>
+<field name="gross_salary" widget="monetary"/>
+<field name="net_taxable_income" widget="monetary"/>
+<field name="tds_deducted" widget="monetary"/>
+<field name="net_tax_payable" widget="monetary"/>
+<field name="state" widget="badge"/>
+<field name="currency_id" column_invisible="1"/>
+</list>
+</field>
+</record>
+<!--  Search View  -->
+<record id="faculty_form16_view_search" model="ir.ui.view">
+<field name="name">faculty.form16.view.search</field>
+<field name="model">faculty.form16</field>
+<field name="arch" type="xml">
+<search string="Search Form 16">
+<field name="faculty_id"/>
+<field name="financial_year"/>
+<field name="assessment_year"/>
+<field name="name"/>
+<filter string="Draft" name="draft" domain="[('state','=','draft')]"/>
+<filter string="Verified" name="verified" domain="[('state','=','verified')]"/>
+<filter string="Issued" name="issued" domain="[('state','=','issued')]"/>
+<group expand="0" string="Group By">
+<filter string="Faculty" name="group_faculty" context="{'group_by': 'faculty_id'}"/>
+<filter string="Financial Year" name="group_fy" context="{'group_by': 'financial_year'}"/>
+<filter string="Department" name="group_dept" context="{'group_by': 'department_id'}"/>
+<filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+</group>
+</search>
+</field>
+</record>
+<!--  Action  -->
+<record id="action_faculty_form16" model="ir.actions.act_window">
+<field name="name">Form 16</field>
+<field name="res_model">faculty.form16</field>
+<field name="view_mode">list,form</field>
+<field name="search_view_id" ref="faculty_form16_view_search"/>
+<field name="context">{}</field>
+<field name="help" type="html">
+<p class="o_view_nocontent_smiling_face"> Generate Form 16 for Faculty </p>
+<p> Form 16 is the TDS certificate issued to employees under Section 203 of the Income Tax Act, 1961. </p>
+</field>
+</record>
+</odoo>

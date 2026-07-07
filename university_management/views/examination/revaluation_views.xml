@@ -1,0 +1,541 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="examination_revaluation_view_form" model="ir.ui.view">
+        <field name="name">examination.revaluation.view.form</field>
+        <field name="model">examination.revaluation</field>
+        <field name="arch" type="xml">
+            <form string="Revaluation Request">
+                <header>
+                    <button name="action_submit" type="object" string="Submit Application"
+                            class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_review" type="object" string="Start Review"
+                            class="oe_highlight"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_start_revaluation" type="object" string="Start Revaluation"
+                            class="oe_highlight"
+                            invisible="state != 'under_review'"/>
+                    <button name="action_complete" type="object" string="Complete Revaluation"
+                            class="oe_highlight"
+                            invisible="state != 'revaluation_in_progress'"/>
+                    <button name="action_reject" type="object" string="Reject Application"
+                            invisible="state in ['completed', 'rejected']"
+                            confirm="Are you sure you want to reject this revaluation request?"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"
+                            confirm="Are you sure you want to reset this Revaluation to draft?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,under_review,revaluation_in_progress,completed"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Fee Pending" bg_color="text-bg-warning"
+                            invisible="fee_paid or state in ['completed', 'rejected']"/>
+                    <widget name="web_ribbon" title="Marks Increased" bg_color="text-bg-success"
+                            invisible="outcome != 'increased' or state != 'completed'"/>
+                    <widget name="web_ribbon" title="Marks Decreased" bg_color="text-bg-danger"
+                            invisible="outcome != 'decreased' or state != 'completed'"/>
+                    <widget name="web_ribbon" title="No Change" bg_color="text-bg-info"
+                            invisible="outcome != 'no_change' or state != 'completed'"/>
+                    <widget name="web_ribbon" title="Rejected" bg_color="text-bg-danger"
+                            invisible="state != 'rejected'"/>
+
+                    <div class="oe_title">
+                        <label for="name" string="Revaluation Number"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Student Details">
+                            <field name="student_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="registration_number" readonly="1"/>
+                        </group>
+                        <group string="Application Details">
+                            <field name="application_date" widget="date"/>
+                            <field name="revaluation_type"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Exam Result">
+                            <field name="result_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"
+                                   domain="[('student_id', '=', student_id), ('state', '=', 'published')]"/>
+                            <field name="examination_id" readonly="1"/>
+                            <field name="subject_id" readonly="1"/>
+                        </group>
+                        <group string="Original Result">
+                            <field name="original_marks" readonly="1"/>
+                            <field name="original_grade" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group string="Fee Details">
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="revaluation_fee" widget="monetary"/>
+                            <field name="fee_paid" widget="boolean_toggle"/>
+                        </group>
+                        <group>
+                            <field name="payment_reference"
+                                   invisible="not fee_paid"
+                                   placeholder="e.g., TXN123456789"/>
+                            <field name="payment_date" widget="date"
+                                   invisible="not fee_paid"/>
+                        </group>
+                    </group>
+
+                    <group string="Reason for Revaluation">
+                        <field name="reason" nolabel="1"
+                               placeholder="Enter detailed reason for requesting revaluation..."/>
+                    </group>
+
+                    <notebook>
+                        <page string="Revaluation Result" name="revaluation_result"
+                              invisible="state in ['draft', 'submitted']">
+                            <group>
+                                <group string="Revaluation Details">
+                                    <field name="revaluated_by"
+                                           options="{'no_create': True, 'no_create_edit': True}"/>
+                                    <field name="revaluation_date" widget="date"/>
+                                </group>
+                                <group string="New Result">
+                                    <field name="revaluated_marks"/>
+                                    <field name="revaluated_grade" readonly="1"/>
+                                </group>
+                            </group>
+
+                            <separator string="Result Comparison"/>
+
+                            <group>
+                                <group string="Marks Analysis">
+                                    <field name="marks_difference" readonly="1"
+                                           decoration-success="marks_difference &gt; 0"
+                                           decoration-danger="marks_difference &lt; 0"
+                                           decoration-muted="marks_difference == 0"/>
+                                    <field name="marks_changed" readonly="1"
+                                           widget="boolean_toggle"/>
+                                    <field name="outcome" readonly="1"
+                                           widget="badge"
+                                           decoration-success="outcome == 'increased'"
+                                           decoration-danger="outcome == 'decreased'"
+                                           decoration-info="outcome == 'no_change'"/>
+                                </group>
+                                <group>
+                                    <div class="alert alert-success" role="alert"
+                                         invisible="outcome != 'increased'">
+                                        <i class="fa fa-arrow-up"/>
+                                        <strong>Marks Increased by <field name="marks_difference" readonly="1"/> marks!</strong>
+                                        <div class="mt-2">
+                                            Original: <field name="original_marks" readonly="1"/> →
+                                            New: <field name="revaluated_marks" readonly="1"/>
+                                        </div>
+                                    </div>
+                                    <div class="alert alert-danger" role="alert"
+                                         invisible="outcome != 'decreased'">
+                                        <i class="fa fa-arrow-down"/>
+                                        <strong>Marks Decreased by <field name="marks_difference" readonly="1"/> marks!</strong>
+                                        <div class="mt-2">
+                                            Original: <field name="original_marks" readonly="1"/> →
+                                            New: <field name="revaluated_marks" readonly="1"/>
+                                        </div>
+                                    </div>
+                                    <div class="alert alert-info" role="alert"
+                                         invisible="outcome != 'no_change'">
+                                        <i class="fa fa-minus"/>
+                                        <strong>No Change in Marks</strong>
+                                        <div class="mt-2">
+                                            Marks remain: <field name="original_marks" readonly="1"/>
+                                        </div>
+                                    </div>
+                                </group>
+                            </group>
+
+                            <separator string="Revaluation Notes"/>
+                            <field name="revaluation_notes" nolabel="1"
+                                   placeholder="Enter detailed notes about the revaluation process..."/>
+                        </page>
+
+                        <page string="Rejection Details" name="rejection"
+                              invisible="state != 'rejected'">
+                            <group>
+                                <field name="rejection_reason" nolabel="1"
+                                       placeholder="Enter reason for rejection..."/>
+                            </group>
+                        </page>
+
+                        <page string="Remarks" name="remarks">
+                            <field name="remarks" nolabel="1"
+                                   placeholder="Enter any additional remarks or comments..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="examination_revaluation_view_list" model="ir.ui.view">
+        <field name="name">examination.revaluation.view.list</field>
+        <field name="model">examination.revaluation</field>
+        <field name="arch" type="xml">
+            <list string="Revaluation Requests"
+                  default_order="application_date desc"
+                  multi_edit="1"
+                  sample="1"
+                  decoration-success="outcome == 'increased' and state == 'completed'"
+                  decoration-info="outcome == 'no_change' and state == 'completed'"
+                  decoration-danger="outcome == 'decreased' and state == 'completed' or state == 'rejected'"
+                  decoration-warning="not fee_paid and state == 'draft'"
+                  decoration-muted="state == 'rejected'">
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="registration_number" optional="show"/>
+                <field name="examination_id" optional="show"/>
+                <field name="subject_id"/>
+                <field name="revaluation_type"/>
+                <field name="application_date"/>
+                <field name="original_marks" optional="show"/>
+                <field name="revaluated_marks" optional="hide"/>
+                <field name="marks_difference" optional="hide"
+                       decoration-success="marks_difference &gt; 0"
+                       decoration-danger="marks_difference &lt; 0"/>
+                <field name="revaluation_fee" optional="hide" widget="monetary"/>
+                <field name="fee_paid" widget="boolean_toggle"/>
+                <field name="outcome" optional="hide"
+                       widget="badge"
+                       decoration-success="outcome == 'increased'"
+                       decoration-danger="outcome == 'decreased'"
+                       decoration-info="outcome == 'no_change'"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'completed'"
+                       decoration-info="state in ['under_review', 'revaluation_in_progress']"
+                       decoration-warning="state == 'submitted'"
+                       decoration-danger="state == 'rejected'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="examination_revaluation_view_search" model="ir.ui.view">
+        <field name="name">examination.revaluation.view.search</field>
+        <field name="model">examination.revaluation</field>
+        <field name="arch" type="xml">
+            <search string="Search Revaluation Requests">
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="registration_number"/>
+                <field name="examination_id"/>
+                <field name="subject_id"/>
+
+                <separator/>
+
+                <filter name="filter_rechecking" string="Rechecking"
+                        domain="[('revaluation_type', '=', 'rechecking')]"/>
+                <filter name="filter_revaluation" string="Revaluation"
+                        domain="[('revaluation_type', '=', 'revaluation')]"/>
+                <filter name="filter_photocopy" string="Photocopy Request"
+                        domain="[('revaluation_type', '=', 'photocopy')]"/>
+
+                <separator/>
+
+                <filter name="filter_fee_paid" string="Fee Paid"
+                        domain="[('fee_paid', '=', True)]"/>
+                <filter name="filter_fee_pending" string="Fee Pending"
+                        domain="[('fee_paid', '=', False)]"/>
+
+                <separator/>
+
+                <filter name="filter_marks_increased" string="Marks Increased"
+                        domain="[('outcome', '=', 'increased')]"/>
+                <filter name="filter_marks_decreased" string="Marks Decreased"
+                        domain="[('outcome', '=', 'decreased')]"/>
+                <filter name="filter_no_change" string="No Change"
+                        domain="[('outcome', '=', 'no_change')]"/>
+
+                <separator/>
+
+                <filter name="filter_draft" string="Draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_submitted" string="Submitted"
+                        domain="[('state', '=', 'submitted')]"/>
+                <filter name="filter_under_review" string="Under Review"
+                        domain="[('state', '=', 'under_review')]"/>
+                <filter name="filter_in_progress" string="In Progress"
+                        domain="[('state', '=', 'revaluation_in_progress')]"/>
+                <filter name="filter_completed" string="Completed"
+                        domain="[('state', '=', 'completed')]"/>
+                <filter name="filter_rejected" string="Rejected"
+                        domain="[('state', '=', 'rejected')]"/>
+
+                <separator/>
+
+                <filter name="filter_today" string="Applied Today"
+                        domain="[('application_date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_this_week" string="Applied This Week"
+                        domain="[('application_date', '&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d')),
+                                 ('application_date', '&lt;=', (context_today() + datetime.timedelta(days=6-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_this_month" string="Applied This Month"
+                        domain="[('application_date', '&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d')),
+                                 ('application_date', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d'))]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_student" string="Student"
+                            context="{'group_by': 'student_id'}"/>
+                    <filter name="group_by_examination" string="Examination"
+                            context="{'group_by': 'examination_id'}"/>
+                    <filter name="group_by_subject" string="Subject"
+                            context="{'group_by': 'subject_id'}"/>
+                    <filter name="group_by_type" string="Revaluation Type"
+                            context="{'group_by': 'revaluation_type'}"/>
+                    <filter name="group_by_outcome" string="Outcome"
+                            context="{'group_by': 'outcome'}"/>
+                    <filter name="group_by_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_by_application_date" string="Application Date"
+                            context="{'group_by': 'application_date'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="examination_id" string="Examination"
+                           select="multi"
+                           icon="fa-graduation-cap"/>
+                    <field name="subject_id" string="Subject"
+                           select="multi"
+                           icon="fa-book"/>
+                    <field name="revaluation_type" string="Type"
+                           select="multi"
+                           icon="fa-file-text"/>
+                    <field name="outcome" string="Outcome"
+                           select="multi"
+                           icon="fa-check-circle"/>
+                    <field name="state" string="Status"
+                           select="multi"
+                           icon="fa-filter"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="examination_revaluation_view_kanban" model="ir.ui.view">
+        <field name="name">examination.revaluation.view.kanban</field>
+        <field name="model">examination.revaluation</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="state"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="registration_number"/>
+                <field name="examination_id"/>
+                <field name="subject_id"/>
+                <field name="revaluation_type"/>
+                <field name="application_date"/>
+                <field name="original_marks"/>
+                <field name="revaluated_marks"/>
+                <field name="marks_difference"/>
+                <field name="outcome"/>
+                <field name="revaluation_fee"/>
+                <field name="fee_paid"/>
+                <field name="marks_changed"/>
+                <field name="state"/>
+
+                <progressbar field="state"
+                             colors='{"draft": "secondary", "submitted": "warning", "under_review": "info", "revaluation_in_progress": "primary", "completed": "success", "rejected": "danger"}'/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="ribbon ribbon-top-right" t-if="!record.fee_paid.raw_value and record.state.raw_value == 'draft'">
+                                <span class="text-bg-warning">Fee Pending</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.outcome.raw_value == 'increased' and record.state.raw_value == 'completed'">
+                                <span class="text-bg-success">Marks Increased</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.outcome.raw_value == 'decreased' and record.state.raw_value == 'completed'">
+                                <span class="text-bg-danger">Marks Decreased</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.outcome.raw_value == 'no_change' and record.state.raw_value == 'completed'">
+                                <span class="text-bg-info">No Change</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.state.raw_value == 'rejected'">
+                                <span class="text-bg-danger">Rejected</span>
+                            </div>
+
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="student_id"/>
+                                        </strong>
+                                        <div class="text-muted">
+                                            <field name="name"/>
+                                        </div>
+                                        <div class="text-muted">
+                                            Reg: <field name="registration_number"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body mt-3">
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded">
+                                                <div class="mb-1">
+                                                    <i class="fa fa-graduation-cap text-primary"/>
+                                                    <strong><field name="examination_id"/></strong>
+                                                </div>
+                                                <div class="mb-1">
+                                                    <i class="fa fa-book text-info"/>
+                                                    <field name="subject_id"/>
+                                                </div>
+                                                <div class="mb-1">
+                                                    <i class="fa fa-file-text text-success"/>
+                                                    <field name="revaluation_type"/>
+                                                </div>
+                                                <div>
+                                                    <i class="fa fa-calendar text-warning"/>
+                                                    Applied: <field name="application_date"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-6">
+                                            <div class="card bg-secondary text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h5 class="mb-0"><field name="original_marks"/></h5>
+                                                    <small>Original Marks</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6" t-if="record.revaluated_marks.raw_value">
+                                            <div class="card text-white"
+                                                 t-attf-class="bg-{{record.marks_difference.raw_value &gt; 0 ? 'success' : (record.marks_difference.raw_value &lt; 0 ? 'danger' : 'info')}}">
+                                                <div class="card-body p-2 text-center">
+                                                    <h5 class="mb-0"><field name="revaluated_marks"/></h5>
+                                                    <small>New Marks</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.marks_difference.raw_value != 0 and record.state.raw_value == 'completed'">
+                                        <div class="col-12 text-center">
+                                            <div class="alert mb-0 py-2"
+                                                 t-attf-class="alert-{{record.marks_difference.raw_value &gt; 0 ? 'success' : 'danger'}}">
+                                                <i t-attf-class="fa fa-arrow-{{record.marks_difference.raw_value &gt; 0 ? 'up' : 'down'}}"/>
+                                                <strong>
+                                                    <t t-if="record.marks_difference.raw_value &gt; 0">+</t>
+                                                    <field name="marks_difference"/> marks
+                                                </strong>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <small class="text-muted">
+                                                    <i class="fa fa-money"/> Fee:
+                                                </small>
+                                                <span class="badge"
+                                                      t-attf-class="text-bg-{{record.fee_paid.raw_value ? 'success' : 'warning'}}">
+                                                    <t t-if="record.fee_paid.raw_value">
+                                                        <i class="fa fa-check"/> Paid
+                                                    </t>
+                                                    <t t-if="!record.fee_paid.raw_value">
+                                                        <i class="fa fa-exclamation-triangle"/> Pending
+                                                    </t>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row" t-if="record.outcome.raw_value and record.state.raw_value == 'completed'">
+                                        <div class="col-12 text-center">
+                                            <span class="badge rounded-pill"
+                                                  t-attf-class="text-bg-{{record.outcome.raw_value == 'increased' ? 'success' : (record.outcome.raw_value == 'decreased' ? 'danger' : 'info')}}">
+                                                <strong><field name="outcome"/></strong>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom mt-2">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="state" widget="badge"
+                                               decoration-success="state == 'completed'"
+                                               decoration-info="state in ['under_review', 'revaluation_in_progress']"
+                                               decoration-warning="state == 'submitted'"
+                                               decoration-danger="state == 'rejected'"/>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Calendar View -->
+    <record id="examination_revaluation_view_calendar" model="ir.ui.view">
+        <field name="name">examination.revaluation.view.calendar</field>
+        <field name="model">examination.revaluation</field>
+        <field name="arch" type="xml">
+            <calendar string="Revaluation Calendar"
+                      date_start="application_date"
+                      color="state"
+                      mode="month"
+                      quick_create="0"
+                      event_open_popup="1">
+                <field name="student_id"/>
+                <field name="subject_id"/>
+                <field name="revaluation_type"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_examination_revaluation" model="ir.actions.act_window">
+        <field name="name">Revaluation Requests</field>
+        <field name="res_model">examination.revaluation</field>
+        <field name="view_mode">kanban,list,form,calendar</field>
+        <field name="context">{'search_default_filter_submitted': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create Revaluation Request
+            </p>
+            <p>
+                Manage exam revaluation requests from students. System automatically assigns unique
+                revaluation numbers using sequence. Select student and published exam result. Choose
+                revaluation type: Rechecking (verify marks calculation), Revaluation (answer sheet
+                re-evaluation), or Photocopy (answer sheet copy). Set revaluation fee (default 500.0)
+                and track payment status with reference and date. Fee payment is mandatory before
+                submission. Enter detailed reason for revaluation request (HTML field). Track original
+                marks and grade from result. 6-state workflow: Draft → Submitted → Under Review →
+                Revaluation in Progress → Completed → Rejected. Assign faculty for revaluation. Enter
+                revaluated marks and grade. System automatically computes marks difference
+                (positive/negative/zero) and outcome (increased/decreased/no_change). On completion,
+                if marks changed, system automatically updates original result with new marks and adds
+                remark. Rejection with reason tracking. Portal mixin provides student portal access.
+                Full chatter support for communication.
+            </p>
+        </field>
+    </record>
+
+</odoo>

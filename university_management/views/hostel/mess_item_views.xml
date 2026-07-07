@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View - Mess Item -->
+    <record id="mess_item_view_form" model="ir.ui.view">
+        <field name="name">mess.item.view.form</field>
+        <field name="model">mess.item</field>
+        <field name="arch" type="xml">
+            <form string="Mess Item">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active == True"/>
+
+                    <div class="oe_title">
+                        <label for="name" string="Item Name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g., Paneer Butter Masala"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Item Classification">
+                            <field name="category"/>
+                            <field name="item_type" widget="radio"/>
+                        </group>
+                        <group string="Nutritional Information">
+                            <field name="calories"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+
+                    <group string="Description">
+                        <field name="description" nolabel="1"
+                               placeholder="Enter item description, ingredients, preparation method, etc."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View - Mess Item -->
+    <record id="mess_item_view_list" model="ir.ui.view">
+        <field name="name">mess.item.view.list</field>
+        <field name="model">mess.item</field>
+        <field name="arch" type="xml">
+            <list string="Mess Items"
+                  default_order="name"
+                  multi_edit="1"
+                  sample="1"
+                  decoration-success="item_type == 'veg'"
+                  decoration-info="item_type == 'vegan'"
+                  decoration-warning="item_type == 'non_veg'"
+                  decoration-muted="active == False">
+                <field name="name"/>
+                <field name="category"/>
+                <field name="item_type" widget="badge"
+                       decoration-success="item_type == 'veg'"
+                       decoration-danger="item_type == 'non_veg'"
+                       decoration-info="item_type == 'vegan'"
+                       decoration-warning="item_type == 'jain'"/>
+                <field name="calories" optional="show"/>
+                <field name="active" widget="boolean_toggle" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View - Mess Item -->
+    <record id="mess_item_view_search" model="ir.ui.view">
+        <field name="name">mess.item.view.search</field>
+        <field name="model">mess.item</field>
+        <field name="arch" type="xml">
+            <search string="Search Mess Items">
+                <field name="name"/>
+                <field name="category"/>
+                <field name="item_type"/>
+
+                <separator/>
+
+                <filter name="filter_veg" string="Vegetarian"
+                        domain="[('item_type', '=', 'veg')]"/>
+                <filter name="filter_non_veg" string="Non-Vegetarian"
+                        domain="[('item_type', '=', 'non_veg')]"/>
+                <filter name="filter_vegan" string="Vegan"
+                        domain="[('item_type', '=', 'vegan')]"/>
+                <filter name="filter_jain" string="Jain"
+                        domain="[('item_type', '=', 'jain')]"/>
+
+                <separator/>
+
+                <filter name="filter_main_course" string="Main Course"
+                        domain="[('category', '=', 'main_course')]"/>
+                <filter name="filter_side_dish" string="Side Dish"
+                        domain="[('category', '=', 'side_dish')]"/>
+                <filter name="filter_bread" string="Bread/Roti"
+                        domain="[('category', '=', 'bread')]"/>
+                <filter name="filter_rice" string="Rice"
+                        domain="[('category', '=', 'rice')]"/>
+                <filter name="filter_dal" string="Dal/Sambar"
+                        domain="[('category', '=', 'dal')]"/>
+                <filter name="filter_vegetable" string="Vegetable"
+                        domain="[('category', '=', 'vegetable')]"/>
+                <filter name="filter_salad" string="Salad"
+                        domain="[('category', '=', 'salad')]"/>
+                <filter name="filter_dessert" string="Dessert"
+                        domain="[('category', '=', 'dessert')]"/>
+                <filter name="filter_beverage" string="Beverage"
+                        domain="[('category', '=', 'beverage')]"/>
+                <filter name="filter_fruit" string="Fruit"
+                        domain="[('category', '=', 'fruit')]"/>
+
+                <separator/>
+
+                <filter name="filter_active" string="Active"
+                        domain="[('active', '=', True)]"/>
+                <filter name="filter_archived" string="Archived"
+                        domain="[('active', '=', False)]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_category" string="Category"
+                            context="{'group_by': 'category'}"/>
+                    <filter name="group_by_item_type" string="Type"
+                            context="{'group_by': 'item_type'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="category" string="Category"
+                           select="multi"
+                           icon="fa-cutlery"/>
+                    <field name="item_type" string="Type"
+                           select="multi"
+                           icon="fa-leaf"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View - Mess Item -->
+    <record id="mess_item_view_kanban" model="ir.ui.view">
+        <field name="name">mess.item.view.kanban</field>
+        <field name="model">mess.item</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="category"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="category"/>
+                <field name="item_type"/>
+                <field name="calories"/>
+                <field name="description"/>
+                <field name="active"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="ribbon ribbon-top-right" t-if="record.item_type.raw_value == 'veg'">
+                                <span class="text-bg-success">VEG</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.item_type.raw_value == 'non_veg'">
+                                <span class="text-bg-warning">NON-VEG</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.item_type.raw_value == 'vegan'">
+                                <span class="text-bg-info">VEGAN</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.item_type.raw_value == 'jain'">
+                                <span class="text-bg-warning">JAIN</span>
+                            </div>
+
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <i class="fa fa-cutlery text-primary"/> <field name="name"/>
+                                        </strong>
+                                        <div class="text-muted">
+                                            <i class="fa fa-tag"/> <field name="category"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body mt-3">
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div t-if="record.item_type.raw_value == 'veg'" class="card bg-success text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h6 class="mb-0">
+                                                        <i class="fa fa-leaf"/> Vegetarian
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                            <div t-if="record.item_type.raw_value == 'non_veg'" class="card bg-warning text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h6 class="mb-0">
+                                                        <i class="fa fa-drumstick-bite"/> Non-Vegetarian
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                            <div t-if="record.item_type.raw_value == 'vegan'" class="card bg-info text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h6 class="mb-0">
+                                                        <i class="fa fa-seedling"/> Vegan
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                            <div t-if="record.item_type.raw_value == 'jain'" class="card bg-warning text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h6 class="mb-0">
+                                                        <i class="fa fa-om"/> Jain
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.calories.raw_value">
+                                        <div class="col-12">
+                                            <div class="card bg-light">
+                                                <div class="card-body p-2 text-center">
+                                                    <h5 class="mb-0 text-primary">
+                                                        <field name="calories"/> Cal
+                                                    </h5>
+                                                    <small class="text-muted">Calories</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.description.raw_value">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded">
+                                                <strong class="text-muted">
+                                                    <i class="fa fa-info-circle"/> Description:
+                                                </strong>
+                                                <div><field name="description"/></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="!record.active.raw_value">
+                                        <div class="col-12">
+                                            <div class="card bg-danger text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h6 class="mb-0">
+                                                        <i class="fa fa-archive"/> Archived
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Pivot View - Mess Item -->
+    <record id="mess_item_view_pivot" model="ir.ui.view">
+        <field name="name">mess.item.view.pivot</field>
+        <field name="model">mess.item</field>
+        <field name="arch" type="xml">
+            <pivot string="Item Analysis">
+                <field name="category" type="row"/>
+                <field name="item_type" type="col"/>
+                <field name="calories" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View - Mess Item -->
+    <record id="mess_item_view_graph" model="ir.ui.view">
+        <field name="name">mess.item.view.graph</field>
+        <field name="model">mess.item</field>
+        <field name="arch" type="xml">
+            <graph string="Item Statistics" type="bar">
+                <field name="category"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_mess_item" model="ir.actions.act_window">
+        <field name="name">Mess Items</field>
+        <field name="res_model">mess.item</field>
+        <field name="view_mode">kanban,list,form,pivot,graph</field>
+        <field name="context">{'search_default_filter_active': 1, 'search_default_group_by_category': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create Mess Food Items
+            </p>
+            <p>
+                Manage mess food items master data. Enter name (char, required, e.g., "Paneer Butter Masala").
+                Select category (10 options, required): main_course (Main Course - primary dishes), side_dish
+                (Side Dish - accompaniments), bread (Bread/Roti - chapati/naan/paratha), rice (Rice - varieties),
+                dal (Dal/Sambar - lentils), vegetable (Vegetable - sabzi), salad (Salad - fresh greens),
+                dessert (Dessert - sweets), beverage (Beverage - drinks), fruit (Fruit - fresh fruits).
+                Select item_type (4 options, default veg, radio widget): veg (Vegetarian - no meat/eggs),
+                non_veg (Non-Vegetarian - contains meat/eggs), vegan (Vegan - no animal products), jain (Jain -
+                no onion/garlic/root vegetables). Enter calories (float, optional, nutritional value per serving).
+                Enter description (text, ingredients/preparation/allergens). Mark active (boolean, default True,
+                toggle widget). List view shows 4-color row decorations: Green (veg), Info (vegan), Yellow
+                (non_veg), Gray (archived). Badge widget for item_type with 4 decoration colors. Kanban view
+                shows dynamic quadruple ribbon (VEG green, NON-VEG yellow, VEGAN info, JAIN yellow) and type
+                cards with icons. Pivot view for analysis (category × item_type matrix, measure: calories avg).
+                Graph view for statistics (bar chart by category). Ordered by name (alphabetical). Default
+                filters: Active items, grouped by category. Archived ribbon on form. Use for menu planning,
+                dietary preferences, and nutritional tracking.
+            </p>
+        </field>
+    </record>
+
+</odoo>

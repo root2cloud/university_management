@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="bulk_id_card_wizard_view_form" model="ir.ui.view">
+        <field name="name">bulk.id.card.wizard.view.form</field>
+        <field name="model">bulk.id.card.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Bulk ID Card Generation">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Generate ID Cards</h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="card_type" widget="radio"/>
+                            <field name="card_template_id"/>
+                            <field name="validity_date"/>
+                        </group>
+                        <group>
+                            <field name="regenerate_existing"/>
+                            <field name="auto_print"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <!-- Student Filters -->
+                        <page string="Student Filters">
+                            <group>
+                                <group>
+                                    <field name="program_id"/>
+                                    <field name="department_id"/>
+                                </group>
+                                <group>
+                                    <field name="batch_id"/>
+                                    <field name="academic_year_id"/>
+                                </group>
+                            </group>
+                            <field name="student_ids" widget="many2many_tags">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="registration_number"/>
+                                    <field name="program_id"/>
+                                    <field name="batch_id"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <!-- Faculty Selection -->
+                        <page string="Faculty Selection">
+                            <field name="faculty_ids" widget="many2many_tags">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="employee_id"/>
+                                    <field name="department_id"/>
+                                    <field name="designation_id"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+
+                    <group>
+                        <div class="o_row">
+                            <field name="preview_count" class="oe_inline"/>
+                            <span class="o_form_label">cards will be generated</span>
+                        </div>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_generate_id_cards"
+                            string="Generate ID Cards"
+                            type="object"
+                            class="btn-primary"/>
+                    <button string="Cancel"
+                            class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bulk_id_card_wizard" model="ir.actions.act_window">
+        <field name="name">Generate ID Cards</field>
+        <field name="res_model">bulk.id.card.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

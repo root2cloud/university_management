@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="naac_student_progression_view_form" model="ir.ui.view">
+        <field name="name">naac.student.progression.view.form</field>
+        <field name="model">naac.student.progression</field>
+        <field name="arch" type="xml">
+            <form string="Student Progression">
+                <header>
+                    <button name="action_verify" string="Verify" type="object"
+                            class="btn-success" invisible="state == 'verified'"
+                            groups="university_management.group_university_admin"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,verified"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Progression description..."/></h1>
+                    </div>
+                    <group>
+                        <group string="Student">
+                            <field name="student_id" options="{'no_create': True}"/>
+                            <field name="department_id"/>
+                            <field name="program_id"/>
+                        </group>
+                        <group string="Details">
+                            <field name="progression_type"/>
+                            <field name="year"/>
+                            <field name="criterion_id"/>
+                            <field name="metric_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Placement" invisible="progression_type != 'placement'">
+                            <group>
+                                <field name="company_name"/>
+                                <field name="designation"/>
+                                <field name="salary_package"/>
+                            </group>
+                        </page>
+                        <page string="Higher Studies" invisible="progression_type != 'higher_study'">
+                            <group>
+                                <field name="institution_name"/>
+                                <field name="program_name"/>
+                                <field name="entrance_exam"/>
+                                <field name="entrance_rank"/>
+                            </group>
+                        </page>
+                        <page string="Scholarship / Award" invisible="progression_type not in ['scholarship', 'award']">
+                            <group>
+                                <field name="scholarship_name"/>
+                                <field name="awarding_body"/>
+                                <field name="amount"/>
+                            </group>
+                        </page>
+                        <page string="Evidence">
+                            <field name="evidence_document" widget="binary"
+                                   filename="evidence_filename"/>
+                            <field name="evidence_filename"/>
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="naac_student_progression_view_list" model="ir.ui.view">
+        <field name="name">naac.student.progression.view.list</field>
+        <field name="model">naac.student.progression</field>
+        <field name="arch" type="xml">
+            <list string="Student Progression" decoration-success="state == 'verified'">
+                <field name="student_id"/>
+                <field name="department_id"/>
+                <field name="program_id"/>
+                <field name="progression_type"/>
+                <field name="company_name"/>
+                <field name="institution_name"/>
+                <field name="year"/>
+                <field name="salary_package"/>
+                <field name="state" widget="badge" decoration-success="state == 'verified'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="naac_student_progression_view_search" model="ir.ui.view">
+        <field name="name">naac.student.progression.view.search</field>
+        <field name="model">naac.student.progression</field>
+        <field name="arch" type="xml">
+            <search string="Search Progression">
+                <field name="student_id"/>
+                <field name="department_id"/>
+                <field name="year"/>
+                <separator/>
+                <filter string="Placement" name="placement"
+                        domain="[('progression_type', '=', 'placement')]"/>
+                <filter string="Higher Studies" name="higher"
+                        domain="[('progression_type', '=', 'higher_study')]"/>
+                <filter string="Entrepreneurship" name="entrepreneur"
+                        domain="[('progression_type', '=', 'entrepreneur')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Department" name="group_dept" context="{'group_by': 'department_id'}"/>
+                    <filter string="Progression Type" name="group_type" context="{'group_by': 'progression_type'}"/>
+                    <filter string="Year" name="group_year" context="{'group_by': 'year'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="naac_student_progression_view_graph" model="ir.ui.view">
+        <field name="name">naac.student.progression.view.graph</field>
+        <field name="model">naac.student.progression</field>
+        <field name="arch" type="xml">
+            <graph string="Student Progression" type="bar">
+                <field name="department_id" type="row"/>
+                <field name="progression_type" type="col"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="naac_student_progression_view_pivot" model="ir.ui.view">
+        <field name="name">naac.student.progression.view.pivot</field>
+        <field name="model">naac.student.progression</field>
+        <field name="arch" type="xml">
+            <pivot string="Progression Pivot">
+                <field name="department_id" type="row"/>
+                <field name="progression_type" type="col"/>
+                <field name="salary_package" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_naac_student_progression" model="ir.actions.act_window">
+        <field name="name">Student Progression</field>
+        <field name="res_model">naac.student.progression</field>
+        <field name="view_mode">list,graph,pivot,form</field>
+        <field name="search_view_id" ref="naac_student_progression_view_search"/>
+    </record>
+
+</odoo>

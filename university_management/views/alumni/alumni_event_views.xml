@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View - Alumni Event -->
+    <record id="alumni_event_view_form" model="ir.ui.view">
+        <field name="name">alumni.event.view.form</field>
+        <field name="model">alumni.event</field>
+        <field name="arch" type="xml">
+            <form string="Alumni Event">
+                <header>
+                    <button name="action_publish" string="Publish Event" type="object"
+                            class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_start" string="Start Event" type="object"
+                            class="btn-success"
+                            invisible="state != 'published'"/>
+                    <button name="action_complete" string="Mark Completed" type="object"
+                            class="btn-success"
+                            invisible="state != 'ongoing'"/>
+                    <button name="action_cancel" string="Cancel Event" type="object"
+                            class="btn-danger"
+                            invisible="state in ['completed', 'cancelled']"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft"
+                            type="object" class="btn-default"
+                            invisible="state == 'draft'"
+                            confirm="Are you sure you want to reset this Event record to draft?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,published,ongoing,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_view_registrations" icon="fa-users">
+                            <field name="total_registrations" widget="statinfo" string="Registrations"/>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <label for="name" string="Event Name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Annual Alumni Reunion 2025" required="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Event Details">
+                            <field name="event_type" widget="radio"/>
+                            <label for="start" string="Event Date &amp; Time"/>
+                            <div class="d-flex">
+                                <field name="start" class="oe_inline" widget="datetime"/>
+                                <span class="mx-2"> to </span>
+                                <field name="stop" class="oe_inline" widget="datetime"/>
+                            </div>
+                            <field name="allday"/>
+                            <field name="location" placeholder="e.g. University Auditorium"/>
+                        </group>
+                        <group string="Target Audience">
+                            <field name="target_batch_ids" widget="many2many_tags"/>
+                            <field name="target_graduation_year" placeholder="e.g. 2020"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Registration">
+                            <field name="registration_open" widget="boolean_toggle"/>
+                            <field name="registration_deadline"
+                                   invisible="not registration_open"/>
+                            <label for="registration_fee"/>
+                            <div class="d-flex">
+                                <field name="registration_fee" class="oe_inline"/>
+                                <field name="currency_id" class="oe_inline ms-2"
+                                       options="{'no_open': True, 'no_create': True}"/>
+                            </div>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Description" name="description">
+                            <field name="description" nolabel="1"
+                                   placeholder="Enter event description, agenda, highlights..."/>
+                        </page>
+
+                        <page string="Venue Details" name="venue">
+                            <field name="venue_details" nolabel="1"
+                                   placeholder="Enter detailed venue information, directions, parking details..."/>
+                        </page>
+
+                        <page string="Registered Alumni" name="registrations">
+                            <field name="registered_alumni_ids" nolabel="1">
+                                <list string="Registered Alumni">
+                                    <field name="name"/>
+                                    <field name="registration_number"/>
+                                    <field name="program_id"/>
+                                    <field name="graduation_year"/>
+                                    <field name="email" widget="email"/>
+                                    <field name="phone" widget="phone"/>
+                                    <field name="current_company"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+
+                    <field name="calendar_event_id" invisible="1"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View - Alumni Event -->
+    <record id="alumni_event_view_list" model="ir.ui.view">
+        <field name="name">alumni.event.view.list</field>
+        <field name="model">alumni.event</field>
+        <field name="arch" type="xml">
+            <list string="Alumni Events"
+                  default_order="start desc"
+                  multi_edit="1"
+                  sample="1"
+                  decoration-info="state == 'draft'"
+                  decoration-primary="state == 'published'"
+                  decoration-success="state == 'ongoing'"
+                  decoration-muted="state in ['completed', 'cancelled']">
+                <field name="name"/>
+                <field name="event_type" widget="badge"
+                       decoration-success="event_type == 'reunion'"
+                       decoration-primary="event_type in ['meet', 'seminar']"
+                       decoration-info="event_type == 'networking'"
+                       decoration-warning="event_type == 'fundraiser'"
+                       decoration-danger="event_type == 'cultural'"/>
+                <field name="start" widget="datetime"/>
+                <field name="stop" widget="datetime" optional="hide"/>
+                <field name="location" optional="show"/>
+                <field name="registration_open" widget="boolean_toggle" optional="show"/>
+                <field name="registration_deadline" optional="hide"/>
+                <field name="total_registrations" optional="show"/>
+                <field name="registration_fee" widget="monetary" optional="hide"/>
+                <field name="currency_id" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-primary="state == 'published'"
+                       decoration-success="state == 'ongoing'"
+                       decoration-muted="state in ['completed', 'cancelled']"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View - Alumni Event -->
+    <record id="alumni_event_view_search" model="ir.ui.view">
+        <field name="name">alumni.event.view.search</field>
+        <field name="model">alumni.event</field>
+        <field name="arch" type="xml">
+            <search string="Search Alumni Events">
+                <field name="name"/>
+                <field name="event_type"/>
+                <field name="location"/>
+                <field name="target_graduation_year"/>
+
+                <separator/>
+
+                <filter name="filter_draft" string="Draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_published" string="Published"
+                        domain="[('state', '=', 'published')]"/>
+                <filter name="filter_ongoing" string="Ongoing"
+                        domain="[('state', '=', 'ongoing')]"/>
+                <filter name="filter_completed" string="Completed"
+                        domain="[('state', '=', 'completed')]"/>
+                <filter name="filter_cancelled" string="Cancelled"
+                        domain="[('state', '=', 'cancelled')]"/>
+
+                <separator/>
+
+                <filter name="filter_registration_open" string="Registration Open"
+                        domain="[('registration_open', '=', True)]"/>
+                <filter name="filter_registration_closed" string="Registration Closed"
+                        domain="[('registration_open', '=', False)]"/>
+
+                <separator/>
+
+                <filter name="filter_reunion" string="Alumni Reunion"
+                        domain="[('event_type', '=', 'reunion')]"/>
+                <filter name="filter_meet" string="Alumni Meet"
+                        domain="[('event_type', '=', 'meet')]"/>
+                <filter name="filter_seminar" string="Seminar/Workshop"
+                        domain="[('event_type', '=', 'seminar')]"/>
+                <filter name="filter_networking" string="Networking Event"
+                        domain="[('event_type', '=', 'networking')]"/>
+                <filter name="filter_fundraiser" string="Fundraising Event"
+                        domain="[('event_type', '=', 'fundraiser')]"/>
+                <filter name="filter_cultural" string="Cultural Event"
+                        domain="[('event_type', '=', 'cultural')]"/>
+
+                <separator/>
+
+                <filter name="filter_upcoming" string="Upcoming Events"
+                        domain="[('start', '>=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_this_month" string="This Month"
+                        domain="[('start', '>=', context_today().strftime('%Y-%m') + '-01')]"/>
+                <filter name="filter_this_year" string="This Year"
+                        domain="[('start', '>=', context_today().strftime('%Y') + '-01-01')]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_event_type" string="Event Type"
+                            context="{'group_by': 'event_type'}"/>
+                    <filter name="group_by_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_by_start_date" string="Start Date"
+                            context="{'group_by': 'start'}"/>
+                    <filter name="group_by_target_graduation_year" string="Target Graduation Year"
+                            context="{'group_by': 'target_graduation_year'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="event_type" string="Event Type"
+                           select="multi"
+                           icon="fa-calendar"/>
+                    <field name="state" string="Status"
+                           select="multi"
+                           icon="fa-flag"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View - Alumni Event -->
+    <record id="alumni_event_view_kanban" model="ir.ui.view">
+        <field name="name">alumni.event.view.kanban</field>
+        <field name="model">alumni.event</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="state"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="event_type"/>
+                <field name="start"/>
+                <field name="stop"/>
+                <field name="location"/>
+                <field name="registration_open"/>
+                <field name="registration_deadline"/>
+                <field name="total_registrations"/>
+                <field name="registration_fee"/>
+                <field name="currency_id"/>
+                <field name="state"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <i class="fa fa-calendar-check-o"/> <field name="name"/>
+                                        </strong>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body mt-3">
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="card text-white"
+                                                 t-attf-class="{{
+                                                    record.event_type.raw_value == 'reunion' ? 'bg-success' :
+                                                    (record.event_type.raw_value in ['meet', 'seminar'] ? 'bg-primary' :
+                                                    (record.event_type.raw_value == 'networking' ? 'bg-info' :
+                                                    (record.event_type.raw_value == 'fundraiser' ? 'bg-warning' : 'bg-danger')))
+                                                 }}">
+                                                <div class="card-body p-2 text-center">
+                                                    <h6 class="mb-0">
+                                                        <field name="event_type"/>
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-6">
+                                            <div class="bg-light p-2 rounded text-center">
+                                                <div class="text-success">
+                                                    <i class="fa fa-calendar fa-lg"/>
+                                                </div>
+                                                <small class="text-muted">Start</small>
+                                                <h6 class="mb-0"><field name="start" widget="datetime"/></h6>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="bg-light p-2 rounded text-center">
+                                                <div class="text-danger">
+                                                    <i class="fa fa-calendar-times-o fa-lg"/>
+                                                </div>
+                                                <small class="text-muted">End</small>
+                                                <h6 class="mb-0"><field name="stop" widget="datetime"/></h6>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.location.raw_value">
+                                        <div class="col-12">
+                                            <div class="card bg-secondary text-white">
+                                                <div class="card-body p-2">
+                                                    <h6 class="mb-0">
+                                                        <i class="fa fa-map-marker"/> <field name="location"/>
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded text-center">
+                                                <div class="text-primary">
+                                                    <i class="fa fa-users fa-lg"/>
+                                                </div>
+                                                <h6 class="mb-0"><field name="total_registrations"/></h6>
+                                                <small class="text-muted">Registrations</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.registration_fee.raw_value &gt; 0">
+                                        <div class="col-12">
+                                            <div class="card bg-warning text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h6 class="mb-0">
+                                                        <i class="fa fa-money"/> Fee: <field name="registration_fee" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.registration_open.raw_value">
+                                        <div class="col-12">
+                                            <div class="alert alert-success mb-0 p-2 text-center">
+                                                <small>
+                                                    <i class="fa fa-check-circle"/> Registration Open
+                                                </small>
+                                                <div t-if="record.registration_deadline.raw_value">
+                                                    <small class="text-muted">Deadline: </small>
+                                                    <small><field name="registration_deadline"/></small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="!record.registration_open.raw_value">
+                                        <div class="col-12">
+                                            <div class="alert alert-danger mb-0 p-2 text-center">
+                                                <small>
+                                                    <i class="fa fa-times-circle"/> Registration Closed
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom mt-2">
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Calendar View - Alumni Event -->
+    <record id="alumni_event_view_calendar" model="ir.ui.view">
+        <field name="name">alumni.event.view.calendar</field>
+        <field name="model">alumni.event</field>
+        <field name="arch" type="xml">
+            <calendar string="Alumni Events Calendar"
+                      date_start="start"
+                      date_stop="stop"
+                      mode="month"
+                      color="event_type"
+                      quick_create="0"
+                      event_limit="5">
+                <field name="name"/>
+                <field name="event_type"/>
+                <field name="location"/>
+                <field name="total_registrations"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Pivot View - Alumni Event -->
+    <record id="alumni_event_view_pivot" model="ir.ui.view">
+        <field name="name">alumni.event.view.pivot</field>
+        <field name="model">alumni.event</field>
+        <field name="arch" type="xml">
+            <pivot string="Event Analysis">
+                <field name="event_type" type="row"/>
+                <field name="state" type="col"/>
+                <field name="total_registrations" type="measure"/>
+                <field name="registration_fee" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View - Alumni Event -->
+    <record id="alumni_event_view_graph" model="ir.ui.view">
+        <field name="name">alumni.event.view.graph</field>
+        <field name="model">alumni.event</field>
+        <field name="arch" type="xml">
+            <graph string="Event Statistics" type="bar">
+                <field name="event_type"/>
+                <field name="total_registrations" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_alumni_event" model="ir.actions.act_window">
+        <field name="name">Alumni Events</field>
+        <field name="res_model">alumni.event</field>
+        <field name="view_mode">calendar,kanban,list,form,pivot,graph</field>
+        <field name="context">{'search_default_filter_upcoming': 1, 'search_default_group_by_event_type': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create Alumni Event
+            </p>
+            <p>
+                Organize and manage alumni events and meets with calendar integration. Enter name
+                (char, required, placeholder "Annual Alumni Reunion 2025", inherited from
+                calendar.event via _inherits pattern with calendar_event_id Many2one required cascade).
+                Select event_type (6 options, required, tracked, radio widget): reunion (Alumni Reunion -
+                success/green badge), meet (Alumni Meet - primary/blue badge), seminar (Seminar/Workshop -
+                primary/blue badge), networking (Networking Event - info badge), fundraiser (Fundraising
+                Event - warning/yellow badge), cultural (Cultural Event - danger/red badge). Enter event
+                date and time: start (datetime, required, inherited, inline d-flex with "to" separator),
+                stop (datetime, inherited, inline), allday (boolean, inherited). Enter location (char,
+                placeholder "University Auditorium", inherited from calendar.event). Enter target audience:
+                target_batch_ids (Many2many to university.batch, many2many_tags widget),
+                target_graduation_year (integer, placeholder "2020"). Enter registration details:
+                registration_open (boolean, default true, boolean_toggle widget), registration_deadline
+                (date, conditional visible if registration_open), registration_fee (monetary, inline with
+                currency selector), currency_id (Many2one to res.currency, default company currency,
+                inline, no-open no-create). Enter description (html, inherited from calendar.event,
+                placeholder "Enter event description, agenda, highlights..."). Enter venue_details (text,
+                placeholder "Enter detailed venue information, directions, parking details..."). View
+                registered_alumni_ids (Many2many to alumni.alumni, shows 7 fields: name/
+                registration_number/program_id/graduation_year/email with email widget/phone with phone
+                widget/current_company). View total_registrations (integer, computed, count of
+                registered_alumni_ids). Select state (5 options, default draft, tracked, statusbar widget):
+                draft (Draft - info/blue row and badge), published (Published - primary row and badge),
+                ongoing (Ongoing - success/green row and badge), completed (Completed - muted row and
+                badge), cancelled (Cancelled - muted row and badge). Header has 4 action buttons with
+                visibility rules: Publish Event (draft→published, primary button), Start Event
+                (published→ongoing, success button), Mark Completed (ongoing→completed, success button),
+                Cancel Event (any→cancelled except completed/cancelled, danger button). Form view button
+                box has 1 stat button: Registrations (users icon, statinfo widget showing
+                total_registrations). List view with 4-color row decorations: Info/Blue (draft), Primary
+                (published), Success/Green (ongoing), Muted (completed/cancelled). Badge widgets for
+                event_type (5-color decorations) and state (4-color decorations). Boolean toggle for
+                registration_open. Monetary widget for registration_fee. Kanban view grouped by state
+                showing event name (calendar-check icon), event type card (dynamic 5-color background:
+                success/reunion, primary/meet+seminar, info/networking, warning/fundraiser, danger/cultural,
+                centered), dates cards (2 cards 6/6 grid: start success/green calendar icon, stop
+                danger/red calendar-times icon), location card (secondary/gray, map-marker icon,
+                conditional), registrations card (light background, centered, users icon primary/blue,
+                shows total_registrations), fee card (warning/yellow, money icon, centered, shows
+                registration_fee monetary, conditional if > 0), registration status alerts (success/green
+                check-circle "Registration Open" with deadline if set, danger/red times-circle
+                "Registration Closed", conditional based on registration_open). Calendar view for event
+                scheduling (date_start: start, date_stop: stop, color by event_type, month mode,
+                event_limit 5, integrated with calendar.event). Pivot view for analysis (event_type ×
+                state matrix, measures: total_registrations/registration_fee). Graph view for statistics
+                (bar chart, event_type vs. total_registrations). Ordered by start desc (most recent
+                first, inherited from calendar.event). Default filters: Upcoming events and Grouped by
+                Event Type. Full chatter support and calendar integration.
+            </p>
+        </field>
+    </record>
+
+</odoo>

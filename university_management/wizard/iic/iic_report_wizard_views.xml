@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="iic_report_wizard_view_form" model="ir.ui.view">
+        <field name="name">iic.report.wizard.view.form</field>
+        <field name="model">iic.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate IIC Report">
+                <group>
+                    <field name="event_id" options="{'no_create': True}"/>
+                    <field name="report_type" widget="radio"/>
+                </group>
+                <footer>
+                    <button name="action_generate" string="Generate PDF" type="object" class="btn-primary"/>
+                    <button string="Close" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_iic_report_wizard" model="ir.actions.act_window">
+        <field name="name">Generate IIC Report</field>
+        <field name="res_model">iic.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

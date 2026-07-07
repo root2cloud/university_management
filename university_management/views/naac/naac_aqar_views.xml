@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="naac_aqar_view_form" model="ir.ui.view">
+        <field name="name">naac.aqar.view.form</field>
+        <field name="model">naac.aqar</field>
+        <field name="arch" type="xml">
+            <form string="AQAR - Annual Quality Assurance Report">
+                <header>
+                    <button name="action_generate_data" string="Auto-Populate from ERP" type="object"
+                            class="btn-secondary"/>
+                    <button name="action_submit_iqac" string="Submit to IQAC" type="object"
+                            class="btn-primary" invisible="state not in ['draft', 'in_progress']"/>
+                    <button name="action_approve" string="Approve" type="object"
+                            class="btn-success" invisible="state != 'iqac_review'"
+                            groups="university_management.group_university_admin"/>
+                    <button name="action_submit_naac" string="Submit to NAAC" type="object"
+                            invisible="state != 'approved'"/>
+                    <button name="action_print_aqar" string="Export AQAR PDF" type="object"
+                            class="btn-secondary" invisible="state not in ['approved', 'submitted']"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,iqac_review,approved,submitted"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                        <h2>Academic Year: <field name="academic_year_id" class="d-inline"/></h2>
+                    </div>
+                    <group>
+                        <group string="Institution">
+                            <field name="institute_name"/>
+                            <field name="naac_id"/>
+                            <field name="accreditation_grade"/>
+                            <field name="iqac_coordinator"/>
+                        </group>
+                        <group string="Period">
+                            <field name="from_date"/>
+                            <field name="to_date"/>
+                        </group>
+                    </group>
+                    <group string="Key Statistics">
+                        <group>
+                            <field name="total_faculty"/>
+                            <field name="total_students"/>
+                            <field name="total_programs"/>
+                        </group>
+                        <group>
+                            <field name="placement_percentage"/>
+                            <field name="research_papers"/>
+                            <field name="patents_filed"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Criterion 1: Curricular Aspects" name="c1">
+                            <field name="criterion1_summary" nolabel="1"/>
+                        </page>
+                        <page string="Criterion 2: Teaching Learning" name="c2">
+                            <field name="criterion2_summary" nolabel="1"/>
+                        </page>
+                        <page string="Criterion 3: Research &amp; Extension" name="c3">
+                            <field name="criterion3_summary" nolabel="1"/>
+                        </page>
+                        <page string="Criterion 4: Infrastructure" name="c4">
+                            <field name="criterion4_summary" nolabel="1"/>
+                        </page>
+                        <page string="Criterion 5: Student Support" name="c5">
+                            <field name="criterion5_summary" nolabel="1"/>
+                        </page>
+                        <page string="Criterion 6: Governance" name="c6">
+                            <field name="criterion6_summary" nolabel="1"/>
+                        </page>
+                        <page string="Criterion 7: Best Practices" name="c7">
+                            <field name="criterion7_summary" nolabel="1"/>
+                        </page>
+                        <page string="Additional Notes" name="notes">
+                            <field name="notes" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="naac_aqar_view_list" model="ir.ui.view">
+        <field name="name">naac.aqar.view.list</field>
+        <field name="model">naac.aqar</field>
+        <field name="arch" type="xml">
+            <list string="AQAR Reports" decoration-success="state == 'submitted'"
+                  decoration-warning="state == 'iqac_review'">
+                <field name="name"/>
+                <field name="academic_year_id"/>
+                <field name="from_date"/>
+                <field name="to_date"/>
+                <field name="total_faculty"/>
+                <field name="total_students"/>
+                <field name="research_papers"/>
+                <field name="prepared_by"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'submitted'"
+                       decoration-warning="state == 'iqac_review'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="naac_aqar_view_search" model="ir.ui.view">
+        <field name="name">naac.aqar.view.search</field>
+        <field name="model">naac.aqar</field>
+        <field name="arch" type="xml">
+            <search string="Search AQAR">
+                <field name="name"/>
+                <field name="academic_year_id"/>
+                <separator/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="IQAC Review" name="iqac" domain="[('state', '=', 'iqac_review')]"/>
+                <filter string="Approved" name="approved" domain="[('state', '=', 'approved')]"/>
+                <filter string="Submitted to NAAC" name="submitted" domain="[('state', '=', 'submitted')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_naac_aqar" model="ir.actions.act_window">
+        <field name="name">AQAR Reports</field>
+        <field name="res_model">naac.aqar</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="naac_aqar_view_search"/>
+    </record>
+
+</odoo>

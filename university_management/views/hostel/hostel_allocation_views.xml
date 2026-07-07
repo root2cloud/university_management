@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View - Hostel Allocation -->
+    <record id="hostel_allocation_view_form" model="ir.ui.view">
+        <field name="name">hostel.allocation.view.form</field>
+        <field name="model">hostel.allocation</field>
+        <field name="arch" type="xml">
+            <form string="Hostel Allocation">
+                <header>
+                    <button name="action_allocate" type="object" string="Allocate"
+                            class="oe_highlight"
+                            invisible="state != 'draft'"
+                            confirm="Are you sure you want to allocate this room to the student?"/>
+                    <button name="action_vacate" type="object" string="Vacate"
+                            invisible="state != 'allocated'"
+                            confirm="Are you sure you want to vacate the student from this room?"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state not in ['draft', 'allocated']"
+                            confirm="Are you sure you want to cancel this allocation?"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft"
+                            type="object" class="btn-default"
+                            invisible="state == 'draft'"
+                            confirm="Are you sure you want to reset this Allocation to draft?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,allocated"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Draft" bg_color="text-bg-secondary"
+                            invisible="state != 'draft'"/>
+                    <widget name="web_ribbon" title="Allocated" bg_color="text-bg-success"
+                            invisible="state != 'allocated'"/>
+                    <widget name="web_ribbon" title="Vacated" bg_color="text-bg-warning"
+                            invisible="state != 'vacated'"/>
+                    <widget name="web_ribbon" title="Cancelled" bg_color="text-bg-danger"
+                            invisible="state != 'cancelled'"/>
+
+                    <div class="oe_title">
+                        <label for="name" string="Allocation Number"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Student Information">
+                            <field name="student_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="registration_number" readonly="1"/>
+                            <field name="program_id" readonly="1"/>
+                        </group>
+                        <group string="Allocation Period">
+                            <field name="allocation_date" widget="date"/>
+                            <field name="from_date" widget="date"/>
+                            <field name="to_date" widget="date"/>
+                            <field name="academic_year_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Hostel &amp; Room Details">
+                            <field name="hostel_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="room_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="bed_number" placeholder="e.g., Bed 1, Bed A"/>
+                        </group>
+                        <group string="Fee Details">
+                            <field name="currency_id" invisible="1"/>
+                            <field name="monthly_rent" widget="monetary"/>
+                            <field name="security_deposit" widget="monetary"/>
+                            <field name="total_paid" widget="monetary"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Assets Issued">
+                            <field name="asset_ids" nolabel="1"
+                                   widget="many2many_tags"
+                                   placeholder="Select assets issued to student (mattress, pillow, blanket, etc.)"/>
+                        </group>
+                    </group>
+
+                    <group invisible="state != 'vacated'">
+                        <group string="Vacate Details">
+                            <field name="vacate_date" widget="date" readonly="1"/>
+                            <field name="vacate_reason" placeholder="Enter reason for vacating..."/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Remarks" name="remarks">
+                            <field name="remarks" nolabel="1"
+                                   placeholder="Enter any remarks or additional information..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View - Hostel Allocation -->
+    <record id="hostel_allocation_view_list" model="ir.ui.view">
+        <field name="name">hostel.allocation.view.list</field>
+        <field name="model">hostel.allocation</field>
+        <field name="arch" type="xml">
+            <list string="Hostel Allocations"
+                  default_order="allocation_date desc"
+                  multi_edit="1"
+                  sample="1"
+                  decoration-muted="state == 'draft'"
+                  decoration-success="state == 'allocated'"
+                  decoration-warning="state == 'vacated'"
+                  decoration-danger="state == 'cancelled'">
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="registration_number" optional="show"/>
+                <field name="program_id" optional="hide"/>
+                <field name="hostel_id"/>
+                <field name="room_id"/>
+                <field name="bed_number" optional="show"/>
+                <field name="allocation_date"/>
+                <field name="from_date" optional="hide"/>
+                <field name="to_date" optional="show"/>
+                <field name="academic_year_id" optional="hide"/>
+                <field name="monthly_rent" widget="monetary" optional="show"/>
+                <field name="security_deposit" widget="monetary" optional="hide"/>
+                <field name="vacate_date" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-muted="state == 'draft'"
+                       decoration-success="state == 'allocated'"
+                       decoration-warning="state == 'vacated'"
+                       decoration-danger="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View - Hostel Allocation -->
+    <record id="hostel_allocation_view_search" model="ir.ui.view">
+        <field name="name">hostel.allocation.view.search</field>
+        <field name="model">hostel.allocation</field>
+        <field name="arch" type="xml">
+            <search string="Search Allocations">
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="registration_number"/>
+                <field name="hostel_id"/>
+                <field name="room_id"/>
+                <field name="bed_number"/>
+                <field name="academic_year_id"/>
+
+                <separator/>
+
+                <filter name="filter_draft" string="Draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_allocated" string="Allocated"
+                        domain="[('state', '=', 'allocated')]"/>
+                <filter name="filter_vacated" string="Vacated"
+                        domain="[('state', '=', 'vacated')]"/>
+                <filter name="filter_cancelled" string="Cancelled"
+                        domain="[('state', '=', 'cancelled')]"/>
+
+                <separator/>
+
+                <filter name="filter_current_allocations" string="Current Allocations"
+                        domain="[('state', '=', 'allocated'), '|', ('to_date', '=', False), ('to_date', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_expired_allocations" string="Expired Allocations"
+                        domain="[('state', '=', 'allocated'), ('to_date', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+
+                <separator/>
+
+                <filter name="filter_allocated_today" string="Allocated Today"
+                        domain="[('allocation_date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_allocated_this_week" string="Allocated This Week"
+                        domain="[('allocation_date', '&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d')),
+                                 ('allocation_date', '&lt;=', (context_today() + datetime.timedelta(days=6-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_allocated_this_month" string="Allocated This Month"
+                        domain="[('allocation_date', '&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d')),
+                                 ('allocation_date', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d'))]"/>
+
+                <separator/>
+
+                <filter name="filter_vacated_today" string="Vacated Today"
+                        domain="[('vacate_date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_student" string="Student"
+                            context="{'group_by': 'student_id'}"/>
+                    <filter name="group_by_hostel" string="Hostel"
+                            context="{'group_by': 'hostel_id'}"/>
+                    <filter name="group_by_room" string="Room"
+                            context="{'group_by': 'room_id'}"/>
+                    <filter name="group_by_program" string="Program"
+                            context="{'group_by': 'program_id'}"/>
+                    <filter name="group_by_academic_year" string="Academic Year"
+                            context="{'group_by': 'academic_year_id'}"/>
+                    <filter name="group_by_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_by_allocation_date" string="Allocation Date"
+                            context="{'group_by': 'allocation_date'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="hostel_id" string="Hostel"
+                           select="multi"
+                           icon="fa-building"/>
+                    <field name="state" string="Status"
+                           select="multi"
+                           icon="fa-filter"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View - Hostel Allocation -->
+    <record id="hostel_allocation_view_kanban" model="ir.ui.view">
+        <field name="name">hostel.allocation.view.kanban</field>
+        <field name="model">hostel.allocation</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="state"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="registration_number"/>
+                <field name="program_id"/>
+                <field name="hostel_id"/>
+                <field name="room_id"/>
+                <field name="bed_number"/>
+                <field name="allocation_date"/>
+                <field name="from_date"/>
+                <field name="to_date"/>
+                <field name="monthly_rent"/>
+                <field name="security_deposit"/>
+                <field name="vacate_date"/>
+                <field name="state"/>
+
+                <progressbar field="state"
+                             colors='{"draft": "muted", "allocated": "success", "vacated": "warning", "cancelled": "danger"}'/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="ribbon ribbon-top-right" t-if="record.state.raw_value == 'draft'">
+                                <span class="text-bg-secondary">Draft</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.state.raw_value == 'allocated'">
+                                <span class="text-bg-success">Allocated</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.state.raw_value == 'vacated'">
+                                <span class="text-bg-warning">Vacated</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.state.raw_value == 'cancelled'">
+                                <span class="text-bg-danger">Cancelled</span>
+                            </div>
+
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="student_id"/>
+                                        </strong>
+                                        <div class="text-muted">
+                                            <field name="name"/> - <field name="registration_number"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body mt-3">
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded">
+                                                <div class="mb-1" t-if="record.program_id.raw_value">
+                                                    <i class="fa fa-graduation-cap text-primary"/>
+                                                    <strong>Program:</strong> <field name="program_id"/>
+                                                </div>
+                                                <div class="mb-1">
+                                                    <i class="fa fa-building text-info"/>
+                                                    <strong>Hostel:</strong> <field name="hostel_id"/>
+                                                </div>
+                                                <div class="mb-1">
+                                                    <i class="fa fa-home text-success"/>
+                                                    <strong>Room:</strong> <field name="room_id"/>
+                                                </div>
+                                                <div class="mb-1" t-if="record.bed_number.raw_value">
+                                                    <i class="fa fa-bed text-warning"/>
+                                                    <strong>Bed:</strong> <field name="bed_number"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded">
+                                                <div class="mb-1">
+                                                    <i class="fa fa-calendar text-primary"/>
+                                                    <strong>Allocated:</strong> <field name="allocation_date"/>
+                                                </div>
+                                                <div class="mb-1">
+                                                    <i class="fa fa-calendar-check-o text-success"/>
+                                                    <strong>From:</strong> <field name="from_date"/>
+                                                </div>
+                                                <div class="mb-1" t-if="record.to_date.raw_value">
+                                                    <i class="fa fa-calendar-times-o text-danger"/>
+                                                    <strong>To:</strong> <field name="to_date"/>
+                                                </div>
+                                                <div class="mb-1" t-if="record.vacate_date.raw_value">
+                                                    <i class="fa fa-sign-out text-warning"/>
+                                                    <strong>Vacated:</strong> <field name="vacate_date"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.monthly_rent.raw_value &gt; 0">
+                                        <div class="col-6">
+                                            <div class="card bg-primary text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h6 class="mb-0">₹<field name="monthly_rent"/></h6>
+                                                    <small>Monthly Rent</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6" t-if="record.security_deposit.raw_value &gt; 0">
+                                            <div class="card bg-info text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h6 class="mb-0">₹<field name="security_deposit"/></h6>
+                                                    <small>Security Deposit</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom mt-2">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="state" widget="badge"
+                                               decoration-muted="state == 'draft'"
+                                               decoration-success="state == 'allocated'"
+                                               decoration-warning="state == 'vacated'"
+                                               decoration-danger="state == 'cancelled'"/>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Calendar View - Hostel Allocation -->
+    <record id="hostel_allocation_view_calendar" model="ir.ui.view">
+        <field name="name">hostel.allocation.view.calendar</field>
+        <field name="model">hostel.allocation</field>
+        <field name="arch" type="xml">
+            <calendar string="Allocation Calendar"
+                      date_start="from_date"
+                      date_stop="to_date"
+                      color="hostel_id"
+                      mode="month"
+                      quick_create="0"
+                      event_open_popup="1">
+                <field name="student_id"/>
+                <field name="hostel_id"/>
+                <field name="room_id"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_hostel_allocation" model="ir.actions.act_window">
+        <field name="name">Room Allocations</field>
+        <field name="res_model">hostel.allocation</field>
+        <field name="view_mode">kanban,list,form,calendar</field>
+        <field name="context">{'search_default_filter_allocated': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create Room Allocation
+            </p>
+            <p>
+                Manage student hostel room allocations. System automatically assigns unique allocation
+                numbers using sequence. Select student (student.student, required, tracked, indexed) -
+                displays related registration_number (readonly) and program_id (stored, readonly). Select
+                hostel (hostel.hostel, required, tracked, indexed). Select room (hostel.room, required,
+                tracked, indexed, domain filters by hostel_id and available_beds > 0 - only shows rooms
+                with available beds in selected hostel). Enter bed_number (e.g., Bed 1, Bed A). Enter
+                allocation_date (default today, required, tracked), from_date (default today, required),
+                to_date (optional end date, tracked). Select academic_year_id (university.academic.year,
+                optional). System auto-fills monthly_rent from room (onchange). Enter security_deposit
+                (one-time deposit) and total_paid (amount paid). Select asset_ids (Many2many to
+                product.product, tags widget - mattress, pillow, blanket, etc.). 4-state workflow with
+                3 action buttons: Draft (default) → Allocate button (highlight, draft only, confirmation,
+                sets state='allocated') → Vacate button (allocated only, confirmation, sets state='vacated'
+                + vacate_date=today) / Cancel button (draft/allocated, confirmation, sets state='cancelled').
+                Vacate details (vacate_date readonly auto-filled, vacate_reason text) visible only when
+                state='vacated'. Calendar view shows allocation period (from_date to to_date, color by
+                hostel). Add remarks for additional information. Full chatter support for communication
+                and tracking.
+            </p>
+        </field>
+    </record>
+
+</odoo>

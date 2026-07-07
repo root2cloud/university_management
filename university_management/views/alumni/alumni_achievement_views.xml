@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View - Alumni Achievement -->
+    <record id="alumni_achievement_view_form" model="ir.ui.view">
+        <field name="name">alumni.achievement.view.form</field>
+        <field name="model">alumni.achievement</field>
+        <field name="arch" type="xml">
+            <form string="Alumni Achievement">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button"
+                                   options="{'terminology': 'archive'}"/>
+                        </button>
+                    </div>
+
+                    <widget name="web_ribbon" title="Featured" bg_color="bg-success"
+                            invisible="not featured"/>
+
+                    <field name="image" widget="image" class="oe_avatar"
+                           options="{'preview_image': 'image', 'size': [128, 128]}"/>
+
+                    <div class="oe_title">
+                        <label for="title" string="Achievement Title"/>
+                        <h1>
+                            <field name="title" placeholder="e.g. Best Research Paper Award"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Achievement Details">
+                            <field name="alumni_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="alumni_name" invisible="1"/>
+                            <field name="achievement_type" widget="radio"/>
+                            <field name="achievement_date"/>
+                            <field name="organization"
+                                   placeholder="e.g. IEEE, Ministry of Innovation, etc."/>
+                        </group>
+                        <group string="Visibility">
+                            <field name="featured" widget="boolean_toggle"/>
+                            <field name="publish_on_website" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Description" name="description">
+                            <field name="description" nolabel="1"
+                                   placeholder="Enter detailed description of the achievement, impact, recognition details..."/>
+                        </page>
+
+                        <page string="Media &amp; Documents" name="media">
+                            <group>
+                                <group string="Certificate/Document">
+                                    <field name="certificate" filename="certificate_filename"
+                                           widget="binary"/>
+                                </group>
+                                <group string="Media Links">
+                                    <field name="media_url"
+                                           placeholder="https://example.com/news-article"
+                                           widget="url"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View - Alumni Achievement -->
+    <record id="alumni_achievement_view_list" model="ir.ui.view">
+        <field name="name">alumni.achievement.view.list</field>
+        <field name="model">alumni.achievement</field>
+        <field name="arch" type="xml">
+            <list string="Alumni Achievements"
+                  default_order="achievement_date desc"
+                  multi_edit="1"
+                  sample="1"
+                  decoration-success="featured == True"
+                  decoration-muted="active == False">
+                <field name="title"/>
+                <field name="alumni_id"/>
+                <field name="achievement_type" widget="badge"
+                       decoration-success="achievement_type == 'award'"
+                       decoration-primary="achievement_type == 'publication'"
+                       decoration-info="achievement_type == 'patent'"
+                       decoration-warning="achievement_type == 'entrepreneurship'"
+                       decoration-danger="achievement_type == 'promotion'"/>
+                <field name="achievement_date"/>
+                <field name="organization" optional="show"/>
+                <field name="featured" widget="boolean_toggle" optional="show"/>
+                <field name="publish_on_website" widget="boolean_toggle" optional="show"/>
+                <field name="active" widget="boolean_toggle" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View - Alumni Achievement -->
+    <record id="alumni_achievement_view_search" model="ir.ui.view">
+        <field name="name">alumni.achievement.view.search</field>
+        <field name="model">alumni.achievement</field>
+        <field name="arch" type="xml">
+            <search string="Search Achievements">
+                <field name="title"/>
+                <field name="alumni_id"/>
+                <field name="organization"/>
+                <field name="achievement_type"/>
+
+                <separator/>
+
+                <filter name="filter_featured" string="Featured"
+                        domain="[('featured', '=', True)]"/>
+                <filter name="filter_published" string="Published on Website"
+                        domain="[('publish_on_website', '=', True)]"/>
+
+                <separator/>
+
+                <filter name="filter_award" string="Awards/Recognition"
+                        domain="[('achievement_type', '=', 'award')]"/>
+                <filter name="filter_publication" string="Research Publications"
+                        domain="[('achievement_type', '=', 'publication')]"/>
+                <filter name="filter_patent" string="Patents"
+                        domain="[('achievement_type', '=', 'patent')]"/>
+                <filter name="filter_entrepreneurship" string="Startups/Business"
+                        domain="[('achievement_type', '=', 'entrepreneurship')]"/>
+                <filter name="filter_promotion" string="Career Milestones"
+                        domain="[('achievement_type', '=', 'promotion')]"/>
+                <filter name="filter_social" string="Social Impact"
+                        domain="[('achievement_type', '=', 'social')]"/>
+
+                <separator/>
+
+                <filter name="filter_this_year" string="This Year"
+                        domain="[('achievement_date', '&gt;=', (context_today().replace(month=1, day=1)).strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_this_month" string="This Month"
+                        domain="[('achievement_date', '&gt;=', (context_today().replace(day=1)).strftime('%Y-%m-%d')),
+                                 ('achievement_date', '&lt;=', ((context_today().replace(day=1) + datetime.timedelta(days=32)).replace(day=1) - datetime.timedelta(days=1)).strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_recent" string="Last 6 Months"
+                        domain="[('achievement_date', '&gt;=', (context_today() - datetime.timedelta(days=180)).strftime('%Y-%m-%d'))]"/>
+
+                <separator/>
+
+                <filter name="filter_active" string="Active"
+                        domain="[('active', '=', True)]"/>
+                <filter name="filter_inactive" string="Inactive"
+                        domain="[('active', '=', False)]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_achievement_type" string="Achievement Type"
+                            context="{'group_by': 'achievement_type'}"/>
+                    <filter name="group_by_alumni" string="Alumni"
+                            context="{'group_by': 'alumni_id'}"/>
+                    <filter name="group_by_organization" string="Organization"
+                            context="{'group_by': 'organization'}"/>
+                    <filter name="group_by_achievement_date" string="Achievement Date"
+                            context="{'group_by': 'achievement_date'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="achievement_type" string="Achievement Type"
+                           select="multi"
+                           icon="fa-trophy"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View - Alumni Achievement -->
+    <record id="alumni_achievement_view_kanban" model="ir.ui.view">
+        <field name="name">alumni.achievement.view.kanban</field>
+        <field name="model">alumni.achievement</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="title"/>
+                <field name="alumni_id"/>
+                <field name="achievement_type"/>
+                <field name="achievement_date"/>
+                <field name="organization"/>
+                <field name="image"/>
+                <field name="featured"/>
+                <field name="publish_on_website"/>
+                <field name="active"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="ribbon ribbon-top-right" t-if="record.featured.raw_value">
+                                <span class="text-bg-success">Featured</span>
+                            </div>
+
+                            <div class="ribbon ribbon-top-right" t-if="!record.active.raw_value"
+                                 style="top: 40px;">
+                                <span class="text-bg-danger">Archived</span>
+                            </div>
+
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <img t-att-src="kanban_image('alumni.achievement', 'image', record.id.raw_value)"
+                                                 class="o_kanban_image o_image_64_cover me-3"
+                                                 alt="Achievement Image"/>
+                                            <div class="flex-grow-1">
+                                                <strong class="o_kanban_record_title">
+                                                    <i class="fa fa-trophy"/> <field name="title"/>
+                                                </strong>
+                                                <div class="text-muted">
+                                                    <small>
+                                                        <i class="fa fa-user-graduate"/> <field name="alumni_id"/>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body mt-3">
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="card text-white"
+                                                 t-attf-class="{{
+                                                    record.achievement_type.raw_value == 'award' ? 'bg-success' :
+                                                    (record.achievement_type.raw_value == 'publication' ? 'bg-primary' :
+                                                    (record.achievement_type.raw_value == 'patent' ? 'bg-info' :
+                                                    (record.achievement_type.raw_value == 'entrepreneurship' ? 'bg-warning' :
+                                                    (record.achievement_type.raw_value == 'promotion' ? 'bg-danger' :
+                                                    (record.achievement_type.raw_value == 'social' ? 'bg-secondary' : 'bg-dark')))))
+                                                 }}">
+                                                <div class="card-body p-2 text-center">
+                                                    <h6 class="mb-0">
+                                                        <field name="achievement_type"/>
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.achievement_date.raw_value">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded text-center">
+                                                <div class="text-primary">
+                                                    <i class="fa fa-calendar fa-lg"/>
+                                                </div>
+                                                <small class="text-muted">Achievement Date</small>
+                                                <h6 class="mb-0"><field name="achievement_date"/></h6>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.organization.raw_value">
+                                        <div class="col-12">
+                                            <div class="card bg-secondary text-white">
+                                                <div class="card-body p-2">
+                                                    <h6 class="mb-0">
+                                                        <i class="fa fa-building"/> <field name="organization"/>
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-6" t-if="record.publish_on_website.raw_value">
+                                            <div class="alert alert-success mb-0 p-2 text-center">
+                                                <small>
+                                                    <i class="fa fa-globe"/> Published
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div t-attf-class="{{record.publish_on_website.raw_value ? 'col-6' : 'col-12'}}"
+                                             t-if="record.featured.raw_value">
+                                            <div class="alert alert-warning mb-0 p-2 text-center">
+                                                <small>
+                                                    <i class="fa fa-star"/> Featured
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom mt-2">
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Calendar View - Alumni Achievement -->
+    <record id="alumni_achievement_view_calendar" model="ir.ui.view">
+        <field name="name">alumni.achievement.view.calendar</field>
+        <field name="model">alumni.achievement</field>
+        <field name="arch" type="xml">
+            <calendar string="Achievement Calendar"
+                      date_start="achievement_date"
+                      mode="month"
+                      color="achievement_type"
+                      quick_create="0"
+                      event_limit="5">
+                <field name="title"/>
+                <field name="alumni_id"/>
+                <field name="achievement_type"/>
+                <field name="organization"/>
+                <field name="featured"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Pivot View - Alumni Achievement -->
+    <record id="alumni_achievement_view_pivot" model="ir.ui.view">
+        <field name="name">alumni.achievement.view.pivot</field>
+        <field name="model">alumni.achievement</field>
+        <field name="arch" type="xml">
+            <pivot string="Achievement Analysis">
+                <field name="achievement_type" type="row"/>
+                <field name="achievement_date" type="col" interval="year"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View - Alumni Achievement -->
+    <record id="alumni_achievement_view_graph" model="ir.ui.view">
+        <field name="name">alumni.achievement.view.graph</field>
+        <field name="model">alumni.achievement</field>
+        <field name="arch" type="xml">
+            <graph string="Achievement Statistics" type="bar">
+                <field name="achievement_type"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_alumni_achievement" model="ir.actions.act_window">
+        <field name="name">Alumni Achievements</field>
+        <field name="res_model">alumni.achievement</field>
+        <field name="view_mode">kanban,list,form,calendar,pivot,graph</field>
+        <field name="context">{'search_default_filter_active': 1, 'search_default_filter_recent': 1, 'search_default_group_by_achievement_type': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add Alumni Achievement
+            </p>
+            <p>
+                Track and showcase alumni achievements and recognition. Enter title (char, required,
+                placeholder "Best Research Paper Award"). Select alumni_id (Many2one to alumni.alumni,
+                required, tracked, indexed, no-create). View alumni_name (char, related to alumni_id.name,
+                invisible). Select achievement_type (7 options, required, tracked, radio widget): award
+                (Award/Recognition - success/green badge), publication (Research Publication - primary/blue
+                badge), patent (Patent - info badge), entrepreneurship (Startup/Business Success -
+                warning/yellow badge), promotion (Career Milestone/Promotion - danger/red badge), social
+                (Social Impact - secondary/gray badge in kanban), other (Other - dark/black badge in
+                kanban). Enter achievement_date (date, tracked). Enter organization (char, placeholder
+                "IEEE, Ministry of Innovation, etc."). Enter description (html, placeholder "Enter
+                detailed description of the achievement, impact, recognition details..."). Upload media:
+                image (binary, attachment, displayed as avatar 128x128 in form, 64px cover in kanban),
+                certificate (binary, attachment, filename certificate_filename, binary widget), media_url
+                (char, url widget, placeholder "https://example.com/news-article"). Set visibility:
+                featured (boolean, boolean_toggle widget, shows success ribbon "Featured" in form and
+                kanban top-right), publish_on_website (boolean, default true, boolean_toggle widget, shows
+                "Published" alert in kanban). Toggle active (boolean, default true, archive button, shows
+                danger ribbon "Archived" in kanban below featured ribbon at top 40px). Form view with
+                archive stat button and featured ribbon (success/green, top, conditional). List view with
+                2-color row decorations: Success/Green (featured=true), Muted (active=false). Badge widget
+                for achievement_type with 5-color decorations. Boolean toggles for featured/
+                publish_on_website/active. Kanban view showing achievement image (64px cover), achievement
+                title (trophy icon), alumni name (user-graduate icon, small), achievement type card
+                (dynamic 6-color background: success/award, primary/publication, info/patent,
+                warning/entrepreneurship, danger/promotion, secondary/social, dark/other, centered),
+                achievement date card (light background, centered, calendar icon primary/blue, conditional),
+                organization card (secondary/gray, building icon, conditional), visibility alerts (2 badges
+                6/6 or 12 grid: Published success/green globe icon, Featured warning/yellow star icon, both
+                conditional), 2 ribbons (Featured success/green top-right conditional, Archived danger/red
+                top-right 40px conditional). Calendar view for achievement tracking (date_start:
+                achievement_date, color by achievement_type, month mode, event_limit 5). Pivot view for
+                analysis (achievement_type × achievement_date year interval matrix). Graph view for
+                statistics (bar chart, achievement_type count). Ordered by achievement_date desc (most
+                recent first). Default filters: Active achievements, Last 6 months, and Grouped by
+                Achievement Type. Full chatter support for tracking and collaboration.
+            </p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="mcq_question_view_form" model="ir.ui.view">
+        <field name="name">mcq.question.view.form</field>
+        <field name="model">mcq.question</field>
+        <field name="arch" type="xml">
+            <form string="Question">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="Question Code"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Classification">
+                            <field name="question_type" widget="radio"/>
+                            <field name="difficulty" widget="priority"/>
+                            <field name="marks"/>
+                            <field name="negative_marks"
+                                   invisible="question_type == 'short_answer'"/>
+                        </group>
+                        <group string="Category">
+                            <field name="bank_id"/>
+                            <field name="subject_id"/>
+                            <field name="department_id"/>
+                            <field name="topic"/>
+                            <field name="tag_ids" widget="many2many_tags"
+                                   options="{'color_field': 'color'}"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Question">
+                            <field name="question_text" widget="html"
+                                   placeholder="Type your question here…"/>
+                            <field name="question_image" widget="image"
+                                   string="Attach Image (optional)"
+                                   invisible="not question_image"/>
+                        </page>
+
+                        <page string="Options / Answer"
+                              invisible="question_type == 'short_answer'">
+                            <field name="option_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="option_text" string="Option"/>
+                                    <field name="is_correct" string="Correct?"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Explanation">
+                            <field name="explanation" widget="html"
+                                   placeholder="Optional: Add an explanation shown to students after the exam…"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="mcq_question_view_list" model="ir.ui.view">
+        <field name="name">mcq.question.view.list</field>
+        <field name="model">mcq.question</field>
+        <field name="arch" type="xml">
+            <list string="Questions" decoration-muted="not active">
+                <field name="name" string="Code"/>
+                <field name="question_type" string="Type" widget="badge"
+                       decoration-info="question_type == 'mcq'"
+                       decoration-warning="question_type == 'true_false'"
+                       decoration-success="question_type == 'multi_select'"
+                       decoration-danger="question_type == 'short_answer'"/>
+                <field name="bank_id"/>
+                <field name="subject_id"/>
+                <field name="difficulty" widget="priority"/>
+                <field name="marks"/>
+                <field name="negative_marks"/>
+                <field name="tag_ids" widget="many2many_tags"
+                       options="{'color_field': 'color'}"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="mcq_question_view_kanban" model="ir.ui.view">
+        <field name="name">mcq.question.view.kanban</field>
+        <field name="model">mcq.question</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" default_group_by="bank_id">
+                <field name="name"/>
+                <field name="question_type"/>
+                <field name="difficulty"/>
+                <field name="marks"/>
+                <field name="subject_id"/>
+                <field name="tag_ids"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click o_kanban_record_has_image_fill">
+                            <div class="o_kanban_record_body">
+                                <strong><field name="name"/></strong>
+                                <div class="o_kanban_tags_section">
+                                    <field name="tag_ids" widget="many2many_tags"
+                                           options="{'color_field': 'color'}"/>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_bottom">
+                                <div class="oe_kanban_bottom_left">
+                                    <span class="badge bg-secondary">
+                                        <field name="question_type"/>
+                                    </span>
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <field name="difficulty" widget="priority"/>
+                                    <span class="ms-1"><field name="marks"/> pts</span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="mcq_question_view_search" model="ir.ui.view">
+        <field name="name">mcq.question.view.search</field>
+        <field name="model">mcq.question</field>
+        <field name="arch" type="xml">
+            <search string="Search Questions">
+                <field name="name"/>
+                <field name="subject_id"/>
+                <field name="bank_id"/>
+                <field name="topic"/>
+                <field name="tag_ids"/>
+                <separator/>
+                <filter string="MCQ" name="f_mcq" domain="[('question_type','=','mcq')]"/>
+                <filter string="Multi Select" name="f_multi" domain="[('question_type','=','multi_select')]"/>
+                <filter string="True / False" name="f_tf" domain="[('question_type','=','true_false')]"/>
+                <filter string="Short Answer" name="f_sa" domain="[('question_type','=','short_answer')]"/>
+                <separator/>
+                <filter string="Easy" name="f_easy" domain="[('difficulty','=','easy')]"/>
+                <filter string="Medium" name="f_medium" domain="[('difficulty','=','medium')]"/>
+                <filter string="Hard" name="f_hard" domain="[('difficulty','=','hard')]"/>
+                <separator/>
+                <filter string="Active" name="active" domain="[('active','=',True)]"/>
+                <filter string="Archived" name="archived" domain="[('active','=',False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Bank" name="grp_bank" context="{'group_by': 'bank_id'}"/>
+                    <filter string="Subject" name="grp_subject" context="{'group_by': 'subject_id'}"/>
+                    <filter string="Type" name="grp_type" context="{'group_by': 'question_type'}"/>
+                    <filter string="Difficulty" name="grp_diff" context="{'group_by': 'difficulty'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Tag list view -->
+    <record id="mcq_question_tag_view_list" model="ir.ui.view">
+        <field name="name">mcq.question.tag.view.list</field>
+        <field name="model">mcq.question.tag</field>
+        <field name="arch" type="xml">
+            <list string="Question Tags" editable="bottom">
+                <field name="name"/>
+                <field name="color" widget="color_index"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_mcq_question_tag" model="ir.actions.act_window">
+        <field name="name">Question Tags</field>
+        <field name="res_model">mcq.question.tag</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_mcq_question" model="ir.actions.act_window">
+        <field name="name">MCQ Questions</field>
+        <field name="res_model">mcq.question</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="search_view_id" ref="mcq_question_view_search"/>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add your first question!</p>
+            <p>Build a rich question bank with MCQ, True/False, and short-answer questions.</p>
+        </field>
+    </record>
+
+</odoo>

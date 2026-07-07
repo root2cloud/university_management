@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="sequence_iic_event" model="ir.sequence">
+            <field name="name">IIC Event Sequence</field>
+            <field name="code">iic.event</field>
+            <field name="prefix">IIC/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="sequence_iic_event_report" model="ir.sequence">
+            <field name="name">IIC Event Report Sequence</field>
+            <field name="code">iic.event.report</field>
+            <field name="prefix">IICR/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="sequence_iic_poster" model="ir.sequence">
+            <field name="name">IIC Poster Sequence</field>
+            <field name="code">iic.poster</field>
+            <field name="prefix">IICP/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="sequence_naac_dept_activity" model="ir.sequence">
+            <field name="name">NAAC Department Activity Sequence</field>
+            <field name="code">naac.department.activity</field>
+            <field name="prefix">NAAC/ACT/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="sequence_naac_evidence" model="ir.sequence">
+            <field name="name">NAAC Evidence Sequence</field>
+            <field name="code">naac.evidence</field>
+            <field name="prefix">NAAC/EV/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="sequence_naac_aqar" model="ir.sequence">
+            <field name="name">NAAC AQAR Sequence</field>
+            <field name="code">naac.aqar</field>
+            <field name="prefix">AQAR/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="sequence_naac_ssr" model="ir.sequence">
+            <field name="name">NAAC SSR Sequence</field>
+            <field name="code">naac.ssr</field>
+            <field name="prefix">SSR/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- ── NBA SAR Sequences ── -->
+        <record id="sequence_nba_sar" model="ir.sequence">
+            <field name="name">NBA SAR Sequence</field>
+            <field name="code">nba.sar</field>
+            <field name="prefix">NBA/SAR/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="sequence_nba_research" model="ir.sequence">
+            <field name="name">NBA Research Sequence</field>
+            <field name="code">nba.research</field>
+            <field name="prefix">NBAR/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+    </data>
+</odoo>

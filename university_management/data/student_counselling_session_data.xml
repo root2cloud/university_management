@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── Scheduled Action: Daily follow-up reminders ───────────────
+         Posts a chatter message on leads whose session follow_up_date
+         is today, reminding the counsellor to act.
+    ─────────────────────────────────────────────────────────────────── -->
+    <record id="cron_counselling_followup_reminders" model="ir.cron">
+        <field name="name">Counselling Session Follow-up Reminders</field>
+        <field name="model_id" ref="model_student_counselling_session"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_remind_follow_ups()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+        <field name="user_id" ref="base.user_root"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,663 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ========================================== -->
+        <!-- AUTOMATED ACTIONS (Server Actions + Cron) -->
+        <!-- ========================================== -->
+
+        <!-- 1. Send Fee Reminder Emails (Daily) -->
+        <record id="cron_send_fee_reminders" model="ir.cron">
+            <field name="name">University: Send Fee Payment Reminders</field>
+            <field name="model_id" ref="model_fee_reminder"/>
+            <field name="state">code</field>
+            <field name="code">model.send_pending_reminders()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- 2. Check Library Overdue Books (Daily) -->
+        <record id="cron_check_overdue_books" model="ir.cron">
+            <field name="name">Library: Check Overdue Books and Send Notifications</field>
+            <field name="model_id" ref="model_library_issue"/>
+            <field name="state">code</field>
+            <field name="code">model.check_overdue_books()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- 3. Auto-generate Library Fines (Daily) -->
+        <record id="cron_generate_library_fines" model="ir.cron">
+            <field name="name">Library: Auto-generate Fines for Overdue Books</field>
+            <field name="model_id" ref="model_library_fine"/>
+            <field name="state">code</field>
+            <field name="code">model.auto_generate_fines()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- 4. Check Exam Registration Deadlines (Daily) -->
+        <record id="cron_check_exam_registration_deadline" model="ir.cron">
+            <field name="name">Examination: Send Registration Deadline Reminders</field>
+            <field name="model_id" ref="model_examination_examination"/>
+            <field name="state">code</field>
+            <field name="code">model.send_registration_reminders()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- 5. Birthday Wishes to Students (Daily) -->
+        <record id="cron_student_birthday_wishes" model="ir.cron">
+            <field name="name">Student: Send Birthday Wishes</field>
+            <field name="model_id" ref="model_student_student"/>
+            <field name="state">code</field>
+            <field name="code">model.send_birthday_wishes()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- 6. Check Vehicle Documents Expiry (Weekly) -->
+        <record id="cron_check_vehicle_documents" model="ir.cron">
+            <field name="name">Transport: Check Vehicle Document Expiry</field>
+            <field name="model_id" ref="model_transport_vehicle"/>
+            <field name="state">code</field>
+            <field name="code">model.check_document_expiry()</field>
+            <field name="interval_number">7</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- 7. Auto-close Event Registrations (Hourly) -->
+        <record id="cron_auto_close_event_registration" model="ir.cron">
+            <field name="name">Events: Auto-close Event Registrations</field>
+            <field name="model_id" ref="model_university_event"/>
+            <field name="state">code</field>
+            <field name="code">model.auto_close_registrations()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- 8. Send Admission Status Updates (Daily) -->
+        <record id="cron_admission_status_update" model="ir.cron">
+            <field name="name">Admission: Send Status Updates to Applicants</field>
+            <field name="model_id" ref="model_student_admission"/>
+            <field name="state">code</field>
+            <field name="code">model.send_status_updates()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- 9. Check Hostel Attendance (Daily) -->
+        <record id="cron_hostel_attendance_check" model="ir.cron">
+            <field name="name">Hostel: Check Daily Attendance</field>
+            <field name="model_id" ref="model_hostel_attendance"/>
+            <field name="state">code</field>
+            <field name="code">model.check_daily_attendance()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- 10. Send Placement Drive Notifications (Daily) -->
+        <record id="cron_placement_drive_notification" model="ir.cron">
+            <field name="name">Placement: Send Drive Notifications to Eligible Students</field>
+            <field name="model_id" ref="model_placement_drive"/>
+            <field name="state">code</field>
+            <field name="code">model.notify_eligible_students()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- 11. Auto-generate Monthly Salary Slips (Monthly) -->
+        <record id="cron_generate_salary_slips" model="ir.cron">
+            <field name="name">Faculty: Auto-generate Monthly Salary Slips</field>
+            <field name="model_id" ref="model_faculty_salary"/>
+            <field name="state">code</field>
+            <field name="code">model.auto_generate_monthly_salary()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">months</field>
+            <field name="active" eval="False"/>
+        </record>
+
+        <!-- 12. Send Exam Hall Ticket Reminders (Daily) -->
+        <record id="cron_hall_ticket_reminder" model="ir.cron">
+            <field name="name">Examination: Send Hall Ticket Download Reminders</field>
+            <field name="model_id" ref="model_examination_hall_ticket"/>
+            <field name="state">code</field>
+            <field name="code">model.send_hall_ticket_reminders()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- 13. Check Project Deadlines (Weekly) -->
+        <record id="cron_project_deadline_check" model="ir.cron">
+            <field name="name">Project: Check Project Submission Deadlines</field>
+            <field name="model_id" ref="model_student_project"/>
+            <field name="state">code</field>
+            <field name="code">model.check_submission_deadlines()</field>
+            <field name="interval_number">7</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- 14. Check Faculty Leave Balances (Monthly) -->
+        <record id="cron_faculty_leave_balance" model="ir.cron">
+            <field name="name">Faculty: Update Leave Balances</field>
+            <field name="model_id" ref="model_faculty_leave"/>
+            <field name="state">code</field>
+            <field name="code">model.update_leave_balances()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">months</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- 15. Send Scholarship Application Reminders (Weekly) -->
+        <record id="cron_scholarship_reminder" model="ir.cron">
+            <field name="name">Scholarship: Send Application Deadline Reminders</field>
+            <field name="model_id" ref="model_scholarship_application"/>
+            <field name="state">code</field>
+            <field name="code">model.send_deadline_reminders()</field>
+            <field name="interval_number">7</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- ========================================== -->
+        <!-- SERVER ACTIONS -->
+        <!-- ========================================== -->
+
+        <!-- Action: Bulk Approve Admissions -->
+        <record id="action_bulk_approve_admissions" model="ir.actions.server">
+            <field name="name">Approve Selected Admissions</field>
+            <field name="model_id" ref="model_student_admission"/>
+            <field name="binding_model_id" ref="model_student_admission"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">
+for record in records:
+    if record.state == 'submitted':
+        record.action_approve()
+            </field>
+        </record>
+
+        <!-- Action: Bulk Reject Admissions -->
+        <record id="action_bulk_reject_admissions" model="ir.actions.server">
+            <field name="name">Reject Selected Admissions</field>
+            <field name="model_id" ref="model_student_admission"/>
+            <field name="binding_model_id" ref="model_student_admission"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">
+for record in records:
+    if record.state in ['draft', 'submitted']:
+        record.action_reject()
+            </field>
+        </record>
+
+        <!-- Action: Bulk Generate Hall Tickets -->
+        <record id="action_bulk_generate_hall_tickets" model="ir.actions.server">
+            <field name="name">Generate Hall Tickets</field>
+            <field name="model_id" ref="model_examination_hall_ticket"/>
+            <field name="binding_model_id" ref="model_examination_hall_ticket"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">
+for record in records:
+    if record.state == 'draft':
+        record.action_generate()
+            </field>
+        </record>
+
+        <!-- Action: Bulk Send Fee Reminders -->
+        <record id="action_bulk_send_fee_reminders" model="ir.actions.server">
+            <field name="name">Send Fee Reminders</field>
+            <field name="model_id" ref="model_student_student"/>
+            <field name="binding_model_id" ref="model_student_student"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">
+for student in records:
+    if student.total_fee_due > 0:
+        env['fee.reminder'].create({
+            'student_id': student.id,
+            'reminder_type': 'manual',
+            'amount_due': student.total_fee_due,
+        }).action_send()
+            </field>
+        </record>
+
+        <!-- Action: Bulk Issue Library Books -->
+        <record id="action_bulk_issue_books" model="ir.actions.server">
+            <field name="name">Issue Selected Books</field>
+            <field name="model_id" ref="model_library_issue"/>
+            <field name="binding_model_id" ref="model_library_issue"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">
+for record in records:
+    if record.state == 'reserved':
+        record.action_issue()
+            </field>
+        </record>
+
+        <!-- Action: Bulk Return Library Books -->
+        <record id="action_bulk_return_books" model="ir.actions.server">
+            <field name="name">Return Selected Books</field>
+            <field name="model_id" ref="model_library_issue"/>
+            <field name="binding_model_id" ref="model_library_issue"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">
+for record in records:
+    if record.state in ['issued', 'overdue']:
+        record.action_return()
+            </field>
+        </record>
+
+        <!-- Action: Bulk Allocate Hostel Rooms -->
+        <record id="action_bulk_allocate_hostel" model="ir.actions.server">
+            <field name="name">Allocate Selected Rooms</field>
+            <field name="model_id" ref="model_hostel_allocation"/>
+            <field name="binding_model_id" ref="model_hostel_allocation"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">
+for record in records:
+    if record.state == 'requested':
+        record.action_allocate()
+            </field>
+        </record>
+
+        <!-- Action: Bulk Send Email Notifications -->
+        <record id="action_bulk_send_notifications" model="ir.actions.server">
+            <field name="name">Send Email Notifications</field>
+            <field name="model_id" ref="model_student_student"/>
+            <field name="binding_model_id" ref="model_student_student"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">
+template = env.ref('university_management.email_template_general_notification', raise_if_not_found=False)
+if template:
+    for student in records:
+        if student.email:
+            template.send_mail(student.id, force_send=True)
+            </field>
+        </record>
+
+        <!-- Action: Mark Attendance as Present -->
+        <record id="action_mark_attendance_present" model="ir.actions.server">
+            <field name="name">Mark as Present</field>
+            <field name="model_id" ref="model_student_attendance"/>
+            <field name="binding_model_id" ref="model_student_attendance"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">
+records.write({'state': 'present'})
+            </field>
+        </record>
+
+        <!-- Action: Mark Attendance as Absent -->
+        <record id="action_mark_attendance_absent" model="ir.actions.server">
+            <field name="name">Mark as Absent</field>
+            <field name="model_id" ref="model_student_attendance"/>
+            <field name="binding_model_id" ref="model_student_attendance"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">
+records.write({'state': 'absent'})
+            </field>
+        </record>
+
+        <!-- Action: Bulk Approve Scholarship Applications -->
+        <record id="action_bulk_approve_scholarship" model="ir.actions.server">
+            <field name="name">Approve Scholarships</field>
+            <field name="model_id" ref="model_scholarship_application"/>
+            <field name="binding_model_id" ref="model_scholarship_application"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">
+for record in records:
+    if record.state == 'submitted':
+        record.action_approve()
+            </field>
+        </record>
+
+        <!-- Action: Send Welcome Email to New Students -->
+        <record id="action_send_welcome_email" model="ir.actions.server">
+            <field name="name">Send Welcome Email</field>
+            <field name="model_id" ref="model_student_student"/>
+            <field name="binding_model_id" ref="model_student_student"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">
+template = env.ref('university_management.email_template_student_welcome', raise_if_not_found=False)
+if template:
+    for student in records:
+        if student.email and student.state == 'enrolled':
+            template.send_mail(student.id, force_send=True)
+            </field>
+        </record>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  ASSET MANAGEMENT — AUTOMATED SERVER ACTIONS (Section 7.1)     -->
+    <!--  Visible in Settings → Technical → Automation → Automated      -->
+    <!--  Actions. Admins can view/edit these from the UI.               -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+
+    <!-- 1. Asset created (state → active) → Generate QR + notify HOD -->
+    <record id="asset_server_action_on_activate" model="ir.actions.server">
+        <field name="name">Asset: On Activation → Notify HOD</field>
+        <field name="model_id" ref="model_asset_asset"/>
+        <field name="state">code</field>
+        <field name="code">
+for rec in records:
+    if rec.state == 'active':
+        rec._notify_hod_on_registration()
+        </field>
+    </record>
+
+    <record id="asset_automation_on_activate" model="base.automation">
+        <field name="name">Asset: On Activation → Notify HOD</field>
+        <field name="model_id" ref="model_asset_asset"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_pre_domain">[('state', '!=', 'active')]</field>
+        <field name="filter_domain">[('state', '=', 'active')]</field>
+        <field name="action_server_ids" eval="[(4, ref('asset_server_action_on_activate'))]"/>
+        <field name="active" eval="True"/>
+    </record>
+
+    <!-- 2. Asset status → needs_purchase → Auto-create draft purchase request -->
+    <record id="asset_server_action_needs_purchase" model="ir.actions.server">
+        <field name="name">Asset: Status Needs Purchase → Auto-Create Purchase Request</field>
+        <field name="model_id" ref="model_asset_asset"/>
+        <field name="state">code</field>
+        <field name="code">
+for rec in records:
+    if rec.status == 'needs_purchase':
+        existing = env['asset.purchase.request'].search([
+            ('asset_id', '=', rec.id),
+            ('state', 'in', ('draft','principal_review','vendor_quotes',
+                             'acc_review','secretary_review','trust_execution')),
+        ], limit=1)
+        if not existing:
+            env['asset.purchase.request'].create({
+                'asset_id': rec.id,
+                'item_description': 'Asset replacement/purchase required: %s' % rec.name,
+                'justification': 'Auto-created: asset status set to Needs Purchase.',
+                'requested_by': env.user.id,
+                'department_id': rec.department_id.id if rec.department_id else False,
+            })
+        </field>
+    </record>
+
+    <record id="asset_automation_needs_purchase" model="base.automation">
+        <field name="name">Asset: Status → Needs Purchase → Auto-Create PR</field>
+        <field name="model_id" ref="model_asset_asset"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_pre_domain">[('status', '!=', 'needs_purchase')]</field>
+        <field name="filter_domain">[('status', '=', 'needs_purchase')]</field>
+        <field name="action_server_ids" eval="[(4, ref('asset_server_action_needs_purchase'))]"/>
+        <field name="active" eval="True"/>
+    </record>
+
+    <!-- 3. Purchase request: principal_review → notify Principal -->
+    <record id="asset_server_action_pr_to_principal" model="ir.actions.server">
+        <field name="name">Asset PR: State → principal_review → Notify Principal</field>
+        <field name="model_id" ref="model_asset_purchase_request"/>
+        <field name="state">code</field>
+        <field name="code">
+for rec in records:
+    if rec.state == 'principal_review':
+        template = env.ref('university_management.mail_template_purchase_request_principal', raise_if_not_found=False)
+        if template:
+            principal_group = env.ref('university_management.group_asset_principal', raise_if_not_found=False)
+            if principal_group:
+                for user in principal_group.users:
+                    if user.partner_id:
+                        template.with_context(default_partner_ids=[user.partner_id.id]).send_mail(rec.id, force_send=True)
+                        break
+        </field>
+    </record>
+
+    <record id="asset_automation_pr_to_principal" model="base.automation">
+        <field name="name">Asset PR: State → principal_review → Notify Principal</field>
+        <field name="model_id" ref="model_asset_purchase_request"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_pre_domain">[('state', '!=', 'principal_review')]</field>
+        <field name="filter_domain">[('state', '=', 'principal_review')]</field>
+        <field name="action_server_ids" eval="[(4, ref('asset_server_action_pr_to_principal'))]"/>
+        <field name="active" eval="True"/>
+    </record>
+
+    <!-- 4. Purchase request: acc_review → notify ACC -->
+    <record id="asset_server_action_pr_to_acc" model="ir.actions.server">
+        <field name="name">Asset PR: State → acc_review → Notify ACC</field>
+        <field name="model_id" ref="model_asset_purchase_request"/>
+        <field name="state">code</field>
+        <field name="code">
+for rec in records:
+    if rec.state == 'acc_review':
+        template = env.ref('university_management.mail_template_purchase_request_acc', raise_if_not_found=False)
+        if template:
+            acc_group = env.ref('university_management.group_asset_acc', raise_if_not_found=False)
+            if acc_group:
+                for user in acc_group.users:
+                    if user.partner_id:
+                        template.with_context(default_partner_ids=[user.partner_id.id]).send_mail(rec.id, force_send=True)
+                        break
+        </field>
+    </record>
+
+    <record id="asset_automation_pr_to_acc" model="base.automation">
+        <field name="name">Asset PR: State → acc_review → Notify ACC</field>
+        <field name="model_id" ref="model_asset_purchase_request"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_pre_domain">[('state', '!=', 'acc_review')]</field>
+        <field name="filter_domain">[('state', '=', 'acc_review')]</field>
+        <field name="action_server_ids" eval="[(4, ref('asset_server_action_pr_to_acc'))]"/>
+        <field name="active" eval="True"/>
+    </record>
+
+    <!-- 5. ACC reviewed → notify Secretary -->
+    <record id="asset_server_action_pr_to_secretary" model="ir.actions.server">
+        <field name="name">Asset PR: ACC Reviewed → Notify Secretary</field>
+        <field name="model_id" ref="model_asset_purchase_request"/>
+        <field name="state">code</field>
+        <field name="code">
+for rec in records:
+    if rec.state == 'secretary_review':
+        template = env.ref('university_management.mail_template_purchase_request_secretary', raise_if_not_found=False)
+        if template:
+            sec_group = env.ref('university_management.group_asset_secretary', raise_if_not_found=False)
+            if sec_group:
+                for user in sec_group.users:
+                    if user.partner_id:
+                        template.with_context(default_partner_ids=[user.partner_id.id]).send_mail(rec.id, force_send=True)
+                        break
+        </field>
+    </record>
+
+    <record id="asset_automation_pr_to_secretary" model="base.automation">
+        <field name="name">Asset PR: State → secretary_review → Notify Secretary</field>
+        <field name="model_id" ref="model_asset_purchase_request"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_pre_domain">[('state', '!=', 'secretary_review')]</field>
+        <field name="filter_domain">[('state', '=', 'secretary_review')]</field>
+        <field name="action_server_ids" eval="[(4, ref('asset_server_action_pr_to_secretary'))]"/>
+        <field name="active" eval="True"/>
+    </record>
+
+    <!-- 6. Secretary approves → notify Trust Manager + all stakeholders -->
+    <record id="asset_server_action_pr_secretary_approved" model="ir.actions.server">
+        <field name="name">Asset PR: Secretary Approved → Notify Trust Manager</field>
+        <field name="model_id" ref="model_asset_purchase_request"/>
+        <field name="state">code</field>
+        <field name="code">
+for rec in records:
+    if rec.state == 'trust_execution':
+        template = env.ref('university_management.mail_template_purchase_request_trust_manager', raise_if_not_found=False)
+        if template:
+            tm_group = env.ref('university_management.group_asset_trust_manager', raise_if_not_found=False)
+            if tm_group:
+                for user in tm_group.users:
+                    if user.partner_id:
+                        template.with_context(default_partner_ids=[user.partner_id.id]).send_mail(rec.id, force_send=True)
+                        break
+        </field>
+    </record>
+
+    <record id="asset_automation_pr_secretary_approved" model="base.automation">
+        <field name="name">Asset PR: State → trust_execution → Notify Trust Manager</field>
+        <field name="model_id" ref="model_asset_purchase_request"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_pre_domain">[('state', '!=', 'trust_execution')]</field>
+        <field name="filter_domain">[('state', '=', 'trust_execution')]</field>
+        <field name="action_server_ids" eval="[(4, ref('asset_server_action_pr_secretary_approved'))]"/>
+        <field name="active" eval="True"/>
+    </record>
+
+    <!-- 7. Trust Manager execution done → final notification to all -->
+    <record id="asset_server_action_pr_done" model="ir.actions.server">
+        <field name="name">Asset PR: Execution Done → Notify All Stakeholders</field>
+        <field name="model_id" ref="model_asset_purchase_request"/>
+        <field name="state">code</field>
+        <field name="code">
+for rec in records:
+    if rec.state == 'done' and rec.trust_manager_executed:
+        template = env.ref('university_management.mail_template_purchase_final_executed', raise_if_not_found=False)
+        if template and rec.requested_by and rec.requested_by.partner_id:
+            template.with_context(
+                default_partner_ids=[rec.requested_by.partner_id.id]
+            ).send_mail(rec.id, force_send=True)
+        </field>
+    </record>
+
+    <record id="asset_automation_pr_done" model="base.automation">
+        <field name="name">Asset PR: State → done → Notify Requester of Completion</field>
+        <field name="model_id" ref="model_asset_purchase_request"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_pre_domain">[('state', '!=', 'done')]</field>
+        <field name="filter_domain">[('state', '=', 'done')]</field>
+        <field name="action_server_ids" eval="[(4, ref('asset_server_action_pr_done'))]"/>
+        <field name="active" eval="True"/>
+    </record>
+
+    <!-- 8. Purchase request rejected → notify faculty -->
+    <record id="asset_server_action_pr_rejected" model="ir.actions.server">
+        <field name="name">Asset PR: Rejected → Notify Faculty</field>
+        <field name="model_id" ref="model_asset_purchase_request"/>
+        <field name="state">code</field>
+        <field name="code">
+for rec in records:
+    if rec.state == 'rejected':
+        template = env.ref('university_management.mail_template_purchase_rejected', raise_if_not_found=False)
+        if template and rec.requested_by and rec.requested_by.partner_id:
+            template.send_mail(rec.id, force_send=True)
+        </field>
+    </record>
+
+    <record id="asset_automation_pr_rejected" model="base.automation">
+        <field name="name">Asset PR: State → rejected → Notify Faculty</field>
+        <field name="model_id" ref="model_asset_purchase_request"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_pre_domain">[('state', '!=', 'rejected')]</field>
+        <field name="filter_domain">[('state', '=', 'rejected')]</field>
+        <field name="action_server_ids" eval="[(4, ref('asset_server_action_pr_rejected'))]"/>
+        <field name="active" eval="True"/>
+    </record>
+
+    <!-- 9. Handover state changes → notify relevant approver -->
+    <record id="asset_server_action_handover_to_principal" model="ir.actions.server">
+        <field name="name">Asset Handover: HOD Approved → Notify Principal</field>
+        <field name="model_id" ref="model_asset_handover"/>
+        <field name="state">code</field>
+        <field name="code">
+for rec in records:
+    if rec.state == 'pending_principal':
+        template = env.ref('university_management.mail_template_handover_request_principal', raise_if_not_found=False)
+        if template:
+            principal_group = env.ref('university_management.group_asset_principal', raise_if_not_found=False)
+            if principal_group:
+                for user in principal_group.users:
+                    if user.partner_id:
+                        template.with_context(default_partner_ids=[user.partner_id.id]).send_mail(rec.id, force_send=True)
+                        break
+        </field>
+    </record>
+
+    <record id="asset_automation_handover_to_principal" model="base.automation">
+        <field name="name">Asset Handover: State → pending_principal → Notify Principal</field>
+        <field name="model_id" ref="model_asset_handover"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_pre_domain">[('state', '!=', 'pending_principal')]</field>
+        <field name="filter_domain">[('state', '=', 'pending_principal')]</field>
+        <field name="action_server_ids" eval="[(4, ref('asset_server_action_handover_to_principal'))]"/>
+        <field name="active" eval="True"/>
+    </record>
+
+    <!-- 10. Audit assigned → notify auditor -->
+    <record id="asset_server_action_audit_assigned" model="ir.actions.server">
+        <field name="name">Asset Audit: Started → Notify Assigned Auditor</field>
+        <field name="model_id" ref="model_asset_audit"/>
+        <field name="state">code</field>
+        <field name="code">
+for rec in records:
+    if rec.state == 'in_progress' and rec.assigned_to:
+        template = env.ref('university_management.mail_template_audit_assigned', raise_if_not_found=False)
+        if template:
+            template.send_mail(rec.id, force_send=True)
+        </field>
+    </record>
+
+    <record id="asset_automation_audit_assigned" model="base.automation">
+        <field name="name">Asset Audit: State → in_progress → Notify Auditor</field>
+        <field name="model_id" ref="model_asset_audit"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_pre_domain">[('state', '!=', 'in_progress')]</field>
+        <field name="filter_domain">[('state', '=', 'in_progress')]</field>
+        <field name="action_server_ids" eval="[(4, ref('asset_server_action_audit_assigned'))]"/>
+        <field name="active" eval="True"/>
+    </record>
+
+    <!-- 11. Audit completed → notify Principal + Secretary -->
+    <record id="asset_server_action_audit_completed" model="ir.actions.server">
+        <field name="name">Asset Audit: Completed → Notify Principal + Secretary</field>
+        <field name="model_id" ref="model_asset_audit"/>
+        <field name="state">code</field>
+        <field name="code">
+for rec in records:
+    if rec.state == 'completed':
+        template = env.ref('university_management.mail_template_audit_completed', raise_if_not_found=False)
+        if template:
+            for group_xml in ['university_management.group_asset_principal',
+                              'university_management.group_asset_secretary']:
+                grp = env.ref(group_xml, raise_if_not_found=False)
+                if grp:
+                    for user in grp.users:
+                        if user.partner_id:
+                            template.with_context(default_partner_ids=[user.partner_id.id]).send_mail(rec.id, force_send=True)
+                            break
+        </field>
+    </record>
+
+    <record id="asset_automation_audit_completed" model="base.automation">
+        <field name="name">Asset Audit: State → completed → Notify Principal + Secretary</field>
+        <field name="model_id" ref="model_asset_audit"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_pre_domain">[('state', '!=', 'completed')]</field>
+        <field name="filter_domain">[('state', '=', 'completed')]</field>
+        <field name="action_server_ids" eval="[(4, ref('asset_server_action_audit_completed'))]"/>
+        <field name="active" eval="True"/>
+    </record>
+
+    </data>
+</odoo>

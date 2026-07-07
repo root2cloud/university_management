@@ -1,0 +1,983 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ========================================= -->
+    <!-- SCHOLARSHIP APPLICATION VIEWS -->
+    <!-- ========================================= -->
+
+    <!-- Form View -->
+    <record id="scholarship_application_view_form" model="ir.ui.view">
+        <field name="name">scholarship.application.view.form</field>
+        <field name="model">scholarship.application</field>
+        <field name="arch" type="xml">
+            <form string="Scholarship Application">
+                <header>
+                    <button name="action_submit" string="Submit Application"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'draft'"
+                            confirm="Submit this scholarship application?"/>
+                    <button name="action_review" string="Start Review"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'submitted'"
+                            groups="base.group_user"/>
+                    <button name="action_shortlist" string="Shortlist"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'under_review'"
+                            groups="base.group_user"/>
+                    <button name="action_schedule_interview" string="Schedule Interview"
+                            type="object"
+                            invisible="state != 'shortlisted'"
+                            groups="base.group_user"/>
+                    <button name="action_approve" string="Approve"
+                            type="object" class="oe_highlight"
+                            invisible="state not in ['shortlisted', 'interview']"
+                            groups="base.group_user"
+                            confirm="Approve this scholarship application?"/>
+                    <button name="action_award" string="Award Scholarship"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'approved'"
+                            groups="base.group_user"
+                            confirm="Award scholarship to this student?"/>
+                    <button name="action_reject" string="Reject"
+                            type="object"
+                            invisible="state in ['awarded', 'rejected', 'cancelled']"
+                            groups="base.group_user"
+                            confirm="Reject this application?"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft"
+                            type="object"
+                            invisible="state == 'draft'"
+                            confirm="This will reset the Scholarship Application to draft. Are you sure to Continue?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,under_review,shortlisted,approved,awarded"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Awarded"
+                            bg_color="text-bg-success"
+                            invisible="state != 'awarded'"/>
+                    <widget name="web_ribbon" title="Rejected"
+                            bg_color="text-bg-danger"
+                            invisible="state != 'rejected'"/>
+                    <widget name="web_ribbon" title="Shortlisted"
+                            bg_color="text-bg-info"
+                            invisible="state != 'shortlisted'"/>
+
+                    <div class="oe_title">
+                        <label for="student_id" string="Student"/>
+                        <h1>
+                            <field name="student_id"
+                                   placeholder="Select Student"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                        </h1>
+                        <h2>
+                            <field name="name" readonly="1"/>
+                        </h2>
+                    </div>
+
+                    <group>
+                        <group string="Student Information">
+                            <field name="registration_number" readonly="1"/>
+                            <field name="program_id" readonly="1"/>
+                            <field name="current_cgpa" readonly="1"/>
+                        </group>
+                        <group string="Scholarship Details">
+                            <field name="scholarship_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="application_date" widget="date"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Accounting Information">
+                            <field name="payment_id" widget="many2one"/>
+                            <field name="move_id" widget="many2one"/>
+                            <field name="invoice_id" widget="many2one"/>
+                        </group>
+                        <group string="Payment Information">
+                            <field name="payment_state"/>
+                            <field name="payment_date"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Application Details" name="application">
+                            <group string="Academic Performance">
+                                <group>
+                                    <field name="previous_year_percentage"/>
+                                    <field name="overall_percentage"/>
+                                </group>
+                            </group>
+
+                            <separator string="Reason for Application"/>
+                            <field name="reason"
+                                   placeholder="Explain why you are applying for this scholarship..."/>
+
+                            <separator string="Academic/Co-curricular Achievements"/>
+                            <field name="achievements"
+                                   placeholder="List your academic and co-curricular achievements..."/>
+                        </page>
+
+                        <page string="Financial Information" name="financial">
+                            <group>
+                                <group>
+                                    <field name="family_annual_income" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="family_size"/>
+                                    <field name="currency_id" invisible="1"/>
+                                </group>
+                            </group>
+
+                            <separator string="Statement of Financial Need"/>
+                            <field name="financial_need"
+                                   placeholder="Explain your financial need for this scholarship..."/>
+                        </page>
+
+                        <page string="Documents" name="documents">
+                            <group>
+                                <field name="documents_verified" widget="boolean"/>
+                            </group>
+                            <field name="document_ids" widget="one2many">
+                                <list editable="bottom">
+                                    <field name="document_type_id"
+                                           options="{'no_create': True}"/>
+                                    <field name="attachment_id" widget="many2one_binary"/>
+                                    <field name="is_verified" widget="boolean_toggle"/>
+                                    <field name="verified_by" readonly="1"/>
+                                    <field name="verification_date" widget="date" readonly="1"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Selection" name="selection">
+                            <group>
+                                <group>
+                                    <field name="selection_score"/>
+                                    <field name="rank"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Interview" name="interview"
+                              invisible="state not in ['interview', 'approved', 'awarded']">
+                            <group>
+                                <group>
+                                    <field name="interview_scheduled" widget="boolean_toggle"/>
+                                    <field name="interview_date" widget="datetime"
+                                           invisible="not interview_scheduled"/>
+                                </group>
+                            </group>
+                            <separator string="Interview Remarks"
+                                       invisible="not interview_scheduled"/>
+                            <field name="interview_remarks"
+                                   invisible="not interview_scheduled"
+                                   placeholder="Enter interview remarks..."/>
+                        </page>
+
+                        <page string="Recommendation" name="recommendation">
+                            <group>
+                                <field name="recommended_by"
+                                       options="{'no_create': True, 'no_create_edit': True}"/>
+                            </group>
+                            <separator string="Recommendation Letter"/>
+                            <field name="recommendation_letter"
+                                   placeholder="Recommendation letter from faculty..."/>
+                        </page>
+
+                        <page string="Award Details" name="award"
+                              invisible="state not in ['awarded']">
+                            <group>
+                                <group>
+                                    <field name="awarded_amount" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="award_date" widget="date"/>
+                                </group>
+                                <group>
+                                    <field name="award_certificate" widget="binary"
+                                           filename="award_certificate_filename"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Rejection" name="rejection"
+                              invisible="state != 'rejected'">
+                            <separator string="Rejection Reason"/>
+                            <field name="rejection_reason"
+                                   placeholder="Enter reason for rejection..."/>
+                        </page>
+
+                        <page string="Notes" name="notes">
+                            <field name="notes"
+                                   placeholder="Enter any additional notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="scholarship_application_view_list" model="ir.ui.view">
+        <field name="name">scholarship.application.view.list</field>
+        <field name="model">scholarship.application</field>
+        <field name="arch" type="xml">
+            <list string="Scholarship Applications"
+                  default_order="application_date desc"
+                  multi_edit="1"
+                  sample="1"
+                  decoration-success="state == 'awarded'"
+                  decoration-info="state == 'shortlisted'"
+                  decoration-warning="state == 'under_review'"
+                  decoration-danger="state == 'rejected'">
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="registration_number" optional="show"/>
+                <field name="program_id" optional="hide"/>
+                <field name="scholarship_id"/>
+                <field name="application_date"/>
+                <field name="current_cgpa" optional="show"/>
+                <field name="family_annual_income" widget="monetary" optional="show"/>
+                <field name="selection_score" optional="show"/>
+                <field name="rank" optional="show"/>
+                <field name="awarded_amount" widget="monetary" optional="hide"/>
+                <field name="documents_verified" widget="boolean_toggle" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-muted="state == 'draft'"
+                       decoration-warning="state in ['submitted', 'under_review']"
+                       decoration-info="state in ['shortlisted', 'interview']"
+                       decoration-success="state in ['approved', 'awarded']"
+                       decoration-danger="state == 'rejected'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="scholarship_application_view_search" model="ir.ui.view">
+        <field name="name">scholarship.application.view.search</field>
+        <field name="model">scholarship.application</field>
+        <field name="arch" type="xml">
+            <search string="Search Scholarship Applications">
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="registration_number"/>
+                <field name="scholarship_id"/>
+                <field name="program_id"/>
+
+                <separator/>
+
+                <filter name="filter_draft" string="Draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_submitted" string="Submitted"
+                        domain="[('state', '=', 'submitted')]"/>
+                <filter name="filter_under_review" string="Under Review"
+                        domain="[('state', '=', 'under_review')]"/>
+                <filter name="filter_shortlisted" string="Shortlisted"
+                        domain="[('state', '=', 'shortlisted')]"/>
+                <filter name="filter_interview" string="Interview Scheduled"
+                        domain="[('state', '=', 'interview')]"/>
+                <filter name="filter_approved" string="Approved"
+                        domain="[('state', '=', 'approved')]"/>
+                <filter name="filter_awarded" string="Awarded"
+                        domain="[('state', '=', 'awarded')]"/>
+                <filter name="filter_rejected" string="Rejected"
+                        domain="[('state', '=', 'rejected')]"/>
+
+                <separator/>
+
+                <filter name="filter_docs_verified" string="Documents Verified"
+                        domain="[('documents_verified', '=', True)]"/>
+                <filter name="filter_docs_pending" string="Documents Pending"
+                        domain="[('documents_verified', '=', False)]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_student" string="Student"
+                            context="{'group_by': 'student_id'}"/>
+                    <filter name="group_by_scholarship" string="Scholarship"
+                            context="{'group_by': 'scholarship_id'}"/>
+                    <filter name="group_by_program" string="Program"
+                            context="{'group_by': 'program_id'}"/>
+                    <filter name="group_by_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_by_application_date" string="Application Date"
+                            context="{'group_by': 'application_date'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="scholarship_id" string="Scholarship"
+                           select="multi"
+                           icon="fa-trophy"/>
+                    <field name="state" string="Status"
+                           select="multi"
+                           icon="fa-filter"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="scholarship_application_view_kanban" model="ir.ui.view">
+        <field name="name">scholarship.application.view.kanban</field>
+        <field name="model">scholarship.application</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="state"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="scholarship_id"/>
+                <field name="application_date"/>
+                <field name="current_cgpa"/>
+                <field name="family_annual_income"/>
+                <field name="selection_score"/>
+                <field name="state"/>
+
+                <progressbar field="state"
+                             colors='{"draft": "muted", "submitted": "warning", "under_review": "warning", "shortlisted": "info", "interview": "info", "approved": "success", "awarded": "success", "rejected": "danger"}'/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="student_id"/>
+                                        </strong>
+                                        <div class="text-muted">
+                                            <field name="name"/>
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_record_top_right">
+                                        <field name="state" widget="badge"
+                                               decoration-muted="state == 'draft'"
+                                               decoration-warning="state in ['submitted', 'under_review']"
+                                               decoration-info="state in ['shortlisted', 'interview']"
+                                               decoration-success="state in ['approved', 'awarded']"
+                                               decoration-danger="state == 'rejected'"/>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body">
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <i class="fa fa-trophy text-warning"/>
+                                            <field name="scholarship_id"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-6">
+                                            <i class="fa fa-calendar text-primary"/>
+                                            <field name="application_date"/>
+                                        </div>
+                                        <div class="col-6">
+                                            <i class="fa fa-graduation-cap text-info"/>
+                                            CGPA: <strong><field name="current_cgpa"/></strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.selection_score.raw_value">
+                                        <div class="col-12">
+                                            <i class="fa fa-star text-success"/>
+                                            Score: <strong><field name="selection_score"/></strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <i class="fa fa-money text-danger"/>
+                                            Family Income: ₹ <field name="family_annual_income"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Calendar View -->
+    <record id="scholarship_application_view_calendar" model="ir.ui.view">
+        <field name="name">scholarship.application.view.calendar</field>
+        <field name="model">scholarship.application</field>
+        <field name="arch" type="xml">
+            <calendar string="Application Calendar"
+                      date_start="application_date"
+                      color="scholarship_id"
+                      mode="month"
+                      event_open_popup="true"
+                      quick_create="false">
+                <field name="student_id"/>
+                <field name="scholarship_id"/>
+                <field name="current_cgpa"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_scholarship_application" model="ir.actions.act_window">
+        <field name="name">Scholarship Applications</field>
+        <field name="res_model">scholarship.application</field>
+        <field name="view_mode">kanban,list,form,calendar</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Scholarship Application
+            </p>
+            <p>
+                Students can apply for scholarships with comprehensive application workflows,
+                document verification, interview scheduling, and award management.
+            </p>
+        </field>
+    </record>
+
+    <!-- ========================================= -->
+    <!-- SCHOLARSHIP APPLICATION DOCUMENT VIEWS -->
+    <!-- ========================================= -->
+
+    <!-- Form View -->
+    <record id="scholarship_application_document_view_form" model="ir.ui.view">
+        <field name="name">scholarship.application.document.form</field>
+        <field name="model">scholarship.application.document</field>
+        <field name="arch" type="xml">
+            <form string="Scholarship Application Document">
+                <sheet>
+                    <group>
+                        <field name="application_id"/>
+                        <field name="document_type_id"/>
+                        <field name="attachment_id" widget="many2one"/>
+                    </group>
+
+                    <group string="Verification">
+                        <field name="is_verified"/>
+                        <field name="verified_by" readonly="1"/>
+                        <field name="verification_date" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="scholarship_application_document_view_list" model="ir.ui.view">
+        <field name="name">scholarship.application.document.view.list</field>
+        <field name="model">scholarship.application.document</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="application_id"/>
+                <field name="document_type_id"/>
+                <field name="attachment_id"/>
+                <field name="is_verified"/>
+                <field name="verified_by"/>
+                <field name="verification_date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_scholarship_application_document" model="ir.actions.act_window">
+        <field name="name">Application Documents</field>
+        <field name="res_model">scholarship.application.document</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+
+
+    <!-- ========================================= -->
+    <!-- SCHOLARSHIP DOCUMENT TYPE VIEWS -->
+    <!-- ========================================= -->
+
+    <!-- Form View -->
+    <record id="scholarship_document_type_view_form" model="ir.ui.view">
+        <field name="name">scholarship.document.type.view.form</field>
+        <field name="model">scholarship.document.type</field>
+        <field name="arch" type="xml">
+            <form string="Document Type">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                    </group>
+                    <group>
+                        <field name="description"
+                               placeholder="Enter description for this document type..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="scholarship_document_type_view_list" model="ir.ui.view">
+        <field name="name">scholarship.document.type.view.list</field>
+        <field name="model">scholarship.document.type</field>
+        <field name="arch" type="xml">
+            <list string="Document Types">
+                <field name="name"/>
+                <field name="description"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_scholarship_document_type" model="ir.actions.act_window">
+        <field name="name">Document Types</field>
+        <field name="res_model">scholarship.document.type</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ========================================= -->
+    <!-- SCHOLARSHIP VIEWS -->
+    <!-- ========================================= -->
+
+    <!-- Form View -->
+    <record id="scholarship_view_form" model="ir.ui.view">
+        <field name="name">scholarship.scholarship.view.form</field>
+        <field name="model">scholarship.scholarship</field>
+        <field name="arch" type="xml">
+            <form string="Scholarship">
+                <header>
+                    <button name="action_open_applications" string="Open Applications"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'draft'"
+                            confirm="Open this scholarship for applications?"/>
+                    <button name="action_close_applications" string="Close Applications"
+                            type="object"
+                            invisible="state != 'open'"
+                            confirm="Close applications for this scholarship?"/>
+                    <button name="action_start_selection" string="Start Selection"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'closed'"/>
+                    <button name="action_complete_awards" string="Complete Awards"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'selection'"
+                            confirm="Mark all scholarships as awarded?"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft"
+                            type="object"
+                            invisible="state == 'draft'"
+                            confirm="Are you sure you want to reset this scholarship to draft ?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,open,closed,selection,awarded"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button"
+                                   options='{"terminology": "archive"}'/>
+                        </button>
+                        <button name="%(action_scholarship_application)d" type="action"
+                                class="oe_stat_button" icon="fa-file-text"
+                                context="{'search_default_scholarship_id': id}">
+                            <field name="total_applications" widget="statinfo"
+                                   string="Applications"/>
+                        </button>
+                        <button name="%(action_scholarship_application)d" type="action"
+                                class="oe_stat_button" icon="fa-trophy"
+                                context="{'search_default_scholarship_id': id, 'search_default_filter_awarded': 1}">
+                            <field name="awarded_count" widget="statinfo"
+                                   string="Awarded"/>
+                        </button>
+                        <button name="%(action_scholarship_application)d" type="action"
+                                class="oe_stat_button" icon="fa-check-circle"
+                                context="{'search_default_scholarship_id': id}">
+                            <field name="available_count" widget="statinfo"
+                                   string="Available"/>
+                        </button>
+                    </div>
+
+                    <widget name="web_ribbon" title="Open"
+                            bg_color="text-bg-success"
+                            invisible="state != 'open'"/>
+                    <widget name="web_ribbon" title="Applications Closed"
+                            bg_color="text-bg-warning"
+                            invisible="state != 'closed'"/>
+                    <widget name="web_ribbon" title="Selection in Progress"
+                            bg_color="text-bg-info"
+                            invisible="state != 'selection'"/>
+                    <widget name="web_ribbon" title="Awarded"
+                            bg_color="text-bg-primary"
+                            invisible="state != 'awarded'"/>
+
+                    <div class="oe_title">
+                        <label for="name" string="Scholarship Name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g., Merit Scholarship 2024-25"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Basic Information">
+                            <field name="code" placeholder="e.g., MERIT-2425"/>
+                            <field name="scholarship_type"/>
+                            <field name="academic_year_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                        </group>
+                        <group string="Sponsor Details">
+                            <field name="sponsor_type"/>
+                            <field name="sponsor_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                        </group>
+                    </group>
+
+                    <group string="Accounting Setup">
+                        <group>
+                            <field name="income_account_id" widget="many2one"/>
+                            <field name="expense_account_id" widget="many2one"/>
+                            <field name="journal_id" widget="many2one"/>
+                            <field name="analytic_account_id" widget="many2one"/>
+                        </group>
+                        <group>
+                            <field name="payment_term_id" widget="many2one"/>
+                            <field name="payment_method"/>
+                            <field name="company_id" widget="Many2one"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Financial Details">
+                            <field name="coverage_type" widget="radio"/>
+                            <field name="coverage_percentage"
+                                   invisible="coverage_type != 'partial'"/>
+                            <field name="total_amount" widget="monetary"
+                                   options="{'currency_field': 'currency_id'}"/>
+                            <field name="amount_per_student" widget="monetary"
+                                   options="{'currency_field': 'currency_id'}"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="Scholarship Availability">
+                            <field name="total_scholarships"/>
+                            <field name="awarded_count" readonly="1"/>
+                            <field name="available_count" readonly="1"/>
+                            <field name="payment_frequency"/>
+                        </group>
+                    </group>
+
+                    <group string="Application Period">
+                        <group>
+                            <field name="application_start_date" widget="date"/>
+                            <field name="application_end_date" widget="date"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Eligibility Criteria" name="eligibility">
+                            <group>
+                                <group>
+                                    <field name="min_percentage"/>
+                                    <field name="max_family_income" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                </group>
+                            </group>
+                            <separator string="Detailed Eligibility Criteria"/>
+                            <field name="eligibility_criteria"
+                                   placeholder="Enter detailed eligibility criteria for applicants..."/>
+                        </page>
+
+                        <page string="Applicable Programs" name="programs">
+                            <group>
+                                <field name="program_ids" widget="many2many_tags"
+                                       options="{'no_create': True}"/>
+                                <field name="department_ids" widget="many2many_tags"
+                                       options="{'no_create': True}"/>
+                            </group>
+                        </page>
+
+                        <page string="Selection Process" name="selection">
+                            <group>
+                                <group>
+                                    <field name="requires_interview" widget="boolean_toggle"/>
+                                    <field name="requires_test" widget="boolean_toggle"/>
+                                </group>
+                            </group>
+                            <separator string="Selection Process Details"/>
+                            <field name="selection_process"
+                                   placeholder="Describe the selection process..."/>
+                        </page>
+
+                        <page string="Required Documents" name="documents">
+                            <field name="required_document_types" widget="many2many_tags"
+                                   options="{'no_create': True}">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="description"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Applications" name="applications">
+                            <field name="application_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="student_id"/>
+                                    <field name="registration_number"/>
+                                    <field name="application_date"/>
+                                    <field name="current_cgpa"/>
+                                    <field name="family_annual_income" widget="monetary"/>
+                                    <field name="selection_score"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'awarded'"
+                                           decoration-info="state == 'shortlisted'"
+                                           decoration-warning="state == 'under_review'"
+                                           decoration-danger="state == 'rejected'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Renewal Policy" name="renewal"
+                              invisible="not is_renewable">
+                            <group>
+                                <field name="is_renewable" widget="boolean_toggle"/>
+                            </group>
+                            <separator string="Renewal Criteria"
+                                       invisible="not is_renewable"/>
+                            <field name="renewal_criteria"
+                                   invisible="not is_renewable"
+                                   placeholder="Enter renewal criteria..."/>
+                        </page>
+
+                        <page string="Terms &amp; Conditions" name="terms">
+                            <field name="terms_conditions"
+                                   placeholder="Enter terms and conditions..."/>
+                        </page>
+
+                        <page string="Description" name="description">
+                            <field name="description"
+                                   placeholder="Enter detailed description about this scholarship..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="scholarship_view_list" model="ir.ui.view">
+        <field name="name">scholarship.scholarship.view.list</field>
+        <field name="model">scholarship.scholarship</field>
+        <field name="arch" type="xml">
+            <list string="Scholarships"
+                  multi_edit="1"
+                  sample="1"
+                  decoration-success="state == 'open'"
+                  decoration-info="state == 'selection'"
+                  decoration-primary="state == 'awarded'">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="scholarship_type"/>
+                <field name="academic_year_id"/>
+                <field name="sponsor_id" optional="hide"/>
+                <field name="total_amount" widget="monetary" optional="show"/>
+                <field name="amount_per_student" widget="monetary" optional="show"/>
+                <field name="total_scholarships" optional="show"/>
+                <field name="awarded_count" optional="show"/>
+                <field name="available_count" optional="show"/>
+                <field name="total_applications" optional="show"/>
+                <field name="application_start_date" optional="hide"/>
+                <field name="application_end_date" optional="hide"/>
+                <field name="active" widget="boolean_toggle" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-muted="state == 'draft'"
+                       decoration-success="state == 'open'"
+                       decoration-warning="state == 'closed'"
+                       decoration-info="state == 'selection'"
+                       decoration-primary="state == 'awarded'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="scholarship_view_search" model="ir.ui.view">
+        <field name="name">scholarship.scholarship.view.search</field>
+        <field name="model">scholarship.scholarship</field>
+        <field name="arch" type="xml">
+            <search string="Search Scholarships">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="scholarship_type"/>
+                <field name="sponsor_id"/>
+                <field name="academic_year_id"/>
+
+                <separator/>
+
+                <filter name="filter_draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_open" string="Open for Applications" domain="[('state', '=', 'open')]"/>
+                <filter name="filter_closed" string="Applications Closed" domain="[('state', '=', 'closed')]"/>
+                <filter name="filter_selection" string="Selection in Progress" domain="[('state', '=', 'selection')]"/>
+                <filter name="filter_awarded" string="Scholarships Awarded" domain="[('state', '=', 'awarded')]"/>
+
+                <separator/>
+
+                <filter name="filter_government" string="Government" domain="[('scholarship_type', '=', 'government')]"/>
+                <filter name="filter_institutional" string="Institutional" domain="[('scholarship_type', '=', 'institutional')]"/>
+                <filter name="filter_private" string="Private/Corporate" domain="[('scholarship_type', '=', 'private')]"/>
+                <filter name="filter_merit" string="Merit Based" domain="[('scholarship_type', '=', 'merit')]"/>
+                <filter name="filter_need" string="Need Based" domain="[('scholarship_type', '=', 'need')]"/>
+
+                <separator/>
+
+                <filter name="filter_renewable" string="Renewable" domain="[('is_renewable', '=', True)]"/>
+                <filter name="filter_interview_required" string="Interview Required" domain="[('requires_interview', '=', True)]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_scholarship_type" string="Scholarship Type" context="{'group_by': 'scholarship_type'}"/>
+                    <filter name="group_by_academic_year" string="Academic Year" context="{'group_by': 'academic_year_id'}"/>
+                    <filter name="group_by_sponsor" string="Sponsor" context="{'group_by': 'sponsor_id'}"/>
+                    <filter name="group_by_coverage_type" string="Coverage Type" context="{'group_by': 'coverage_type'}"/>
+                    <filter name="group_by_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="scholarship_type" string="Type"
+                           select="multi"
+                           icon="fa-graduation-cap"/>
+                    <field name="academic_year_id" string="Academic Year"
+                           select="multi"
+                           icon="fa-calendar"/>
+                    <field name="state" string="Status"
+                           select="multi"
+                           icon="fa-filter"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="scholarship_view_kanban" model="ir.ui.view">
+        <field name="name">scholarship.scholarship.view.kanban</field>
+        <field name="model">scholarship.scholarship</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" quick_create="false" sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="scholarship_type"/>
+                <field name="total_amount"/>
+                <field name="amount_per_student"/>
+                <field name="total_scholarships"/>
+                <field name="awarded_count"/>
+                <field name="available_count"/>
+                <field name="total_applications"/>
+                <field name="application_end_date"/>
+                <field name="state"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                        <div class="text-muted">
+                                            <field name="code"/>
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_record_top_right">
+                                        <field name="state" widget="badge"
+                                               decoration-muted="state == 'draft'"
+                                               decoration-success="state == 'open'"
+                                               decoration-warning="state == 'closed'"
+                                               decoration-info="state == 'selection'"
+                                               decoration-primary="state == 'awarded'"/>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body">
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <span class="badge text-bg-primary">
+                                                <field name="scholarship_type"/>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <i class="fa fa-money text-success"/>
+                                            <strong>₹ <field name="amount_per_student"/></strong> per student
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-4 text-center">
+                                            <div><i class="fa fa-trophy text-warning"/></div>
+                                            <strong><field name="total_scholarships"/></strong>
+                                            <div class="text-muted small">Total</div>
+                                        </div>
+                                        <div class="col-4 text-center">
+                                            <div><i class="fa fa-check-circle text-success"/></div>
+                                            <strong><field name="awarded_count"/></strong>
+                                            <div class="text-muted small">Awarded</div>
+                                        </div>
+                                        <div class="col-4 text-center">
+                                            <div><i class="fa fa-file-text text-info"/></div>
+                                            <strong><field name="total_applications"/></strong>
+                                            <div class="text-muted small">Applications</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row" t-if="record.application_end_date.raw_value">
+                                        <div class="col-12">
+                                            <i class="fa fa-calendar text-danger"/>
+                                            <span class="text-muted">Deadline: </span>
+                                            <field name="application_end_date"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Calendar View -->
+    <record id="scholarship_view_calendar" model="ir.ui.view">
+        <field name="name">scholarship.scholarship.view.calendar</field>
+        <field name="model">scholarship.scholarship</field>
+        <field name="arch" type="xml">
+            <calendar string="Scholarship Timeline"
+                      date_start="application_start_date"
+                      date_stop="application_end_date"
+                      color="scholarship_type"
+                      mode="month"
+                      event_open_popup="true"
+                      quick_create="false">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="scholarship_type"/>
+                <field name="total_scholarships"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_scholarship" model="ir.actions.act_window">
+        <field name="name">Scholarships</field>
+        <field name="res_model">scholarship.scholarship</field>
+        <field name="view_mode">kanban,list,form,calendar</field>
+        <field name="context">{'search_default_filter_open': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Scholarship
+            </p>
+            <p>
+                Manage government, institutional, and private scholarships with comprehensive
+                application workflows, eligibility criteria, selection process, and document verification.
+            </p>
+        </field>
+    </record>
+
+</odoo>

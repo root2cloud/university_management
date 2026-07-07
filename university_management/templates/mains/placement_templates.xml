@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Placements Page Template -->
+        <template id="placements_page" name="Placements Portal">
+            <t t-call="website.layout">
+                <div id="wrap" class="oe_structure">
+                    <!-- Hero Section -->
+                    <section class="s_title bg-primary text-white py-5">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-lg-8 mx-auto text-center">
+                                    <h1 class="display-4 mb-3">Campus Placements</h1>
+                                    <p class="lead mb-4">
+                                        Connecting talented students with leading companies for successful career opportunities
+                                    </p>
+                                    <div class="d-flex justify-content-center gap-4 mt-4">
+                                        <a href="#placement-drives" class="btn btn-light btn-lg">
+                                            <i class="fa fa-briefcase me-2"></i>View Drives
+                                        </a>
+                                        <a href="#placement-stats" class="btn btn-outline-light btn-lg">
+                                            <i class="fa fa-chart-bar me-2"></i>Statistics
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Statistics Section -->
+                    <section id="placement-stats" class="s_text_block py-5 bg-light">
+                        <div class="container">
+                            <div class="row mb-4">
+                                <div class="col-12 text-center">
+                                    <h2 class="text-primary mb-3">Placement Statistics</h2>
+                                    <p class="text-muted" t-if="current_year">
+                                        Academic Year: <span class="fw-bold" t-field="current_year.name"/>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row g-4">
+                                <!-- Total Students Card -->
+                                <div class="col-md-4">
+                                    <div class="card shadow-sm border-0 h-100">
+                                        <div class="card-body text-center p-4">
+                                            <div class="mb-3">
+                                                <div style="width:80px;height:80px;border-radius:50%;background:#e8f4fd;display:inline-flex;align-items:center;justify-content:center;">
+                                                    <i class="fa fa-graduation-cap fa-2x" style="color:#0d6efd;"></i>
+                                                </div>
+                                            </div>
+                                            <h3 class="display-5 fw-bold text-dark" t-if="stats">
+                                                <t t-esc="stats.get('total_students', 0)"/>
+                                            </h3>
+                                            <h5 class="card-title">Total Students</h5>
+                                            <p class="text-muted">Eligible for placements this year</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Placed Students Card -->
+                                <div class="col-md-4">
+                                    <div class="card shadow-sm border-0 h-100">
+                                        <div class="card-body text-center p-4">
+                                            <div class="mb-3">
+                                                <div style="width:80px;height:80px;border-radius:50%;background:#d1f2eb;display:inline-flex;align-items:center;justify-content:center;">
+                                                    <i class="fa fa-briefcase fa-2x" style="color:#198754;"></i>
+                                                </div>
+                                            </div>
+                                            <h3 class="display-5 fw-bold text-dark" t-if="stats">
+                                                <t t-esc="stats.get('placed_students', 0)"/>
+                                            </h3>
+                                            <h5 class="card-title">Placed Students</h5>
+                                            <p class="text-muted">Successfully placed in companies</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Companies Card -->
+                                <div class="col-md-4">
+                                    <div class="card shadow-sm border-0 h-100">
+                                        <div class="card-body text-center p-4">
+                                            <div class="mb-3">
+                                                <div style="width:80px;height:80px;border-radius:50%;background:#fef9e7;display:inline-flex;align-items:center;justify-content:center;">
+                                                    <i class="fa fa-building fa-2x" style="color:#ffc107;"></i>
+                                                </div>
+                                            </div>
+                                            <h3 class="display-5 fw-bold text-dark" t-if="stats">
+                                                <t t-esc="stats.get('companies', 0)"/>
+                                            </h3>
+                                            <h5 class="card-title">Companies</h5>
+                                            <p class="text-muted">Recruiting from our campus</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Placement Drives Section -->
+                    <section id="placement-drives" class="s_text_block py-5">
+                        <div class="container">
+                            <div class="row mb-5">
+                                <div class="col-12 text-center">
+                                    <h2 class="text-primary mb-3">Upcoming Placement Drives</h2>
+                                    <p class="text-muted">Explore the latest placement opportunities from top companies</p>
+                                </div>
+                            </div>
+
+                            <!-- Placement Drives List -->
+                            <div class="row g-4" id="placement-drives-list">
+                                <t t-if="drives">
+                                    <t t-foreach="drives" t-as="drive">
+                                        <div class="col-md-6 col-lg-4">
+                                            <div class="card h-100 shadow-sm border-0">
+                                                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                                    <h6 class="mb-0 fw-bold"><t t-esc="drive.name"/></h6>
+                                                    <span t-attf-class="badge bg-{'success' if drive.state == 'active' else 'secondary'}">
+                                                        <t t-esc="drive.state.capitalize()"/>
+                                                    </span>
+                                                </div>
+                                                <div class="card-body">
+                                                    <p class="mb-1"><i class="fa fa-building me-2 text-primary"/><strong><t t-esc="drive.company_id.name or '—'"/></strong></p>
+                                                    <p class="mb-1"><i class="fa fa-briefcase me-2 text-muted"/><t t-esc="drive.job_title"/></p>
+                                                    <p class="mb-1"><i class="fa fa-calendar me-2 text-muted"/><t t-esc="drive.drive_date"/></p>
+                                                    <t t-if="drive.ctc_max">
+                                                        <p class="mb-1"><i class="fa fa-money me-2 text-success"/><t t-esc="drive.ctc_min"/> - <t t-esc="drive.ctc_max"/> LPA</p>
+                                                    </t>
+                                                    <p class="mb-1"><i class="fa fa-map-marker me-2 text-muted"/><t t-esc="drive.job_location or '—'"/></p>
+                                                </div>
+                                                <div class="card-footer bg-transparent">
+                                                    <a t-attf-href="/placements/drive/#{drive.id}" class="btn btn-outline-primary btn-sm w-100">View Details</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </t>
+                                <t t-else="">
+                                    <div class="col-12 text-center py-5">
+                                        <div class="alert alert-info">
+                                            <h4 class="alert-heading">No Drives Found</h4>
+                                            <p>There are currently no placement drives. Please check back later.</p>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Information Section -->
+                    <section class="s_text_block py-5 bg-light">
+                        <div class="container">
+                            <div class="row align-items-center">
+                                <div class="col-lg-6">
+                                    <h2 class="text-primary mb-4">Placement Process</h2>
+                                    <div class="d-flex mb-3">
+                                        <div class="flex-shrink-0">
+                                            <span class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                1
+                                            </span>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h5>Registration</h5>
+                                            <p class="text-muted">Students register for placement drives through the portal</p>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex mb-3">
+                                        <div class="flex-shrink-0">
+                                            <span class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                2
+                                            </span>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h5>Aptitude Test</h5>
+                                            <p class="text-muted">Online/offline aptitude tests to assess problem-solving skills</p>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex mb-3">
+                                        <div class="flex-shrink-0">
+                                            <span class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                3
+                                            </span>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h5>Technical Interview</h5>
+                                            <p class="text-muted">Technical rounds to evaluate domain knowledge</p>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0">
+                                            <span class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                4
+                                            </span>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h5>HR Interview &amp; Offer</h5>
+                                            <p class="text-muted">Final HR round and offer letter distribution</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="card border-0 shadow-sm">
+                                        <div class="card-body p-4">
+                                            <h4 class="card-title text-primary mb-3">Eligibility Criteria</h4>
+                                            <ul class="list-unstyled">
+                                                <li class="mb-2">
+                                                    <i class="fa fa-check text-success me-2"></i>
+                                                    Minimum CGPA: 6.0 (varies by company)
+                                                </li>
+                                                <li class="mb-2">
+                                                    <i class="fa fa-check text-success me-2"></i>
+                                                    No active backlogs
+                                                </li>
+                                                <li class="mb-2">
+                                                    <i class="fa fa-check text-success me-2"></i>
+                                                    75%+ attendance
+                                                </li>
+                                                <li class="mb-2">
+                                                    <i class="fa fa-check text-success me-2"></i>
+                                                    All documents verified
+                                                </li>
+                                                <li class="mb-2">
+                                                    <i class="fa fa-check text-success me-2"></i>
+                                                    No disciplinary actions
+                                                </li>
+                                            </ul>
+                                            <div class="alert alert-warning mt-4">
+                                                <i class="fa fa-exclamation-triangle me-2"></i>
+                                                <strong>Note:</strong> Additional company-specific criteria may apply
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Call to Action -->
+                    <section class="s_text_block py-5">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-lg-8 mx-auto text-center">
+                                    <h2 class="text-primary mb-4">Ready to Start Your Career?</h2>
+                                    <p class="lead mb-4">
+                                        Contact our Placement Cell for guidance and support throughout the placement process
+                                    </p>
+                                    <div class="d-flex justify-content-center gap-3">
+                                        <a href="/contact" class="btn btn-primary btn-lg">
+                                            <i class="fa fa-envelope me-2"></i>Contact Placement Cell
+                                        </a>
+                                        <a href="/student-portal" class="btn btn-outline-primary btn-lg">
+                                            <i class="fa fa-user-graduate me-2"></i>Student Portal
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </t>
+        </template>
+
+    </data>
+
+    <template id="placement_drive_detail" name="Placement Drive Detail">
+        <t t-call="website.layout">
+            <div class="container py-5">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/placements">Placements</a></li>
+                        <li class="breadcrumb-item active"><t t-esc="drive.name"/></li>
+                    </ol>
+                </nav>
+
+                <div class="row g-4">
+                    <!-- Left: Drive Info -->
+                    <div class="col-lg-8">
+                        <div class="card shadow-sm border-0 mb-4">
+                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-3">
+                                <h4 class="mb-0 fw-bold"><t t-esc="drive.name"/></h4>
+                                <span t-attf-class="badge bg-{'success' if drive.state == 'active' else 'secondary'} fs-6">
+                                    <t t-esc="drive.state.capitalize()"/>
+                                </span>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-6">
+                                        <p class="mb-2"><i class="fa fa-building me-2 text-primary"/><strong>Company:</strong> <t t-esc="drive.company_id.name or '—'"/></p>
+                                        <p class="mb-2"><i class="fa fa-briefcase me-2 text-primary"/><strong>Position:</strong> <t t-esc="drive.job_title"/></p>
+                                        <p class="mb-2"><i class="fa fa-map-marker me-2 text-primary"/><strong>Location:</strong> <t t-esc="drive.job_location or '—'"/></p>
+                                        <p class="mb-2"><i class="fa fa-calendar me-2 text-primary"/><strong>Drive Date:</strong> <t t-esc="drive.drive_date"/></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <t t-if="drive.ctc_max">
+                                            <p class="mb-2"><i class="fa fa-money me-2 text-success"/><strong>CTC:</strong> <t t-esc="drive.ctc_min"/> - <t t-esc="drive.ctc_max"/> LPA</p>
+                                        </t>
+                                        <p class="mb-2"><i class="fa fa-users me-2 text-primary"/><strong>Positions:</strong> <t t-esc="drive.total_positions"/></p>
+                                        <p class="mb-2"><i class="fa fa-map-pin me-2 text-primary"/><strong>Venue:</strong> <t t-esc="drive.venue or '—'"/></p>
+                                        <t t-if="drive.registration_end">
+                                            <p class="mb-2"><i class="fa fa-clock-o me-2 text-danger"/><strong>Register By:</strong> <t t-esc="drive.registration_end"/></p>
+                                        </t>
+                                    </div>
+                                </div>
+
+                                <t t-if="drive.job_description">
+                                    <h5 class="fw-bold mt-3 mb-2">Job Description</h5>
+                                    <div t-field="drive.job_description"/>
+                                </t>
+
+                                <t t-if="drive.eligibility_criteria">
+                                    <h5 class="fw-bold mt-3 mb-2">Eligibility Criteria</h5>
+                                    <div t-field="drive.eligibility_criteria"/>
+                                </t>
+
+                                <t t-if="drive.selection_rounds">
+                                    <h5 class="fw-bold mt-3 mb-2">Selection Process</h5>
+                                    <div t-field="drive.selection_rounds"/>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Summary -->
+                    <div class="col-lg-4">
+                        <div class="card shadow-sm border-0 mb-3">
+                            <div class="card-body p-4">
+                                <h5 class="fw-bold mb-3">Quick Info</h5>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><strong>Min CGPA:</strong> <t t-esc="drive.min_cgpa"/></li>
+                                    <li class="mb-2"><strong>Max Backlogs:</strong> <t t-esc="drive.max_backlogs"/></li>
+                                    <li class="mb-2"><strong>Applications:</strong> <t t-esc="drive.total_applications"/></li>
+                                    <li class="mb-2"><strong>Offers:</strong> <t t-esc="drive.total_offers"/></li>
+                                </ul>
+                                <a href="/placements" class="btn btn-outline-primary w-100 mt-2">
+                                    <i class="fa fa-arrow-left me-2"/>Back to Placements
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>

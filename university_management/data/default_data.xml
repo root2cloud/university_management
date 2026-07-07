@@ -1,0 +1,485 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ========================================== -->
+        <!-- DEFAULT ACADEMIC YEAR (Current Year) -->
+        <!-- ========================================== -->
+
+        <record id="academic_year_2024_25" model="university.academic.year">
+            <field name="name">Academic Year 2024-25</field>
+            <field name="code">AY2024-25</field>
+            <field name="start_date">2024-07-01</field>
+            <field name="end_date">2025-06-30</field>
+            <field name="is_current" eval="True"/>
+        </record>
+
+        <record id="academic_year_2025_26" model="university.academic.year">
+            <field name="name">Academic Year 2025-26</field>
+            <field name="code">AY2025-26</field>
+            <field name="start_date">2025-07-01</field>
+            <field name="end_date">2026-06-30</field>
+            <field name="is_current" eval="False"/>
+        </record>
+
+        <!-- ========================================== -->
+        <!-- GRADE SYSTEMS -->
+        <!-- ========================================== -->
+
+        <record id="grade_o" model="examination.grade.system">
+            <field name="name">Outstanding</field>
+            <field name="grade">O</field>
+            <field name="grade_point">10</field>
+            <field name="min_percentage">90</field>
+            <field name="max_percentage">100</field>
+            <field name="is_pass" eval="True"/>
+            <field name="color">10</field>
+            <field name="description">Outstanding - Exceptional performance</field>
+        </record>
+
+        <record id="grade_a_plus" model="examination.grade.system">
+            <field name="name">Excellent</field>
+            <field name="grade">A+</field>
+            <field name="grade_point">9</field>
+            <field name="min_percentage">80</field>
+            <field name="max_percentage">89.99</field>
+            <field name="is_pass" eval="True"/>
+            <field name="color">9</field>
+            <field name="description">Excellent - Very high level of achievement</field>
+        </record>
+
+        <record id="grade_a" model="examination.grade.system">
+            <field name="name">Very Good</field>
+            <field name="grade">A</field>
+            <field name="grade_point">8</field>
+            <field name="min_percentage">70</field>
+            <field name="max_percentage">79.99</field>
+            <field name="is_pass" eval="True"/>
+            <field name="color">8</field>
+            <field name="description">Very Good - High level of achievement</field>
+        </record>
+
+        <record id="grade_b_plus" model="examination.grade.system">
+            <field name="name">Good</field>
+            <field name="grade">B+</field>
+            <field name="grade_point">7</field>
+            <field name="min_percentage">60</field>
+            <field name="max_percentage">69.99</field>
+            <field name="is_pass" eval="True"/>
+            <field name="color">7</field>
+            <field name="description">Good - Above average performance</field>
+        </record>
+
+        <record id="grade_b" model="examination.grade.system">
+            <field name="name">Above Average</field>
+            <field name="grade">B</field>
+            <field name="grade_point">6</field>
+            <field name="min_percentage">50</field>
+            <field name="max_percentage">59.99</field>
+            <field name="is_pass" eval="True"/>
+            <field name="color">6</field>
+            <field name="description">Above Average - Satisfactory performance</field>
+        </record>
+
+        <record id="grade_c" model="examination.grade.system">
+            <field name="name">Average</field>
+            <field name="grade">C</field>
+            <field name="grade_point">5</field>
+            <field name="min_percentage">40</field>
+            <field name="max_percentage">49.99</field>
+            <field name="is_pass" eval="True"/>
+            <field name="color">5</field>
+            <field name="description">Average - Minimum passing grade</field>
+        </record>
+
+        <record id="grade_d" model="examination.grade.system">
+            <field name="name">Pass</field>
+            <field name="grade">D</field>
+            <field name="grade_point">4</field>
+            <field name="min_percentage">35</field>
+            <field name="max_percentage">39.99</field>
+            <field name="is_pass" eval="True"/>
+            <field name="color">4</field>
+            <field name="description">Pass - Just passed</field>
+        </record>
+
+        <record id="grade_f" model="examination.grade.system">
+            <field name="name">Fail</field>
+            <field name="grade">F</field>
+            <field name="grade_point">0</field>
+            <field name="min_percentage">0</field>
+            <field name="max_percentage">34.99</field>
+            <field name="is_pass" eval="False"/>
+            <field name="color">1</field>
+            <field name="description">Fail - Did not meet minimum requirements</field>
+        </record>
+
+        <!-- ========================================== -->
+        <!-- LIBRARY CATEGORIES -->
+        <!-- ========================================== -->
+
+        <record id="library_category_textbook" model="library.category">
+            <field name="name">Textbooks</field>
+            <field name="code">TXT</field>
+            <field name="description">Academic textbooks prescribed for courses</field>
+        </record>
+
+        <record id="library_category_reference" model="library.category">
+            <field name="name">Reference Books</field>
+            <field name="code">REF</field>
+            <field name="description">Reference books and encyclopedias</field>
+        </record>
+
+        <record id="library_category_magazine" model="library.category">
+            <field name="name">Magazines &amp; Journals</field>
+            <field name="code">MAG</field>
+            <field name="description">Periodicals, magazines and academic journals</field>
+        </record>
+
+        <record id="library_category_fiction" model="library.category">
+            <field name="name">Fiction</field>
+            <field name="code">FIC</field>
+            <field name="description">Fiction books and novels</field>
+        </record>
+
+        <record id="library_category_research" model="library.category">
+            <field name="name">Research Papers</field>
+            <field name="code">RES</field>
+            <field name="description">Research papers and thesis</field>
+        </record>
+
+        <record id="library_category_nonfiction" model="library.category">
+            <field name="name">Non-Fiction</field>
+            <field name="code">NF</field>
+            <field name="description">Non-fiction books</field>
+        </record>
+
+        <!-- ========================================== -->
+        <!-- FACULTY DESIGNATIONS -->
+        <!-- ========================================== -->
+
+        <record id="designation_professor" model="faculty.designation">
+            <field name="name">Professor</field>
+            <field name="code">PROF</field>
+            <field name="level">professor</field>
+            <field name="sequence">1</field>
+            <field name="description">Senior-most faculty position with highest academic rank</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="designation_associate_professor" model="faculty.designation">
+            <field name="name">Associate Professor</field>
+            <field name="code">ASPROF</field>
+            <field name="level">associate_professor</field>
+            <field name="sequence">2</field>
+            <field name="description">Mid-senior level faculty position</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="designation_assistant_professor" model="faculty.designation">
+            <field name="name">Assistant Professor</field>
+            <field name="code">ASTPROF</field>
+            <field name="level">assistant_professor</field>
+            <field name="sequence">3</field>
+            <field name="description">Entry-level professorial position</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="designation_senior_lecturer" model="faculty.designation">
+            <field name="name">Senior Lecturer</field>
+            <field name="code">SLEC</field>
+            <field name="level">senior_lecturer</field>
+            <field name="sequence">4</field>
+            <field name="description">Senior teaching position</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="designation_lecturer" model="faculty.designation">
+            <field name="name">Lecturer</field>
+            <field name="code">LEC</field>
+            <field name="level">lecturer</field>
+            <field name="sequence">5</field>
+            <field name="description">Teaching position</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="designation_visiting_faculty" model="faculty.designation">
+            <field name="name">Visiting Faculty</field>
+            <field name="code">VF</field>
+            <field name="level">visiting_faculty</field>
+            <field name="sequence">6</field>
+            <field name="description">Temporary visiting position</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="designation_guest_faculty" model="faculty.designation">
+            <field name="name">Guest Faculty</field>
+            <field name="code">GF</field>
+            <field name="level">guest_faculty</field>
+            <field name="sequence">7</field>
+            <field name="description">Guest teaching position</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="designation_teaching_assistant" model="faculty.designation">
+            <field name="name">Teaching Assistant</field>
+            <field name="code">TA</field>
+            <field name="level">teaching_assistant</field>
+            <field name="sequence">8</field>
+            <field name="description">Assistant teaching position</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- ========================================== -->
+        <!-- SCHOLARSHIP TYPES -->
+        <!-- ========================================== -->
+
+        <record id="scholarship_merit" model="scholarship.scholarship">
+            <field name="name">Merit Scholarship</field>
+            <field name="code">MERIT001</field>
+            <field name="scholarship_type">merit</field>
+            <field name="total_amount">500000</field>
+            <field name="amount_per_student">50000</field>
+            <field name="coverage_type">partial</field>
+            <field name="coverage_percentage">50</field>
+            <field name="total_scholarships">10</field>
+            <field name="eligibility_criteria"><![CDATA[
+                <ul>
+                    <li>Minimum CGPA: 8.5</li>
+                    <li>No active backlogs</li>
+                    <li>Regular attendance (minimum 75%)</li>
+                </ul>
+            ]]></field>
+            <field name="min_percentage">8.5</field>
+            <field name="academic_year_id" ref="academic_year_2024_25"/>
+            <field name="application_start_date">2024-07-01</field>
+            <field name="application_end_date">2024-08-31</field>
+            <field name="payment_frequency">semester</field>
+            <field name="state">draft</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="scholarship_need_based" model="scholarship.scholarship">
+            <field name="name">Financial Aid - Need Based</field>
+            <field name="code">NEED001</field>
+            <field name="scholarship_type">need</field>
+            <field name="total_amount">300000</field>
+            <field name="amount_per_student">30000</field>
+            <field name="coverage_type">fixed</field>
+            <field name="total_scholarships">10</field>
+            <field name="eligibility_criteria"><![CDATA[
+                <ul>
+                    <li>Family income below ₹3,00,000 per annum</li>
+                    <li>Valid income certificate required</li>
+                    <li>Minimum CGPA: 6.0</li>
+                </ul>
+            ]]></field>
+            <field name="min_percentage">6.0</field>
+            <field name="max_family_income">300000</field>
+            <field name="academic_year_id" ref="academic_year_2024_25"/>
+            <field name="application_start_date">2024-07-01</field>
+            <field name="application_end_date">2024-08-31</field>
+            <field name="payment_frequency">semester</field>
+            <field name="state">draft</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="scholarship_sports" model="scholarship.scholarship">
+            <field name="name">Sports Excellence Scholarship</field>
+            <field name="code">SPORT001</field>
+            <field name="scholarship_type">sports</field>
+            <field name="total_amount">250000</field>
+            <field name="amount_per_student">25000</field>
+            <field name="coverage_type">fixed</field>
+            <field name="total_scholarships">10</field>
+            <field name="eligibility_criteria"><![CDATA[
+                <ul>
+                    <li>State/National level sports achievement</li>
+                    <li>Certificate from recognized sports authority</li>
+                    <li>Active participation in university sports</li>
+                </ul>
+            ]]></field>
+            <field name="min_percentage">6.0</field>
+            <field name="academic_year_id" ref="academic_year_2024_25"/>
+            <field name="application_start_date">2024-07-01</field>
+            <field name="application_end_date">2024-08-31</field>
+            <field name="payment_frequency">annual</field>
+            <field name="state">draft</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="scholarship_sc_st" model="scholarship.scholarship">
+            <field name="name">SC/ST Category Scholarship</field>
+            <field name="code">SCST001</field>
+            <field name="scholarship_type">minority</field>
+            <field name="total_amount">400000</field>
+            <field name="amount_per_student">40000</field>
+            <field name="coverage_type">partial</field>
+            <field name="coverage_percentage">80</field>
+            <field name="total_scholarships">10</field>
+            <field name="eligibility_criteria"><![CDATA[
+                <ul>
+                    <li>Valid SC/ST caste certificate</li>
+                    <li>Minimum CGPA: 5.5</li>
+                    <li>Regular attendance</li>
+                </ul>
+            ]]></field>
+            <field name="min_percentage">5.5</field>
+            <field name="academic_year_id" ref="academic_year_2024_25"/>
+            <field name="application_start_date">2024-07-01</field>
+            <field name="application_end_date">2024-08-31</field>
+            <field name="payment_frequency">semester</field>
+            <field name="state">draft</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- ========================================== -->
+        <!-- MESS ITEMS (Common Food Items) -->
+        <!-- ========================================== -->
+
+        <record id="mess_item_chapati" model="mess.item">
+            <field name="name">Chapati/Roti</field>
+            <field name="category">bread</field>
+            <field name="item_type">veg</field>
+        </record>
+
+        <record id="mess_item_rice" model="mess.item">
+            <field name="name">Steamed Rice</field>
+            <field name="category">rice</field>
+            <field name="item_type">veg</field>
+        </record>
+
+        <record id="mess_item_dal" model="mess.item">
+            <field name="name">Dal (Lentils)</field>
+            <field name="category">dal</field>
+            <field name="item_type">veg</field>
+        </record>
+
+        <record id="mess_item_sambar" model="mess.item">
+            <field name="name">Sambar</field>
+            <field name="category">dal</field>
+            <field name="item_type">veg</field>
+        </record>
+
+        <record id="mess_item_mixed_veg" model="mess.item">
+            <field name="name">Mixed Vegetables</field>
+            <field name="category">vegetable</field>
+            <field name="item_type">veg</field>
+        </record>
+
+        <record id="mess_item_paneer_curry" model="mess.item">
+            <field name="name">Paneer Curry</field>
+            <field name="category">main_course</field>
+            <field name="item_type">veg</field>
+        </record>
+
+        <record id="mess_item_chicken_curry" model="mess.item">
+            <field name="name">Chicken Curry</field>
+            <field name="category">main_course</field>
+            <field name="item_type">non_veg</field>
+        </record>
+
+        <record id="mess_item_curd" model="mess.item">
+            <field name="name">Curd/Yogurt</field>
+            <field name="category">side_dish</field>
+            <field name="item_type">veg</field>
+        </record>
+
+        <record id="mess_item_salad" model="mess.item">
+            <field name="name">Green Salad</field>
+            <field name="category">salad</field>
+            <field name="item_type">veg</field>
+        </record>
+
+        <record id="mess_item_tea" model="mess.item">
+            <field name="name">Tea</field>
+            <field name="category">beverage</field>
+            <field name="item_type">veg</field>
+        </record>
+
+        <record id="mess_item_coffee" model="mess.item">
+            <field name="name">Coffee</field>
+            <field name="category">beverage</field>
+            <field name="item_type">veg</field>
+        </record>
+
+        <record id="mess_item_fruit" model="mess.item">
+            <field name="name">Seasonal Fruit</field>
+            <field name="category">fruit</field>
+            <field name="item_type">veg</field>
+        </record>
+
+        <!-- ========================================== -->
+        <!-- HACKATHON JUDGES (Sample) -->
+        <!-- ========================================== -->
+
+        <record id="judge_external_1" model="hackathon.judge">
+            <field name="name">Dr. Rajesh Kumar</field>
+            <field name="judge_type">external</field>
+            <field name="designation">Senior Technical Architect</field>
+            <field name="company">TCS</field>
+            <field name="expertise">Cloud Computing, Microservices, DevOps</field>
+        </record>
+
+        <record id="judge_industry_1" model="hackathon.judge">
+            <field name="name">Ms. Priya Sharma</field>
+            <field name="judge_type">industry</field>
+            <field name="designation">Product Manager</field>
+            <field name="company">Infosys</field>
+            <field name="expertise">Product Development, Agile, User Experience</field>
+        </record>
+
+        <!-- ========================================== -->
+        <!-- SEMESTERS -->
+        <!-- ========================================== -->
+
+        <record id="semester_1" model="university.semester">
+            <field name="name">Semester I</field>
+            <field name="code">SEM1</field>
+            <field name="sequence">1</field>
+            <field name="semester_number">1</field>
+            <field name="academic_year_id" ref="academic_year_2024_25"/>
+            <field name="start_date">2024-07-01</field>
+            <field name="end_date">2024-11-30</field>
+            <field name="state">draft</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="semester_2" model="university.semester">
+            <field name="name">Semester II</field>
+            <field name="code">SEM2</field>
+            <field name="sequence">2</field>
+            <field name="semester_number">2</field>
+            <field name="academic_year_id" ref="academic_year_2024_25"/>
+            <field name="start_date">2024-12-01</field>
+            <field name="end_date">2025-04-30</field>
+            <field name="state">draft</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="semester_3" model="university.semester">
+            <field name="name">Semester III</field>
+            <field name="code">SEM3</field>
+            <field name="sequence">3</field>
+            <field name="semester_number">3</field>
+            <field name="academic_year_id" ref="academic_year_2025_26"/>
+            <field name="start_date">2025-07-01</field>
+            <field name="end_date">2025-11-30</field>
+            <field name="state">draft</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="semester_4" model="university.semester">
+            <field name="name">Semester IV</field>
+            <field name="code">SEM4</field>
+            <field name="sequence">4</field>
+            <field name="semester_number">4</field>
+            <field name="academic_year_id" ref="academic_year_2025_26"/>
+            <field name="start_date">2025-12-01</field>
+            <field name="end_date">2026-04-30</field>
+            <field name="state">draft</field>
+            <field name="active" eval="True"/>
+        </record>
+
+    </data>
+</odoo>

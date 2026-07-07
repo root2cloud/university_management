@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="seq_mcq_question_bank" model="ir.sequence">
+        <field name="name">MCQ Question Bank</field>
+        <field name="code">mcq.question.bank</field>
+        <field name="prefix">QB-</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="seq_mcq_question" model="ir.sequence">
+        <field name="name">MCQ Question</field>
+        <field name="code">mcq.question</field>
+        <field name="prefix">Q-</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="seq_online_exam" model="ir.sequence">
+        <field name="name">Online Exam</field>
+        <field name="code">online.exam</field>
+        <field name="prefix">OE-</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+</odoo>

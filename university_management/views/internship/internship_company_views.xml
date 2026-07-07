@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View - Internship Company -->
+    <record id="internship_company_view_form" model="ir.ui.view">
+        <field name="name">internship.company.view.form</field>
+        <field name="model">internship.company</field>
+        <field name="arch" type="xml">
+            <form string="Internship Company">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_view_internships" icon="fa-briefcase">
+                            <field name="total_internships" widget="statinfo" string="Internships"/>
+                        </button>
+                    </div>
+
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="active"/>
+
+                    <field name="image_1920" widget="image" class="oe_avatar"/>
+
+                    <div class="oe_title">
+                        <label for="name" string="Company Name"/>
+                        <h1>
+                            <field name="name" placeholder="Company Name" required="1"/>
+                        </h1>
+                        <div class="o_row">
+                            <field name="industry" widget="badge"
+                                   decoration-success="industry == 'it'"
+                                   decoration-info="industry == 'finance'"
+                                   decoration-warning="industry == 'startup'"
+                                   decoration-primary="industry == 'core'"/>
+                        </div>
+                    </div>
+
+                    <group>
+                        <group string="Company Details">
+                            <field name="partner_id" invisible="1"/>
+                            <field name="website" widget="url" placeholder="https://www.company.com"/>
+                            <field name="email" widget="email" placeholder="info@company.com"/>
+                            <field name="phone" widget="phone" placeholder="+91 1234567890"/>
+                            <field name="mobile" widget="phone" placeholder="+91 9876543210"/>
+                        </group>
+                        <group string="Company Rating &amp; Status">
+                            <field name="rating" widget="priority"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Address">
+                            <field name="street" placeholder="Street Address"/>
+                            <field name="street2" placeholder="Street Address 2"/>
+                            <div class="o_address_format">
+                                <field name="city" placeholder="City" class="o_address_city"/>
+                                <field name="state_id" placeholder="State" class="o_address_state"
+                                       options="{'no_open': True, 'no_create': True}"/>
+                                <field name="zip" placeholder="PIN Code" class="o_address_zip"/>
+                                <field name="country_id" placeholder="Country" class="o_address_country"
+                                       options="{'no_open': True, 'no_create': True}"/>
+                            </div>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="HR Contact Details" name="hr_contact">
+                            <group>
+                                <group string="HR Department">
+                                    <field name="hr_contact_name" placeholder="HR Manager Name"/>
+                                    <field name="hr_contact_email" widget="email"
+                                           placeholder="hr@company.com"/>
+                                    <field name="hr_contact_phone" widget="phone"
+                                           placeholder="+91 1234567890"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Internship History" name="internships">
+                            <field name="internship_ids" nolabel="1">
+                                <list string="Internships" create="0" delete="0">
+                                    <field name="name"/>
+                                    <field name="student_id"/>
+                                    <field name="designation"/>
+                                    <field name="internship_type"/>
+                                    <field name="start_date"/>
+                                    <field name="end_date"/>
+                                    <field name="stipend_amount" widget="monetary"/>
+                                    <field name="state" widget="badge"
+                                           decoration-info="state == 'approved'"
+                                           decoration-warning="state == 'ongoing'"
+                                           decoration-success="state == 'completed'"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Additional Information" name="additional_info">
+                            <group>
+                                <field name="comment" nolabel="1"
+                                       placeholder="Add notes about the company, feedback, collaboration history..."/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View - Internship Company -->
+    <record id="internship_company_view_list" model="ir.ui.view">
+        <field name="name">internship.company.view.list</field>
+        <field name="model">internship.company</field>
+        <field name="arch" type="xml">
+            <list string="Internship Companies"
+                  default_order="name"
+                  multi_edit="1"
+                  sample="1">
+                <field name="name"/>
+                <field name="industry" widget="badge"
+                       decoration-success="industry == 'it'"
+                       decoration-info="industry == 'finance'"
+                       decoration-warning="industry == 'startup'"
+                       decoration-primary="industry == 'core'"
+                       optional="show"/>
+                <field name="email" widget="email" optional="show"/>
+                <field name="phone" widget="phone" optional="show"/>
+                <field name="website" widget="url" optional="hide"/>
+                <field name="city" optional="show"/>
+                <field name="state_id" optional="hide"/>
+                <field name="country_id" optional="hide"/>
+                <field name="total_internships" optional="show"/>
+                <field name="rating" widget="priority" optional="show"/>
+                <field name="active" widget="boolean_toggle" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View - Internship Company -->
+    <record id="internship_company_view_search" model="ir.ui.view">
+        <field name="name">internship.company.view.search</field>
+        <field name="model">internship.company</field>
+        <field name="arch" type="xml">
+            <search string="Search Companies">
+                <field name="name"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <field name="city"/>
+
+                <separator/>
+
+                <filter name="filter_it" string="IT/Software"
+                        domain="[('industry', '=', 'it')]"/>
+                <filter name="filter_core" string="Core Engineering"
+                        domain="[('industry', '=', 'core')]"/>
+                <filter name="filter_finance" string="Finance/Banking"
+                        domain="[('industry', '=', 'finance')]"/>
+                <filter name="filter_consulting" string="Consulting"
+                        domain="[('industry', '=', 'consulting')]"/>
+                <filter name="filter_manufacturing" string="Manufacturing"
+                        domain="[('industry', '=', 'manufacturing')]"/>
+                <filter name="filter_healthcare" string="Healthcare"
+                        domain="[('industry', '=', 'healthcare')]"/>
+                <filter name="filter_startup" string="Startup"
+                        domain="[('industry', '=', 'startup')]"/>
+
+                <separator/>
+
+                <filter name="filter_5_star" string="5 Stars"
+                        domain="[('rating', '=', '5')]"/>
+                <filter name="filter_4_star" string="4 Stars"
+                        domain="[('rating', '=', '4')]"/>
+                <filter name="filter_3_star" string="3 Stars"
+                        domain="[('rating', '=', '3')]"/>
+
+                <separator/>
+
+                <filter name="filter_active" string="Active"
+                        domain="[('active', '=', True)]"/>
+                <filter name="filter_archived" string="Archived"
+                        domain="[('active', '=', False)]"/>
+
+                <separator/>
+
+                <filter name="filter_has_internships" string="Has Internships"
+                        domain="[('total_internships', '&gt;', 0)]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_industry" string="Industry"
+                            context="{'group_by': 'industry'}"/>
+                    <filter name="group_by_rating" string="Rating"
+                            context="{'group_by': 'rating'}"/>
+                    <filter name="group_by_city" string="City"
+                            context="{'group_by': 'city'}"/>
+                    <filter name="group_by_state" string="State"
+                            context="{'group_by': 'state_id'}"/>
+                    <filter name="group_by_country" string="Country"
+                            context="{'group_by': 'country_id'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="industry" string="Industry"
+                           select="multi"
+                           icon="fa-industry"/>
+                    <field name="country_id" string="Country"
+                           select="multi"
+                           operator="in"
+                           icon="fa-globe"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View - Internship Company -->
+    <record id="internship_company_view_kanban" model="ir.ui.view">
+        <field name="name">internship.company.view.kanban</field>
+        <field name="model">internship.company</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="industry"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <field name="website"/>
+                <field name="city"/>
+                <field name="state_id"/>
+                <field name="country_id"/>
+                <field name="total_internships"/>
+                <field name="rating"/>
+                <field name="active"/>
+                <field name="image_128"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <img t-att-src="kanban_image('internship.company', 'image_128', record.id.raw_value)"
+                                     alt="Company Logo"
+                                     class="o_image_64_cover"/>
+                            </div>
+
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                        <div class="text-muted mt-1">
+                                            <small>
+                                                <span class="badge"
+                                                      t-attf-class="{{
+                                                        record.industry.raw_value == 'it' ? 'bg-success' :
+                                                        (record.industry.raw_value == 'finance' ? 'bg-info' :
+                                                        (record.industry.raw_value == 'startup' ? 'bg-warning' :
+                                                        (record.industry.raw_value == 'core' ? 'bg-primary' : 'bg-secondary')))
+                                                      }}">
+                                                    <field name="industry"/>
+                                                </span>
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_record_top_right">
+                                        <field name="rating" widget="priority"/>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body mt-3">
+                                    <div class="row mb-2" t-if="record.email.raw_value">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded">
+                                                <small>
+                                                    <i class="fa fa-envelope text-primary"/> <field name="email"/>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.phone.raw_value">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded">
+                                                <small>
+                                                    <i class="fa fa-phone text-success"/> <field name="phone"/>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.website.raw_value">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded">
+                                                <small>
+                                                    <i class="fa fa-globe text-info"/> <field name="website" widget="url"/>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.city.raw_value or record.state_id.raw_value">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded">
+                                                <small>
+                                                    <i class="fa fa-map-marker text-danger"/>
+                                                    <field name="city"/><t t-if="record.state_id.raw_value">, <field name="state_id"/></t>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.total_internships.raw_value">
+                                        <div class="col-12">
+                                            <div class="alert alert-info mb-0 p-2 text-center">
+                                                <strong><field name="total_internships"/></strong>
+                                                <small>Internships</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom mt-2">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="active" widget="boolean_toggle"/>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_internship_company" model="ir.actions.act_window">
+        <field name="name">Companies</field>
+        <field name="res_model">internship.company</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_filter_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create Internship Company
+            </p>
+            <p>
+                Manage internship companies with comprehensive contact details. This model uses _inherits
+                pattern with res.partner for contact integration (partner_id required, ondelete cascade,
+                auto_join). Inherits all res.partner fields including name (required, company name),
+                image_1920 (avatar widget), email (email widget), phone/mobile (phone widgets),
+                website (url widget), complete address fields (street/street2/city/state_id/zip/country_id
+                with special o_address_format formatting and no_open/no_create options), comment (notes
+                text). Select industry (9 options with 4-color badge decorations): it (IT/Software -
+                success/green), core (Core Engineering - primary/blue), finance (Finance/Banking - info),
+                consulting (Consulting), manufacturing (Manufacturing), healthcare (Healthcare), education
+                (Education), startup (Startup - warning/yellow), other (Other - secondary). Enter HR
+                contact details: hr_contact_name (char, placeholder "HR Manager Name"), hr_contact_email
+                (char email widget, placeholder "hr@company.com"), hr_contact_phone (char phone widget,
+                placeholder "+91 1234567890"). View internship_ids (One2many to internship.internship,
+                read-only 8-field embedded list: name/student_id/designation/internship_type/start_date/
+                end_date/stipend_amount with monetary widget/state with 3-color badge decorations
+                info-approved/warning-ongoing/success-completed, no create/delete, stat button "Internships"
+                briefcase icon showing total_internships computed count). Select rating (5 options, priority
+                widget): 1-5 Stars. Toggle active (boolean default True, shows web_ribbon "Archived"
+                danger/red at top if false). Form view has stat button for internships, avatar image,
+                badge industry in oe_title. List view with multi_edit, 4-color industry badge decorations,
+                optional fields control. Kanban cards showing image_128 (64px cover), name as title,
+                industry badge (dynamic 4-color background), rating widget at top-right, conditional info
+                cards for email (envelope icon primary/blue), phone (phone icon success/green), website
+                (globe icon info/blue, url widget), location (map-marker icon danger/red showing city,
+                state_id if present), total_internships alert (info, centered), active toggle and activity
+                widget at bottom. Ordered by name. Default filter for active companies. Comprehensive
+                search filters for all industries, ratings, active/archived status, has internships. Group
+                by industry/rating/city/state/country. Searchpanel for industry (multi-select) and country.
+                Full chatter and activity support.
+            </p>
+        </field>
+    </record>
+
+</odoo>

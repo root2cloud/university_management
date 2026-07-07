@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Student Sequences -->
+        <record id="seq_student_student" model="ir.sequence">
+            <field name="name">Student Sequence</field>
+            <field name="code">student.student</field>
+            <field name="prefix">STU</field>
+            <field name="padding">6</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_student_admission" model="ir.sequence">
+            <field name="name">Admission Sequence</field>
+            <field name="code">student.admission</field>
+            <field name="prefix">ADM</field>
+            <field name="padding">6</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_student_registration" model="ir.sequence">
+            <field name="name">Registration Number</field>
+            <field name="code">student.registration</field>
+            <field name="prefix">REG/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_student_id_card" model="ir.sequence">
+            <field name="name">ID Card Sequence</field>
+            <field name="code">student.id.card</field>
+            <field name="prefix">ID</field>
+            <field name="padding">6</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <!-- Student Temporary ID — Format: TEMP{YEAR}-{5-digit} -->
+        <record id="seq_student_temp_id" model="ir.sequence">
+            <field name="name">Student Temporary ID</field>
+            <field name="code">student.temp.id</field>
+            <field name="prefix">%(year)s-</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="use_date_range">True</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Seat Blocking Reference — Format: SB/{YEAR}/{5-digit} -->
+        <record id="seq_student_seat_blocking" model="ir.sequence">
+            <field name="name">Student Seat Blocking</field>
+            <field name="code">student.seat.blocking</field>
+            <field name="prefix">SB/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="use_date_range">True</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="seq_id_card_request" model="ir.sequence">
+            <field name="name">ID Card Request Sequence</field>
+            <field name="code">id.card.request</field>
+            <field name="prefix">IDREQ/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_student_leave" model="ir.sequence">
+            <field name="name">Student Leave Sequence</field>
+            <field name="code">student.leave</field>
+            <field name="prefix">LEAVE/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <!-- Faculty Sequences -->
+        <record id="seq_faculty_faculty" model="ir.sequence">
+            <field name="name">Faculty Sequence</field>
+            <field name="code">faculty.faculty</field>
+            <field name="prefix">FAC</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_faculty_salary" model="ir.sequence">
+            <field name="name">Salary Slip Sequence</field>
+            <field name="code">faculty.salary</field>
+            <field name="prefix">SAL/%(year)s/%(month)s/</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_faculty_leave" model="ir.sequence">
+            <field name="name">Faculty Leave Sequence</field>
+            <field name="code">faculty.leave</field>
+            <field name="prefix">FL</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_faculty_evaluation" model="ir.sequence">
+            <field name="name">Faculty Evaluation Sequence</field>
+            <field name="code">faculty.evaluation</field>
+            <field name="prefix">EVAL</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <!-- Fee Sequences -->
+        <record id="seq_fee_payment" model="ir.sequence">
+            <field name="name">Fee Payment Sequence</field>
+            <field name="code">fee.payment</field>
+            <field name="prefix">FEE/%(year)s/</field>
+            <field name="padding">6</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_fee_reminder" model="ir.sequence">
+            <field name="name">Fee Reminder Sequence</field>
+            <field name="code">fee.reminder</field>
+            <field name="prefix">REM</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_scholarship_application" model="ir.sequence">
+            <field name="name">Scholarship Application Sequence</field>
+            <field name="code">scholarship.application</field>
+            <field name="prefix">SCH</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_fee_discount_application" model="ir.sequence">
+            <field name="name">Fee Discount Application Sequence</field>
+            <field name="code">fee.discount.application</field>
+            <field name="prefix">DIS</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <!-- Examination Sequences -->
+        <record id="seq_hall_ticket" model="ir.sequence">
+            <field name="name">Hall Ticket Sequence</field>
+            <field name="code">examination.hall.ticket</field>
+            <field name="prefix">HT/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_marksheet" model="ir.sequence">
+            <field name="name">Marksheet Sequence</field>
+            <field name="code">examination.marksheet</field>
+            <field name="prefix">MS/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_revaluation" model="ir.sequence">
+            <field name="name">Revaluation Sequence</field>
+            <field name="code">examination.revaluation</field>
+            <field name="prefix">REV</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <!-- Library Sequences -->
+        <record id="seq_library_member" model="ir.sequence">
+            <field name="name">Library Member Sequence</field>
+            <field name="code">library.member</field>
+            <field name="prefix">LIB</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_library_issue" model="ir.sequence">
+            <field name="name">Library Issue Sequence</field>
+            <field name="code">library.issue</field>
+            <field name="prefix">ISS/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_library_fine" model="ir.sequence">
+            <field name="name">Library Fine Sequence</field>
+            <field name="code">library.fine</field>
+            <field name="prefix">FINE</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_library_reservation" model="ir.sequence">
+            <field name="name">Library Reservation Sequence</field>
+            <field name="code">library.reservation</field>
+            <field name="prefix">RES</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <!-- Hostel Sequences -->
+        <record id="seq_hostel_allocation" model="ir.sequence">
+            <field name="name">Hostel Allocation Sequence</field>
+            <field name="code">hostel.allocation</field>
+            <field name="prefix">HA</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_hostel_complaint" model="ir.sequence">
+            <field name="name">Hostel Complaint Sequence</field>
+            <field name="code">hostel.complaint</field>
+            <field name="prefix">HC</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <!-- Transport Sequences -->
+        <record id="seq_transport_allocation" model="ir.sequence">
+            <field name="name">Transport Allocation Sequence</field>
+            <field name="code">transport.allocation</field>
+            <field name="prefix">TA</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_transport_driver" model="ir.sequence">
+            <field name="name">Driver Sequence</field>
+            <field name="code">transport.driver</field>
+            <field name="prefix">DRV</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_transport_fee" model="ir.sequence">
+            <field name="name">Transport Fee Sequence</field>
+            <field name="code">transport.fee</field>
+            <field name="prefix">TF</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <!-- Placement Sequences -->
+        <record id="seq_placement_drive" model="ir.sequence">
+            <field name="name">Placement Drive Sequence</field>
+            <field name="code">placement.drive</field>
+            <field name="prefix">PD/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_placement_application" model="ir.sequence">
+            <field name="name">Placement Application Sequence</field>
+            <field name="code">placement.application</field>
+            <field name="prefix">PA</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_placement_offer" model="ir.sequence">
+            <field name="name">Placement Offer Sequence</field>
+            <field name="code">placement.offer</field>
+            <field name="prefix">OFF/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <!-- Alumni Sequences -->
+        <record id="seq_alumni_donation" model="ir.sequence">
+            <field name="name">Alumni Donation Sequence</field>
+            <field name="code">alumni.donation</field>
+            <field name="prefix">DON/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <!-- Project Sequences -->
+        <record id="seq_student_project" model="ir.sequence">
+            <field name="name">Student Project Sequence</field>
+            <field name="code">student.project</field>
+            <field name="prefix">PROJ/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_project_evaluation" model="ir.sequence">
+            <field name="name">Project Evaluation Sequence</field>
+            <field name="code">project.evaluation</field>
+            <field name="prefix">PE</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <!-- Internship Sequences -->
+        <record id="seq_internship" model="ir.sequence">
+            <field name="name">Internship Sequence</field>
+            <field name="code">internship.internship</field>
+            <field name="prefix">INT/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_internship_evaluation" model="ir.sequence">
+            <field name="name">Internship Evaluation Sequence</field>
+            <field name="code">internship.evaluation</field>
+            <field name="prefix">IE</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <!-- Event Sequences -->
+        <record id="seq_university_event" model="ir.sequence">
+            <field name="name">University Event Sequence</field>
+            <field name="code">university.event</field>
+            <field name="prefix">EVT/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_event_registration" model="ir.sequence">
+            <field name="name">Event Registration Sequence</field>
+            <field name="code">university.event.registration</field>
+            <field name="prefix">ER</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_hackathon" model="ir.sequence">
+            <field name="name">Hackathon Sequence</field>
+            <field name="code">hackathon.hackathon</field>
+            <field name="prefix">HACK/%(year)s/</field>
+            <field name="padding">3</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_hackathon_team" model="ir.sequence">
+            <field name="name">Hackathon Team Sequence</field>
+            <field name="code">hackathon.team</field>
+            <field name="prefix">TEAM</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <!-- Timetable Sequences -->
+        <record id="seq_timetable_substitution" model="ir.sequence">
+            <field name="name">Timetable Substitution Sequence</field>
+            <field name="code">timetable.substitution</field>
+            <field name="prefix">SUB</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <!-- Discipline Sequence -->
+        <record id="seq_student_discipline" model="ir.sequence">
+            <field name="name">Student Discipline Sequence</field>
+            <field name="code">student.discipline</field>
+            <field name="prefix">DISC</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <!-- Regularization -->
+        <record id="seq_faculty_attendance_regularization" model="ir.sequence">
+            <field name="name">Faculty Attendance Regularization</field>
+            <field name="code">faculty.attendance.regularization</field>
+            <field name="prefix">FAR</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_faculty_form16" model="ir.sequence">
+            <field name="name">Faculty Form 16</field>
+            <field name="code">faculty.form16</field>
+            <field name="prefix">FORM16/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="seq_library_digital_resource" model="ir.sequence">
+            <field name="name">Library Digital Resource</field>
+            <field name="code">library.digital.resource</field>
+            <field name="prefix">DRES/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,544 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View - Hackathon -->
+    <record id="hackathon_view_form" model="ir.ui.view">
+        <field name="name">hackathon.hackathon.view.form</field>
+        <field name="model">hackathon.hackathon</field>
+        <field name="arch" type="xml">
+            <form string="Hackathon">
+                <header>
+                    <button name="action_open_registration" string="Open Registration" type="object"
+                            class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_close_registration" string="Close Registration" type="object"
+                            class="btn-warning"
+                            invisible="state != 'registration_open'"/>
+                    <button name="action_start_hackathon" string="Start Hackathon" type="object"
+                            class="btn-success"
+                            invisible="state != 'registration_closed'"/>
+                    <button name="action_start_judging" string="Start Judging" type="object"
+                            class="btn-info"
+                            invisible="state != 'ongoing'"/>
+                    <button name="action_complete" string="Complete" type="object"
+                            class="btn-success"
+                            invisible="state != 'judging'"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            class="btn-danger"
+                            invisible="state in ['completed', 'cancelled']"
+                            confirm="Are you sure you want to cancel this hackathon?"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft"
+                            type="object"
+                            invisible="state == 'draft'"
+                            confirm="Are you sure you want to reset this Hackathon to draft?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,registration_open,registration_closed,ongoing,judging,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_teams" type="object"
+                                class="oe_stat_button"
+                                icon="fa-users">
+                            <field name="total_teams" widget="statinfo"
+                                   string="Teams"/>
+                        </button>
+                        <button name="toggle_website_published" type="object"
+                                class="oe_stat_button"
+                                icon="fa-globe">
+                            <field name="website_published" widget="website_button"/>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <label for="name" string="Hackathon Name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g., AI Innovation Hackathon 2025"/>
+                        </h1>
+                        <div class="o_row">
+                            <field name="code" readonly="1"/>
+                        </div>
+                    </div>
+
+                    <group>
+                        <group string="Event Details">
+                            <field name="event_id"/>
+                            <field name="theme" placeholder="e.g., Artificial Intelligence, Web3, IoT"/>
+                        </group>
+                        <group string="Schedule">
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                            <field name="duration_hours" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Venue &amp; Registration" name="venue">
+                            <group>
+                                <group string="Venue">
+                                    <field name="venue_type" widget="radio"/>
+                                    <field name="venue"
+                                           invisible="venue_type == 'online'"
+                                           placeholder="Physical venue address"/>
+                                    <field name="online_platform_url"
+                                           invisible="venue_type == 'offline'"
+                                           widget="url"
+                                           placeholder="https://meet.google.com/xxx-xxxx-xxx"/>
+                                </group>
+                                <group string="Registration">
+                                    <field name="registration_start"/>
+                                    <field name="registration_end"/>
+                                    <field name="max_teams"
+                                           placeholder="Leave empty for unlimited"/>
+                                    <label for="team_size_min" string="Team Size"/>
+                                    <div class="o_row">
+                                        <field name="team_size_min" class="oe_inline"/>
+                                        <span class="oe_inline"> to </span>
+                                        <field name="team_size_max" class="oe_inline"/>
+                                        <span class="oe_inline"> members</span>
+                                    </div>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Description" name="description">
+                            <group>
+                                <field name="description" nolabel="1"
+                                       placeholder="Describe the hackathon, objectives, problem statements, etc..."/>
+                            </group>
+                        </page>
+
+                        <page string="Teams" name="teams">
+                            <field name="team_ids">
+                                <list string="Registered Teams"
+                                      create="false">
+                                    <field name="name"/>
+                                    <field name="team_leader_id"/>
+                                    <field name="team_size"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Judges" name="judges">
+                            <field name="judge_ids">
+                                <list string="Judges">
+                                    <field name="name"/>
+                                    <field name="email"/>
+                                    <field name="company"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Prizes" name="prizes">
+                            <group>
+                                <group string="Prize Distribution">
+                                    <field name="currency_id" invisible="1"/>
+                                    <field name="first_prize"
+                                           widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="second_prize"
+                                           widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="third_prize"
+                                           widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Winners" name="winners">
+                            <field name="winner_ids">
+                                <list string="Winners">
+                                    <field name="position"/>
+                                    <field name="team_id"/>
+                                    <field name="prize_amount" widget="monetary"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Rules" name="rules">
+                            <group>
+                                <field name="rules" nolabel="1"
+                                       placeholder="Add hackathon rules, eligibility criteria, judging criteria, submission guidelines, etc..."/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View - Hackathon -->
+    <record id="hackathon_view_list" model="ir.ui.view">
+        <field name="name">hackathon.hackathon.view.list</field>
+        <field name="model">hackathon.hackathon</field>
+        <field name="arch" type="xml">
+            <list string="Hackathons"
+                  default_order="start_date desc"
+                  multi_edit="1"
+                  sample="1"
+                  decoration-info="state == 'draft'"
+                  decoration-primary="state == 'registration_open'"
+                  decoration-warning="state == 'registration_closed'"
+                  decoration-success="state in ['ongoing', 'judging', 'completed']"
+                  decoration-muted="state == 'cancelled'">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="theme" optional="show"/>
+                <field name="event_id" optional="hide"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="duration_hours" optional="hide"/>
+                <field name="venue_type" widget="badge"
+                       decoration-info="venue_type == 'offline'"
+                       decoration-success="venue_type == 'online'"
+                       decoration-warning="venue_type == 'hybrid'"
+                       optional="show"/>
+                <field name="total_teams" optional="show"/>
+                <field name="max_teams" optional="hide"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="first_prize" optional="hide"
+                       widget="monetary"/>
+                <field name="website_published" widget="boolean_toggle" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-primary="state == 'registration_open'"
+                       decoration-warning="state == 'registration_closed'"
+                       decoration-success="state in ['ongoing', 'judging']"
+                       decoration-muted="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View - Hackathon -->
+    <record id="hackathon_view_search" model="ir.ui.view">
+        <field name="name">hackathon.hackathon.view.search</field>
+        <field name="model">hackathon.hackathon</field>
+        <field name="arch" type="xml">
+            <search string="Search Hackathons">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="theme"/>
+                <field name="event_id"/>
+
+                <separator/>
+
+                <filter name="filter_draft" string="Draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_registration_open" string="Registration Open"
+                        domain="[('state', '=', 'registration_open')]"/>
+                <filter name="filter_registration_closed" string="Registration Closed"
+                        domain="[('state', '=', 'registration_closed')]"/>
+                <filter name="filter_ongoing" string="Ongoing"
+                        domain="[('state', '=', 'ongoing')]"/>
+                <filter name="filter_judging" string="Judging"
+                        domain="[('state', '=', 'judging')]"/>
+                <filter name="filter_completed" string="Completed"
+                        domain="[('state', '=', 'completed')]"/>
+                <filter name="filter_cancelled" string="Cancelled"
+                        domain="[('state', '=', 'cancelled')]"/>
+
+                <separator/>
+
+                <filter name="filter_offline" string="Offline"
+                        domain="[('venue_type', '=', 'offline')]"/>
+                <filter name="filter_online" string="Online"
+                        domain="[('venue_type', '=', 'online')]"/>
+                <filter name="filter_hybrid" string="Hybrid"
+                        domain="[('venue_type', '=', 'hybrid')]"/>
+
+                <separator/>
+
+                <filter name="filter_published" string="Published on Website"
+                        domain="[('website_published', '=', True)]"/>
+                <filter name="filter_unpublished" string="Unpublished"
+                        domain="[('website_published', '=', False)]"/>
+
+                <separator/>
+
+                <filter name="filter_upcoming" string="Upcoming"
+                        domain="[('start_date', '&gt;', datetime.datetime.now())]"/>
+                <filter name="filter_this_month" string="This Month"
+                        domain="[('start_date', '&gt;=', (context_today().replace(day=1)).strftime('%Y-%m-%d')),
+                                 ('start_date', '&lt;=', ((context_today().replace(day=1) + datetime.timedelta(days=32)).replace(day=1) - datetime.timedelta(days=1)).strftime('%Y-%m-%d'))]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_by_venue_type" string="Venue Type"
+                            context="{'group_by': 'venue_type'}"/>
+                    <filter name="group_by_event" string="Event"
+                            context="{'group_by': 'event_id'}"/>
+                    <filter name="group_by_start_date" string="Start Date"
+                            context="{'group_by': 'start_date'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="state" string="Status"
+                           select="multi"
+                           operator="in"
+                           icon="fa-flag"/>
+                    <field name="venue_type" string="Venue Type"
+                           select="multi"
+                           icon="fa-map-marker"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View - Hackathon -->
+    <record id="hackathon_view_kanban" model="ir.ui.view">
+        <field name="name">hackathon.hackathon.view.kanban</field>
+        <field name="model">hackathon.hackathon</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="state"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="theme"/>
+                <field name="event_id"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="duration_hours"/>
+                <field name="venue_type"/>
+                <field name="venue"/>
+                <field name="online_platform_url"/>
+                <field name="total_teams"/>
+                <field name="max_teams"/>
+                <field name="first_prize"/>
+                <field name="currency_id"/>
+                <field name="website_published"/>
+                <field name="state"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                        <div class="text-muted mt-1">
+                                            <small><field name="code"/></small>
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_record_top_right">
+                                        <field name="website_published" widget="boolean_toggle"/>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body mt-3">
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="card bg-primary text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h6 class="mb-0">
+                                                        <i class="fa fa-lightbulb-o"/> <field name="theme"/>
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.event_id.raw_value">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded">
+                                                <small class="text-muted">Related Event</small>
+                                                <h6 class="mb-0">
+                                                    <i class="fa fa-calendar-check-o text-info"/> <field name="event_id"/>
+                                                </h6>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded">
+                                                <div class="row">
+                                                    <div class="col-6">
+                                                        <small class="text-muted">Start</small>
+                                                        <div>
+                                                            <i class="fa fa-clock-o text-success"/>
+                                                            <field name="start_date" widget="datetime"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <small class="text-muted">End</small>
+                                                        <div>
+                                                            <i class="fa fa-clock-o text-danger"/>
+                                                            <field name="end_date" widget="datetime"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-1 text-center">
+                                                    <small>
+                                                        <strong><field name="duration_hours"/> hours</strong>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="card"
+                                                 t-attf-class="{{
+                                                    record.venue_type.raw_value == 'offline' ? 'bg-info' :
+                                                    (record.venue_type.raw_value == 'online' ? 'bg-success' : 'bg-warning')
+                                                 }} text-white">
+                                                <div class="card-body p-2">
+                                                    <div class="text-center">
+                                                        <h6 class="mb-0">
+                                                            <i class="fa fa-map-marker"/> <field name="venue_type"/>
+                                                        </h6>
+                                                    </div>
+                                                    <div class="mt-1" t-if="record.venue.raw_value and record.venue_type.raw_value != 'online'">
+                                                        <small><field name="venue"/></small>
+                                                    </div>
+                                                    <div class="mt-1" t-if="record.online_platform_url.raw_value and record.venue_type.raw_value != 'offline'">
+                                                        <small><i class="fa fa-globe"/> Online Platform</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-6">
+                                            <div class="bg-light p-2 rounded text-center">
+                                                <h4 class="mb-0 text-primary">
+                                                    <field name="total_teams"/>
+                                                </h4>
+                                                <small class="text-muted">
+                                                    <span t-if="record.max_teams.raw_value">
+                                                        / <field name="max_teams"/>
+                                                    </span>
+                                                    Teams
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="col-6" t-if="record.first_prize.raw_value &gt; 0">
+                                            <div class="bg-warning p-2 rounded text-center text-white">
+                                                <h5 class="mb-0">
+                                                    <i class="fa fa-trophy"/>
+                                                </h5>
+                                                <small>
+                                                    <field name="first_prize" widget="monetary"
+                                                           options="{'currency_field': 'currency_id'}"/>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom mt-2">
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Calendar View - Hackathon -->
+    <record id="hackathon_view_calendar" model="ir.ui.view">
+        <field name="name">hackathon.hackathon.view.calendar</field>
+        <field name="model">hackathon.hackathon</field>
+        <field name="arch" type="xml">
+            <calendar string="Hackathon Calendar"
+                      date_start="start_date"
+                      date_stop="end_date"
+                      mode="month"
+                      color="state"
+                      quick_create="0"
+                      event_limit="5">
+                <field name="name"/>
+                <field name="theme"/>
+                <field name="venue_type"/>
+                <field name="total_teams"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_hackathon" model="ir.actions.act_window">
+        <field name="name">Hackathons</field>
+        <field name="res_model">hackathon.hackathon</field>
+        <field name="view_mode">kanban,calendar,list,form</field>
+        <field name="context">{'search_default_filter_registration_open': 1, 'search_default_group_by_state': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create Hackathon
+            </p>
+            <p>
+                Manage hackathon events with comprehensive features. Auto-generated unique code (Hackathon
+                Code, readonly sequence). Enter name (char required tracked, placeholder "e.g., AI
+                Innovation Hackathon 2025"). Select event_id (Many2one to university.event optional). Enter
+                theme (char required, placeholder "e.g., Artificial Intelligence, Web3, IoT"). Enter
+                description (html, placeholder "Describe the hackathon, objectives, problem statements,
+                etc..."). Enter start_date/end_date (datetime required tracked). View duration_hours (float
+                computed readonly via _compute_duration with api.depends('start_date','end_date') calculating
+                delta.total_seconds()/3600). Select venue_type (3 options default offline, radio widget):
+                offline (Offline - info badge), online (Online - success badge), hybrid (Hybrid - warning
+                badge). Enter venue (char, placeholder "Physical venue address", invisible if venue_type is
+                online). Enter online_platform_url (char, url widget, placeholder
+                "https://meet.google.com/xxx-xxxx-xxx", invisible if venue_type is offline). Enter
+                registration_start/registration_end (datetime). Enter max_teams (integer, placeholder "Leave
+                empty for unlimited"). Enter team_size_min (integer default 1) and team_size_max (integer
+                default 4) in o_row with "to" span and "members" span. View team_ids (One2many to
+                hackathon.team with create=false showing name/team_leader_id/team_size/state badge). View
+                total_teams (integer computed via _compute_teams with api.depends('team_ids') counting
+                len(team_ids), displayed in statinfo button with icon fa-users). Add judge_ids (Many2many to
+                hackathon.judge showing name/email/company). Enter first_prize/second_prize/third_prize
+                (monetary with currency_field and monetary widget). View currency_id (Many2one default
+                company currency, invisible/column_invisible). View winner_ids (One2many to hackathon.winner
+                showing position/team_id/prize_amount monetary). Enter rules (html, placeholder "Add
+                hackathon rules, eligibility criteria, judging criteria, submission guidelines, etc...").
+                Select state (7 options default draft tracked): draft/registration_open/registration_closed/
+                ongoing/judging/completed/cancelled. View/manage website_published (boolean from
+                website.published.mixin, boolean_toggle widget, website_button widget in statinfo button
+                with icon fa-globe). Header has 6 workflow action buttons: Open Registration
+                (draft→registration_open, primary), Close Registration (registration_open→registration_closed,
+                warning), Start Hackathon (registration_closed→ongoing, success), Start Judging
+                (ongoing→judging, info), Complete (judging→completed, success), Cancel (any→cancelled except
+                completed/cancelled with confirmation dialog, danger). Statusbar widget for state (visible
+                draft,registration_open,registration_closed,ongoing,judging,completed). Form view with
+                button_box containing total_teams statinfo and website_published button, notebook having 7
+                pages: Venue &amp; Registration (venue_type/venue/online_platform_url/registration_start/
+                registration_end/max_teams/team_size_min-max in o_row), Description (description html), Teams
+                (team_ids list), Judges (judge_ids list), Prizes (first_prize/second_prize/third_prize),
+                Winners (winner_ids list), Rules (rules html). List view with 5-color row decorations: Info
+                (draft), Primary/Blue (registration_open), Warning/Yellow (registration_closed), Success/Green
+                (ongoing/judging/completed), Muted/Gray (cancelled). Badge widgets for venue_type (3-color
+                decorations) and state (5-color decorations). Boolean_toggle widget for website_published.
+                Monetary widget for first_prize. Optional field controls. Kanban view grouped by state showing
+                name as title with code small text, website_published boolean_toggle at top-right, theme card
+                (primary background, lightbulb-o icon, centered), conditional event_id card (light background,
+                calendar-check-o icon info, small "Related Event" label), start_date/end_date card (light
+                background, 2-column grid showing start with clock-o icon success and end with clock-o icon
+                danger, duration_hours centered bold small text), venue_type card (dynamic 3-color background:
+                info/offline, success/online, warning/hybrid, centered, map-marker icon, conditional venue
+                text if not online, conditional online platform text with globe icon if not offline), 2-card
+                grid (6/6) showing total_teams h4 primary with max_teams if present and "Teams" small text,
+                first_prize card with warning background trophy icon if &gt; 0. Calendar view for timeline
+                (date_start: start_date, date_stop: end_date, color by state, month mode). Ordered by
+                start_date desc (most recent first). Default filters: Registration Open and grouped by State.
+                Comprehensive search filters for 7 states/3 venue types/published-unpublished/upcoming/this
+                month/group by state-venue_type-event-start_date. Searchpanel for state and venue_type
+                multi-select. Full chatter/activity/website.published support. SQL constraint for unique code.
+                Complete hackathon lifecycle management.
+            </p>
+        </field>
+    </record>
+
+</odoo>

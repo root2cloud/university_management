@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_asset_stock_issue_wizard_form" model="ir.ui.view">
+        <field name="name">asset.stock.issue.wizard.form</field>
+        <field name="model">asset.stock.issue.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Issue Consumable Stock">
+                <group string="Consumable Asset">
+                    <field name="asset_id"/>
+                    <field name="current_stock" readonly="1"/>
+                    <field name="min_stock" readonly="1"/>
+                </group>
+                <group string="Issue Details">
+                    <field name="qty_issued"/>
+                    <field name="issued_to"/>
+                    <field name="department_id"/>
+                </group>
+                <group string="Purpose">
+                    <field name="purpose" colspan="2"/>
+                </group>
+                <div class="alert alert-warning" role="alert"
+                     invisible="current_stock > qty_issued">
+                    ⚠ Issuing this quantity will trigger a <strong>low stock alert</strong>.
+                </div>
+                <footer>
+                    <button name="action_confirm_issue" string="Confirm Issue"
+                            type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Stock Issue Log List View -->
+    <record id="view_asset_stock_issue_list" model="ir.ui.view">
+        <field name="name">asset.stock.issue.list</field>
+        <field name="model">asset.stock.issue</field>
+        <field name="arch" type="xml">
+            <list string="Stock Issues">
+                <field name="name"/>
+                <field name="asset_id"/>
+                <field name="qty_issued"/>
+                <field name="qty_before"/>
+                <field name="qty_after"/>
+                <field name="issued_to"/>
+                <field name="issued_by"/>
+                <field name="department_id"/>
+                <field name="issue_date"/>
+                <field name="low_stock_triggered" widget="boolean"/>
+                <field name="purpose"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_asset_stock_issue_log" model="ir.actions.act_window">
+        <field name="name">Consumable Stock Issue Log</field>
+        <field name="res_model">asset.stock.issue</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_asset_stock_issue_wizard" model="ir.actions.act_window">
+        <field name="name">Issue Consumable Stock</field>
+        <field name="res_model">asset.stock.issue.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- Asset Code Sequence: AST/2026/00001 -->
+        <record id="seq_asset_asset" model="ir.sequence">
+            <field name="name">Asset Code</field>
+            <field name="code">asset.asset</field>
+            <field name="prefix">AST/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="number_increment">1</field>
+            <field name="use_date_range">True</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Maintenance Reference: MAINT/00001 -->
+        <record id="seq_asset_maintenance" model="ir.sequence">
+            <field name="name">Asset Maintenance</field>
+            <field name="code">asset.maintenance</field>
+            <field name="prefix">MAINT/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="number_increment">1</field>
+            <field name="use_date_range">True</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Transfer Reference: TRF/00001 -->
+        <record id="seq_asset_transfer" model="ir.sequence">
+            <field name="name">Asset Transfer</field>
+            <field name="code">asset.transfer</field>
+            <field name="prefix">TRF/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="number_increment">1</field>
+            <field name="use_date_range">True</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Audit Session Reference: AUD/2026/001 -->
+        <record id="seq_asset_audit_session" model="ir.sequence">
+            <field name="name">Asset Audit Session</field>
+            <field name="code">asset.audit.session</field>
+            <field name="prefix">AUD/%(year)s/</field>
+            <field name="padding">3</field>
+            <field name="number_increment">1</field>
+            <field name="use_date_range">True</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+    </data>
+
+    <data noupdate="1">
+
+        <!-- Default Asset Categories for Indian Colleges -->
+        <record id="asset_cat_it" model="asset.category">
+            <field name="name">IT Equipment</field>
+            <field name="code">IT</field>
+            <field name="depreciation_method">straight_line</field>
+            <field name="useful_life_years">5</field>
+            <field name="residual_value_pct">10</field>
+            <field name="requires_amc">True</field>
+            <field name="maintenance_frequency">annually</field>
+        </record>
+
+        <record id="asset_cat_lab" model="asset.category">
+            <field name="name">Lab Equipment</field>
+            <field name="code">LAB</field>
+            <field name="depreciation_method">straight_line</field>
+            <field name="useful_life_years">10</field>
+            <field name="residual_value_pct">10</field>
+            <field name="requires_amc">True</field>
+            <field name="maintenance_frequency">annually</field>
+        </record>
+
+        <record id="asset_cat_furniture" model="asset.category">
+            <field name="name">Furniture</field>
+            <field name="code">FURN</field>
+            <field name="depreciation_method">straight_line</field>
+            <field name="useful_life_years">10</field>
+            <field name="residual_value_pct">5</field>
+            <field name="requires_amc">False</field>
+        </record>
+
+        <record id="asset_cat_vehicle" model="asset.category">
+            <field name="name">Vehicles</field>
+            <field name="code">VEH</field>
+            <field name="depreciation_method">straight_line</field>
+            <field name="useful_life_years">8</field>
+            <field name="residual_value_pct">10</field>
+            <field name="requires_amc">True</field>
+            <field name="maintenance_frequency">quarterly</field>
+        </record>
+
+        <record id="asset_cat_electrical" model="asset.category">
+            <field name="name">Electrical Equipment</field>
+            <field name="code">ELEC</field>
+            <field name="depreciation_method">straight_line</field>
+            <field name="useful_life_years">7</field>
+            <field name="residual_value_pct">5</field>
+            <field name="requires_amc">True</field>
+            <field name="maintenance_frequency">half_yearly</field>
+        </record>
+
+        <record id="asset_cat_sports" model="asset.category">
+            <field name="name">Sports Equipment</field>
+            <field name="code">SPORT</field>
+            <field name="depreciation_method">straight_line</field>
+            <field name="useful_life_years">5</field>
+            <field name="residual_value_pct">0</field>
+            <field name="requires_amc">False</field>
+        </record>
+
+        <record id="asset_cat_medical" model="asset.category">
+            <field name="name">Medical / Dispensary Equipment</field>
+            <field name="code">MED</field>
+            <field name="depreciation_method">straight_line</field>
+            <field name="useful_life_years">7</field>
+            <field name="residual_value_pct">5</field>
+            <field name="requires_amc">True</field>
+            <field name="maintenance_frequency">annually</field>
+        </record>
+
+        <!-- Cron: Check maintenance due daily -->
+        <record id="cron_asset_maintenance_due" model="ir.cron">
+            <field name="name">Asset: Check Maintenance Due</field>
+            <field name="model_id" ref="model_asset_asset"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_check_maintenance_due()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active">True</field>
+            <field name="user_id" ref="base.user_root"/>
+        </record>
+
+        <!-- Cron: Check AMC expiry daily -->
+        <record id="cron_asset_amc_expiry" model="ir.cron">
+            <field name="name">Asset: Check AMC Expiry</field>
+            <field name="model_id" ref="model_asset_asset"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_check_amc_expiry()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active">True</field>
+            <field name="user_id" ref="base.user_root"/>
+        </record>
+
+        <!-- Cron: Monthly auto-generate depreciation entries (delegates to base_accounting_kit) -->
+        <record id="cron_asset_generate_depreciation" model="ir.cron">
+            <field name="name">Asset: Generate Monthly Depreciation Entries</field>
+            <field name="model_id" ref="model_asset_asset"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_generate_depreciation_entries()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">months</field>
+            <field name="active">True</field>
+            <field name="user_id" ref="base.user_root"/>
+        </record>
+
+        <!-- Cron: Check warranty expiry daily -->
+        <record id="cron_asset_warranty_expiry" model="ir.cron">
+            <field name="name">Asset: Check Warranty Expiry</field>
+            <field name="model_id" ref="model_asset_asset"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_check_warranty_expiry()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active">True</field>
+            <field name="user_id" ref="base.user_root"/>
+        </record>
+
+    </data>
+</odoo>

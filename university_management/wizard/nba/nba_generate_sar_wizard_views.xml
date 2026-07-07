@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="nba_generate_sar_wizard_view_form" model="ir.ui.view">
+        <field name="name">nba.generate.sar.wizard.form</field>
+        <field name="model">nba.generate.sar.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate SAR PDF">
+                <group string="SAR">
+                    <field name="sar_id" readonly="1"/>
+                </group>
+                <group string="Report Options">
+                    <group>
+                        <field name="include_part_a"/>
+                        <field name="include_all_criteria"/>
+                        <field name="include_score_summary"/>
+                    </group>
+                    <group>
+                        <field name="include_evidence_index"/>
+                        <field name="output_format"/>
+                        <field name="cover_style"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_generate" string="Generate SAR" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

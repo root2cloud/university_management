@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="iic_event_view_form" model="ir.ui.view">
+        <field name="name">iic.event.view.form</field>
+        <field name="model">iic.event</field>
+        <field name="arch" type="xml">
+            <form string="IIC Event">
+                <header>
+                    <button name="action_set_poster_pending" string="Submit Poster" type="object"
+                            class="btn-primary" invisible="iic_state != 'planning'"/>
+                    <button name="action_approve_poster" string="Approve Poster" type="object"
+                            class="btn-success" invisible="iic_state != 'poster_pending'"
+                            groups="university_management.group_university_admin"/>
+                    <button name="action_mark_ongoing" string="Mark Ongoing" type="object"
+                            invisible="iic_state != 'poster_approved'"/>
+                    <button name="action_mark_completed" string="Mark Completed" type="object"
+                            invisible="iic_state != 'ongoing'"/>
+                    <button name="action_submit_report" string="Submit Report" type="object"
+                            invisible="iic_state != 'completed'"/>
+                    <button name="action_approve_report" string="Approve Report" type="object"
+                            class="btn-success" invisible="iic_state != 'report_pending'"
+                            groups="university_management.group_university_admin"/>
+                    <button name="action_regenerate_qr" string="Regenerate QR" type="object" class="btn-secondary"/>
+                    <button name="action_cancel" string="Reset" type="object" class="btn-secondary"
+                            confirm="Are you sure you want to reset this event to Planning state?"
+                            invisible="iic_state == 'planning'"/>
+                    <field name="iic_state" widget="statusbar"
+                           statusbar_visible="planning,poster_approved,ongoing,completed,report_approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object"
+                                name="action_open_attendance" icon="fa-users">
+                            <field name="attendance_count" widget="statinfo" string="Attendees"/>
+                        </button>
+                        <button class="oe_stat_button" type="object"
+                                name="action_open_media" icon="fa-camera">
+                            <field name="media_count" widget="statinfo" string="Photos"/>
+                        </button>
+                        <button class="oe_stat_button" type="object"
+                                name="action_print_attendance_sheet" icon="fa-list"/>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Event Title"/></h1>
+                        <field name="iic_sequence" class="text-muted"/>
+                    </div>
+                    <group>
+                        <group string="Activity Details">
+                            <field name="activity_type" widget="selection" options="{'no_create': True, 'create': False}"/>
+                            <field name="event_category"/>
+                            <field name="academic_year_id"/>
+                            <field name="quarter"/>
+                        </group>
+                        <group string="Schedule &amp; Venue">
+                            <field name="date_begin" string="Start Date &amp; Time"/>
+                            <field name="date_end" string="End Date &amp; Time"/>
+                            <field name="venue"/>
+                            <field name="expected_participants"/>
+                            <field name="actual_participants"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Speaker">
+                            <field name="speaker_id" options="{'no_create': True}"/>
+                            <field name="speaker_name" placeholder="External speaker name"/>
+                        </group>
+                        <group string="Faculty">
+                            <field name="faculty_incharge_id" options="{'no_create': True}"/>
+                            <field name="faculty_coordinator_ids" widget="many2many_tags"/>
+                            <field name="iic_president_id" options="{'no_create': True}"/>
+                            <field name="iic_convenor_id" options="{'no_create': True}"/>
+                        </group>
+                    </group>
+
+                    <!-- Minimum attendance duration -->
+                    <group string="Attendance Settings">
+                        <field name="min_attendance_minutes"/>
+                    </group>
+
+                    <!-- Dual QR Code display -->
+                    <div class="row mt-3 mb-3" invisible="not qr_code">
+                        <div class="col-md-6 text-center">
+                            <h5 class="text-success"><i class="fa fa-sign-in"/> QR 1 — Check-in</h5>
+                            <p class="text-muted small">Show this at the <strong>START</strong> of the event</p>
+                            <field name="qr_code" widget="image" nolabel="1"
+                                   options="{'size': [200, 200]}"/>
+                            <div class="mt-2">
+                                <field name="qr_code_url" readonly="1" nolabel="1"/>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-center">
+                            <h5 class="text-danger"><i class="fa fa-sign-out"/> QR 2 — Check-out</h5>
+                            <p class="text-muted small">Show this at the <strong>END</strong> of the event</p>
+                            <field name="qr_checkout_code" widget="image" nolabel="1"
+                                   options="{'size': [200, 200]}"/>
+                            <div class="mt-2">
+                                <field name="qr_checkout_url" readonly="1" nolabel="1"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <notebook>
+                        <page string="Event Details" name="details">
+                            <group>
+                                <field name="event_summary" placeholder="Event summary..."/>
+                                <field name="key_takeaways" placeholder="Key takeaways..."/>
+                            </group>
+                        </page>
+                        <page string="Attendance" name="attendance">
+                            <field name="attendance_ids" nolabel="1">
+                                <list editable="bottom">
+                                    <field name="attendee_type"/>
+                                    <field name="student_id"
+                                           invisible="attendee_type != 'student'"/>
+                                    <field name="faculty_id"
+                                           invisible="attendee_type != 'faculty'"/>
+                                    <field name="external_name"
+                                           invisible="attendee_type != 'external'"/>
+                                    <field name="department_id"/>
+                                    <field name="checkin_time"/>
+                                    <field name="checkout_time"/>
+                                    <field name="duration_minutes"/>
+                                    <field name="status"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Posters" name="posters">
+                            <field name="poster_ids" nolabel="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="template_type"/>
+                                    <field name="state"/>
+                                    <field name="approved_by"/>
+                                    <field name="approved_date"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Media" name="media">
+                            <field name="media_ids" nolabel="1">
+                                <kanban>
+                                    <field name="name"/>
+                                    <field name="attachment"/>
+                                    <field name="media_type"/>
+                                    <templates>
+                                        <t t-name="kanban-box">
+                                            <div class="oe_kanban_card">
+                                                <div class="o_kanban_image">
+                                                    <img t-att-src="kanban_image('iic.media', 'attachment', record.id.raw_value)"
+                                                         alt="Media" class="o_image_64_cover"/>
+                                                </div>
+                                                <div class="oe_kanban_details">
+                                                    <strong><field name="name"/></strong>
+                                                    <div><field name="media_type"/></div>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </templates>
+                                </kanban>
+                            </field>
+                        </page>
+                        <page string="Event Reports" name="reports">
+                            <field name="report_ids" nolabel="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="state"/>
+                                    <field name="submitted_by"/>
+                                    <field name="submitted_date"/>
+                                    <field name="approved_by"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Approval Log" name="approval_log">
+                            <field name="approval_log_ids" nolabel="1">
+                                <list create="0" delete="0">
+                                    <field name="timestamp"/>
+                                    <field name="action"/>
+                                    <field name="user_id"/>
+                                    <field name="remarks"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="iic_event_view_list" model="ir.ui.view">
+        <field name="name">iic.event.view.list</field>
+        <field name="model">iic.event</field>
+        <field name="arch" type="xml">
+            <list string="IIC Events" decoration-success="iic_state == 'report_approved'"
+                  decoration-warning="iic_state in ['poster_pending','report_pending']"
+                  decoration-muted="iic_state == 'archived'">
+                <field name="iic_sequence"/>
+                <field name="name"/>
+                <field name="activity_type"/>
+                <field name="event_category"/>
+                <field name="date_begin"/>
+                <field name="venue"/>
+                <field name="speaker_id"/>
+                <field name="faculty_incharge_id"/>
+                <field name="attendance_count"/>
+                <field name="quarter"/>
+                <field name="iic_state" widget="badge"
+                       decoration-success="iic_state == 'report_approved'"
+                       decoration-warning="iic_state in ['poster_pending','report_pending']"
+                       decoration-primary="iic_state == 'ongoing'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="iic_event_view_kanban" model="ir.ui.view">
+        <field name="name">iic.event.view.kanban</field>
+        <field name="model">iic.event</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="iic_state" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="activity_type"/>
+                <field name="date_begin"/>
+                <field name="iic_state"/>
+                <field name="speaker_id"/>
+                <field name="attendance_count"/>
+                <field name="quarter"/>
+                <progressbar field="iic_state"
+                             colors='{"report_approved": "success", "ongoing": "warning", "archived": "muted"}'/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                    </div>
+                                    <field name="iic_state" widget="label_selection"
+                                           options="{'classes': {'planning': 'default', 'ongoing': 'warning',
+                                                    'completed': 'info', 'report_approved': 'success'}}"/>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <div><i class="fa fa-calendar"/> <field name="date_begin"/></div>
+                                    <div><i class="fa fa-map-marker"/> <field name="venue"/></div>
+                                    <div><i class="fa fa-tag"/> <field name="activity_type"/></div>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <span class="badge badge-pill badge-secondary">
+                                            <field name="attendance_count"/> attendees
+                                        </span>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="quarter" widget="badge"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Calendar View -->
+    <record id="iic_event_view_calendar" model="ir.ui.view">
+        <field name="name">iic.event.view.calendar</field>
+        <field name="model">iic.event</field>
+        <field name="arch" type="xml">
+            <calendar string="IIC Event Calendar" date_start="event_date" date_stop="date_end" color="activity_type">
+                <field name="name"/>
+                <field name="activity_type"/>
+                <field name="venue"/>
+                <field name="faculty_incharge_id"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="iic_event_view_search" model="ir.ui.view">
+        <field name="name">iic.event.view.search</field>
+        <field name="model">iic.event</field>
+        <field name="arch" type="xml">
+            <search string="Search IIC Events">
+                <field name="name"/>
+                <field name="speaker_id"/>
+                <field name="faculty_incharge_id"/>
+                <field name="academic_year_id"/>
+                <separator/>
+                <filter string="Mandatory Activities" name="mandatory"
+                        domain="[('activity_type', '=', 'mandatory')]"/>
+                <filter string="Self Driven" name="self_driven"
+                        domain="[('activity_type', '=', 'self_driven')]"/>
+                <separator/>
+                <filter string="Planning" name="planning" domain="[('iic_state', '=', 'planning')]"/>
+                <filter string="Ongoing" name="ongoing" domain="[('iic_state', '=', 'ongoing')]"/>
+                <filter string="Completed" name="completed"
+                        domain="[('iic_state', '=', 'report_approved')]"/>
+                <separator/>
+                <filter string="Q1 (Jan-Mar)" name="q1" domain="[('quarter', '=', 'q1')]"/>
+                <filter string="Q2 (Apr-Jun)" name="q2" domain="[('quarter', '=', 'q2')]"/>
+                <filter string="Q3 (Jul-Sep)" name="q3" domain="[('quarter', '=', 'q3')]"/>
+                <filter string="Q4 (Oct-Dec)" name="q4" domain="[('quarter', '=', 'q4')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Activity Type" name="group_type" context="{'group_by': 'activity_type'}"/>
+                    <filter string="Quarter" name="group_quarter" context="{'group_by': 'quarter'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'iic_state'}"/>
+                    <filter string="Faculty In-charge" name="group_faculty"
+                            context="{'group_by': 'faculty_incharge_id'}"/>
+                    <filter string="Month" name="group_month" context="{'group_by': 'date_begin:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Graph View -->
+    <record id="iic_event_view_graph" model="ir.ui.view">
+        <field name="name">iic.event.view.graph</field>
+        <field name="model">iic.event</field>
+        <field name="arch" type="xml">
+            <graph string="IIC Events Analysis" type="bar">
+                <field name="quarter" type="row"/>
+                <field name="activity_type" type="col"/>
+                <field name="attendance_count" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="iic_event_view_pivot" model="ir.ui.view">
+        <field name="name">iic.event.view.pivot</field>
+        <field name="model">iic.event</field>
+        <field name="arch" type="xml">
+            <pivot string="IIC Events Pivot">
+                <field name="quarter" type="row"/>
+                <field name="activity_type" type="col"/>
+                <field name="attendance_count" type="measure"/>
+                <field name="actual_participants" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_iic_event" model="ir.actions.act_window">
+        <field name="name">IIC Events</field>
+        <field name="res_model">iic.event</field>
+        <field name="view_mode">list,kanban,calendar,graph,pivot,form</field>
+        <field name="search_view_id" ref="iic_event_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first IIC Activity!
+            </p>
+        </field>
+    </record>
+
+</odoo>

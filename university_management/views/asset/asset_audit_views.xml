@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_asset_audit_form" model="ir.ui.view">
+        <field name="name">asset.audit.form</field>
+        <field name="model">asset.audit</field>
+        <field name="arch" type="xml">
+            <form string="Asset Audit">
+                <header>
+                    <button name="action_start_audit" string="Start Audit"
+                            type="object" class="btn-primary"
+                            invisible="state != 'draft'"
+                            groups="university_management.group_asset_principal"/>
+                    <button name="action_complete_audit" string="Mark Complete"
+                            type="object" class="btn-success"
+                            invisible="state != 'in_progress'"
+                            groups="university_management.group_asset_principal"/>
+                    <button name="action_cancel" string="Cancel"
+                            type="object" class="btn-secondary"
+                            invisible="state in ['completed', 'cancelled']"
+                            groups="university_management.group_asset_principal"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
+
+                    <group>
+                        <group string="Audit Setup">
+                            <field name="audit_scope"/>
+                            <field name="department_id"
+                                   invisible="audit_scope != 'department'"
+                                   required="audit_scope == 'department'"/>
+                            <field name="initiated_by" readonly="1"/>
+                            <field name="assigned_to"/>
+                        </group>
+                        <group string="Schedule">
+                            <field name="start_date"/>
+                            <field name="target_completion_date"/>
+                            <field name="end_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Progress">
+                        <field name="total_assets" readonly="1"/>
+                        <field name="scanned_count" readonly="1"/>
+                        <field name="missing_count" readonly="1"/>
+                        <field name="discrepancy_count" readonly="1"/>
+                        <field name="completion_pct" readonly="1" widget="progressbar"/>
+                    </group>
+                    <field name="notes"/>
+
+                    <notebook>
+                        <page string="Asset Checklist">
+                            <field name="audit_line_ids">
+                                <list editable="bottom"
+                                      decoration-danger="scan_status == 'missing'"
+                                      decoration-warning="has_discrepancy"
+                                      decoration-success="scan_status == 'present'">
+                                    <field name="asset_id"/>
+                                    <field name="asset_code"/>
+                                    <field name="category_id"/>
+                                    <field name="expected_location"/>
+                                    <field name="expected_department_id"/>
+                                    <field name="scan_status" widget="badge"
+                                           decoration-success="scan_status == 'present'"
+                                           decoration-danger="scan_status == 'missing'"
+                                           decoration-warning="scan_status in ('location_mismatch', 'condition_issue')"/>
+                                    <field name="physical_condition"/>
+                                    <field name="actual_location"/>
+                                    <field name="scanned_by" readonly="1"/>
+                                    <field name="scan_date" readonly="1"/>
+                                    <field name="has_discrepancy" readonly="1"/>
+                                    <field name="auditor_notes"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_asset_audit_list" model="ir.ui.view">
+        <field name="name">asset.audit.list</field>
+        <field name="model">asset.audit</field>
+        <field name="arch" type="xml">
+            <list string="Asset Audits"
+                  decoration-success="state == 'completed'"
+                  decoration-warning="state == 'in_progress'">
+                <field name="name"/>
+                <field name="audit_scope"/>
+                <field name="department_id"/>
+                <field name="assigned_to"/>
+                <field name="start_date"/>
+                <field name="target_completion_date"/>
+                <field name="total_assets"/>
+                <field name="scanned_count"/>
+                <field name="missing_count"/>
+                <field name="completion_pct" widget="progressbar"/>
+                <field name="state" widget="badge"
+                       decoration-warning="state == 'in_progress'"
+                       decoration-success="state == 'completed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_asset_audit" model="ir.actions.act_window">
+        <field name="name">Asset Audits</field>
+        <field name="res_model">asset.audit</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_asset_audit_principal" model="ir.actions.act_window">
+        <field name="name">Manage Audits</field>
+        <field name="res_model">asset.audit</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'default_initiated_by': uid}</field>
+    </record>
+
+</odoo>

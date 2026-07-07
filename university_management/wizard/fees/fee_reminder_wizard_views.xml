@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="fee_reminder_wizard_view_form" model="ir.ui.view">
+        <field name="name">fee.reminder.wizard.view.form</field>
+        <field name="model">fee.reminder.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Send Fee Reminders">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Fee Payment Reminders</h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="reminder_type" widget="radio"/>
+                            <field name="send_to" widget="radio"/>
+                        </group>
+                        <group>
+                            <field name="send_email"/>
+                            <field name="send_sms"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Filters">
+                            <group>
+                                <group>
+                                    <field name="program_id"/>
+                                    <field name="department_id"/>
+                                </group>
+                                <group>
+                                    <field name="batch_id"/>
+                                    <field name="semester"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="student_ids" widget="many2many_tags"/>
+                            </group>
+                        </page>
+
+                        <page string="Custom Selection">
+                            <field name="fee_payment_ids" nolabel="1">
+                                <list>
+                                    <field name="student_id"/>
+<!--                                    <field name="payment_method"/>-->
+                                    <field name="amount"/>
+                                    <field name="due_date"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Message Template">
+                            <group>
+                                <field name="email_template_id"/>
+                                <field name="sms_template_id"/>
+                            </group>
+                            <group string="Custom Message (Optional)">
+                                <field name="custom_message" nolabel="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+
+                    <group>
+                        <div class="o_row">
+                            <field name="preview_count" class="oe_inline"/>
+                            <span class="o_form_label">reminders will be sent</span>
+                        </div>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_preview_reminders"
+                            string="Preview"
+                            type="object"
+                            class="btn-secondary"/>
+                    <button name="action_send_reminders"
+                            string="Send Reminders"
+                            type="object"
+                            class="btn-primary"/>
+                    <button string="Cancel"
+                            class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fee_reminder_wizard" model="ir.actions.act_window">
+        <field name="name">Send Fee Reminders</field>
+        <field name="res_model">fee.reminder.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Report Action -->
+    <record id="action_report_marksheet" model="ir.actions.report">
+        <field name="name">Student Marksheet</field>
+        <field name="model">examination.marksheet</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">university_management.report_marksheet</field>
+        <field name="report_file">university_management.report_marksheet</field>
+        <field name="binding_model_id" ref="model_examination_marksheet"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Report Template -->
+    <template id="report_marksheet">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+
+                        <!-- Watermark -->
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 100pt; color: rgba(76, 175, 80, 0.05); font-weight: bold; z-index: -1; pointer-events: none;">
+                            <t t-if="o.state == 'draft'">DRAFT</t>
+                            <t t-elif="o.state == 'provisional'">PROVISIONAL</t>
+                        </div>
+
+                        <!-- Header with Border -->
+                        <div class="row" style="border: 3px solid #1976D2; padding: 15px; margin-bottom: 20px;">
+                            <div class="col-2 text-center">
+                                <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="max-height: 80px;"/>
+                            </div>
+                            <div class="col-8 text-center">
+                                <h2 style="color: #1976D2; margin: 0; font-weight: bold; text-transform: uppercase;">
+                                    <t t-esc="o.company_id.name"/>
+                                </h2>
+                                <p style="margin: 5px 0; font-size: 10pt;">
+                                    <t t-esc="o.company_id.street"/>, <t t-esc="o.company_id.city"/> - <t t-esc="o.company_id.zip"/>
+                                </p>
+                                <p style="margin: 0; font-size: 10pt;">
+                                    Phone: <t t-esc="o.company_id.phone"/> | Website: <t t-esc="o.company_id.website"/>
+                                </p>
+                                <h3 style="margin: 15px 0 0 0; padding: 8px; background: #1976D2; color: white; text-transform: uppercase;">
+                                    STATEMENT OF MARKS
+                                </h3>
+                            </div>
+                            <div class="col-2 text-center">
+                                <div style="border: 2px solid #1976D2; padding: 3px;">
+                                    <img t-if="o.student_id.student_photo"
+                                         t-att-src="image_data_uri(o.student_id.student_photo)"
+                                         style="width: 80px; height: 100px; object-fit: cover;"/>
+                                    <div t-else="" style="width: 80px; height: 100px; background: #f0f0f0; display: flex; align-items: center; justify-content: center;">
+                                        <span style="font-size: 8pt; color: #999;">Photo</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Marksheet Details -->
+                        <div style="margin-bottom: 15px;">
+                            <table class="table table-bordered table-sm">
+                                <tr>
+                                    <td style="width: 25%; background: #f5f5f5; font-weight: bold;">Marksheet Number</td>
+                                    <td style="width: 25%; color: #1976D2; font-weight: bold; font-size: 11pt;">
+                                        <t t-esc="o.name"/>
+                                    </td>
+                                    <td style="width: 25%; background: #f5f5f5; font-weight: bold;">Issue Date</td>
+                                    <td style="width: 25%;"><t t-esc="o.issue_date"/></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Student Details -->
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="background: #1976D2; color: white; padding: 6px; margin-bottom: 10px; font-size: 11pt;">
+                                STUDENT DETAILS
+                            </h4>
+                            <table class="table table-bordered table-sm">
+                                <tr>
+                                    <td style="width: 25%; background: #f5f5f5; font-weight: bold;">Name of the Student</td>
+                                    <td style="width: 75%;" colspan="3">
+                                        <span style="text-transform: uppercase; font-weight: bold;">
+                                            <t t-esc="o.student_id.name"/>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Registration Number</td>
+                                    <td><t t-esc="o.student_id.registration_number"/></td>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Date of Birth</td>
+                                    <td><t t-esc="o.student_id.date_of_birth"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Program</td>
+                                    <td><t t-esc="o.student_id.program_id.name"/></td>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Department</td>
+                                    <td><t t-esc="o.student_id.department_id.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Semester</td>
+                                    <td><t t-esc="o.semester_id.name"/></td>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Academic Year</td>
+                                    <td><t t-esc="o.academic_year_id.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Examination</td>
+                                    <td colspan="3"><t t-esc="o.examination_id.name"/></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Marks Details -->
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="background: #1976D2; color: white; padding: 6px; margin-bottom: 10px; font-size: 11pt;">
+                                MARKS OBTAINED
+                            </h4>
+                            <table class="table table-bordered table-sm" style="font-size: 9pt;">
+                                <thead style="background: #E3F2FD;">
+                                    <tr>
+                                        <th style="width: 8%; text-align: center;">S.No</th>
+                                        <th style="width: 12%; text-align: center;">Subject Code</th>
+                                        <th style="width: 30%;">Subject Name</th>
+                                        <th style="width: 8%; text-align: center;">Credits</th>
+                                        <th style="width: 10%; text-align: center;">Max Marks</th>
+                                        <th style="width: 10%; text-align: center;">Marks Obtained</th>
+                                        <th style="width: 10%; text-align: center;">Grade</th>
+                                        <th style="width: 12%; text-align: center;">Grade Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="counter" t-value="1"/>
+                                    <t t-set="total_credits" t-value="0"/>
+                                    <t t-set="total_grade_points" t-value="0"/>
+
+                                    <t t-foreach="o.result_ids" t-as="line">
+                                        <tr>
+                                            <td class="text-center"><t t-esc="counter"/></td>
+                                            <td class="text-center"><t t-esc="line.subject_id.code"/></td>
+                                            <td><t t-esc="line.subject_id.name"/></td>
+                                            <td class="text-center"><t t-esc="line.credits"/></td>
+                                            <td class="text-center"><t t-esc="line.max_marks"/></td>
+                                            <td class="text-center">
+                                                <strong><t t-esc="line.total_marks"/></strong>
+                                            </td>
+                                            <td class="text-center">
+                                                <strong style="color: #1976D2;"><t t-esc="line.grade_letter"/></strong>
+                                            </td>
+                                            <td class="text-center"><t t-esc="line.grade_point"/></td>
+                                        </tr>
+                                        <t t-set="counter" t-value="counter + 1"/>
+                                        <t t-set="total_credits" t-value="total_credits + line.credits"/>
+                                        <t t-set="total_grade_points" t-value="total_grade_points + (line.credits * line.grade_point)"/>
+                                    </t>
+
+                                    <!-- Total Row -->
+                                    <tr style="background: #E3F2FD; font-weight: bold;">
+                                        <td colspan="3" class="text-right">TOTAL</td>
+                                        <td class="text-center"><t t-esc="total_credits"/></td>
+                                        <td colspan="4"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Result Summary -->
+                        <div class="row" style="margin-bottom: 20px;">
+                            <div class="col-6">
+                                <div style="border: 2px solid #4CAF50; padding: 15px; background: #F1F8E9; height: 100%;">
+                                    <h5 style="color: #4CAF50; margin-top: 0; margin-bottom: 15px; text-align: center;">
+                                        GRADE POINT AVERAGE
+                                    </h5>
+                                    <table style="width: 100%; font-size: 10pt;">
+                                        <tr>
+                                            <td style="padding: 5px; font-weight: bold;">Semester GPA (SGPA):</td>
+                                            <td style="padding: 5px; text-align: right;">
+                                                <span style="font-size: 16pt; color: #4CAF50; font-weight: bold;">
+                                                    <t t-esc="'{:.2f}'.format(o.sgpa)"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 5px; font-weight: bold;">Cumulative GPA (CGPA):</td>
+                                            <td style="padding: 5px; text-align: right;">
+                                                <span style="font-size: 16pt; color: #4CAF50; font-weight: bold;">
+                                                    <t t-esc="'{:.2f}'.format(o.cgpa)"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 5px; font-weight: bold;">Percentage:</td>
+                                            <td style="padding: 5px; text-align: right;">
+                                                <span style="font-size: 16pt; color: #4CAF50; font-weight: bold;">
+                                                    <t t-esc="'{:.2f}'.format(o.percentage)"/>%
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div style="border: 2px solid #FF9800; padding: 15px; background: #FFF3E0; height: 100%;">
+                                    <h5 style="color: #FF9800; margin-top: 0; margin-bottom: 15px; text-align: center;">
+                                        RESULT DECLARATION
+                                    </h5>
+                                    <table style="width: 100%; font-size: 10pt;">
+                                        <tr>
+                                            <td style="padding: 5px; font-weight: bold;">Overall Grade:</td>
+                                            <td style="padding: 5px; text-align: right;">
+                                                <span style="font-size: 16pt; color: #FF9800; font-weight: bold;">
+                                                    <t t-esc="o.overall_result"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 5px; font-weight: bold;">Result:</td>
+                                            <td style="padding: 5px; text-align: right;">
+                                                <span t-if="o.overall_result == 'pass'" style="font-size: 14pt; color: #4CAF50; font-weight: bold;">
+                                                    ✓ PASSED
+                                                </span>
+                                                <span t-else="" style="font-size: 14pt; color: #F44336; font-weight: bold;">
+                                                    ✗ FAILED
+                                                </span>
+                                            </td>
+                                        </tr>
+<!--                                        <t t-if="o.backlogs > 0">-->
+<!--                                            <tr>-->
+<!--                                                <td style="padding: 5px; font-weight: bold;">Backlogs:</td>-->
+<!--                                                <td style="padding: 5px; text-align: right;">-->
+<!--                                                    <span style="font-size: 14pt; color: #F44336; font-weight: bold;">-->
+<!--                                                        <t t-esc="o.backlogs"/>-->
+<!--                                                    </span>-->
+<!--                                                </td>-->
+<!--                                            </tr>-->
+<!--                                        </t>-->
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Grading System -->
+                        <div style="margin-bottom: 20px;">
+                            <h5 style="background: #f5f5f5; padding: 6px; margin-bottom: 10px; font-size: 10pt; border-left: 4px solid #1976D2;">
+                                GRADING SYSTEM
+                            </h5>
+                            <table class="table table-bordered table-sm" style="font-size: 9pt;">
+                                <thead style="background: #E3F2FD;">
+                                    <tr>
+                                        <th class="text-center">Grade</th>
+                                        <th class="text-center">Grade Point</th>
+                                        <th class="text-center">Percentage Range</th>
+                                        <th class="text-center">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="grades" t-value="env['examination.grade.system'].search([])"/>
+                                    <t t-foreach="grades" t-as="grade">
+                                        <tr>
+                                            <td class="text-center"><strong><t t-esc="grade.grade"/></strong></td>
+                                            <td class="text-center"><t t-esc="grade.grade_point"/></td>
+                                            <td class="text-center"><t t-esc="grade.min_percentage"/> - <t t-esc="grade.max_percentage"/>%</td>
+                                            <td class="text-center"><t t-esc="grade.description"/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Important Note -->
+                        <div style="background: #FFF9C4; border-left: 4px solid #FFC107; padding: 10px; margin-bottom: 20px; font-size: 9pt;">
+                            <p style="margin: 0;">
+                                <strong>Note:</strong> This marksheet is provisional and subject to verification.
+                                The original marksheet will be issued after final verification of all academic records.
+                            </p>
+                        </div>
+
+                        <!-- Signatures -->
+                        <div class="row" style="margin-top: 60px;">
+                            <div class="col-4 text-center">
+                                <div style="border-top: 2px solid #333; padding-top: 5px; margin-top: 40px;">
+                                    <strong>Checked By</strong><br/>
+                                    <span style="font-size: 9pt;">Deputy Controller of Examinations</span>
+                                </div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <img t-if="o.company_id.company_registry"
+                                     style="max-height: 40px; margin-bottom: 5px;"
+                                     alt="Seal"/>
+                                <div style="border-top: 2px solid #333; padding-top: 5px;">
+                                    <strong>Official Seal</strong>
+                                </div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div style="border-top: 2px solid #333; padding-top: 5px; margin-top: 40px;">
+                                    <strong>Controller of Examinations</strong><br/>
+                                    <span style="font-size: 9pt;">Signature</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="text-center" style="margin-top: 30px; padding-top: 10px; border-top: 2px double #1976D2; font-size: 9pt; color: #666;">
+                            <p style="margin: 0;">
+                                This is a computer-generated marksheet. For verification, visit: <t t-esc="o.company_id.website"/>
+                            </p>
+                            <p style="margin: 5px 0 0 0;">
+                                Date of Issue: <t t-esc="o.issue_date"/> | Marksheet No: <t t-esc="o.name"/>
+                            </p>
+                        </div>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

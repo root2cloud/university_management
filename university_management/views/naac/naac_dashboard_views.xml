@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- NAAC IQAC Monitoring Dashboard -->
+    <record id="action_naac_iqac_dashboard" model="ir.actions.client">
+        <field name="name">NAAC IQAC Dashboard</field>
+        <field name="tag">naac_iqac_dashboard</field>
+    </record>
+
+    <!-- NAAC Department Dashboard -->
+    <record id="action_naac_department_dashboard" model="ir.actions.client">
+        <field name="name">Department NAAC Dashboard</field>
+        <field name="tag">naac_dept_dashboard</field>
+    </record>
+
+    <!-- Combined IIC + NAAC Admin Dashboard -->
+    <record id="action_combined_admin_dashboard" model="ir.actions.client">
+        <field name="name">IIC &amp; NAAC Admin Overview</field>
+        <field name="tag">combined_admin_dashboard</field>
+    </record>
+
+</odoo>

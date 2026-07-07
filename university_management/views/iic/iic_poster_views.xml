@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="iic_poster_view_form" model="ir.ui.view">
+        <field name="name">iic.poster.view.form</field>
+        <field name="model">iic.poster</field>
+        <field name="arch" type="xml">
+            <form string="IIC Poster">
+                <header>
+                    <button name="action_submit_approval" string="Submit for Approval" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_approve" string="Approve" type="object"
+                            class="btn-success" invisible="state != 'pending'"
+                            groups="university_management.group_university_admin"/>
+                    <button name="action_reject" string="Reject" type="object"
+                            invisible="state != 'pending'"/>
+                    <button name="action_publish" string="Publish" type="object"
+                            class="btn-primary" invisible="state != 'approved'"/>
+                    <button name="action_print_poster" string="🖨️ Print Poster" type="object"
+                            class="btn-primary"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,pending,approved,published"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group string="Event">
+                            <field name="event_id" options="{'no_create': True}"/>
+                            <field name="template_type"/>
+                        </group>
+                        <group string="IIC Leadership">
+                            <field name="iic_president_name"/>
+                            <field name="iic_president_designation"/>
+                            <field name="iic_convenor_name"/>
+                            <field name="iic_convenor_designation"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Content">
+                            <field name="tagline"/>
+                            <field name="highlight_text"/>
+                        </group>
+                        <group string="Publish Status">
+                            <field name="published_instagram"/>
+                            <field name="published_linkedin"/>
+                            <field name="published_facebook"/>
+                            <field name="published_website"/>
+                            <field name="publish_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Logos" name="logos">
+                            <group>
+                                <group>
+                                    <field name="iic_logo" widget="image" string="IIC Logo"
+                                           options="{'size': [200, 200]}"/>
+                                </group>
+                                <group>
+                                    <field name="institute_logo" widget="image" string="Institute Logo"
+                                           options="{'size': [200, 200]}"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Event Photos" name="event_photos">
+                            <p class="text-muted" style="margin-bottom:8px;">
+                                Photos are pulled from the Media records of the linked event (Photo type only).
+                                To add more photos, go to the Event's Media tab.
+                            </p>
+                            <field name="media_image_ids" readonly="1" nolabel="1">
+                                <list>
+                                    <field name="image" widget="image" options="{'size': [80, 80]}"/>
+                                    <field name="name" string="Caption"/>
+                                    <field name="is_cover" string="Cover"/>
+                                    <field name="media_id" string="Media Record"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Generated Poster" name="poster" invisible="not poster_image">
+                            <field name="poster_image" widget="image" nolabel="1"
+                                   options="{'size': [400, 600]}"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="iic_poster_view_list" model="ir.ui.view">
+        <field name="name">iic.poster.view.list</field>
+        <field name="model">iic.poster</field>
+        <field name="arch" type="xml">
+            <list string="IIC Posters">
+                <field name="name"/>
+                <field name="event_id"/>
+                <field name="template_type"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'published'"
+                       decoration-warning="state == 'pending'"/>
+                <field name="approved_by"/>
+                <field name="publish_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="iic_poster_view_kanban" model="ir.ui.view">
+        <field name="name">iic.poster.view.kanban</field>
+        <field name="model">iic.poster</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state">
+                <field name="name"/>
+                <field name="event_id"/>
+                <field name="state"/>
+                <field name="poster_image"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_image" invisible="not poster_image">
+                                <img t-att-src="kanban_image('iic.poster', 'poster_image', record.id.raw_value)"
+                                     alt="Poster" class="o_image_64_cover"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong><field name="name"/></strong>
+                                <div><field name="event_id"/></div>
+                                <field name="state" widget="badge"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="action_iic_poster" model="ir.actions.act_window">
+        <field name="name">IIC Posters</field>
+        <field name="res_model">iic.poster</field>
+        <field name="view_mode">kanban,list,form</field>
+    </record>
+
+</odoo>

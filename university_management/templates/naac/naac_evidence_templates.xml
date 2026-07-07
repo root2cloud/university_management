@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="naac_evidence_upload_portal" name="NAAC Evidence Upload Portal">
+        <t t-call="website.layout">
+            <div class="container mt-5">
+                <h2>Upload NAAC Evidence</h2>
+                <t t-if="error">
+                    <div class="alert alert-danger">
+                        Please fill all required fields and select a file.
+                    </div>
+                </t>
+                <form method="POST" action="/naac/evidence/upload"
+                      enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label>Evidence Title *</label>
+                            <input type="text" name="name" class="form-control" required="1"/>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>NAAC Criterion *</label>
+                            <select name="criterion_id" class="form-control" required="1">
+                                <option value="">-- Select Criterion --</option>
+                                <t t-foreach="criteria" t-as="c">
+                                    <option t-att-value="c.id">
+                                        Criterion <t t-esc="c.criterion_number"/>: <t t-esc="c.name"/>
+                                    </option>
+                                </t>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Department</label>
+                            <select name="department_id" class="form-control">
+                                <option value="">-- Select Department --</option>
+                                <t t-foreach="departments" t-as="d">
+                                    <option t-att-value="d.id"><t t-esc="d.name"/></option>
+                                </t>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Academic Year</label>
+                            <input type="text" name="academic_year_id" class="form-control"
+                                   placeholder="e.g. 2024-25"/>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Document Type</label>
+                            <select name="doc_type" class="form-control">
+                                <option value="pdf_report">PDF Report</option>
+                                <option value="photo">Photograph</option>
+                                <option value="attendance_sheet">Attendance Sheet</option>
+                                <option value="certificate">Certificate</option>
+                                <option value="research_paper">Research Paper</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Upload File *</label>
+                            <input type="file" name="document" class="form-control" required="1"/>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Upload Evidence</button>
+                </form>
+            </div>
+        </t>
+    </template>
+
+</odoo>

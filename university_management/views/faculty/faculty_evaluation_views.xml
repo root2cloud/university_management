@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="faculty_evaluation_view_form" model="ir.ui.view">
+        <field name="name">faculty.evaluation.view.form</field>
+        <field name="model">faculty.evaluation</field>
+        <field name="arch" type="xml">
+            <form string="Faculty Evaluation">
+                <header>
+                    <button name="action_submit" type="object" string="Submit"
+                            class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_review" type="object" string="Mark as Reviewed"
+                            class="oe_highlight"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_approve" type="object" string="Approve"
+                            class="oe_highlight"
+                            invisible="state != 'reviewed'"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"
+                            confirm="Are you sure you want to reset this Evaluation to draft?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,reviewed,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="Evaluation Number"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Faculty Information">
+                            <field name="faculty_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="department_id" readonly="1"/>
+                            <field name="designation_id" readonly="1"/>
+                        </group>
+                        <group string="Evaluation Details">
+                            <field name="evaluation_type" widget="radio"/>
+                            <field name="evaluation_period"/>
+                            <field name="evaluation_date" widget="date"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Academic Period">
+                            <field name="academic_year_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="semester_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                        </group>
+                        <group string="Evaluator Details">
+                            <field name="evaluated_by"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="evaluator_faculty_id"
+                                   invisible="evaluation_type not in ['peer', 'hod']"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="survey_id"
+                                   invisible="evaluation_type != 'student'"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Rating Criteria" name="ratings">
+                            <group>
+                                <group string="Teaching &amp; Subject Knowledge">
+                                    <label for="teaching_quality"/>
+                                    <div class="o_row">
+                                        <field name="teaching_quality" widget="float"/>
+                                        <span>/ 10</span>
+                                    </div>
+
+                                    <label for="subject_knowledge"/>
+                                    <div class="o_row">
+                                        <field name="subject_knowledge" widget="float"/>
+                                        <span>/ 10</span>
+                                    </div>
+
+                                    <label for="course_coverage"/>
+                                    <div class="o_row">
+                                        <field name="course_coverage" widget="float"/>
+                                        <span>/ 10</span>
+                                    </div>
+                                </group>
+
+                                <group string="Communication &amp; Interaction">
+                                    <label for="communication_skills"/>
+                                    <div class="o_row">
+                                        <field name="communication_skills" widget="float"/>
+                                        <span>/ 10</span>
+                                    </div>
+
+                                    <label for="student_interaction"/>
+                                    <div class="o_row">
+                                        <field name="student_interaction" widget="float"/>
+                                        <span>/ 10</span>
+                                    </div>
+                                </group>
+                            </group>
+
+                            <group>
+                                <group string="Professional Conduct">
+                                    <label for="punctuality"/>
+                                    <div class="o_row">
+                                        <field name="punctuality" widget="float"/>
+                                        <span>/ 10</span>
+                                    </div>
+
+                                    <label for="assessment_fairness"/>
+                                    <div class="o_row">
+                                        <field name="assessment_fairness" widget="float"/>
+                                        <span>/ 10</span>
+                                    </div>
+                                </group>
+
+                                <group string="Research &amp; Administration">
+                                    <label for="research_contribution"/>
+                                    <div class="o_row">
+                                        <field name="research_contribution" widget="float"/>
+                                        <span>/ 10</span>
+                                    </div>
+
+                                    <label for="administrative_work"/>
+                                    <div class="o_row">
+                                        <field name="administrative_work" widget="float"/>
+                                        <span>/ 10</span>
+                                    </div>
+                                </group>
+                            </group>
+
+                            <separator/>
+
+                            <group>
+                                <group string="Overall Performance">
+                                    <field name="overall_rating" readonly="1"/>
+                                    <field name="performance_grade" readonly="1"
+                                           widget="badge"
+                                           decoration-success="performance_grade == 'outstanding'"
+                                           decoration-info="performance_grade == 'excellent'"
+                                           decoration-primary="performance_grade == 'good'"
+                                           decoration-warning="performance_grade == 'satisfactory'"
+                                           decoration-danger="performance_grade == 'needs_improvement'"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Strengths &amp; Areas of Improvement" name="feedback">
+                            <group>
+                                <field name="strengths"
+                                       placeholder="Enter faculty strengths and positive aspects..."
+                                       widget="html"/>
+                            </group>
+
+                            <separator string="Areas of Improvement"/>
+
+                            <group>
+                                <field name="areas_of_improvement"
+                                       placeholder="Enter areas where faculty can improve..."
+                                       widget="html"/>
+                            </group>
+
+                            <separator string="Recommendations"/>
+
+                            <group>
+                                <field name="recommendations"
+                                       placeholder="Enter recommendations for development..."
+                                       widget="html"/>
+                            </group>
+                        </page>
+
+                        <page string="Action Plan" name="action_plan">
+                            <field name="action_plan"
+                                   placeholder="Enter action plan for improvement and development..."
+                                   widget="html"/>
+                        </page>
+
+                        <page string="Comments" name="comments">
+                            <group string="Evaluator Comments">
+                                <field name="evaluator_comments"
+                                       placeholder="Enter evaluator comments..."
+                                       nolabel="1"/>
+                            </group>
+
+                            <separator string="Faculty Response"/>
+
+                            <group string="Faculty Comments/Response">
+                                <field name="faculty_comments"
+                                       placeholder="Enter faculty response and comments..."
+                                       nolabel="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                    <group string="HR Integration" invisible="state != 'approved'">
+                        <field name="faculty_id" readonly="1" invisible="1"/>
+                        <div class="alert alert-success" role="alert"
+                             invisible="state != 'approved'">
+                            <i class="fa fa-check-circle"/>
+                            <strong> Approved.</strong>
+                            The faculty's Last Appraisal Date on the HR Employee profile
+                            has been updated to <strong><field name="evaluation_date"
+                            readonly="1" nolabel="1" widget="date"/></strong>.
+                        </div>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="faculty_evaluation_view_list" model="ir.ui.view">
+        <field name="name">faculty.evaluation.view.list</field>
+        <field name="model">faculty.evaluation</field>
+        <field name="arch" type="xml">
+            <list string="Faculty Evaluations"
+                  default_order="evaluation_date desc"
+                  multi_edit="1"
+                  sample="1"
+                  decoration-success="state == 'approved'"
+                  decoration-info="state == 'reviewed'"
+                  decoration-warning="state == 'submitted'"
+                  decoration-muted="state == 'draft'">
+                <field name="name"/>
+                <field name="faculty_id"/>
+                <field name="department_id" optional="show"/>
+                <field name="designation_id" optional="hide"/>
+                <field name="evaluation_type"/>
+                <field name="evaluation_period" optional="show"/>
+                <field name="evaluation_date"/>
+                <field name="academic_year_id" optional="hide"/>
+                <field name="semester_id" optional="hide"/>
+                <field name="overall_rating" optional="show"
+                       avg="Average Rating"/>
+                <field name="performance_grade" optional="show"
+                       widget="badge"
+                       decoration-success="performance_grade == 'outstanding'"
+                       decoration-info="performance_grade == 'excellent'"
+                       decoration-primary="performance_grade == 'good'"
+                       decoration-warning="performance_grade == 'satisfactory'"
+                       decoration-danger="performance_grade == 'needs_improvement'"/>
+                <field name="evaluated_by" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'approved'"
+                       decoration-info="state == 'reviewed'"
+                       decoration-warning="state == 'submitted'"
+                       decoration-muted="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="faculty_evaluation_view_search" model="ir.ui.view">
+        <field name="name">faculty.evaluation.view.search</field>
+        <field name="model">faculty.evaluation</field>
+        <field name="arch" type="xml">
+            <search string="Search Faculty Evaluations">
+                <field name="name"/>
+                <field name="faculty_id"/>
+                <field name="department_id"/>
+                <field name="designation_id"/>
+                <field name="evaluation_type"/>
+
+                <separator/>
+
+                <filter name="filter_draft" string="Draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_submitted" string="Submitted"
+                        domain="[('state', '=', 'submitted')]"/>
+                <filter name="filter_reviewed" string="Reviewed"
+                        domain="[('state', '=', 'reviewed')]"/>
+                <filter name="filter_approved" string="Approved"
+                        domain="[('state', '=', 'approved')]"/>
+
+                <separator/>
+
+                <filter name="filter_student_feedback" string="Student Feedback"
+                        domain="[('evaluation_type', '=', 'student')]"/>
+                <filter name="filter_peer_review" string="Peer Review"
+                        domain="[('evaluation_type', '=', 'peer')]"/>
+                <filter name="filter_hod_assessment" string="HOD Assessment"
+                        domain="[('evaluation_type', '=', 'hod')]"/>
+                <filter name="filter_self_assessment" string="Self Assessment"
+                        domain="[('evaluation_type', '=', 'self')]"/>
+                <filter name="filter_annual_review" string="Annual Performance Review"
+                        domain="[('evaluation_type', '=', 'annual')]"/>
+
+                <separator/>
+
+                <filter name="filter_monthly" string="Monthly"
+                        domain="[('evaluation_period', '=', 'monthly')]"/>
+                <filter name="filter_quarterly" string="Quarterly"
+                        domain="[('evaluation_period', '=', 'quarterly')]"/>
+                <filter name="filter_semester" string="Semester"
+                        domain="[('evaluation_period', '=', 'semester')]"/>
+                <filter name="filter_annual" string="Annual"
+                        domain="[('evaluation_period', '=', 'annual')]"/>
+
+                <separator/>
+
+                <filter name="filter_outstanding" string="Outstanding"
+                        domain="[('performance_grade', '=', 'outstanding')]"/>
+                <filter name="filter_excellent" string="Excellent"
+                        domain="[('performance_grade', '=', 'excellent')]"/>
+                <filter name="filter_good" string="Good"
+                        domain="[('performance_grade', '=', 'good')]"/>
+                <filter name="filter_satisfactory" string="Satisfactory"
+                        domain="[('performance_grade', '=', 'satisfactory')]"/>
+                <filter name="filter_needs_improvement" string="Needs Improvement"
+                        domain="[('performance_grade', '=', 'needs_improvement')]"/>
+
+                <separator/>
+
+                <filter name="filter_this_month" string="This Month"
+                        domain="[('evaluation_date', '&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d')),
+                                 ('evaluation_date', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_this_year" string="This Year"
+                        domain="[('evaluation_date', '&gt;=', (context_today() + relativedelta(month=1, day=1)).strftime('%Y-%m-%d')),
+                                 ('evaluation_date', '&lt;=', (context_today() + relativedelta(month=12, day=31)).strftime('%Y-%m-%d'))]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_faculty" string="Faculty"
+                            context="{'group_by': 'faculty_id'}"/>
+                    <filter name="group_by_department" string="Department"
+                            context="{'group_by': 'department_id'}"/>
+                    <filter name="group_by_evaluation_type" string="Evaluation Type"
+                            context="{'group_by': 'evaluation_type'}"/>
+                    <filter name="group_by_period" string="Evaluation Period"
+                            context="{'group_by': 'evaluation_period'}"/>
+                    <filter name="group_by_grade" string="Performance Grade"
+                            context="{'group_by': 'performance_grade'}"/>
+                    <filter name="group_by_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_by_academic_year" string="Academic Year"
+                            context="{'group_by': 'academic_year_id'}"/>
+                    <filter name="group_by_semester" string="Semester"
+                            context="{'group_by': 'semester_id'}"/>
+                    <filter name="group_by_date" string="Evaluation Date"
+                            context="{'group_by': 'evaluation_date'}"/>
+                    <filter name="group_by_month" string="Month"
+                            context="{'group_by': 'evaluation_date:month'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="department_id" string="Department"
+                           select="multi"
+                           icon="fa-building"/>
+                    <field name="evaluation_type" string="Evaluation Type"
+                           select="multi"
+                           icon="fa-clipboard"/>
+                    <field name="performance_grade" string="Performance Grade"
+                           select="multi"
+                           icon="fa-star"/>
+                    <field name="state" string="Status"
+                           select="multi"
+                           icon="fa-filter"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="faculty_evaluation_view_kanban" model="ir.ui.view">
+        <field name="name">faculty.evaluation.view.kanban</field>
+        <field name="model">faculty.evaluation</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="state"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="faculty_id"/>
+                <field name="department_id"/>
+                <field name="designation_id"/>
+                <field name="evaluation_type"/>
+                <field name="evaluation_period"/>
+                <field name="evaluation_date"/>
+                <field name="overall_rating"/>
+                <field name="performance_grade"/>
+                <field name="state"/>
+
+                <progressbar field="state"
+                             colors='{"draft": "muted", "submitted": "warning", "reviewed": "info", "approved": "success"}'/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="faculty_id"/>
+                                        </strong>
+                                        <div class="text-muted">
+                                            <field name="name"/>
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_record_top_right">
+                                        <field name="state" widget="badge"
+                                               decoration-success="state == 'approved'"
+                                               decoration-info="state == 'reviewed'"
+                                               decoration-warning="state == 'submitted'"
+                                               decoration-muted="state == 'draft'"/>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body">
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <i class="fa fa-building text-primary"/>
+                                            <field name="department_id"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-6">
+                                            <i class="fa fa-clipboard text-info"/>
+                                            <field name="evaluation_type"/>
+                                        </div>
+                                        <div class="col-6">
+                                            <i class="fa fa-calendar text-secondary"/>
+                                            <field name="evaluation_period"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <i class="fa fa-calendar-o text-warning"/>
+                                            Date: <field name="evaluation_date"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-6">
+                                            <div class="text-center">
+                                                <i class="fa fa-star text-warning"/>
+                                                <div><strong><field name="overall_rating"/>/10</strong></div>
+                                                <div class="text-muted small">Rating</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="text-center">
+                                                <field name="performance_grade" widget="badge"
+                                                       decoration-success="performance_grade == 'outstanding'"
+                                                       decoration-info="performance_grade == 'excellent'"
+                                                       decoration-primary="performance_grade == 'good'"
+                                                       decoration-warning="performance_grade == 'satisfactory'"
+                                                       decoration-danger="performance_grade == 'needs_improvement'"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="faculty_evaluation_view_pivot" model="ir.ui.view">
+        <field name="name">faculty.evaluation.view.pivot</field>
+        <field name="model">faculty.evaluation</field>
+        <field name="arch" type="xml">
+            <pivot string="Evaluation Analysis">
+                <field name="faculty_id" type="row"/>
+                <field name="evaluation_period" type="col"/>
+                <field name="overall_rating" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View -->
+    <record id="faculty_evaluation_view_graph" model="ir.ui.view">
+        <field name="name">faculty.evaluation.view.graph</field>
+        <field name="model">faculty.evaluation</field>
+        <field name="arch" type="xml">
+            <graph string="Evaluation Statistics" type="bar">
+                <field name="faculty_id"/>
+                <field name="overall_rating" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_faculty_evaluation" model="ir.actions.act_window">
+        <field name="name">Faculty Evaluations</field>
+        <field name="res_model">faculty.evaluation</field>
+        <field name="view_mode">list,kanban,form,pivot,graph</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create Faculty Evaluation
+            </p>
+            <p>
+                Conduct comprehensive faculty performance evaluations with multiple criteria
+                including teaching quality, subject knowledge, communication skills, punctuality,
+                and more. Track evaluations by type: Student Feedback, Peer Review, HOD Assessment,
+                Self Assessment, or Annual Performance Review.
+            </p>
+        </field>
+    </record>
+
+</odoo>

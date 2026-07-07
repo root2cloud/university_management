@@ -1,0 +1,522 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="student_discipline_view_form" model="ir.ui.view">
+        <field name="name">student.discipline.view.form</field>
+        <field name="model">student.discipline</field>
+        <field name="arch" type="xml">
+            <form string="Student Discipline">
+                <header>
+                    <button name="action_report" string="Report"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_review" string="Review"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'reported'"/>
+                    <button name="action_take_action" string="Take Action"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'under_review'"/>
+                    <button name="action_resolve" string="Resolve"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'action_taken'"/>
+                    <button name="action_close" string="Close"
+                            type="object"
+                            invisible="state != 'resolved'"/>
+                    <button name="action_notify_parent" string="Notify Parent"
+                            type="object"
+                            icon="fa-envelope"
+                            invisible="parent_notified"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft"
+                            type="object"
+                            invisible="state == 'draft'"
+                            confirm="Are you sure you want to reset this record to draft?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,reported,under_review,action_taken,resolved,closed"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Critical"
+                            bg_color="text-bg-danger"
+                            invisible="severity != 'critical'"/>
+                    <widget name="web_ribbon" title="Major"
+                            bg_color="text-bg-warning"
+                            invisible="severity != 'major'"/>
+
+                    <div class="oe_title">
+                        <label for="student_id" string="Student"/>
+                        <h1>
+                            <field name="student_id"
+                                   placeholder="Select Student"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                        </h1>
+                        <h2>
+                            <field name="name" readonly="1"/>
+                        </h2>
+                    </div>
+
+                    <group>
+                        <group string="Student Information">
+                            <field name="registration_number" readonly="1"/>
+                            <field name="program_id" readonly="1"/>
+                            <field name="department_id" readonly="1"/>
+                        </group>
+                        <group string="Incident Details">
+                            <field name="incident_date" widget="date"/>
+                            <field name="incident_time" widget="float_time"/>
+                            <field name="incident_location" placeholder="e.g., Classroom 101, Library, Hostel"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Incident Classification">
+                            <field name="incident_type"/>
+                            <field name="severity" widget="selection"
+                                   decoration-info="severity == 'minor'"
+                                   decoration-warning="severity == 'moderate'"
+                                   decoration-danger="severity in ['major', 'critical']"/>
+                        </group>
+                        <group string="Reporting Information">
+                            <field name="reported_by" readonly="1"/>
+                            <field name="faculty_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Incident Description" name="description">
+                            <field name="description"
+                                   placeholder="Provide detailed description of the incident..."/>
+                        </page>
+
+                        <page string="Action Taken" name="action">
+                            <group>
+                                <group string="Action Details">
+                                    <field name="action_type"/>
+                                    <field name="action_description"
+                                           placeholder="Describe the action taken..."/>
+                                </group>
+                                <group string="Approval">
+                                    <field name="approved_by" readonly="1"/>
+                                    <field name="approval_date" widget="date" readonly="1"/>
+                                </group>
+                            </group>
+
+                            <separator string="Fine/Penalty Details"
+                                       invisible="action_type != 'fine'"/>
+                            <group invisible="action_type != 'fine'">
+                                <group>
+                                    <field name="fine_amount" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="currency_id" invisible="1"/>
+                                </group>
+                                <group>
+                                    <field name="fine_paid" widget="boolean_toggle"/>
+                                </group>
+                            </group>
+
+                            <separator string="Suspension Details"
+                                       invisible="action_type != 'suspension'"/>
+                            <group invisible="action_type != 'suspension'">
+                                <group>
+                                    <field name="suspension_start" widget="date"/>
+                                    <field name="suspension_end" widget="date"/>
+                                </group>
+                                <group>
+                                    <field name="suspension_days" readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Witnesses" name="witnesses">
+                            <field name="witness_ids" mode="kanban">
+                                <kanban>
+                                    <field name="name"/>
+                                    <field name="registration_number"/>
+                                    <field name="program_id"/>
+                                    <templates>
+                                        <t t-name="kanban-box">
+                                            <div class="oe_kanban_card">
+                                                <div class="oe_kanban_content">
+                                                    <div class="o_kanban_record_title">
+                                                        <strong><field name="name"/></strong>
+                                                    </div>
+                                                    <div class="text-muted">
+                                                        <field name="registration_number"/>
+                                                    </div>
+                                                    <div>
+                                                        <field name="program_id"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </templates>
+                                </kanban>
+                            </field>
+                        </page>
+
+                        <page string="Parent Communication" name="parent">
+                            <group>
+                                <group>
+                                    <field name="parent_notified" widget="boolean_toggle"/>
+                                    <field name="parent_meeting_date" widget="date"
+                                           invisible="not parent_notified"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="parent_response"
+                                       placeholder="Enter parent's response or feedback..."
+                                       invisible="not parent_notified"/>
+                            </group>
+                        </page>
+
+                        <page string="Follow-up" name="followup">
+                            <group>
+                                <group>
+                                    <field name="follow_up_required" widget="boolean_toggle"/>
+                                    <field name="follow_up_date" widget="date"
+                                           invisible="not follow_up_required"/>
+                                </group>
+                            </group>
+                            <group invisible="not follow_up_required">
+                                <field name="follow_up_notes"
+                                       placeholder="Enter follow-up notes..."/>
+                            </group>
+                        </page>
+
+                        <page string="Evidence/Attachments" name="attachments">
+                            <field name="attachment_ids" widget="many2many_binary"
+                                   nolabel="1"/>
+                        </page>
+
+                        <page string="Notes" name="notes">
+                            <field name="notes"
+                                   placeholder="Enter additional notes or observations..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="student_discipline_view_list" model="ir.ui.view">
+        <field name="name">student.discipline.view.list</field>
+        <field name="model">student.discipline</field>
+        <field name="arch" type="xml">
+            <list string="Discipline Records"
+                  default_order="incident_date desc"
+                  multi_edit="1"
+                  sample="1">
+                <field name="name"/>
+                <field name="incident_date"/>
+                <field name="student_id"/>
+                <field name="registration_number" optional="show"/>
+                <field name="program_id" optional="hide"/>
+                <field name="department_id" optional="hide"/>
+                <field name="incident_type" optional="show"/>
+                <field name="severity" widget="badge"
+                       decoration-info="severity == 'minor'"
+                       decoration-warning="severity == 'moderate'"
+                       decoration-danger="severity in ['major', 'critical']"/>
+                <field name="action_type" optional="show"/>
+                <field name="reported_by" optional="hide"/>
+                <field name="faculty_id" optional="hide"/>
+                <field name="parent_notified" widget="boolean_toggle" optional="show"/>
+                <field name="fine_amount" widget="monetary" optional="hide" sum="Total Fine"/>
+                <field name="fine_paid" widget="boolean_toggle" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'reported'"
+                       decoration-warning="state == 'under_review'"
+                       decoration-primary="state == 'action_taken'"
+                       decoration-success="state == 'resolved'"
+                       decoration-muted="state == 'closed'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="student_discipline_view_search" model="ir.ui.view">
+        <field name="name">student.discipline.view.search</field>
+        <field name="model">student.discipline</field>
+        <field name="arch" type="xml">
+            <search string="Search Discipline Records">
+                <field name="name" string="Incident"
+                       filter_domain="['|', ('name', 'ilike', self), ('student_id', 'ilike', self)]"/>
+                <field name="student_id"/>
+                <field name="registration_number"/>
+                <field name="incident_type"/>
+                <field name="reported_by"/>
+                <field name="faculty_id"/>
+
+                <separator/>
+
+                <filter name="filter_reported" string="Reported"
+                        domain="[('state', '=', 'reported')]"/>
+                <filter name="filter_under_review" string="Under Review"
+                        domain="[('state', '=', 'under_review')]"/>
+                <filter name="filter_action_taken" string="Action Taken"
+                        domain="[('state', '=', 'action_taken')]"/>
+                <filter name="filter_resolved" string="Resolved"
+                        domain="[('state', '=', 'resolved')]"/>
+                <filter name="filter_closed" string="Closed"
+                        domain="[('state', '=', 'closed')]"/>
+
+                <separator/>
+
+                <filter name="filter_minor" string="Minor"
+                        domain="[('severity', '=', 'minor')]"/>
+                <filter name="filter_moderate" string="Moderate"
+                        domain="[('severity', '=', 'moderate')]"/>
+                <filter name="filter_major" string="Major"
+                        domain="[('severity', '=', 'major')]"/>
+                <filter name="filter_critical" string="Critical"
+                        domain="[('severity', '=', 'critical')]"/>
+
+                <separator/>
+
+                <filter name="filter_attendance" string="Poor Attendance"
+                        domain="[('incident_type', '=', 'attendance')]"/>
+                <filter name="filter_misbehavior" string="Misbehavior"
+                        domain="[('incident_type', '=', 'misbehavior')]"/>
+                <filter name="filter_cheating" string="Cheating"
+                        domain="[('incident_type', '=', 'cheating')]"/>
+                <filter name="filter_violence" string="Violence"
+                        domain="[('incident_type', '=', 'violence')]"/>
+                <filter name="filter_ragging" string="Ragging"
+                        domain="[('incident_type', '=', 'ragging')]"/>
+
+                <separator/>
+
+                <filter name="filter_parent_notified" string="Parent Notified"
+                        domain="[('parent_notified', '=', True)]"/>
+                <filter name="filter_parent_pending" string="Parent Not Notified"
+                        domain="[('parent_notified', '=', False)]"/>
+
+                <filter name="filter_fine_unpaid" string="Fine Unpaid"
+                        domain="[('action_type', '=', 'fine'), ('fine_paid', '=', False)]"/>
+                <filter name="filter_suspension" string="Suspension"
+                        domain="[('action_type', '=', 'suspension')]"/>
+
+                <separator/>
+
+                <filter name="filter_follow_up" string="Follow-up Required"
+                        domain="[('follow_up_required', '=', True)]"/>
+
+                <separator/>
+
+                <filter name="filter_today" string="Today"
+                        domain="[('incident_date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_this_week" string="This Week"
+                        domain="[('incident_date', '&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d')),
+                                 ('incident_date', '&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_this_month" string="This Month"
+                        domain="[('incident_date', '&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d')),
+                                 ('incident_date', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d'))]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_student" string="Student"
+                            context="{'group_by': 'student_id'}"/>
+                    <filter name="group_by_incident_type" string="Incident Type"
+                            context="{'group_by': 'incident_type'}"/>
+                    <filter name="group_by_severity" string="Severity"
+                            context="{'group_by': 'severity'}"/>
+                    <filter name="group_by_action_type" string="Action Type"
+                            context="{'group_by': 'action_type'}"/>
+                    <filter name="group_by_program" string="Program"
+                            context="{'group_by': 'program_id'}"/>
+                    <filter name="group_by_department" string="Department"
+                            context="{'group_by': 'department_id'}"/>
+                    <filter name="group_by_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_by_reported_by" string="Reported By"
+                            context="{'group_by': 'reported_by'}"/>
+                    <filter name="group_by_faculty" string="Faculty"
+                            context="{'group_by': 'faculty_id'}"/>
+                    <filter name="group_by_date" string="Incident Date"
+                            context="{'group_by': 'incident_date'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="severity" string="Severity"
+                           select="multi"
+                           icon="fa-exclamation-triangle"/>
+                    <field name="incident_type" string="Incident Type"
+                           select="multi"
+                           icon="fa-warning"/>
+                    <field name="state" string="Status"
+                           select="multi"
+                           icon="fa-filter"/>
+                    <field name="program_id" string="Program"
+                           select="multi"
+                           icon="fa-graduation-cap"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="student_discipline_view_kanban" model="ir.ui.view">
+        <field name="name">student.discipline.view.kanban</field>
+        <field name="model">student.discipline</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="severity"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="registration_number"/>
+                <field name="incident_date"/>
+                <field name="incident_type"/>
+                <field name="severity"/>
+                <field name="action_type"/>
+                <field name="parent_notified"/>
+                <field name="state"/>
+
+                <progressbar field="state"
+                             colors='{"reported": "info", "under_review": "warning", "action_taken": "primary", "resolved": "success", "closed": "muted"}'/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="student_id"/>
+                                        </strong>
+                                        <div class="text-muted">
+                                            <field name="name"/>
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_record_top_right">
+                                        <field name="severity" widget="badge"
+                                               decoration-info="severity == 'minor'"
+                                               decoration-warning="severity == 'moderate'"
+                                               decoration-danger="severity in ['major', 'critical']"/>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body">
+                                    <div class="row mb-2">
+                                        <div class="col-6">
+                                            <i class="fa fa-calendar text-primary"/>
+                                            <field name="incident_date"/>
+                                        </div>
+                                        <div class="col-6">
+                                            <i class="fa fa-warning text-danger"/>
+                                            <field name="incident_type"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.action_type.raw_value">
+                                        <div class="col-12">
+                                            <i class="fa fa-gavel text-info"/>
+                                            Action: <field name="action_type"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <span t-if="record.parent_notified.raw_value"
+                                                  class="badge text-bg-success">
+                                                <i class="fa fa-check"/> Parent Notified
+                                            </span>
+                                            <span t-else="" class="badge text-bg-warning">
+                                                <i class="fa fa-clock-o"/> Notify Parent
+                                            </span>
+                                        </div>
+                                        <div class="col-6">
+                                            <field name="state" widget="badge"
+                                                   decoration-info="state == 'reported'"
+                                                   decoration-warning="state == 'under_review'"
+                                                   decoration-primary="state == 'action_taken'"
+                                                   decoration-success="state == 'resolved'"
+                                                   decoration-muted="state == 'closed'"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Calendar View -->
+    <record id="student_discipline_view_calendar" model="ir.ui.view">
+        <field name="name">student.discipline.view.calendar</field>
+        <field name="model">student.discipline</field>
+        <field name="arch" type="xml">
+            <calendar string="Discipline Incidents"
+                      date_start="incident_date"
+                      color="severity"
+                      mode="month"
+                      event_open_popup="true"
+                      quick_create="false">
+                <field name="student_id"/>
+                <field name="name"/>
+                <field name="incident_type"/>
+                <field name="severity"/>
+                <field name="action_type"/>
+                <field name="state"/>
+                <field name="reported_by"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="student_discipline_view_pivot" model="ir.ui.view">
+        <field name="name">student.discipline.view.pivot</field>
+        <field name="model">student.discipline</field>
+        <field name="arch" type="xml">
+            <pivot string="Discipline Analysis">
+                <field name="incident_type" type="row"/>
+                <field name="severity" type="row"/>
+                <field name="program_id" type="col"/>
+                <field name="state" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View -->
+    <record id="student_discipline_view_graph" model="ir.ui.view">
+        <field name="name">student.discipline.view.graph</field>
+        <field name="model">student.discipline</field>
+        <field name="arch" type="xml">
+            <graph string="Discipline Statistics" type="bar" stacked="1">
+                <field name="incident_type"/>
+                <field name="severity"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_student_discipline" model="ir.actions.act_window">
+        <field name="name">Discipline Records</field>
+        <field name="res_model">student.discipline</field>
+        <field name="view_mode">kanban,list,form,calendar,pivot,graph</field>
+        <field name="context">{
+            'search_default_filter_reported': 1,
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Discipline Record
+            </p>
+            <p>
+                Track student discipline incidents, manage actions taken,
+                notify parents, and maintain comprehensive records for student conduct management.
+            </p>
+        </field>
+    </record>
+
+</odoo>

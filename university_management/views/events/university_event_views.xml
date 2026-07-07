@@ -1,0 +1,708 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View - University Event -->
+    <record id="university_event_view_form" model="ir.ui.view">
+        <field name="name">university.event.view.form</field>
+        <field name="model">university.event</field>
+        <field name="arch" type="xml">
+            <form string="University Event">
+                <header>
+                    <button name="action_publish" string="Publish" type="object"
+                            class="btn-primary"
+                            invisible="state != 'draft'"
+                            confirm="Publish this event?"/>
+                    <button name="action_open_registration" string="Open Registration" type="object"
+                            class="btn-success"
+                            invisible="state not in ['published', 'registration_closed']"
+                            confirm="Open registration for this event?"/>
+                    <button name="action_close_registration" string="Close Registration" type="object"
+                            class="btn-warning"
+                            invisible="state != 'registration_open'"
+                            confirm="Close registration for this event?"/>
+                    <button name="action_start_event" string="Start Event" type="object"
+                            class="btn-info"
+                            invisible="state not in ['registration_open', 'registration_closed']"
+                            confirm="Start this event?"/>
+                    <button name="action_complete" string="Mark as Completed" type="object"
+                            class="btn-success"
+                            invisible="state != 'ongoing'"
+                            confirm="Mark this event as completed?"/>
+                    <button name="action_cancel" string="Cancel Event" type="object"
+                            class="btn-danger"
+                            invisible="state in ['completed', 'cancelled']"
+                            confirm="Are you sure you want to cancel this event?"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft"
+                            type="object"
+                            invisible="state == 'draft'"
+                            confirm="Are you sure you want to reset this Event to draft?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,published,registration_open,ongoing,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_event_registration" type="object"
+                                class="oe_stat_button"
+                                icon="fa-users">
+                            <field name="total_registrations" widget="statinfo"
+                                   string="Registrations"/>
+                        </button>
+                        <button name="toggle_website_published" type="object"
+                                class="oe_stat_button"
+                                icon="fa-globe">
+                            <field name="website_published" widget="website_button"/>
+                        </button>
+                    </div>
+
+                    <widget name="web_ribbon" title="Cancelled" bg_color="text-bg-danger"
+                            invisible="state != 'cancelled'"/>
+                    <widget name="web_ribbon" title="Completed" bg_color="text-bg-success"
+                            invisible="state != 'completed'"/>
+
+                    <field name="poster" widget="image" class="oe_avatar"
+                           options="{'preview_image': 'poster', 'size': [150, 150]}"/>
+
+                    <div class="oe_title">
+                        <label for="name" string="Event Name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g., Tech Fest 2025" required="1"/>
+                        </h1>
+                        <div class="o_row">
+                            <field name="event_code" readonly="1"/>
+                        </div>
+                    </div>
+
+                    <group>
+                        <group string="Event Details">
+                            <field name="event_type"/>
+                            <field name="category"/>
+                            <field name="start" required="1"/>
+                            <field name="stop" required="1"/>
+                        </group>
+                        <group string="Organizer">
+                            <field name="organized_by"/>
+                            <field name="department_id"
+                                   invisible="organized_by != 'department'"
+                                   required="organized_by == 'department'"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="club_name"
+                                   invisible="organized_by != 'club'"
+                                   required="organized_by == 'club'"
+                                   placeholder="e.g., Technical Club"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Details" name="details">
+                            <group>
+                                <group string="Venue">
+                                    <field name="venue_type"/>
+                                    <field name="location" string="Venue Name"
+                                           placeholder="e.g., Main Auditorium"/>
+                                    <field name="venue_address"
+                                           invisible="venue_type == 'online'"
+                                           placeholder="Enter complete venue address..."/>
+                                    <field name="online_meeting_url"
+                                           widget="url"
+                                           invisible="venue_type == 'offline'"
+                                           placeholder="https://meet.google.com/xxx-xxxx-xxx"/>
+                                </group>
+                                <group string="Target Audience">
+                                    <field name="target_audience"/>
+                                    <field name="target_program_ids" widget="many2many_tags"
+                                           invisible="target_audience == 'faculty'"/>
+                                    <field name="target_year"
+                                           invisible="target_audience in ['faculty', 'external']"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="description" nolabel="1"
+                                       placeholder="Describe the event, objectives, activities, etc..."/>
+                            </group>
+                            <group>
+                                <field name="agenda" nolabel="1"
+                                       placeholder="Add event agenda/schedule with timings..."/>
+                            </group>
+                        </page>
+
+                        <page string="Coordinators" name="coordinators">
+                            <group>
+                                <group string="Faculty Coordinators">
+                                    <field name="coordinator_ids" nolabel="1"
+                                           widget="many2many_tags"
+                                           options="{'no_create': True, 'no_create_edit': True}">
+                                        <list>
+                                            <field name="name"/>
+                                            <field name="employee_id"/>
+                                            <field name="department_id"/>
+                                            <field name="designation_id"/>
+                                            <field name="work_mobile"/>
+                                            <field name="work_email"/>
+                                        </list>
+                                    </field>
+                                </group>
+                                <group string="Student Coordinators">
+                                    <field name="student_coordinator_ids" nolabel="1"
+                                           widget="many2many_tags"
+                                           options="{'no_create': True, 'no_create_edit': True, 'color_field': 'color'}">
+                                        <list>
+                                            <field name="name"/>
+                                            <field name="registration_number"/>
+                                            <field name="program_id"/>
+                                            <field name="department_id"/>
+                                            <field name="personal_mobile"/>
+                                            <field name="personal_email"/>
+                                        </list>
+                                    </field>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Registration" name="registration">
+                            <group>
+                                <group string="Registration Settings">
+                                    <field name="requires_registration"/>
+                                    <field name="registration_open"
+                                           invisible="requires_registration == False"/>
+                                    <field name="registration_start"
+                                           invisible="requires_registration == False"/>
+                                    <field name="registration_end"
+                                           invisible="requires_registration == False"/>
+                                    <field name="max_participants"
+                                           invisible="requires_registration == False"/>
+                                </group>
+                                <group string="Registration Fee">
+                                    <field name="has_registration_fee"/>
+                                    <field name="currency_id" invisible="1"/>
+                                    <field name="registration_fee"
+                                           widget="monetary"
+                                           invisible="has_registration_fee == False"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                </group>
+                            </group>
+                            <group string="Registrations" invisible="requires_registration == False">
+                                <field name="registration_ids" nolabel="1">
+                                    <list>
+                                        <field name="student_id"/>
+                                        <field name="registration_date"/>
+                                        <field name="state" widget="badge"/>
+                                        <field name="payment_reference" widget="badge" optional="show"/>
+                                    </list>
+                                </field>
+                            </group>
+                        </page>
+
+                        <page string="Guest Speaker" name="guest_speaker">
+                            <group>
+                                <field name="has_guest_speaker"/>
+                            </group>
+                            <group invisible="has_guest_speaker == False">
+                                <group string="Speaker Details">
+                                    <field name="speaker_name" placeholder="Speaker Name"/>
+                                    <field name="speaker_designation"
+                                           placeholder="e.g., CEO, Tech Solutions Pvt. Ltd."/>
+                                </group>
+                            </group>
+                            <group invisible="has_guest_speaker == False">
+                                <field name="speaker_bio" nolabel="1"
+                                       placeholder="Add speaker biography, achievements, expertise, etc..."/>
+                            </group>
+                        </page>
+
+                        <page string="Budget &amp; Sponsors" name="budget">
+                            <group>
+                                <group string="Budget">
+                                    <field name="currency_id" invisible="1"/>
+                                    <field name="estimated_budget" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                    <field name="actual_expense" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"/>
+                                </group>
+                            </group>
+                            <group string="Sponsors">
+                                <field name="sponsor_ids" nolabel="1">
+                                    <list editable="bottom">
+                                        <field name="sponsor_type"/>
+                                        <field name="name"/>
+                                        <field name="contribution_amount"/>
+                                        <field name="contact_person"/>
+                                        <field name="contact_phone"/>
+                                    </list>
+                                </field>
+                            </group>
+                        </page>
+
+                        <page string="Certificate &amp; Feedback" name="certificate">
+                            <group>
+                                <group string="Certificate">
+                                    <field name="provides_certificate"/>
+                                    <field name="certificate_template"
+                                           invisible="provides_certificate == False"
+                                           filename="certificate_template_filename"/>
+                                </group>
+                                <group string="Feedback">
+                                    <field name="feedback_survey_id"
+                                           options="{'no_create': True, 'no_create_edit': True}"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Attachments" name="attachments">
+                            <group>
+                                <group string="Event Materials">
+                                    <field name="poster" filename="poster_filename"/>
+                                    <field name="brochure" filename="brochure_filename"/>
+                                </group>
+                            </group>
+                            <group string="Event Photos Gallery">
+                                <field name="photo_ids" nolabel="1" widget="many2many_binary"/>
+                            </group>
+                        </page>
+
+                        <page string="Calendar Integration" name="calendar">
+                            <group>
+                                <group string="Calendar Event">
+                                    <field name="calendar_event_id" invisible="1"/>
+                                    <field name="allday"/>
+                                    <field name="duration" widget="float_time"/>
+                                </group>
+                                <group string="Reminders">
+                                    <field name="alarm_ids" widget="many2many_tags"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="description" string="Calendar Description"/>
+                            </group>
+                        </page>
+
+                        <page string="Remarks" name="remarks">
+                            <group>
+                                <field name="remarks" nolabel="1"
+                                       placeholder="Add remarks, special notes, instructions, etc..."/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View - University Event -->
+    <record id="university_event_view_list" model="ir.ui.view">
+        <field name="name">university.event.view.list</field>
+        <field name="model">university.event</field>
+        <field name="arch" type="xml">
+            <list string="University Events"
+                  default_order="start desc"
+                  multi_edit="1"
+                  sample="1"
+                  decoration-info="state == 'draft'"
+                  decoration-primary="state == 'published'"
+                  decoration-success="state in ['registration_open', 'ongoing']"
+                  decoration-muted="state in ['completed', 'cancelled']">
+                <field name="event_code"/>
+                <field name="name"/>
+                <field name="event_type"/>
+                <field name="category" optional="show"/>
+                <field name="start"/>
+                <field name="stop" optional="hide"/>
+                <field name="venue_type" optional="show"/>
+                <field name="location" optional="show"/>
+                <field name="organized_by" optional="show"/>
+                <field name="department_id" optional="hide"/>
+                <field name="total_registrations" optional="show"/>
+                <field name="max_participants" optional="hide"/>
+                <field name="website_published" optional="show" widget="boolean_toggle"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-primary="state == 'published'"
+                       decoration-warning="state == 'registration_open'"
+                       decoration-danger="state == 'registration_closed'"
+                       decoration-success="state in ['ongoing', 'completed']"
+                       decoration-muted="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View - University Event -->
+    <record id="university_event_view_search" model="ir.ui.view">
+        <field name="name">university.event.view.search</field>
+        <field name="model">university.event</field>
+        <field name="arch" type="xml">
+            <search string="Search Events">
+                <field name="name"/>
+                <field name="event_code"/>
+                <field name="event_type"/>
+                <field name="department_id"/>
+                <field name="coordinator_ids"/>
+
+                <separator/>
+
+                <filter name="filter_draft" string="Draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_published" string="Published"
+                        domain="[('state', '=', 'published')]"/>
+                <filter name="filter_registration_open" string="Registration Open"
+                        domain="[('state', '=', 'registration_open')]"/>
+                <filter name="filter_ongoing" string="Ongoing"
+                        domain="[('state', '=', 'ongoing')]"/>
+                <filter name="filter_completed" string="Completed"
+                        domain="[('state', '=', 'completed')]"/>
+                <filter name="filter_cancelled" string="Cancelled"
+                        domain="[('state', '=', 'cancelled')]"/>
+
+                <separator/>
+
+                <filter name="filter_upcoming" string="Upcoming Events"
+                        domain="[('start', '&gt;=', context_today())]"/>
+                <filter name="filter_past" string="Past Events"
+                        domain="[('start', '&lt;', context_today())]"/>
+                <filter name="filter_this_week" string="This Week"
+                        domain="[('start', '&gt;=', (context_today() - relativedelta(weeks=0, weekday=0)).strftime('%Y-%m-%d')), ('start', '&lt;=', (context_today() - relativedelta(weeks=0, weekday=6)).strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_this_month" string="This Month"
+                        domain="[('start', '&gt;=', context_today().strftime('%Y-%m-01')), ('start', '&lt;', (context_today() + relativedelta(months=1)).strftime('%Y-%m-01'))]"/>
+
+
+                <separator/>
+
+                <filter name="filter_website_published" string="Published on Website"
+                        domain="[('website_published', '=', True)]"/>
+                <filter name="filter_registration_required" string="Requires Registration"
+                        domain="[('requires_registration', '=', True)]"/>
+                <filter name="filter_has_fee" string="Has Registration Fee"
+                        domain="[('has_registration_fee', '=', True)]"/>
+                <filter name="filter_guest_speaker" string="Has Guest Speaker"
+                        domain="[('has_guest_speaker', '=', True)]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_event_type" string="Event Type"
+                            context="{'group_by': 'event_type'}"/>
+                    <filter name="group_by_category" string="Category"
+                            context="{'group_by': 'category'}"/>
+                    <filter name="group_by_organized_by" string="Organized By"
+                            context="{'group_by': 'organized_by'}"/>
+                    <filter name="group_by_department" string="Department"
+                            context="{'group_by': 'department_id'}"/>
+                    <filter name="group_by_venue_type" string="Venue Type"
+                            context="{'group_by': 'venue_type'}"/>
+                    <filter name="group_by_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_by_start_date" string="Start Date"
+                            context="{'group_by': 'start'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="event_type" string="Event Type"
+                           select="multi"
+                           operator="in"
+                           icon="fa-calendar"/>
+                    <field name="category" string="Category"
+                           select="multi"
+                           operator="in"
+                           icon="fa-tags"/>
+                    <field name="state" string="Status"
+                           select="multi"
+                           icon="fa-flag"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View - University Event -->
+    <record id="university_event_view_kanban" model="ir.ui.view">
+        <field name="name">university.event.view.kanban</field>
+        <field name="model">university.event</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="event_type"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="event_code"/>
+                <field name="event_type"/>
+                <field name="category"/>
+                <field name="start"/>
+                <field name="stop"/>
+                <field name="venue_type"/>
+                <field name="location"/>
+                <field name="organized_by"/>
+                <field name="department_id"/>
+                <field name="total_registrations"/>
+                <field name="max_participants"/>
+                <field name="website_published"/>
+                <field name="state"/>
+                <field name="poster"/>
+                <field name="activity_ids"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_image" t-if="record.poster.raw_value">
+                                <img t-att-src="kanban_image('university.event', 'poster', record.id.raw_value)"
+                                     alt="Event Poster" class="o_image_64_cover"/>
+                            </div>
+                            <div class="o_kanban_image" t-if="!record.poster.raw_value">
+                                <div class="d-flex align-items-center justify-content-center bg-secondary text-white"
+                                     style="width: 64px; height: 64px; font-size: 32px;">
+                                    <i class="fa fa-calendar"/>
+                                </div>
+                            </div>
+
+                            <div class="oe_kanban_details">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                        <div class="text-muted mt-1">
+                                            <small><field name="event_code"/></small>
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_record_headings text-end">
+                                        <span t-if="record.website_published.raw_value"
+                                              class="badge bg-success">
+                                            <i class="fa fa-globe"/> Published
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body mt-3">
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded">
+                                                <div class="row">
+                                                    <div class="col-6">
+                                                        <small class="text-muted">Start</small>
+                                                        <div>
+                                                            <small>
+                                                                <i class="fa fa-calendar text-primary"/>
+                                                                <field name="start" widget="date"/>
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <small class="text-muted">End</small>
+                                                        <div>
+                                                            <small>
+                                                                <i class="fa fa-calendar text-danger"/>
+                                                                <field name="stop" widget="date"/>
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-6">
+                                            <div class="bg-light p-2 rounded">
+                                                <small class="text-muted d-block">Category</small>
+                                                <small>
+                                                    <i class="fa fa-tags text-info"/> <field name="category"/>
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="bg-light p-2 rounded">
+                                                <small class="text-muted d-block">Venue</small>
+                                                <small>
+                                                    <i class="fa fa-map-marker text-danger"/> <field name="venue_type"/>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.location.raw_value">
+                                        <div class="col-12">
+                                            <div class="alert alert-info mb-0 p-2">
+                                                <small>
+                                                    <strong>Location:</strong> <field name="location"/>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.max_participants.raw_value">
+                                        <div class="col-6">
+                                            <div class="bg-light p-2 rounded text-center">
+                                                <h5 class="mb-0 text-success">
+                                                    <field name="total_registrations"/>
+                                                </h5>
+                                                <small class="text-muted">Registered</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="bg-light p-2 rounded text-center">
+                                                <h5 class="mb-0 text-info">
+                                                    <field name="max_participants"/>
+                                                </h5>
+                                                <small class="text-muted">Max</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <field name="state" widget="badge"
+                                                   decoration-info="state == 'draft'"
+                                                   decoration-primary="state == 'published'"
+                                                   decoration-warning="state == 'registration_open'"
+                                                   decoration-danger="state == 'registration_closed'"
+                                                   decoration-success="state in ['ongoing', 'completed']"
+                                                   decoration-muted="state == 'cancelled'"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom mt-2">
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Calendar View - University Event -->
+    <record id="university_event_view_calendar" model="ir.ui.view">
+        <field name="name">university.event.view.calendar</field>
+        <field name="model">university.event</field>
+        <field name="arch" type="xml">
+            <calendar string="Events Calendar"
+                      date_start="start"
+                      date_stop="stop"
+                      mode="month"
+                      quick_create="0"
+                      color="event_type"
+                      event_open_popup="1"
+                      hide_time="0">
+                <field name="name"/>
+                <field name="event_type"/>
+                <field name="location"/>
+                <field name="state" filters="1" invisible="1"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_university_event" model="ir.actions.act_window">
+        <field name="name">Events</field>
+        <field name="res_model">university.event</field>
+        <field name="view_mode">calendar,kanban,list,form</field>
+        <field name="context">{'search_default_filter_upcoming': 1, 'search_default_group_by_event_type': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create University Event
+            </p>
+            <p>
+                Manage university events with comprehensive features. Auto-generated unique event_code (Event
+                Code, readonly sequence). Enter name (char required, placeholder "e.g., Tech Fest 2025",
+                displayed as h1 title labeled "Event Name"). Upload poster (binary attachment, image widget
+                avatar size 150x150 with preview, also used in kanban 64px cover). Select event_type (11
+                options required tracked): fest (Cultural Fest), tech_fest (Technical Fest), seminar
+                (Seminar), workshop (Workshop), conference (Conference), webinar (Webinar), sports (Sports
+                Event), competition (Competition), guest_lecture (Guest Lecture), hackathon (Hackathon),
+                other (Other). Select category (5 options): cultural/technical/sports/academic/social. Enter
+                start/stop (datetime required from inherited calendar.event). Select organized_by (4 options
+                required): department/club/university/external. Select department_id (Many2one to
+                university.department, shown if organized_by=department, required if so, no-create). Enter
+                club_name (char, shown if organized_by=club, required if so, placeholder "e.g., Technical
+                Club"). Add coordinator_ids (Many2many to faculty.faculty labeled "Faculty Coordinators",
+                many2many_tags widget, no-create, tree showing name/employee_id/department_id/designation_id/
+                phone/email). Add student_coordinator_ids (Many2many to student.student labeled "Student
+                Coordinators", many2many_tags widget with color_field option, no-create, tree showing name/
+                registration_number/program_id/department_id/phone/email). Select venue_type (3 options
+                default offline): offline/online/hybrid. Enter location (char labeled "Venue Name",
+                placeholder "e.g., Main Auditorium", from inherited calendar.event). Enter venue_address
+                (text, shown if venue_type!=online, placeholder "Enter complete venue address..."). Enter
+                online_meeting_url (char, url widget, shown if venue_type!=offline, placeholder
+                "https://meet.google.com/xxx-xxxx-xxx"). Select target_audience (4 options default students):
+                students (Students Only), faculty (Faculty Only), all (All Students &amp; Faculty), external
+                (Open to External Participants). Add target_program_ids (Many2many to university.program
+                many2many_tags, shown if target_audience!=faculty). Select target_year (5 options shown if
+                target_audience not in faculty/external): 1 (First Year)/2 (Second Year)/3 (Third Year)/4
+                (Fourth Year)/all (All Years). Check requires_registration (boolean default True). Check
+                registration_open (boolean default False). Enter registration_start/registration_end
+                (datetime, shown if requires_registration). Enter max_participants (integer, shown if
+                requires_registration). View registration_ids (One2many to university.event.registration, shown if
+                requires_registration, tree showing student_id/registration_date/state badge/payment_status
+                badge optional). View total_registrations (integer computed via _compute_registrations with
+                api.depends('registration_ids') counting filtered registration_ids where state in
+                registered/attended, displayed in statinfo button with icon fa-users linking to
+                action_event_registration with context search_default_event_id active_id). Check
+                has_registration_fee (boolean). Enter registration_fee (monetary with currency_field and
+                monetary widget, shown if has_registration_fee). View currency_id (Many2one to res.currency
+                default company currency, invisible). Enter description (html, placeholder "Describe the
+                event, objectives, activities, etc..."). Enter agenda (html, placeholder "Add event agenda/
+                schedule with timings..."). Check has_guest_speaker (boolean). Enter speaker_name (char,
+                shown if has_guest_speaker, placeholder "Speaker Name"). Enter speaker_designation (char,
+                shown if has_guest_speaker, placeholder "e.g., CEO, Tech Solutions Pvt. Ltd."). Enter
+                speaker_bio (html, shown if has_guest_speaker, placeholder "Add speaker biography,
+                achievements, expertise, etc..."). View sponsor_ids (One2many to event.sponsor, editable
+                bottom tree showing sponsor_type/sponsor_name/contribution_amount/contact_person/phone).
+                Enter estimated_budget/actual_expense (monetary with currency_field and monetary widget).
+                Check provides_certificate (boolean). Upload certificate_template (binary with filename
+                certificate_template_filename, shown if provides_certificate). Upload brochure (binary with
+                filename brochure_filename). Select feedback_survey_id (Many2one to survey.survey no-create).
+                Add photo_ids (Many2many to ir.attachment labeled "Event Photos Gallery", many2many_binary
+                widget). View calendar_event_id (Many2one to calendar.event readonly from _inherits). Check
+                allday (boolean from inherited calendar.event). View duration (float float_time widget from
+                inherited calendar.event). Add alarm_ids (Many2many to calendar.alarm many2many_tags widget
+                from inherited calendar.event for reminders). Enter remarks (text, placeholder "Add remarks,
+                special notes, instructions, etc..."). Select state (7 options default draft tracked): draft/
+                published/registration_open/registration_closed/ongoing/completed/cancelled. Header has 6
+                workflow action buttons: Publish (draft→published+website_published with confirmation
+                "Publish this event?", primary), Open Registration (published/registration_closed→
+                registration_open+registration_open=True with confirmation "Open registration for this
+                event?", success), Close Registration (registration_open→registration_closed+
+                registration_open=False with confirmation "Close registration for this event?", warning),
+                Start Event (registration_open/registration_closed→ongoing with confirmation "Start this
+                event?", info), Mark as Completed (ongoing→completed with confirmation "Mark this event as
+                completed?", success), Cancel Event (any except completed/cancelled→cancelled with
+                confirmation "Are you sure you want to cancel this event?", danger). Statusbar widget for
+                state (visible draft,published,registration_open,ongoing,completed). Form view with 2 ribbon
+                widgets (Cancelled danger/red if cancelled, Completed success/green if completed), button_box
+                containing total_registrations statinfo linked to registrations action and website_published
+                toggle button, poster image avatar, notebook having 9 pages: Details (venue group and target
+                audience group/description/agenda), Coordinators (faculty coordinators and student
+                coordinators groups with trees), Registration (registration settings group and fee group/
+                registration_ids tree), Guest Speaker (has_guest_speaker/speaker details/speaker_bio), Budget
+                &amp; Sponsors (budget group/sponsor_ids editable tree), Certificate &amp; Feedback
+                (certificate group/feedback group), Attachments (event materials group with poster/brochure/
+                photo_ids many2many_binary gallery), Calendar Integration (calendar event group/reminders
+                group/description from calendar.event), Remarks (remarks text). List view with 7-color row
+                decorations: Info/Blue (draft), Primary/DarkBlue (published), Success/Green
+                (registration_open/ongoing), Muted/Gray (completed/cancelled). Badge widget for state with
+                6-color decorations: Info (draft), Primary (published), Warning (registration_open), Danger
+                (registration_closed), Success (ongoing/completed), Muted (cancelled). Boolean_toggle widget
+                for website_published. Optional field controls. Kanban view grouped by event_type showing
+                poster image (64px cover if exists, else 64px centered secondary background calendar icon
+                32px font), name as title with event_code small text, conditional website_published badge
+                (success/green globe icon "Published" top-right if published), 2-card start/stop dates (6/6
+                grid, light background, calendar icons primary/danger, small "Start"/"End" labels, date
+                widgets), 2-card category/venue_type (6/6 grid, light background, tags icon info/map-marker
+                icon danger, small labels), conditional location alert (info background, shown if location
+                exists), conditional registrations 2-card grid (6/6, total_registrations h5 success
+                "Registered" and max_participants h5 info "Max", centered, shown if max_participants exists),
+                state badge with 6-color decorations, activity widget at bottom-right. Calendar view with
+                date_start/date_stop, mode month, color by event_type, state filters, event_open_popup.
+                Ordered by start desc (most recent first). Default filters: Upcoming events and grouped by
+                Event Type. Comprehensive search filters for 6 states/upcoming-past-this week-this month/
+                website published-registration required-has fee-guest speaker/group by event_type-category-
+                organized_by-department-venue_type-state-start_date. Searchpanel for event_type, category,
+                and state multi-select. Full chatter/activity/website.published support via _inherit.
+                Calendar integration via _inherits calendar.event (inherits name/start/stop/location/allday/
+                duration/alarm_ids/description fields). Complete event lifecycle management with
+                registration/budget/sponsor tracking.
+            </p>
+        </field>
+    </record>
+
+</odoo>

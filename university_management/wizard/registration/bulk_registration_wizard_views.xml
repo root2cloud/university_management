@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="bulk_registration_wizard_line_view_list" model="ir.ui.view">
+        <field name="name">bulk.registration.wizard.line.view.list</field>
+        <field name="model">bulk.registration.wizard.line</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false" delete="false">
+                <field name="student_id"/>
+                <field name="registration_number"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="bulk_registration_wizard_view_form" model="ir.ui.view">
+        <field name="name">bulk.registration.wizard.view.form</field>
+        <field name="model">bulk.registration.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Bulk Registration Number Generation">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Generate Registration Numbers</h1>
+                    </div>
+                    <group>
+                        <group string="Filters">
+                            <field name="program_id"/>
+                            <field name="department_id"/>
+                            <field name="batch_id"/>
+                            <field name="academic_year_id"/>
+                        </group>
+                        <group string="Registration Format">
+                            <field name="registration_prefix" placeholder="e.g., REG/2024/"/>
+                            <field name="starting_number"/>
+                        </group>
+                    </group>
+
+                    <group string="Select Students">
+                        <field name="student_ids" nolabel="1" widget="many2many">
+                            <list>
+                                <field name="name"/>
+                                <field name="program_id"/>
+                                <field name="batch_id"/>
+                                <field name="admission_date"/>
+                            </list>
+                        </field>
+                    </group>
+
+                    <group string="Preview">
+                        <field name="preview_lines" nolabel="1">
+                            <list>
+                                <field name="student_id"/>
+                                <field name="registration_number"/>
+                            </list>
+                        </field>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_generate_registrations"
+                            string="Generate Registration Numbers"
+                            type="object"
+                            class="btn-primary"/>
+                    <button string="Cancel"
+                            class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bulk_registration_wizard" model="ir.actions.act_window">
+        <field name="name">Generate Registration Numbers</field>
+        <field name="res_model">bulk.registration.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

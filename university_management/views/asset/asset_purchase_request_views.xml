@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="view_asset_purchase_request_form" model="ir.ui.view">
+        <field name="name">asset.purchase.request.form</field>
+        <field name="model">asset.purchase.request</field>
+        <field name="arch" type="xml">
+            <form string="Asset Purchase Request">
+                <header>
+                    <!-- Submit: visible to the requester when draft -->
+                    <button name="action_submit" string="Submit to Principal"
+                            type="object" class="btn-primary"
+                            invisible="state != 'draft' or not is_requester"/>
+
+                    <!-- Principal: Approve/Reject -->
+                    <button name="action_principal_approve" string="✓ Approve"
+                            type="object" class="btn-primary"
+                            invisible="state != 'principal_review' or not is_principal"/>
+
+                    <button name="action_principal_reject" string="✗ Reject"
+                            type="object" class="btn-danger"
+                            invisible="state != 'principal_review' or not is_principal"/>
+
+                    <!-- Requester: Submit Vendor Quotes -->
+                    <button name="action_submit_quotes" string="Submit Quotes to ACC"
+                            type="object" class="btn-primary"
+                            invisible="state != 'vendor_quotes' or not is_requester"/>
+
+                    <!-- ACC: Review and Forward -->
+                    <button name="action_acc_review_and_forward" string="Reviewed — Forward to Secretary"
+                            type="object" class="btn-primary"
+                            invisible="state != 'acc_review' or not is_acc_user"/>
+
+                    <!-- Secretary: Final Approve/Reject -->
+                    <button name="action_secretary_approve" string="✓ FINAL APPROVAL"
+                            type="object" class="btn-primary"
+                            invisible="state != 'secretary_review' or not is_secretary"/>
+
+                    <button name="action_secretary_reject" string="✗ Reject"
+                            type="object" class="btn-danger"
+                            invisible="state != 'secretary_review' or not is_secretary"/>
+
+                    <!-- Trust Manager: Confirm Execution + Notify Vendor -->
+                    <button name="action_trust_manager_execute" string="✓ Confirm Execution Complete"
+                            type="object" class="btn-primary"
+                            invisible="state != 'trust_execution' or not is_trust_manager"/>
+
+                    <button name="action_notify_vendor" string="📧 Notify Vendor"
+                            type="object" class="btn-info"
+                            invisible="state != 'trust_execution' or not is_trust_manager"/>
+
+                    <!-- Reset to Draft: requester only -->
+                    <button name="action_reset_to_draft" string="Reset to Draft"
+                            type="object" class="btn-secondary"
+                            invisible="state not in ['draft', 'rejected'] or not is_requester"/>
+
+                    <field name="state" widget="statusbar" readonly="1"
+                           statusbar_visible="draft,principal_review,vendor_quotes,acc_review,secretary_review,trust_execution,done"/>
+                </header>
+
+                <!-- Hidden computed fields needed for button visibility -->
+                <field name="is_principal" invisible="1"/>
+                <field name="is_acc_user" invisible="1"/>
+                <field name="is_secretary" invisible="1"/>
+                <field name="is_trust_manager" invisible="1"/>
+                <field name="is_requester" invisible="1"/>
+
+                <div class="alert alert-warning" role="alert" invisible="state != 'rejected'">
+                    <strong>Rejected:</strong>
+                    <field name="rejection_reason" readonly="1"/>
+                    <small> — by <field name="rejected_by" readonly="1"/> on <field name="rejection_date" readonly="1"/></small>
+                </div>
+
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <!-- REQUEST DETAILS -->
+                    <group string="Request Details">
+                        <group>
+                            <field name="requested_by" readonly="state != 'draft'"/>
+                            <field name="department_id" readonly="state != 'draft'"/>
+                            <field name="asset_id" readonly="state != 'draft'"/>
+                            <field name="priority" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="request_date"/>
+                            <field name="estimated_cost" readonly="state != 'draft'"/>
+                            <field name="quantity" readonly="state != 'draft'"/>
+                            <field name="days_pending" widget="integer"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="item_description" colspan="2" readonly="state != 'draft'"/>
+                        <field name="justification" colspan="2" readonly="state != 'draft'"/>
+                    </group>
+
+                    <!-- APPROVERS -->
+                    <group string="Approvers">
+                        <group>
+                            <field name="principal_id" readonly="state != 'draft'"/>
+                            <field name="acc_user_id" readonly="state not in ['draft', 'vendor_quotes']"/>
+                        </group>
+                        <group>
+                            <field name="secretary_id" readonly="state not in ['draft', 'acc_review']"/>
+                            <field name="trust_manager_id" readonly="state not in ['draft', 'secretary_review']"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <!-- PRINCIPAL STAGE -->
+                        <page string="Principal Review"
+                              invisible="state not in ['principal_review', 'vendor_quotes', 'acc_review', 'secretary_review', 'trust_execution', 'done', 'rejected']">
+                            <group>
+                                <field name="principal_approved" readonly="1"/>
+                                <field name="principal_approved_by" readonly="1"/>
+                                <field name="principal_date" readonly="1"/>
+                            </group>
+                            <field name="principal_remarks" readonly="state != 'principal_review'"/>
+                        </page>
+
+                        <!-- VENDOR QUOTES STAGE -->
+                        <page string="Vendor Quotes"
+                              invisible="state not in ['vendor_quotes', 'acc_review', 'secretary_review', 'trust_execution', 'done']">
+                            <group string="Quote 1">
+                                <field name="vendor_quote_1_vendor" readonly="state != 'vendor_quotes'"/>
+                                <field name="vendor_quote_1_amount" readonly="state != 'vendor_quotes'"/>
+                                <field name="vendor_quote_1" widget="binary" readonly="state != 'vendor_quotes'"/>
+                                <field name="vendor_quote_1_name" invisible="1"/>
+                            </group>
+                            <group string="Quote 2">
+                                <field name="vendor_quote_2_vendor" readonly="state != 'vendor_quotes'"/>
+                                <field name="vendor_quote_2_amount" readonly="state != 'vendor_quotes'"/>
+                                <field name="vendor_quote_2" widget="binary" readonly="state != 'vendor_quotes'"/>
+                                <field name="vendor_quote_2_name" invisible="1"/>
+                            </group>
+                            <group string="Quote 3">
+                                <field name="vendor_quote_3_vendor" readonly="state != 'vendor_quotes'"/>
+                                <field name="vendor_quote_3_amount" readonly="state != 'vendor_quotes'"/>
+                                <field name="vendor_quote_3" widget="binary" readonly="state != 'vendor_quotes'"/>
+                                <field name="vendor_quote_3_name" invisible="1"/>
+                            </group>
+                        </page>
+
+                        <!-- ACC REVIEW STAGE -->
+                        <page string="ACC Review"
+                              invisible="state not in ['acc_review', 'secretary_review', 'trust_execution', 'done']">
+                            <group>
+                                <field name="acc_reviewed" readonly="1"/>
+                                <field name="acc_reviewed_by" readonly="1"/>
+                                <field name="acc_review_date" readonly="1"/>
+                            </group>
+                            <group string="ACC Vendor Selection">
+                                <field name="selected_vendor" readonly="state != 'acc_review'"/>
+                                <field name="selected_vendor_name" readonly="state != 'acc_review'"/>
+                                <field name="selected_quote_amount" readonly="state != 'acc_review'"/>
+                            </group>
+                            <field name="acc_notes" readonly="state != 'acc_review'"/>
+                        </page>
+
+                        <!-- SECRETARY STAGE -->
+                        <page string="Secretary Decision"
+                              invisible="state not in ['secretary_review', 'trust_execution', 'done', 'rejected']">
+                            <group>
+                                <field name="secretary_approved" readonly="1"/>
+                                <field name="secretary_approved_by" readonly="1"/>
+                                <field name="secretary_date" readonly="1"/>
+                                <field name="final_approval_date" readonly="1"/>
+                            </group>
+                            <field name="secretary_remarks" readonly="state != 'secretary_review'"/>
+                        </page>
+
+                        <!-- TRUST MANAGER EXECUTION STAGE -->
+                        <page string="Trust Manager Execution"
+                              invisible="state not in ['trust_execution', 'done']">
+                            <group>
+                                <field name="trust_manager_executed" readonly="1"/>
+                                <field name="trust_manager_executed_by" readonly="1"/>
+                                <field name="trust_manager_execution_date" readonly="1"/>
+                                <field name="vendor_notified" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="po_reference" readonly="state != 'trust_execution'"/>
+                                <field name="purchase_order_id" readonly="state != 'trust_execution'"/>
+                            </group>
+                            <field name="execution_notes" readonly="state != 'trust_execution'"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="view_asset_purchase_request_list" model="ir.ui.view">
+        <field name="name">asset.purchase.request.list</field>
+        <field name="model">asset.purchase.request</field>
+        <field name="arch" type="xml">
+            <list string="Purchase Requests"
+                  decoration-danger="state == 'rejected'"
+                  decoration-success="state == 'done'"
+                  decoration-warning="days_pending &gt; 7">
+                <field name="name"/>
+                <field name="requested_by"/>
+                <field name="department_id"/>
+                <field name="item_description"/>
+                <field name="principal_id"/>
+                <field name="estimated_cost"/>
+                <field name="priority" widget="priority"/>
+                <field name="state" widget="badge"
+                       decoration-warning="state in ('principal_review', 'vendor_quotes')"
+                       decoration-info="state in ('acc_review', 'secretary_review')"
+                       decoration-primary="state == 'trust_execution'"
+                       decoration-success="state == 'done'"
+                       decoration-danger="state == 'rejected'"/>
+                <field name="days_pending"/>
+                <field name="request_date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_asset_purchase_request_search" model="ir.ui.view">
+        <field name="name">asset.purchase.request.search</field>
+        <field name="model">asset.purchase.request</field>
+        <field name="arch" type="xml">
+            <search string="Search Purchase Requests">
+                <field name="name"/>
+                <field name="requested_by"/>
+                <field name="item_description"/>
+                <field name="department_id"/>
+                <field name="principal_id"/>
+                <separator/>
+                <filter name="filter_draft" string="Draft" domain="[('state','=','draft')]"/>
+                <filter name="filter_principal" string="Awaiting Principal" domain="[('state','=','principal_review')]"/>
+                <filter name="filter_vendor_quotes" string="Awaiting Quotes" domain="[('state','=','vendor_quotes')]"/>
+                <filter name="filter_acc" string="ACC Review" domain="[('state','=','acc_review')]"/>
+                <filter name="filter_secretary" string="Awaiting Secretary" domain="[('state','=','secretary_review')]"/>
+                <filter name="filter_execution" string="Trust Execution" domain="[('state','=','trust_execution')]"/>
+                <filter name="filter_done" string="Completed" domain="[('state','=','done')]"/>
+                <filter name="filter_rejected" string="Rejected" domain="[('state','=','rejected')]"/>
+                <separator/>
+                <filter name="filter_mine" string="My Requests" domain="[('requested_by','=',uid)]"/>
+                <filter name="filter_my_action" string="Needs My Action"
+                        domain="['|', '|', '|',
+                            '&amp;', ('state','=','principal_review'), ('principal_id','=',uid),
+                            '&amp;', ('state','=','acc_review'), ('acc_user_id','=',uid),
+                            '&amp;', ('state','=','secretary_review'), ('secretary_id','=',uid),
+                            '&amp;', ('state','=','trust_execution'), ('trust_manager_id','=',uid)
+                        ]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_dept" string="Department" context="{'group_by': 'department_id'}"/>
+                    <filter name="group_principal" string="Principal" context="{'group_by': 'principal_id'}"/>
+                    <filter name="group_requester" string="Requester" context="{'group_by': 'requested_by'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Single Action — all roles use this one menu -->
+    <record id="action_asset_purchase_request" model="ir.actions.act_window">
+        <field name="name">Purchase Requests</field>
+        <field name="res_model">asset.purchase.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_asset_purchase_request_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No purchase requests yet.</p>
+            <p>Raise a request when an asset needs to be purchased or replaced.
+               Use the <b>Needs My Action</b> filter to see requests awaiting your approval.
+            </p>
+        </field>
+    </record>
+
+</odoo>

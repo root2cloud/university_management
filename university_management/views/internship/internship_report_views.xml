@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View - Internship Report -->
+    <record id="internship_report_view_form" model="ir.ui.view">
+        <field name="name">internship.report.view.form</field>
+        <field name="model">internship.report</field>
+        <field name="arch" type="xml">
+            <form string="Internship Report">
+                <header>
+                    <button name="action_submit" string="Submit Report" type="object"
+                            class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_review" string="Mark as Reviewed" type="object"
+                            class="btn-success"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft" type="object"
+                            invisible="state != 'draft'"
+                            confirm="Are you sure you want to reset this Internship Report to draft?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,reviewed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="Report"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Report Details">
+                            <field name="internship_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="student_id" readonly="1"/>
+                            <field name="report_type" widget="radio"/>
+                        </group>
+                        <group string="Report Period">
+                            <field name="report_date"/>
+                            <field name="report_period"
+                                   placeholder="e.g., Week 1, Month 1, Quarter 1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Work Summary" name="work_summary">
+                            <group>
+                                <group string="Overall Work Summary">
+                                    <field name="work_summary" nolabel="1"
+                                           placeholder="Describe the work performed during this period..."/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Tasks Completed">
+                                    <field name="tasks_completed" nolabel="1"
+                                           placeholder="List all tasks and milestones completed..."/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Challenges &amp; Learnings" name="challenges">
+                            <group>
+                                <group string="Challenges Faced">
+                                    <field name="challenges_faced" nolabel="1"
+                                           placeholder="Describe challenges, obstacles, and how you addressed them..."/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Key Learnings">
+                                    <field name="learnings" nolabel="1"
+                                           placeholder="Share what you learned and skills gained during this period..."/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Report Document" name="document">
+                            <group>
+                                <group string="Upload Report">
+                                    <label for="report_document"/>
+                                    <div class="o_row">
+                                        <field name="report_document" filename="report_filename"/>
+                                        <field name="report_filename" invisible="1"/>
+                                    </div>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Mentor Feedback" name="feedback">
+                            <group>
+                                <group string="Faculty Mentor Feedback">
+                                    <field name="faculty_feedback" nolabel="1"
+                                           placeholder="Faculty mentor's comments and feedback on the report..."/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Company Supervisor Feedback">
+                                    <field name="company_feedback" nolabel="1"
+                                           placeholder="Company supervisor's comments and feedback on the report..."/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View - Internship Report -->
+    <record id="internship_report_view_list" model="ir.ui.view">
+        <field name="name">internship.report.view.list</field>
+        <field name="model">internship.report</field>
+        <field name="arch" type="xml">
+            <list string="Internship Reports"
+                  default_order="report_date desc"
+                  multi_edit="1"
+                  sample="1"
+                  decoration-info="state == 'draft'"
+                  decoration-warning="state == 'submitted'"
+                  decoration-success="state == 'reviewed'">
+                <field name="name"/>
+                <field name="internship_id"/>
+                <field name="student_id"/>
+                <field name="report_type" widget="badge"
+                       decoration-info="report_type == 'weekly'"
+                       decoration-warning="report_type == 'monthly'"
+                       decoration-success="report_type == 'final'"
+                       optional="show"/>
+                <field name="report_date"/>
+                <field name="report_period" optional="show"/>
+                <field name="report_document" widget="binary" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'submitted'"
+                       decoration-success="state == 'reviewed'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View - Internship Report -->
+    <record id="internship_report_view_search" model="ir.ui.view">
+        <field name="name">internship.report.view.search</field>
+        <field name="model">internship.report</field>
+        <field name="arch" type="xml">
+            <search string="Search Reports">
+                <field name="internship_id"/>
+                <field name="student_id"/>
+                <field name="report_period"/>
+
+                <separator/>
+
+                <filter name="filter_draft" string="Draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_submitted" string="Submitted"
+                        domain="[('state', '=', 'submitted')]"/>
+                <filter name="filter_reviewed" string="Reviewed"
+                        domain="[('state', '=', 'reviewed')]"/>
+
+                <separator/>
+
+                <filter name="filter_weekly" string="Weekly Reports"
+                        domain="[('report_type', '=', 'weekly')]"/>
+                <filter name="filter_monthly" string="Monthly Reports"
+                        domain="[('report_type', '=', 'monthly')]"/>
+                <filter name="filter_final" string="Final Reports"
+                        domain="[('report_type', '=', 'final')]"/>
+
+                <separator/>
+
+                <filter name="filter_this_month" string="This Month"
+                        domain="[('report_date', '&gt;=', (context_today().replace(day=1)).strftime('%Y-%m-%d')),
+                                 ('report_date', '&lt;=', ((context_today().replace(day=1) + datetime.timedelta(days=32)).replace(day=1) - datetime.timedelta(days=1)).strftime('%Y-%m-%d'))]"/>
+
+                <separator/>
+
+                <filter name="filter_has_faculty_feedback" string="Has Faculty Feedback"
+                        domain="[('faculty_feedback', '!=', False)]"/>
+                <filter name="filter_has_company_feedback" string="Has Company Feedback"
+                        domain="[('company_feedback', '!=', False)]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_by_report_type" string="Report Type"
+                            context="{'group_by': 'report_type'}"/>
+                    <filter name="group_by_internship" string="Internship"
+                            context="{'group_by': 'internship_id'}"/>
+                    <filter name="group_by_student" string="Student"
+                            context="{'group_by': 'student_id'}"/>
+                    <filter name="group_by_report_date" string="Report Date"
+                            context="{'group_by': 'report_date'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="state" string="Status"
+                           select="multi"
+                           operator="in"
+                           icon="fa-flag"/>
+                    <field name="report_type" string="Report Type"
+                           select="multi"
+                           icon="fa-file-text"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View - Internship Report -->
+    <record id="internship_report_view_kanban" model="ir.ui.view">
+        <field name="name">internship.report.view.kanban</field>
+        <field name="model">internship.report</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="state"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="internship_id"/>
+                <field name="student_id"/>
+                <field name="report_type"/>
+                <field name="report_date"/>
+                <field name="report_period"/>
+                <field name="report_document"/>
+                <field name="faculty_feedback"/>
+                <field name="company_feedback"/>
+                <field name="state"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                        <div class="text-muted mt-1">
+                                            <small>
+                                                <i class="fa fa-calendar"/> <field name="report_date"/>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body mt-3">
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded">
+                                                <h6 class="mb-0">
+                                                    <i class="fa fa-briefcase text-primary"/> <field name="internship_id"/>
+                                                </h6>
+                                                <small class="text-muted">
+                                                    <i class="fa fa-user"/> <field name="student_id"/>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="card"
+                                                 t-attf-class="{{
+                                                    record.report_type.raw_value == 'weekly' ? 'bg-info' :
+                                                    (record.report_type.raw_value == 'monthly' ? 'bg-warning' : 'bg-success')
+                                                 }} text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h6 class="mb-0">
+                                                        <field name="report_type"/>
+                                                    </h6>
+                                                    <small t-if="record.report_period.raw_value">
+                                                        <field name="report_period"/>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.report_document.raw_value">
+                                        <div class="col-12">
+                                            <div class="alert alert-info mb-0 p-2 text-center">
+                                                <i class="fa fa-file-pdf-o fa-2x text-danger"/>
+                                                <small class="d-block mt-1">Report Attached</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-6" t-if="record.faculty_feedback.raw_value">
+                                            <div class="bg-light p-2 rounded text-center">
+                                                <i class="fa fa-check-circle text-success"/>
+                                                <small class="d-block">Faculty Feedback</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-6" t-if="record.company_feedback.raw_value">
+                                            <div class="bg-light p-2 rounded text-center">
+                                                <i class="fa fa-check-circle text-success"/>
+                                                <small class="d-block">Company Feedback</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom mt-2">
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Calendar View - Internship Report -->
+    <record id="internship_report_view_calendar" model="ir.ui.view">
+        <field name="name">internship.report.view.calendar</field>
+        <field name="model">internship.report</field>
+        <field name="arch" type="xml">
+            <calendar string="Report Calendar"
+                      date_start="report_date"
+                      mode="month"
+                      color="report_type"
+                      quick_create="0"
+                      event_limit="5">
+                <field name="name"/>
+                <field name="internship_id"/>
+                <field name="student_id"/>
+                <field name="report_type"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_internship_report" model="ir.actions.act_window">
+        <field name="name">Reports</field>
+        <field name="res_model">internship.report</field>
+        <field name="view_mode">kanban,calendar,list,form</field>
+        <field name="context">{'search_default_filter_submitted': 1, 'search_default_group_by_state': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create Internship Report
+            </p>
+            <p>
+                Manage internship progress reports with comprehensive tracking. Auto-computed unique name
+                (Report Number, readonly stored via _compute_name with api.depends('internship_id',
+                'report_type','report_date') combining internship_id.name + " - " + report_type + " - " +
+                report_date). Select internship_id (Many2one to internship.internship required indexed
+                ondelete cascade no-create). View student_id (Many2one related from internship_id.student_id
+                readonly stored). Select report_type (3 options required, radio widget): weekly (Weekly
+                Report - info badge), monthly (Monthly Report - warning/yellow badge), final (Final Report
+                - success/green badge). Enter report_date (date default today required). Enter report_period
+                (char with placeholder "e.g., Week 1, Month 1, Quarter 1" and help text "e.g., Week 1,
+                Month 1"). Enter comprehensive work summary: work_summary (html required, placeholder
+                "Describe the work performed during this period..."), tasks_completed (html, placeholder
+                "List all tasks and milestones completed..."), challenges_faced (html, placeholder
+                "Describe challenges, obstacles, and how you addressed them..."), learnings (html,
+                placeholder "Share what you learned and skills gained during this period..."). Upload
+                report_document (binary attachment with report_filename, inline o_row with label). Enter
+                mentor feedback: faculty_feedback (text, placeholder "Faculty mentor's comments and
+                feedback on the report..."), company_feedback (text, placeholder "Company supervisor's
+                comments and feedback on the report..."). Select state (3 options default draft tracked):
+                draft/submitted/reviewed. Header has 2 workflow action buttons: Submit Report
+                (draft→submitted, primary), Mark as Reviewed (submitted→reviewed, success). Statusbar
+                widget for state (visible draft,submitted,reviewed). Form view with notebook having 4 pages:
+                Work Summary (work_summary/tasks_completed), Challenges &amp; Learnings (challenges_faced/
+                learnings), Report Document (upload section), Mentor Feedback (faculty_feedback/
+                company_feedback). List view with 3-color row decorations: Info (draft), Warning/Yellow
+                (submitted), Success/Green (reviewed). Badge widgets for report_type (3-color decorations
+                info/warning/success) and state (3-color decorations). Binary widget for report_document.
+                Optional field controls. Kanban view grouped by state showing name as title, calendar icon
+                with report_date small text, internship_id/student_id card (light background, briefcase
+                icon primary/blue for internship, user icon for student), report_type card (dynamic 3-color
+                background: info/weekly, warning/monthly, success/final, centered, showing report_period if
+                present), conditional report_document alert (info background, file-pdf-o icon 2x danger/red,
+                "Report Attached" text, centered, shown if report_document exists), 2-card feedback grid
+                (6/6) showing check-circle icons success/green with labels if faculty_feedback or
+                company_feedback exist. Calendar view for timeline (date_start: report_date, color by
+                report_type, month mode). Ordered by report_date desc (most recent first). Default filters:
+                Submitted status and grouped by State. Comprehensive search filters for 3 states/3 report
+                types/this month/has faculty feedback/has company feedback/group by state-report_type-
+                internship-student-report_date. Searchpanel for state and report_type multi-select. Full
+                chatter and activity support. Complete internship report lifecycle management.
+            </p>
+        </field>
+    </record>
+
+</odoo>

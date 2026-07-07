@@ -1,0 +1,661 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Programs List Page Template -->
+        <template id="programs_page" name="University Programs">
+            <t t-call="website.layout">
+                <t t-set="title">University Programs - Academic Offerings</t>
+
+                <div id="wrap" class="oe_structure">
+                    <div class="container mt-4">
+                        <!-- Page Header -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h1 class="display-4 mb-3">University Programs</h1>
+                                <p class="lead">
+                                    Explore our comprehensive range of academic programs designed to
+                                    shape future leaders and professionals.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Search Bar -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <form action="/programs" method="get" class="d-flex">
+                                    <div class="input-group">
+                                        <input type="text"
+                                               name="search"
+                                               class="form-control form-control-lg"
+                                               placeholder="Search programs by name or code..."
+                                               t-att-value="search"
+                                               autocomplete="off"/>
+                                        <button type="submit" class="btn btn-primary btn-lg">
+                                            <i class="fa fa-search me-2"/>Search
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Programs Grid -->
+                        <div class="row" t-if="programs">
+                            <t t-foreach="programs" t-as="program">
+                                <div class="col-md-6 col-lg-4 mb-4">
+                                    <div class="card h-100 border-0 shadow-sm program-card">
+                                        <!-- Program Image -->
+                                        <div t-if="program.image_128" class="card-img-top overflow-hidden" style="height: 200px;">
+                                            <img t-attf-src="/web/image/university.program/#{program.id}/image_128"
+                                                 class="img-fluid w-100 h-100 object-fit-cover"
+                                                 t-att-alt="program.name"/>
+                                        </div>
+                                        <div t-else="" class="card-img-top d-flex align-items-center justify-content-center" style="height: 200px; background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);">
+                                            <div class="text-center text-white">
+                                                <i class="fa fa-graduation-cap fa-4x mb-2"/>
+                                                <div class="fw-bold fs-6 px-3" style="line-height:1.2;"><t t-esc="program.name"/></div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Program Badge -->
+                                        <div t-if="program.is_accredited" class="position-absolute top-0 end-0 m-3">
+                                            <span class="badge bg-success">
+                                                <i class="fa fa-certificate me-1"/>
+                                                <t t-esc="program.accreditation_grade or 'Accredited'"/>
+                                            </span>
+                                        </div>
+
+                                        <!-- Card Body -->
+                                        <div class="card-body">
+                                            <h5 class="card-title">
+                                                <t t-esc="program.name"/>
+                                            </h5>
+                                            <h6 class="card-subtitle mb-2 text-muted">
+                                                <t t-esc="program.code"/> |
+                                                <span class="text-capitalize">
+                                                    <t t-esc="program.program_type"/>
+                                                </span>
+                                            </h6>
+
+                                            <p class="card-text text-muted mb-3">
+                                                <i class="fa fa-building text-primary me-2"/>
+                                                <t t-esc="program.department_id.name or ''"/>
+                                            </p>
+
+                                            <div class="program-details mb-3">
+                                                <div class="row">
+                                                    <div class="col-6">
+                                                        <small class="text-muted">
+                                                            <i class="fa fa-clock-o text-warning me-1"/>
+                                                            <t t-esc="program.duration_years"/> Years
+                                                        </small>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <small class="text-muted">
+                                                            <i class="fa fa-calendar text-info me-1"/>
+                                                            <t t-esc="program.total_semesters"/> Semesters
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Enrollment Progress -->
+                                            <div class="mb-3">
+                                                <div class="d-flex justify-content-between mb-1">
+                                                    <small>Enrollment</small>
+                                                    <small>
+                                                        <t t-esc="program.total_seats - program.available_seats"/> /
+                                                        <t t-esc="program.total_seats"/>
+                                                    </small>
+                                                </div>
+                                                <div class="progress" style="height: 8px;">
+                                                    <div class="progress-bar bg-success"
+                                                         t-att-style="'width: ' + str((program.total_seats - program.available_seats) / program.total_seats * 100 if program.total_seats &gt; 0 else 0) + '%'">
+                                                    </div>
+                                                </div>
+                                                <small class="text-muted">
+                                                    <t t-esc="program.available_seats"/> seats available
+                                                </small>
+                                            </div>
+                                        </div>
+
+                                        <!-- Card Footer -->
+                                        <div class="card-footer bg-transparent border-top-0">
+                                            <a t-attf-href="/program/#{program.id}"
+                                               class="btn btn-outline-primary w-100">
+                                                View Details <i class="fa fa-arrow-right ms-2"/>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+
+                        <!-- No Results Message -->
+                        <div t-if="not programs" class="row">
+                            <div class="col-12 text-center py-5">
+                                <i class="fa fa-search fa-4x text-muted mb-3"/>
+                                <h3>No programs found</h3>
+                                <p class="text-muted">
+                                    Try adjusting your search or browse all programs.
+                                </p>
+                                <a href="/programs" class="btn btn-primary mt-2">
+                                    View All Programs
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div t-if="pager and pager['page_count'] &gt; 1" class="row mt-5">
+                            <div class="col-12">
+                                <nav aria-label="Program pagination">
+                                    <ul class="pagination justify-content-center">
+                                        <li t-if="pager['page_count'] &gt; 1" class="page-item">
+                                            <a class="page-link" t-attf-href="/programs/page/#{pager['previous']['page']}?search=#{search}"
+                                               t-if="pager['previous']">
+                                                Previous
+                                            </a>
+                                            <span class="page-link disabled" t-else="">
+                                                Previous
+                                            </span>
+                                        </li>
+
+                                        <t t-foreach="range(1, pager['page_count'] + 1)" t-as="page_num">
+                                            <li class="page-item" t-att-class="'active' if page_num == pager['page'] else ''">
+                                                <a class="page-link"
+                                                   t-attf-href="/programs/page/#{page_num}?search=#{search}">
+                                                    <t t-esc="page_num"/>
+                                                </a>
+                                            </li>
+                                        </t>
+
+                                        <li t-if="pager['page_count'] &gt; 1" class="page-item">
+                                            <a class="page-link" t-attf-href="/programs/page/#{pager['next']['page']}?search=#{search}"
+                                               t-if="pager['next']">
+                                                Next
+                                            </a>
+                                            <span class="page-link disabled" t-else="">
+                                                Next
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <!-- Program Detail Page Template -->
+        <template id="program_detail_page" name="Program Detail">
+            <t t-call="website.layout">
+                <t t-set="title" t-value="program.name + ' - ' + program.code"/>
+
+                <div id="wrap" class="oe_structure">
+                    <div class="container mt-4">
+                        <!-- Back Button -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <a href="/programs" class="btn btn-outline-secondary">
+                                    <i class="fa fa-arrow-left me-2"/>Back to Programs
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Program Header -->
+                        <div class="row mb-5">
+                            <div class="col-lg-4">
+                                <!-- Program Image -->
+                                <div class="card border-0 shadow-sm mb-4">
+                                    <div class="card-body p-4 text-center">
+                                        <div t-if="program.image_128" class="mb-4">
+                                            <img t-attf-src="/web/image/university.program/#{program.id}/image_128"
+                                                 class="img-fluid rounded"
+                                                 style="max-height: 300px;"
+                                                 t-att-alt="program.name"/>
+                                        </div>
+                                        <div t-else="" class="mb-4">
+                                            <div class="rounded d-flex align-items-center justify-content-center" style="height: 200px; background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);">
+                                                <div class="text-center text-white">
+                                                    <i class="fa fa-graduation-cap fa-5x mb-2"/>
+                                                    <div class="fw-bold fs-6 px-3" style="line-height:1.2;"><t t-esc="program.name"/></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Accreditation Badge -->
+                                        <div t-if="program.is_accredited" class="mb-3">
+                                            <span class="badge bg-success fs-6 p-3">
+                                                <i class="fa fa-certificate me-2"/>
+                                                Accredited
+                                                <t t-if="program.accreditation_grade">
+                                                    - <t t-esc="program.accreditation_grade"/>
+                                                </t>
+                                            </span>
+                                            <p t-if="program.accreditation_body" class="mt-2 mb-0">
+                                                By <strong><t t-esc="program.accreditation_body"/></strong>
+                                            </p>
+                                        </div>
+
+                                        <!-- Quick Stats -->
+                                        <div class="row text-center mt-4">
+                                            <div class="col-4">
+                                                <div class="border rounded p-3">
+                                                    <h4 class="text-primary mb-0">
+                                                        <t t-esc="program.total_students"/>
+                                                    </h4>
+                                                    <small class="text-muted">Students</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="border rounded p-3">
+                                                    <h4 class="text-success mb-0">
+                                                        <t t-esc="program.total_batches"/>
+                                                    </h4>
+                                                    <small class="text-muted">Batches</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="border rounded p-3">
+                                                    <h4 class="text-info mb-0">
+                                                        <t t-esc="program.total_courses"/>
+                                                    </h4>
+                                                    <small class="text-muted">Courses</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-8">
+                                <!-- Program Title -->
+                                <div class="mb-4">
+                                    <h1 class="display-5 mb-2">
+                                        <t t-esc="program.name"/>
+                                    </h1>
+                                    <h2 class="text-muted h4 mb-4">
+                                        <t t-esc="program.code"/> |
+                                        <span class="text-capitalize">
+                                            <t t-esc="program.program_type"/>
+                                        </span>
+                                    </h2>
+
+                                    <div class="d-flex flex-wrap gap-3 mb-4">
+                                        <span class="badge bg-primary p-3">
+                                            <i class="fa fa-building me-2"/>
+                                            <t t-esc="program.department_id.name"/>
+                                        </span>
+                                        <span class="badge bg-warning text-dark p-3">
+                                            <i class="fa fa-clock-o me-2"/>
+                                            <t t-esc="program.duration_years"/> Years
+                                        </span>
+                                        <span class="badge bg-info text-dark p-3">
+                                            <i class="fa fa-calendar me-2"/>
+                                            <t t-esc="program.total_semesters"/> Semesters
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Seats Information -->
+                                <div class="card border-0 shadow-sm mb-4">
+                                    <div class="card-body">
+                                        <h5 class="card-title mb-3">
+                                            <i class="fa fa-th-large text-success me-2"/>Seats Availability
+                                        </h5>
+                                        <div class="mb-2">
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <span>Enrolled Students</span>
+                                                <span>
+                                                    <strong>
+                                                        <t t-esc="program.total_seats - program.available_seats"/>
+                                                    </strong> /
+                                                    <t t-esc="program.total_seats"/>
+                                                </span>
+                                            </div>
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar bg-success"
+                                                     t-att-style="'width: ' + str((program.total_seats - program.available_seats) / program.total_seats * 100 if program.total_seats &gt; 0 else 0) + '%'">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="alert alert-info mb-0">
+                                            <i class="fa fa-info-circle me-2"/>
+                                            <strong>
+                                                <t t-esc="program.available_seats"/>
+                                            </strong> seats available for admission
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Eligibility Criteria -->
+                                <div t-if="program.eligibility_criteria or program.min_percentage"
+                                     class="card border-0 shadow-sm mb-4">
+                                    <div class="card-body">
+                                        <h5 class="card-title mb-3">
+                                            <i class="fa fa-graduation-cap text-primary me-2"/>Eligibility Criteria
+                                        </h5>
+                                        <div t-if="program.min_percentage" class="mb-3">
+                                            <p class="mb-1">
+                                                <strong>Minimum Percentage Required:</strong>
+                                            </p>
+                                            <div class="d-flex align-items-center">
+                                                <div class="progress flex-grow-1 me-3" style="height: 10px;">
+                                                    <div class="progress-bar bg-warning"
+                                                         t-att-style="'width: ' + str(program.min_percentage) + '%'">
+                                                    </div>
+                                                </div>
+                                                <span class="fw-bold">
+                                                    <t t-esc="program.min_percentage"/>%
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div t-if="program.eligibility_criteria">
+                                            <p class="mb-1">
+                                                <strong>Requirements:</strong>
+                                            </p>
+                                            <div class="border rounded p-3 bg-light">
+                                                <t t-raw="program.eligibility_criteria.replace('\n', '&lt;br/&gt;')"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Program Description -->
+                        <div t-if="program.description" class="row mb-5">
+                            <div class="col-12">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body p-5">
+                                        <h3 class="card-title mb-4">
+                                            <i class="fa fa-info-circle text-primary me-2"/>Program Overview
+                                        </h3>
+                                        <div class="program-description">
+                                            <t t-raw="program.description"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Career Opportunities -->
+                        <div t-if="program.career_opportunities" class="row mb-5">
+                            <div class="col-12">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body p-5">
+                                        <h3 class="card-title mb-4">
+                                            <i class="fa fa-briefcase text-success me-2"/>Career Opportunities
+                                        </h3>
+                                        <div class="career-opportunities">
+                                            <t t-raw="program.career_opportunities"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Related Content Tabs -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-header bg-white border-0 p-0">
+                                        <ul class="nav nav-tabs nav-fill" role="tablist">
+                                            <li class="nav-item">
+                                                <a class="nav-link active" data-bs-toggle="tab" href="#courses">
+                                                    <i class="fa fa-book me-2"/>Courses
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" data-bs-toggle="tab" href="#batches">
+                                                    <i class="fa fa-calendar me-2"/>Batches
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" data-bs-toggle="tab" href="#syllabus">
+                                                    <i class="fa fa-list-alt me-2"/>Syllabus
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" data-bs-toggle="tab" href="#fees">
+                                                    <i class="fa fa-money me-2"/>Fee Structure
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="tab-content">
+                                            <!-- Courses Tab -->
+                                            <div class="tab-pane fade show active" id="courses">
+                                                <div t-if="program.course_ids" class="row">
+                                                    <t t-foreach="program.course_ids[:10]" t-as="course">
+                                                        <div class="col-md-6 col-lg-4 mb-3">
+                                                            <div class="border rounded p-3 h-100">
+                                                                <h6 class="mb-2">
+                                                                    <t t-esc="course.code"/> - <t t-esc="course.name"/>
+                                                                </h6>
+                                                                <div class="text-muted small mb-2">
+                                                                    <i class="fa fa-user me-1"/>
+                                                                    <t t-esc="course.faculty_id.name or 'TBA'"/>
+                                                                </div>
+                                                                <div class="d-flex justify-content-between">
+                                                                    <span class="badge bg-info">
+                                                                        <t t-esc="course.credits"/> Credits
+                                                                    </span>
+                                                                    <span class="badge" t-att-class="'bg-success' if course.state == 'active' else 'bg-secondary'">
+                                                                        <t t-esc="course.state"/>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </t>
+                                                </div>
+                                                <div t-else="" class="text-center py-4">
+                                                    <i class="fa fa-book fa-3x text-muted mb-3"/>
+                                                    <p class="text-muted">No courses available for this program</p>
+                                                </div>
+                                            </div>
+
+                                            <!-- Batches Tab -->
+                                            <div class="tab-pane fade" id="batches">
+                                                <div t-if="program.batch_ids" class="table-responsive">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Batch Name</th>
+                                                                <th>Start Year</th>
+                                                                <th>End Year</th>
+                                                                <th>Current Semester</th>
+                                                                <th>Students</th>
+                                                                <th>Status</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <t t-foreach="program.batch_ids" t-as="batch">
+                                                                <tr>
+                                                                    <td>
+                                                                        <strong><t t-esc="batch.name"/></strong>
+                                                                        <div class="text-muted small">
+                                                                            <t t-esc="batch.code"/>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td><t t-esc="batch.start_year"/></td>
+                                                                    <td><t t-esc="batch.end_year"/></td>
+                                                                    <td>
+                                                                        <span class="badge bg-primary">
+                                                                            <t t-esc="batch.current_semester"/>
+                                                                        </span>
+                                                                    </td>
+                                                                    <td><t t-esc="batch.total_students"/></td>
+                                                                    <td>
+                                                                        <span t-att-class="'badge bg-' + ('success' if batch.state == 'graduated' else 'info' if batch.state == 'active' else 'secondary')">
+                                                                            <t t-esc="batch.state"/>
+                                                                        </span>
+                                                                    </td>
+                                                                </tr>
+                                                            </t>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div t-else="" class="text-center py-4">
+                                                    <i class="fa fa-calendar fa-3x text-muted mb-3"/>
+                                                    <p class="text-muted">No batches available for this program</p>
+                                                </div>
+                                            </div>
+
+                                            <!-- Syllabus Tab -->
+                                            <div class="tab-pane fade" id="syllabus">
+                                                <div t-if="program.syllabus_ids" class="row">
+                                                    <t t-foreach="program.syllabus_ids" t-as="syllabus">
+                                                        <div class="col-md-6 mb-3">
+                                                            <div class="card">
+                                                                <div class="card-body">
+                                                                    <h5 class="card-title">
+                                                                        <t t-esc="syllabus.name"/>
+                                                                    </h5>
+                                                                    <h6 class="card-subtitle mb-3 text-muted">
+                                                                        <t t-esc="syllabus.code"/>
+                                                                    </h6>
+                                                                    <div class="row">
+                                                                        <div class="col-6">
+                                                                            <small class="text-muted">
+                                                                                <i class="fa fa-calendar me-1"/>
+                                                                                Academic Year:
+                                                                                <t t-esc="syllabus.academic_year_id.name or 'N/A'"/>
+                                                                            </small>
+                                                                        </div>
+                                                                        <div class="col-6">
+                                                                            <small class="text-muted">
+                                                                                <i class="fa fa-book me-1"/>
+                                                                                Semester:
+                                                                                <t t-esc="syllabus.semester_id.name or 'N/A'"/>
+                                                                            </small>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row mt-2">
+                                                                        <div class="col-6">
+                                                                            <span class="badge bg-info">
+                                                                                <t t-esc="syllabus.total_subjects"/> Subjects
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="col-6">
+                                                                            <span class="badge bg-success">
+                                                                                <t t-esc="syllabus.total_credits"/> Credits
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </t>
+                                                </div>
+                                                <div t-else="" class="text-center py-4">
+                                                    <i class="fa fa-list-alt fa-3x text-muted mb-3"/>
+                                                    <p class="text-muted">No syllabus available for this program</p>
+                                                </div>
+                                            </div>
+
+                                            <!-- Fee Structure Tab -->
+                                            <div class="tab-pane fade" id="fees">
+                                                <div t-if="program.fee_structure_ids" class="table-responsive">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Fee Structure</th>
+                                                                <th>Academic Year</th>
+                                                                <th>Semester</th>
+                                                                <th>Total Amount</th>
+                                                                <th>Status</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <t t-foreach="program.fee_structure_ids" t-as="fee">
+                                                                <tr>
+                                                                    <td>
+                                                                        <strong><t t-esc="fee.name"/></strong>
+                                                                    </td>
+                                                                    <td>
+                                                                        <t t-esc="fee.academic_year_id.name or 'N/A'"/>
+                                                                    </td>
+                                                                    <td>
+                                                                        <t t-esc="fee.semester_id.name or 'N/A'"/>
+                                                                    </td>
+                                                                    <td>
+                                                                        <strong class="text-primary">
+                                                                            ₹<t t-esc="'%0.2f' % fee.total_amount"/>
+                                                                        </strong>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span t-att-class="'badge bg-' + ('success' if fee.state == 'active' else 'warning' if fee.state == 'draft' else 'secondary')">
+                                                                            <t t-esc="fee.state"/>
+                                                                        </span>
+                                                                    </td>
+                                                                </tr>
+                                                            </t>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div t-else="" class="text-center py-4">
+                                                    <i class="fa fa-money fa-3x text-muted mb-3"/>
+                                                    <p class="text-muted">No fee structure available for this program</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Bootstrap JS for tabs -->
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"/>
+                <script>
+                    // Activate Bootstrap tabs
+                    document.addEventListener('DOMContentLoaded', function() {
+                        var triggerTabList = [].slice.call(document.querySelectorAll('a[data-bs-toggle="tab"]'));
+                        triggerTabList.forEach(function (triggerEl) {
+                            var tabTrigger = new bootstrap.Tab(triggerEl);
+                            triggerEl.addEventListener('click', function (event) {
+                                event.preventDefault();
+                                tabTrigger.show();
+                            });
+                        });
+                    });
+                </script>
+
+                <!-- Custom CSS -->
+                <style>
+                    .program-card {
+                        transition: transform 0.3s ease, box-shadow 0.3s ease;
+                    }
+                    .program-card:hover {
+                        transform: translateY(-5px);
+                        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+                    }
+                    .progress-bar {
+                        transition: width 1s ease-in-out;
+                    }
+                    .nav-tabs .nav-link {
+                        color: #495057;
+                        font-weight: 500;
+                    }
+                    .nav-tabs .nav-link.active {
+                        color: #0d6efd;
+                        border-bottom: 3px solid #0d6efd;
+                    }
+                    .tab-content {
+                        padding-top: 20px;
+                    }
+                    .program-description img,
+                    .career-opportunities img {
+                        max-width: 100%;
+                        height: auto;
+                    }
+                </style>
+            </t>
+        </template>
+
+    </data>
+</odoo>

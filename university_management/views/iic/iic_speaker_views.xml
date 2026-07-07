@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="iic_speaker_view_form" model="ir.ui.view">
+        <field name="name">iic.speaker.view.form</field>
+        <field name="model">iic.speaker</field>
+        <field name="arch" type="xml">
+            <form string="IIC Speaker">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object"
+                                name="action_view_events" icon="fa-calendar">
+                            <field name="event_count" widget="statinfo" string="Events"/>
+                        </button>
+                    </div>
+                    <field name="photo" widget="image" class="oe_avatar" options="{'preview_image': 'photo'}"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Speaker Full Name"/></h1>
+                        <h3><field name="designation" placeholder="Designation"/></h3>
+                    </div>
+                    <group>
+                        <group string="Professional Details">
+                            <field name="organization"/>
+                            <field name="expertise"/>
+                        </group>
+                        <group string="Contact">
+                            <field name="email"/>
+                            <field name="phone"/>
+                            <field name="linkedin_url"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Profile / Bio" name="profile">
+                            <field name="profile" placeholder="Enter speaker biography, professional background, achievements..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="iic_speaker_view_list" model="ir.ui.view">
+        <field name="name">iic.speaker.view.list</field>
+        <field name="model">iic.speaker</field>
+        <field name="arch" type="xml">
+            <list string="IIC Speakers">
+                <field name="name"/>
+                <field name="designation"/>
+                <field name="organization"/>
+                <field name="expertise"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <field name="event_count"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="iic_speaker_view_kanban" model="ir.ui.view">
+        <field name="name">iic.speaker.view.kanban</field>
+        <field name="model">iic.speaker</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name"/>
+                <field name="designation"/>
+                <field name="organization"/>
+                <field name="photo"/>
+                <field name="event_count"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <img t-att-src="kanban_image('iic.speaker', 'photo', record.id.raw_value)"
+                                     alt="Speaker Photo" class="o_image_64_cover"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong><field name="name"/></strong>
+                                <div><field name="designation"/></div>
+                                <div class="text-muted"><field name="organization"/></div>
+                                <div class="mt-2">
+                                    <span class="badge badge-pill badge-info">
+                                        <field name="event_count"/> Events
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="iic_speaker_view_search" model="ir.ui.view">
+        <field name="name">iic.speaker.view.search</field>
+        <field name="model">iic.speaker</field>
+        <field name="arch" type="xml">
+            <search string="Search Speakers">
+                <field name="name"/>
+                <field name="organization"/>
+                <field name="expertise"/>
+                <separator/>
+                <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Organization" name="group_org" context="{'group_by': 'organization'}"/>
+                    <filter string="Expertise" name="group_exp" context="{'group_by': 'expertise'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_iic_speaker" model="ir.actions.act_window">
+        <field name="name">IIC Speakers</field>
+        <field name="res_model">iic.speaker</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="iic_speaker_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add your first IIC Speaker!
+            </p>
+        </field>
+    </record>
+
+</odoo>

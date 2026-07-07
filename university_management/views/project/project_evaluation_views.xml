@@ -1,0 +1,507 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View - Project Evaluation -->
+    <record id="project_evaluation_view_form" model="ir.ui.view">
+        <field name="name">project.evaluation.view.form</field>
+        <field name="model">project.evaluation</field>
+        <field name="arch" type="xml">
+            <form string="Project Evaluation">
+                <header>
+                    <button name="action_submit" string="Submit Evaluation" type="object"
+                            class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_approve" string="Approve" type="object"
+                            class="btn-success"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft" type="object"
+                            class="btn-warning"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_view_project" icon="fa-folder">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">View</span>
+                                <span class="o_stat_text">Project</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <label for="name" string="Evaluation Number"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Project Details">
+                            <field name="project_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="evaluation_type" widget="radio"/>
+                            <field name="evaluation_date"/>
+                        </group>
+                        <group string="Evaluator Details">
+                            <field name="evaluator_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="is_external" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+
+                    <group string="Evaluation Criteria">
+                        <group>
+                            <label for="innovation" string="Innovation/Novelty"/>
+                            <div class="d-flex align-items-center">
+                                <field name="innovation" class="oe_inline"/>
+                                <span class="ms-2 text-muted">/ 10</span>
+                            </div>
+
+                            <label for="technical_complexity" string="Technical Complexity"/>
+                            <div class="d-flex align-items-center">
+                                <field name="technical_complexity" class="oe_inline"/>
+                                <span class="ms-2 text-muted">/ 10</span>
+                            </div>
+
+                            <label for="implementation" string="Implementation Quality"/>
+                            <div class="d-flex align-items-center">
+                                <field name="implementation" class="oe_inline"/>
+                                <span class="ms-2 text-muted">/ 10</span>
+                            </div>
+                        </group>
+
+                        <group>
+                            <label for="documentation" string="Documentation"/>
+                            <div class="d-flex align-items-center">
+                                <field name="documentation" class="oe_inline"/>
+                                <span class="ms-2 text-muted">/ 10</span>
+                            </div>
+
+                            <label for="presentation" string="Presentation Skills"/>
+                            <div class="d-flex align-items-center">
+                                <field name="presentation" class="oe_inline"/>
+                                <span class="ms-2 text-muted">/ 10</span>
+                            </div>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Total Score">
+                            <field name="total_marks" class="text-success fw-bold" widget="float"/>
+                            <field name="max_marks" readonly="1"/>
+                            <field name="percentage" widget="progressbar" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Strengths" name="strengths">
+                            <field name="strengths"
+                                   placeholder="Enter the strong points and good aspects of the project..."/>
+                        </page>
+
+                        <page string="Areas of Improvement" name="weaknesses">
+                            <field name="weaknesses"
+                                   placeholder="Enter the areas that need improvement..."/>
+                        </page>
+
+                        <page string="Suggestions" name="suggestions">
+                            <field name="suggestions"
+                                   placeholder="Enter suggestions for further enhancement..."/>
+                        </page>
+
+                        <page string="Overall Comments" name="comments">
+                            <field name="comments" nolabel="1"
+                                   placeholder="Enter overall evaluation comments and remarks..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View - Project Evaluation -->
+    <record id="project_evaluation_view_list" model="ir.ui.view">
+        <field name="name">project.evaluation.view.list</field>
+        <field name="model">project.evaluation</field>
+        <field name="arch" type="xml">
+            <list string="Project Evaluations"
+                  default_order="evaluation_date desc"
+                  multi_edit="1"
+                  sample="1"
+                  decoration-info="state == 'draft'"
+                  decoration-primary="state == 'submitted'"
+                  decoration-success="state == 'approved'">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="evaluation_type" widget="badge"
+                       decoration-info="evaluation_type == 'synopsis'"
+                       decoration-warning="evaluation_type == 'progress'"
+                       decoration-primary="evaluation_type == 'internal'"
+                       decoration-danger="evaluation_type == 'external'"
+                       decoration-success="evaluation_type == 'final'"/>
+                <field name="evaluator_id"/>
+                <field name="is_external" widget="boolean_toggle" optional="show"/>
+                <field name="evaluation_date"/>
+                <field name="innovation" optional="hide" sum="Total"/>
+                <field name="technical_complexity" optional="hide" sum="Total"/>
+                <field name="implementation" optional="hide" sum="Total"/>
+                <field name="documentation" optional="hide" sum="Total"/>
+                <field name="presentation" optional="hide" sum="Total"/>
+                <field name="total_marks" widget="float" sum="Total Marks" optional="show"/>
+                <field name="max_marks" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-primary="state == 'submitted'"
+                       decoration-success="state == 'approved'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View - Project Evaluation -->
+    <record id="project_evaluation_view_search" model="ir.ui.view">
+        <field name="name">project.evaluation.view.search</field>
+        <field name="model">project.evaluation</field>
+        <field name="arch" type="xml">
+            <search string="Search Project Evaluations">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="evaluator_id"/>
+                <field name="evaluation_type"/>
+
+                <separator/>
+
+                <filter name="filter_draft" string="Draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_submitted" string="Submitted"
+                        domain="[('state', '=', 'submitted')]"/>
+                <filter name="filter_approved" string="Approved"
+                        domain="[('state', '=', 'approved')]"/>
+
+                <separator/>
+
+                <filter name="filter_internal" string="Internal Evaluator"
+                        domain="[('is_external', '=', False)]"/>
+                <filter name="filter_external" string="External Evaluator"
+                        domain="[('is_external', '=', True)]"/>
+
+                <separator/>
+
+                <filter name="filter_synopsis" string="Synopsis Review"
+                        domain="[('evaluation_type', '=', 'synopsis')]"/>
+                <filter name="filter_progress" string="Progress Review"
+                        domain="[('evaluation_type', '=', 'progress')]"/>
+                <filter name="filter_internal_eval" string="Internal Evaluation"
+                        domain="[('evaluation_type', '=', 'internal')]"/>
+                <filter name="filter_external_eval" string="External Evaluation"
+                        domain="[('evaluation_type', '=', 'external')]"/>
+                <filter name="filter_final" string="Final Evaluation"
+                        domain="[('evaluation_type', '=', 'final')]"/>
+
+                <separator/>
+
+                <filter name="filter_high_marks" string="High Marks (≥ 40)"
+                        domain="[('total_marks', '&gt;=', 40)]"/>
+                <filter name="filter_medium_marks" string="Medium Marks (30-39)"
+                        domain="[('total_marks', '&gt;=', 30), ('total_marks', '&lt;', 40)]"/>
+                <filter name="filter_low_marks" string="Low Marks (&lt; 30)"
+                        domain="[('total_marks', '&lt;', 30)]"/>
+
+                <separator/>
+
+                <filter name="filter_this_month"
+                        string="This Month"
+                        domain="[('evaluation_date', '>=', context_today().strftime('%Y-%m') + '-01')]"/>
+                <filter name="filter_this_year"
+                        string="This Year"
+                        domain="[('evaluation_date', '>=', context_today().strftime('%Y') + '-01-01')]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_project" string="Project"
+                            context="{'group_by': 'project_id'}"/>
+                    <filter name="group_by_evaluator" string="Evaluator"
+                            context="{'group_by': 'evaluator_id'}"/>
+                    <filter name="group_by_evaluation_type" string="Evaluation Type"
+                            context="{'group_by': 'evaluation_type'}"/>
+                    <filter name="group_by_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_by_evaluation_date" string="Evaluation Date"
+                            context="{'group_by': 'evaluation_date'}"/>
+                    <filter name="group_by_is_external" string="External Evaluator"
+                            context="{'group_by': 'is_external'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="evaluation_type" string="Evaluation Type"
+                           select="multi"
+                           icon="fa-list-alt"/>
+                    <field name="state" string="Status"
+                           select="multi"
+                           icon="fa-flag"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View - Project Evaluation -->
+    <record id="project_evaluation_view_kanban" model="ir.ui.view">
+        <field name="name">project.evaluation.view.kanban</field>
+        <field name="model">project.evaluation</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="state"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="evaluation_type"/>
+                <field name="evaluator_id"/>
+                <field name="is_external"/>
+                <field name="evaluation_date"/>
+                <field name="innovation"/>
+                <field name="technical_complexity"/>
+                <field name="implementation"/>
+                <field name="documentation"/>
+                <field name="presentation"/>
+                <field name="total_marks"/>
+                <field name="max_marks"/>
+                <field name="state"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <i class="fa fa-check-square-o"/> <field name="name"/>
+                                        </strong>
+                                        <div class="text-muted">
+                                            <small>
+                                                <i class="fa fa-folder"/> <field name="project_id"/>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body mt-3">
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="card text-white"
+                                                 t-attf-class="{{
+                                                    record.evaluation_type.raw_value == 'synopsis' ? 'bg-info' :
+                                                    (record.evaluation_type.raw_value == 'progress' ? 'bg-warning' :
+                                                    (record.evaluation_type.raw_value == 'internal' ? 'bg-primary' :
+                                                    (record.evaluation_type.raw_value == 'external' ? 'bg-danger' : 'bg-success')))
+                                                 }}">
+                                                <div class="card-body p-2 text-center">
+                                                    <h6 class="mb-0">
+                                                        <field name="evaluation_type"/>
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="card bg-secondary text-white">
+                                                <div class="card-body p-2">
+                                                    <h6 class="mb-1">
+                                                        <i class="fa fa-user"/> Evaluator
+                                                    </h6>
+                                                    <small><field name="evaluator_id"/></small>
+                                                    <div t-if="record.is_external.raw_value" class="mt-1">
+                                                        <span class="badge badge-warning">External</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded text-center">
+                                                <div class="text-primary">
+                                                    <i class="fa fa-calendar fa-lg"/>
+                                                </div>
+                                                <small class="text-muted">Evaluation Date</small>
+                                                <h6 class="mb-0"><field name="evaluation_date"/></h6>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="card"
+                                                 t-attf-class="{{
+                                                    record.total_marks.raw_value >= 40 ? 'bg-success' :
+                                                    (record.total_marks.raw_value >= 30 ? 'bg-warning' : 'bg-danger')
+                                                 }} text-white">
+                                                <div class="card-body p-3 text-center">
+                                                    <h3 class="mb-0">
+                                                        <field name="total_marks"/> / <field name="max_marks"/>
+                                                    </h3>
+                                                    <small>Total Score</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded">
+                                                <h6 class="mb-2 text-center">Score Breakdown</h6>
+                                                <table class="table table-sm table-borderless mb-0">
+                                                    <tr>
+                                                        <td><small>Innovation</small></td>
+                                                        <td class="text-end"><strong><field name="innovation"/>/10</strong></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><small>Technical</small></td>
+                                                        <td class="text-end"><strong><field name="technical_complexity"/>/10</strong></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><small>Implementation</small></td>
+                                                        <td class="text-end"><strong><field name="implementation"/>/10</strong></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><small>Documentation</small></td>
+                                                        <td class="text-end"><strong><field name="documentation"/>/10</strong></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><small>Presentation</small></td>
+                                                        <td class="text-end"><strong><field name="presentation"/>/10</strong></td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom mt-2">
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Calendar View - Project Evaluation -->
+    <record id="project_evaluation_view_calendar" model="ir.ui.view">
+        <field name="name">project.evaluation.view.calendar</field>
+        <field name="model">project.evaluation</field>
+        <field name="arch" type="xml">
+            <calendar string="Evaluation Calendar"
+                      date_start="evaluation_date"
+                      mode="month"
+                      color="evaluation_type"
+                      quick_create="0"
+                      event_limit="5">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="evaluator_id"/>
+                <field name="total_marks"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Pivot View - Project Evaluation -->
+    <record id="project_evaluation_view_pivot" model="ir.ui.view">
+        <field name="name">project.evaluation.view.pivot</field>
+        <field name="model">project.evaluation</field>
+        <field name="arch" type="xml">
+            <pivot string="Evaluation Analysis">
+                <field name="evaluation_type" type="row"/>
+                <field name="evaluator_id" type="row"/>
+                <field name="state" type="col"/>
+                <field name="total_marks" type="measure"/>
+                <field name="innovation" type="measure"/>
+                <field name="technical_complexity" type="measure"/>
+                <field name="implementation" type="measure"/>
+                <field name="documentation" type="measure"/>
+                <field name="presentation" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View - Project Evaluation -->
+    <record id="project_evaluation_view_graph" model="ir.ui.view">
+        <field name="name">project.evaluation.view.graph</field>
+        <field name="model">project.evaluation</field>
+        <field name="arch" type="xml">
+            <graph string="Evaluation Statistics" type="bar">
+                <field name="evaluation_type"/>
+                <field name="total_marks" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_project_evaluation" model="ir.actions.act_window">
+        <field name="name">Project Evaluations</field>
+        <field name="res_model">project.evaluation</field>
+        <field name="view_mode">list,kanban,form,calendar,pivot,graph</field>
+        <field name="context">{'search_default_filter_this_year': 1, 'search_default_group_by_evaluation_type': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create Project Evaluation
+            </p>
+            <p>
+                Assess and evaluate student projects with detailed criteria. Enter name (char,
+                Evaluation Number, required, readonly, copy=false, default '/' for auto-sequence
+                generation via ir.sequence 'project.evaluation', unique constraint name_unique). Select
+                project_id (Many2one to student.project, required, tracked, indexed, no-create). Select
+                evaluation_type (5 options, required, tracked, radio widget): synopsis (Synopsis Review -
+                info badge), progress (Progress Review - warning/yellow badge), internal (Internal
+                Evaluation - primary/blue badge), external (External Evaluation - danger/red badge),
+                final (Final Evaluation - success/green badge). Select evaluator_id (Many2one to
+                faculty.faculty, required, tracked, no-create). Toggle is_external (boolean,
+                boolean_toggle widget for External Evaluator identification). Enter evaluation_date (date,
+                default today, required). Enter evaluation criteria (5 float fields, each 0-10 marks with
+                default 0.0, validation constraint 0-10 via _check_marks, displayed with "/ 10" text):
+                innovation (Innovation/Novelty, 10 marks), technical_complexity (Technical Complexity, 10
+                marks), implementation (Implementation Quality, 10 marks), documentation (Documentation,
+                10 marks), presentation (Presentation Skills, 10 marks). View total_marks (float,
+                computed sum of 5 criteria via _compute_total with api.depends, stored, text-success
+                fw-bold, float widget). View max_marks (float, default 50.0, readonly). Enter feedback:
+                strengths (html, placeholder "Enter the strong points and good aspects of the
+                project..."), weaknesses (html, Areas of Improvement, placeholder "Enter the areas that
+                need improvement..."), suggestions (html, placeholder "Enter suggestions for further
+                enhancement..."), comments (text, Overall Comments, placeholder "Enter overall evaluation
+                comments and remarks..."). Select state (3 options, default draft, tracked, statusbar
+                widget): draft (Draft - info/blue row and badge), submitted (Submitted - primary row and
+                badge), approved (Approved - success/green row and badge). Header has 3 action buttons:
+                Submit Evaluation (draft→submitted, primary button), Approve (submitted→approved, success
+                button), Reset to Draft (any→draft except draft, warning button). Form view button box has
+                1 stat button: View Project (folder icon). List view with 3-color row decorations:
+                Info/Blue (draft), Primary (submitted), Success/Green (approved). Badge widgets for
+                evaluation_type (5-color decorations) and state (3-color decorations). Sum aggregates for
+                all marks fields. Filters for marks ranges: High (≥40), Medium (30-39), Low (&lt;30).
+                Kanban view grouped by state showing evaluation number (check-square icon), project name
+                (folder icon, small), evaluation type card (dynamic 5-color background: info/synopsis,
+                warning/progress, primary/internal, danger/external, success/final, centered), evaluator
+                card (secondary/gray, user icon, shows evaluator_id with external badge if is_external),
+                evaluation date card (light background, centered, calendar icon primary/blue), total score
+                card (dynamic 3-color background based on score: success if ≥40, warning if ≥30, danger if
+                &lt;30, large h3 centered showing total_marks/max_marks), score breakdown table (light
+                background, 5-row table showing all criteria with marks/10). Calendar view for scheduling
+                (date_start: evaluation_date, color by evaluation_type, month mode, event_limit 5). Pivot
+                view for analysis (evaluation_type × evaluator_id rows, state cols, measures: all 6 marks
+                fields). Graph view for statistics (bar chart, evaluation_type vs. total_marks). Ordered
+                by evaluation_date desc (most recent first). Default filters: This year evaluations and
+                Grouped by Evaluation Type. Full chatter support for academic collaboration.
+            </p>
+        </field>
+    </record>
+
+</odoo>

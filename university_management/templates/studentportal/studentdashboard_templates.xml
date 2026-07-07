@@ -1,0 +1,1657 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ==================== STUDENT DASHBOARD ==================== -->
+        <template id="student_dashboard" name="Student Dashboard" inherit_id="portal.portal_layout">
+            <xpath expr="//div[hasclass('o_portal')]" position="inside">
+                <t t-if="student">
+                <div class="container mt-3">
+                    <!-- Welcome Banner -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <t t-if="student.student_photo">
+                                                <img t-attf-src="data:image/png;base64,{{ student.student_photo }}"
+                                                     class="img-thumbnail rounded-circle" width="100" height="100"/>
+                                            </t>
+                                            <t t-else="">
+                                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+                                                    <i class="fa fa-user fa-3x text-muted"></i>
+                                                </div>
+                                            </t>
+                                        </div>
+                                        <div class="col-md-10">
+                                            <h1 class="card-title">Welcome, <t t-esc="student.name"/>!</h1>
+                                            <p class="card-text">
+                                                <span class="badge bg-light text-dark mr-2">
+                                                    <i class="fa fa-id-card-o"></i> <t t-esc="student.registration_number"/>
+                                                </span>
+                                                <span class="badge bg-light text-dark mr-2">
+                                                    <i class="fa fa-graduation-cap"></i> <t t-esc="student.program_id.name"/>
+                                                </span>
+                                                <span class="badge bg-light text-dark">
+                                                    <i class="fa fa-building"></i> <t t-esc="student.department_id.name"/>
+                                                </span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h1 class="display-4 text-primary"><i class="fa fa-percent"></i></h1>
+                                    <h5 class="card-title">Attendance</h5>
+                                    <p class="card-text h3"><t t-esc="'%.1f' % ((attendance_percentage or 0.0) if attendance_percentage is not None else 0.0)"/>%</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h1 class="display-4 text-success"><i class="fa fa-star"></i></h1>
+                                    <h5 class="card-title">CGPA</h5>
+                                    <p class="card-text h3"><t t-esc="'%.2f' % (cgpa or 0)"/></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h1 class="display-4 text-warning"><i class="fa fa-exclamation-triangle"></i></h1>
+                                    <h5 class="card-title">Backlogs</h5>
+                                    <p class="card-text h3"><t t-esc="active_backlogs or 0"/></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h1 class="display-4 text-danger"><i class="fa fa-calendar"></i></h1>
+                                    <h5 class="card-title">Current Semester</h5>
+                                    <p class="card-text h3">Sem <t t-esc="student.current_semester"/></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Recent Attendance -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fa fa-calendar text-primary"></i> Recent Attendance
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>Subject</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-foreach="recent_attendance" t-as="att">
+                                                    <tr>
+                                                        <td><t t-esc="att.date"/></td>
+                                                        <td><t t-esc="att.subject_id.name"/></td>
+                                                        <td>
+                                                            <span t-if="att.state == 'present'" class="badge bg-success">Present</span>
+                                                            <span t-elif="att.state == 'absent'" class="badge bg-danger">Absent</span>
+                                                            <span t-elif="att.state == 'late'" class="badge bg-warning">Late</span>
+                                                            <span t-else="" class="badge bg-secondary"><t t-esc="att.state"/></span>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="not recent_attendance">
+                                                    <tr>
+                                                        <td colspan="3" class="text-center text-muted">No recent attendance records</td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <a href="/my/attendance" class="btn btn-sm btn-outline-primary">View All Attendance</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Fee Payments -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fa fa-credit-card text-success"></i> Recent Fee Payments
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>Amount</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-foreach="recent_fees" t-as="fee">
+                                                    <tr>
+                                                        <td><t t-esc="fee.payment_date"/></td>
+                                                        <td><t t-esc="'%s %s' % (fee.amount, fee.currency_id.symbol or fee.currency_id.name)"/></td>
+                                                        <td>
+                                                            <span t-if="fee.state == 'paid'" class="badge bg-success">Paid</span>
+                                                            <span t-else="" class="badge bg-secondary"><t t-esc="fee.state"/></span>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="not recent_fees">
+                                                    <tr>
+                                                        <td colspan="3" class="text-center text-muted">No recent fee payments</td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <a href="/my/fees" class="btn btn-sm btn-outline-success">View All Fees</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming Exams -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fa fa-clipboard text-danger"></i> Upcoming Exams
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Exam</th>
+                                                    <th>Type</th>
+                                                    <th>Start Date</th>
+                                                    <th>End Date</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-foreach="upcoming_exams" t-as="exam">
+                                                    <tr>
+                                                        <td><t t-esc="exam.name"/></td>
+                                                        <td>
+                                                            <span class="badge bg-info"><t t-esc="exam.exam_type"/></span>
+                                                        </td>
+                                                        <td><t t-esc="exam.start_date"/></td>
+                                                        <td><t t-esc="exam.end_date"/></td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="not upcoming_exams">
+                                                    <tr>
+                                                        <td colspan="4" class="text-center text-muted">No upcoming exams</td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </t>
+            </xpath>
+        </template>
+
+        <!-- ==================== STUDENT PROFILE ==================== -->
+        <template id="student_profile" name="Student Profile">
+            <t t-call="portal.portal_layout">
+                <div class="container mt-3">
+                    <!-- Success/Error Messages -->
+                    <t t-if="request.params.get('success')">
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            Profile updated successfully!
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    </t>
+                    <t t-elif="request.params.get('error')">
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            Error updating profile. Please try again.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    </t>
+
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <!-- Profile Card -->
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <t t-if="student.student_photo">
+                                        <img t-attf-src="data:image/png;base64,{{ student.student_photo }}"
+                                             class="img-thumbnail rounded-circle mb-3" width="150" height="150"/>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                                             style="width: 150px; height: 150px;">
+                                            <i class="fa fa-user fa-5x text-muted"></i>
+                                        </div>
+                                    </t>
+                                    <h4><t t-esc="student.name"/></h4>
+                                    <p class="text-muted">
+                                        <i class="fa fa-id-card-o"></i> <t t-esc="student.registration_number"/>
+                                    </p>
+                                    <div class="d-grid gap-2">
+                                        <a href="/my/student/dashboard" class="btn btn-outline-primary">
+                                            <i class="fa fa-dashboard"></i> Dashboard
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Academic Info -->
+                            <div class="card mt-3">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">Academic Information</h6>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2">
+                                            <strong><i class="fa fa-graduation-cap text-primary"></i> Program:</strong>
+                                            <br/><t t-esc="student.program_id.name"/>
+                                        </li>
+                                        <li class="mb-2">
+                                            <strong><i class="fa fa-building text-primary"></i> Department:</strong>
+                                            <br/><t t-esc="student.department_id.name"/>
+                                        </li>
+                                        <li class="mb-2">
+                                            <strong><i class="fa fa-calendar text-primary"></i> Current Semester:</strong>
+                                            <br/>Semester <t t-esc="student.current_semester"/>
+                                        </li>
+                                        <li class="mb-2">
+                                            <strong><i class="fa fa-star text-primary"></i> CGPA:</strong>
+                                            <br/><t t-esc="'%.2f' % student.cgpa"/>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-8">
+                            <!-- Edit Profile Form -->
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">Edit Profile</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form action="/my/profile/update" method="post" enctype="multipart/form-data">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                                        <div class="row">
+                                            <!-- Photo Upload -->
+                                            <div class="col-md-12 mb-3">
+                                                <label class="form-label">Profile Photo</label>
+                                                <input type="file" class="form-control" name="photo" accept="image/*"/>
+                                            </div>
+
+                                            <!-- Contact Information -->
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Mobile Number *</label>
+                                                <input type="tel" class="form-control" name="mobile"
+                                                       t-att-value="student.mobile" required="required"/>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Email Address *</label>
+                                                <input type="email" class="form-control" name="email"
+                                                       t-att-value="student.email" required="required"/>
+                                            </div>
+
+                                            <!-- Emergency Contact -->
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Emergency Contact Name</label>
+                                                <input type="text" class="form-control" name="emergency_contact_name"
+                                                       t-att-value="student.emergency_contact_name"/>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Emergency Contact Phone</label>
+                                                <input type="tel" class="form-control" name="emergency_contact"
+                                                       t-att-value="student.emergency_contact"/>
+                                            </div>
+
+                                            <!-- Current Address -->
+                                            <div class="col-12 mb-3">
+                                                <label class="form-label">Current Address</label>
+                                                <textarea class="form-control" name="current_address" rows="3"
+                                                          t-att-value="student.current_address"></textarea>
+                                            </div>
+
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label">City</label>
+                                                <input type="text" class="form-control" name="city"
+                                                       t-att-value="student.city"/>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label">State</label>
+                                                <select class="form-control" name="state_id">
+                                                    <option value="">Select State</option>
+                                                    <t t-foreach="states" t-as="state">
+                                                        <option t-att-value="state.id"
+                                                                t-att-selected="student.state_id and state.id == student.state_id.id">
+                                                            <t t-esc="state.name"/>
+                                                        </option>
+                                                    </t>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label">ZIP Code</label>
+                                                <input type="text" class="form-control" name="zip"
+                                                       t-att-value="student.zip"/>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                            <a href="/my" class="btn btn-secondary me-md-2">Cancel</a>
+                                            <button type="submit" class="btn btn-primary">Update Profile</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Personal Information -->
+                            <div class="card mt-3">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">Personal Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p><strong>Date of Birth:</strong> <t t-esc="student.date_of_birth"/></p>
+                                            <p><strong>Age:</strong> <t t-esc="student.age"/> years</p>
+                                            <p><strong>Gender:</strong> <t t-esc="student.gender"/></p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>Blood Group:</strong> <t t-esc="student.blood_group"/></p>
+                                            <p><strong>Aadhar Number:</strong> <t t-esc="student.aadhar_number"/></p>
+                                            <p><strong>PAN Number:</strong> <t t-esc="student.pan_number"/></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <!-- ==================== ATTENDANCE ==================== -->
+        <template id="student_attendance" name="Student Attendance">
+            <t t-call="portal.portal_layout">
+                <div class="container mt-3">
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fa fa-calendar text-primary"></i> Attendance Records
+                                        </h5>
+                                        <span class="badge bg-primary">
+                                            Attendance: <t t-esc="'%.1f' % (student.attendance_percentage)"/>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <!-- Filters -->
+                                    <form class="row g-3 mb-4">
+                                        <div class="col-md-3">
+                                            <label class="form-label">Date From</label>
+                                            <input type="date" class="form-control" name="date_from"
+                                                   t-att-value="date_from"/>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Date To</label>
+                                            <input type="date" class="form-control" name="date_to"
+                                                   t-att-value="date_to"/>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Subject</label>
+                                            <select class="form-control" name="subject">
+                                                <option value="">All Subjects</option>
+                                                <t t-foreach="subjects" t-as="subject">
+                                                    <option t-att-value="subject.id"
+                                                            t-att-selected="selected_subject and subject.id == selected_subject">
+                                                        <t t-esc="subject.name"/>
+                                                    </option>
+                                                </t>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 d-flex align-items-end">
+                                            <button type="submit" class="btn btn-primary w-100">Filter</button>
+                                            <a href="/my/attendance" class="btn btn-outline-secondary ms-2">Clear</a>
+                                        </div>
+                                    </form>
+
+                                    <!-- Attendance Table -->
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>Day</th>
+                                                    <th>Subject</th>
+                                                    <th>Faculty</th>
+                                                    <th>Status</th>
+                                                    <th>Time In</th>
+                                                    <th>Time Out</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-foreach="attendance" t-as="att">
+                                                    <tr>
+                                                        <td><t t-esc="att.date"/></td>
+                                                        <td>
+                                                            <t t-if="att.date">
+                                                                <t t-esc="att.date.strftime('%A')"/>
+                                                            </t>
+                                                            <t t-else="">-</t>
+                                                        </td>
+                                                        <td><t t-esc="att.subject_id.name"/></td>
+                                                        <td><t t-esc="att.faculty_id.sudo().name or ''"/></td>
+                                                        <td>
+                                                            <span t-if="att.state == 'present'" class="badge bg-success">Present</span>
+                                                            <span t-elif="att.state == 'absent'" class="badge bg-danger">Absent</span>
+                                                            <span t-elif="att.state == 'late'" class="badge bg-warning">Late</span>
+                                                            <span t-elif="att.state == 'on_leave'" class="badge bg-info">On Leave</span>
+                                                            <span t-else="" class="badge bg-secondary"><t t-esc="att.state"/></span>
+                                                        </td>
+                                                        <td>
+                                                            <t t-if="att.time_in">
+                                                                <t t-set="hours" t-value="int(att.time_in)"/>
+                                                                <t t-set="minutes" t-value="int((att.time_in * 60) % 60)"/>
+                                                                <t t-esc="f'{hours:02d}:{minutes:02d}'"/>
+                                                            </t>
+                                                        </td>
+                                                        <td>
+                                                            <t t-if="att.time_out">
+                                                                <t t-set="hours" t-value="int(att.time_out)"/>
+                                                                <t t-set="minutes" t-value="int((att.time_out * 60) % 60)"/>
+                                                                <t t-esc="f'{hours:02d}:{minutes:02d}'"/>
+                                                            </t>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="not attendance">
+                                                    <tr>
+                                                        <td colspan="7" class="text-center text-muted">
+                                                            No attendance records found
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- Pagination -->
+                                    <t t-if="pager and pager['page_count'] > 1">
+                                        <nav aria-label="Attendance pagination">
+                                            <ul class="pagination justify-content-center">
+                                                <t t-foreach="pager['pages']" t-as="page">
+                                                    <li class="page-item" t-att-class="'active' if page['active'] else ''">
+                                                        <a class="page-link" t-att-href="page['url']">
+                                                            <t t-esc="page['num']"/>
+                                                        </a>
+                                                    </li>
+                                                </t>
+                                            </ul>
+                                        </nav>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <!-- ==================== TIMETABLE ==================== -->
+        <template id="student_timetable" name="Student Timetable">
+            <t t-call="portal.portal_layout">
+                <div class="container mt-3">
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fa fa-calendar text-primary"></i> Class Timetable
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Time</th>
+                                                    <th>Monday</th>
+                                                    <th>Tuesday</th>
+                                                    <th>Wednesday</th>
+                                                    <th>Thursday</th>
+                                                    <th>Friday</th>
+                                                    <th>Saturday</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <!-- Define time slots -->
+                                                <t t-set="time_slots" t-value="[('8:00', '9:30'), ('9:30', '11:00'),
+                                                                                ('11:00', '12:30'), ('12:30', '14:00'),
+                                                                                ('14:00', '15:30'), ('15:30', '17:00')]"/>
+
+                                                <t t-foreach="time_slots" t-as="slot">
+                                                    <tr>
+                                                        <td class="text-center align-middle">
+                                                            <strong><t t-esc="slot[0]"/> - <t t-esc="slot[1]"/></strong>
+                                                        </td>
+                                                        <!-- Monday to Saturday -->
+                                                        <t t-foreach="['0', '1', '2', '3', '4', '5']" t-as="day">
+                                                            <td>
+                                                                <t t-set="found_classes" t-value="[]"/>
+                                                                <t t-foreach="timetable_by_day.get(day, [])" t-as="tt">
+                                                                    <t t-set="tt_start" t-value="int(tt.start_time)"/>
+                                                                    <t t-set="tt_end" t-value="int(tt.end_time)"/>
+                                                                    <t t-set="slot_start" t-value="int(slot[0].split(':')[0])"/>
+                                                                    <t t-set="slot_end" t-value="int(slot[1].split(':')[0])"/>
+                                                                    <t t-if="tt_start >= slot_start and tt_start &lt; slot_end">
+                                                                        <t t-set="found_classes" t-value="found_classes + [tt]"/>
+                                                                    </t>
+                                                                </t>
+                                                                <t t-foreach="found_classes" t-as="cls">
+                                                                    <div class="timetable-class mb-2 p-2 rounded"
+                                                                         style="background-color: #e3f2fd; border-left: 4px solid #2196f3;">
+                                                                        <strong><t t-esc="cls.subject_id.name"/></strong><br/>
+                                                                        <small class="text-muted">
+                                                                            <i class="fa fa-user"></i> <t t-esc="cls.faculty_id.sudo().name or ''"/><br/>
+                                                                            <i class="fa fa-sign-in"></i> <t t-esc="cls.room_number or 'TBA'"/><br/>
+                                                                            <span class="badge bg-info"><t t-esc="cls.class_type"/></span>
+                                                                        </small>
+                                                                    </div>
+                                                                </t>
+                                                                <t t-if="not found_classes">
+                                                                    <div class="text-center text-muted">-</div>
+                                                                </t>
+                                                            </td>
+                                                        </t>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- Legend -->
+                                    <div class="row mt-4">
+                                        <div class="col-12">
+                                            <h6>Legend:</h6>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                <span class="badge bg-primary">Theory</span>
+                                                <span class="badge bg-success">Practical</span>
+                                                <span class="badge bg-warning">Lab</span>
+                                                <span class="badge bg-info">Tutorial</span>
+                                                <span class="badge bg-secondary">Seminar</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <!-- ==================== FEES ==================== -->
+        <template id="student_fees" name="Student Fees">
+            <t t-call="portal.portal_layout">
+                <div class="container mt-3">
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fa fa-credit-card text-success"></i> Fee Payments
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <!-- Summary Cards -->
+                                    <div class="row mb-4">
+                                        <div class="col-md-4">
+                                            <div class="card text-center bg-light">
+                                                <div class="card-body">
+                                                    <h6 class="card-title">Total Fee</h6>
+                                                    <h3 class="text-primary">
+                                                        <t t-esc="'%s %s' % (total_fee, student.currency_id.symbol or student.currency_id.name)"/>
+                                                    </h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="card text-center bg-light">
+                                                <div class="card-body">
+                                                    <h6 class="card-title">Total Paid</h6>
+                                                    <h3 class="text-success">
+                                                        <t t-esc="'%s %s' % (total_paid, student.currency_id.symbol or student.currency_id.name)"/>
+                                                    </h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="card text-center bg-light">
+                                                <div class="card-body">
+                                                    <h6 class="card-title">Total Due</h6>
+                                                    <h3 class="text-danger">
+                                                        <t t-esc="'%s %s' % (total_due, student.currency_id.symbol or student.currency_id.name)"/>
+                                                    </h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Fee Payments Table -->
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Receipt No.</th>
+                                                    <th>Payment Date</th>
+                                                    <th>Due Date</th>
+                                                    <th>Amount</th>
+                                                    <th>Method</th>
+                                                    <th>Status</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-foreach="fees" t-as="fee">
+                                                    <tr>
+                                                        <td><t t-esc="fee.name"/></td>
+                                                        <td><t t-esc="fee.payment_date"/></td>
+                                                        <td><t t-esc="fee.due_date"/></td>
+                                                        <td>
+                                                            <div><t t-esc="'%s %s' % (fee.total_amount, fee.currency_id.symbol or fee.currency_id.name)"/></div>
+                                                            <t t-if="fee.state in ('invoiced', 'partial')">
+                                                                <small class="text-success">Paid: <t t-esc="'%s %s' % (fee.amount_paid, fee.currency_id.symbol or fee.currency_id.name)"/></small><br/>
+                                                                <small class="text-danger">Due: <t t-esc="'%s %s' % (fee.outstanding_amount, fee.currency_id.symbol or fee.currency_id.name)"/></small>
+                                                            </t>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge bg-info">
+                                                                <t t-esc="fee.payment_method or '-'"/>
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <span t-if="fee.state == 'paid'" class="badge bg-success">Paid</span>
+                                                            <span t-elif="fee.state == 'partial'" class="badge bg-warning">Partially Paid</span>
+                                                            <span t-elif="fee.state == 'invoiced'" class="badge bg-primary">Invoice Sent</span>
+                                                            <span t-elif="fee.state == 'pending'" class="badge bg-warning">Pending</span>
+                                                            <span t-elif="fee.state == 'verified'" class="badge bg-info">Verified</span>
+                                                            <span t-elif="fee.state == 'cancelled'" class="badge bg-secondary">Cancelled</span>
+                                                            <span t-else="" class="badge bg-secondary"><t t-esc="fee.state"/></span>
+                                                        </td>
+                                                        <td>
+                                                            <!-- Pay Now button for invoiced/partial states -->
+                                                            <t t-if="fee.state in ('invoiced', 'partial')">
+                                                                <a t-att-href="'/my/fees/' + str(fee.id)"
+                                                                   class="btn btn-sm btn-primary me-1">
+                                                                    <i class="fa fa-credit-card"></i> Pay
+                                                                </a>
+                                                            </t>
+                                                            <a t-att-href="'/my/fee/' + str(fee.id)"
+                                                               class="btn btn-sm btn-outline-secondary">
+                                                                <i class="fa fa-eye"></i> View
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="not fees">
+                                                    <tr>
+                                                        <td colspan="7" class="text-center text-muted">
+                                                            No fee payment records found
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- Pagination -->
+                                    <t t-if="pager and pager.get('page_count', 0) > 1">
+                                        <nav aria-label="Fee pagination">
+                                            <ul class="pagination justify-content-center">
+                                                <t t-foreach="pager.get('pages', [])" t-as="page">
+                                                    <li class="page-item" t-att-class="'active' if page.get('active', False) else ''">
+                                                        <a class="page-link" t-att-href="page.get('url', '#')">
+                                                            <t t-esc="page.get('num', '')"/>
+                                                        </a>
+                                                    </li>
+                                                </t>
+                                            </ul>
+                                        </nav>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <!-- ==================== FEE DETAIL ==================== -->
+        <template id="student_fee_detail" name="Fee Payment Detail">
+            <t t-call="portal.portal_layout">
+                <div class="container mt-3">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fa fa-file-text-o text-success"></i> Fee Payment Details
+                                        </h5>
+                                        <a href="/my/fees" class="btn btn-sm btn-outline-secondary">
+                                            <i class="fa fa-arrow-left"></i> Back
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <!-- Payment Details -->
+                                    <div class="row mb-4">
+                                        <div class="col-md-6">
+                                            <h6>Payment Information</h6>
+                                            <table class="table table-sm">
+                                                <tr>
+                                                    <td><strong>Receipt Number:</strong></td>
+                                                    <td><t t-esc="fee.name"/></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Payment Date:</strong></td>
+                                                    <td><t t-esc="fee.payment_date"/></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Due Date:</strong></td>
+                                                    <td><t t-esc="fee.due_date"/></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Payment Method:</strong></td>
+                                                    <td><span class="badge bg-info"><t t-esc="fee.payment_method"/></span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Status:</strong></td>
+                                                    <td>
+                                                        <span t-if="fee.state == 'paid'" class="badge bg-success">Paid</span>
+                                                        <span t-elif="fee.state == 'pending'" class="badge bg-warning">Pending</span>
+                                                        <span t-elif="fee.state == 'verified'" class="badge bg-info">Verified</span>
+                                                        <span t-elif="fee.state == 'bounced'" class="badge bg-danger">Bounced</span>
+                                                        <span t-else="" class="badge bg-secondary"><t t-esc="fee.state"/></span>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6>Amount Details</h6>
+                                            <table class="table table-sm">
+                                                <tr>
+                                                    <td><strong>Base Amount:</strong></td>
+                                                    <td class="text-end">
+                                                        <t t-esc="'%s %s' % (fee.amount, fee.currency_id.symbol or fee.currency_id.name)"/>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Late Fee:</strong></td>
+                                                    <td class="text-end text-danger">
+                                                        + <t t-esc="'%s %s' % (fee.late_fee, fee.currency_id.symbol or fee.currency_id.name)"/>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Discount:</strong></td>
+                                                    <td class="text-end text-success">
+                                                        - <t t-esc="'%s %s' % (fee.discount_amount, fee.currency_id.symbol or fee.currency_id.name)"/>
+                                                    </td>
+                                                </tr>
+                                                <tr class="table-active">
+                                                    <td><strong>Total Amount:</strong></td>
+                                                    <td class="text-end fw-bold">
+                                                        <t t-esc="'%s %s' % (fee.total_amount, fee.currency_id.symbol or fee.currency_id.name)"/>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <!-- Additional Information -->
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <h6>Additional Information</h6>
+                                            <table class="table table-sm">
+                                                <t t-if="fee.payment_reference">
+                                                    <tr>
+                                                        <td width="30%"><strong>Transaction ID:</strong></td>
+                                                        <td><t t-esc="fee.payment_reference"/></td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="fee.cheque_number">
+                                                    <tr>
+                                                        <td><strong>Cheque/DD Number:</strong></td>
+                                                        <td><t t-esc="fee.cheque_number"/></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Cheque/DD Date:</strong></td>
+                                                        <td><t t-esc="fee.cheque_date"/></td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="fee.bank_name">
+                                                    <tr>
+                                                        <td><strong>Bank Name:</strong></td>
+                                                        <td><t t-esc="fee.bank_name"/></td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="fee.verified_by">
+                                                    <tr>
+                                                        <td><strong>Verified By:</strong></td>
+                                                        <td><t t-esc="fee.verified_by.name"/></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Verification Date:</strong></td>
+                                                        <td><t t-esc="fee.verification_date"/></td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="fee.notes">
+                                                    <tr>
+                                                        <td><strong>Notes:</strong></td>
+                                                        <td><t t-esc="fee.notes"/></td>
+                                                    </tr>
+                                                </t>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <!-- Print Button -->
+                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                                        <button type="button" class="btn btn-primary" onclick="window.print()">
+                                            <i class="fa fa-print"></i> Print Receipt
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <!-- ==================== RESULTS ==================== -->
+        <template id="student_results" name="Student Results">
+            <t t-call="portal.portal_layout">
+                <div class="container mt-3">
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fa fa-line-chart text-warning"></i> Examination Results
+                                        </h5>
+                                        <span class="badge bg-warning">
+                                            Current CGPA: <t t-esc="'%.2f' % student.cgpa"/>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Examination</th>
+                                                    <th>Subject</th>
+                                                    <th>Internal</th>
+                                                    <th>External</th>
+                                                    <th>Total</th>
+                                                    <th>Percentage</th>
+                                                    <th>Grade</th>
+                                                    <th>Result</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-foreach="results" t-as="result">
+                                                    <tr>
+                                                        <td>
+                                                            <strong><t t-esc="result.examination_id.name"/></strong><br/>
+                                                            <small class="text-muted"><t t-esc="result.semester_id.name"/></small>
+                                                        </td>
+                                                        <td><t t-esc="result.subject_id.name"/></td>
+                                                        <td>
+                                                            <t t-esc="result.internal_marks"/>/<t t-esc="result.internal_max"/>
+                                                        </td>
+                                                        <td>
+                                                            <t t-esc="result.external_marks"/>/<t t-esc="result.external_max"/>
+                                                        </td>
+                                                        <td><strong><t t-esc="result.total_marks"/></strong>/<t t-esc="result.max_marks"/></td>
+                                                        <td>
+                                                            <span class="badge"
+                                                                  t-att-class="'bg-success' if result.percentage >= 60 else
+                                                                              'bg-warning' if result.percentage >= 40 else 'bg-danger'">
+                                                                <t t-esc="'{:.1f}'.format(result.percentage)"/>%
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <t t-if="result.grade_letter">
+                                                                <span class="badge bg-info">
+                                                                    <t t-esc="result.grade_letter"/> (<t t-esc="'%.1f' % result.grade_point"/>)
+                                                                </span>
+                                                            </t>
+                                                            <t t-else="">
+                                                                <span class="badge bg-secondary">N/A</span>
+                                                            </t>
+                                                        </td>
+                                                        <td>
+                                                            <t t-if="result.is_absent">
+                                                                <span class="badge bg-secondary">Absent</span>
+                                                            </t>
+                                                            <t t-elif="result.is_pass">
+                                                                <span class="badge bg-success">Pass</span>
+                                                            </t>
+                                                            <t t-else="">
+                                                                <span class="badge bg-danger">Fail</span>
+                                                            </t>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="not results">
+                                                    <tr>
+                                                        <td colspan="8" class="text-center text-muted">
+                                                            No result records found
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- Results Summary -->
+                                    <t t-if="results">
+                                        <div class="row mt-4">
+                                            <div class="col-md-6">
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <h6 class="card-title">Performance Summary</h6>
+                                                        <table class="table table-sm">
+                                                            <tr>
+                                                                <td>Total Subjects:</td>
+                                                                <td class="text-end"><t t-esc="len(results)"/></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Passed Subjects:</td>
+                                                                <td class="text-end text-success">
+                                                                    <t t-set="passed" t-value="len([r for r in results if r.is_pass and not r.is_absent])"/>
+                                                                    <t t-esc="passed"/>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Failed Subjects:</td>
+                                                                <td class="text-end text-danger">
+                                                                    <t t-set="failed" t-value="len([r for r in results if not r.is_pass and not r.is_absent])"/>
+                                                                    <t t-esc="failed"/>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Absent Subjects:</td>
+                                                                <td class="text-end text-warning">
+                                                                    <t t-set="absent" t-value="len([r for r in results if r.is_absent])"/>
+                                                                    <t t-esc="absent"/>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <h6 class="card-title">Average Performance</h6>
+                                                        <table class="table table-sm">
+                                                            <tr>
+                                                                <td>Average Percentage:</td>
+                                                                <td class="text-end">
+                                                                    <t t-set="avg_percentage"
+                                                                       t-value="sum(r.percentage for r in results if not r.is_absent) /
+                                                                                len([r for r in results if not r.is_absent]) if
+                                                                                len([r for r in results if not r.is_absent]) > 0 else 0"/>
+                                                                    <t t-esc="'{:.1f}'.format(avg_percentage)"/>%
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Average Grade Point:</td>
+                                                                <td class="text-end">
+                                                                    <t t-set="avg_gp"
+                                                                       t-value="sum(r.grade_point for r in results if r.grade_point) /
+                                                                                len([r for r in results if r.grade_point]) if
+                                                                                len([r for r in results if r.grade_point]) > 0 else 0"/>
+                                                                    <t t-esc="'%.2f' % avg_gp"/>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Success Rate:</td>
+                                                                <td class="text-end">
+                                                                    <t t-set="success_rate"
+                                                                       t-value="(passed / len(results)) * 100 if len(results) > 0 else 0"/>
+                                                                    <t t-esc="'{:.1f}'.format(success_rate)"/>%
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <!-- ==================== LIBRARY ==================== -->
+        <template id="student_library" name="Student Library">
+            <t t-call="portal.portal_layout">
+                <div class="container mt-3">
+                    <div class="row">
+                        <!-- Issued Books -->
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fa fa-book text-info"></i> Currently Issued Books
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Book Title</th>
+                                                    <th>ISBN</th>
+                                                    <th>Issue Date</th>
+                                                    <th>Due Date</th>
+                                                    <th>Status</th>
+                                                    <th>Fine</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-foreach="issued_books" t-as="issue">
+                                                    <tr>
+                                                        <td><t t-esc="issue.book_id.name"/></td>
+                                                        <td><t t-esc="issue.isbn"/></td>
+                                                        <td><t t-esc="issue.issue_date"/></td>
+                                                        <td>
+                                                            <t t-esc="issue.due_date"/>
+                                                            <t t-if="issue.overdue_days > 0">
+                                                                <br/><small class="text-danger">
+                                                                    Overdue: <t t-esc="issue.overdue_days"/> days
+                                                                </small>
+                                                            </t>
+                                                        </td>
+                                                        <td>
+                                                            <span t-if="issue.state == 'issued'" class="badge bg-success">Issued</span>
+                                                            <span t-elif="issue.state == 'overdue'" class="badge bg-danger">Overdue</span>
+                                                            <span t-else="" class="badge bg-secondary"><t t-esc="issue.state"/></span>
+                                                        </td>
+                                                        <td>
+                                                            <t t-if="issue.fine_amount and not issue.fine_paid">
+                                                                <span class="text-danger">
+                                                                    <t t-esc="'%s %s' % (issue.fine_amount, issue.currency_id.symbol or issue.currency_id.name)"/>
+                                                                </span>
+                                                            </t>
+                                                            <t t-else="">
+                                                                <span class="text-muted">-</span>
+                                                            </t>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="not issued_books">
+                                                    <tr>
+                                                        <td colspan="6" class="text-center text-muted">
+                                                            No books currently issued
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Fines -->
+                            <t t-if="fines">
+                                <div class="card mt-4">
+                                    <div class="card-header bg-warning">
+                                        <h5 class="card-title mb-0 text-white">
+                                            <i class="fa fa-exclamation-triangle"></i> Pending Fines
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Fine Number</th>
+                                                        <th>Book</th>
+                                                        <th>Type</th>
+                                                        <th>Amount</th>
+                                                        <th>Status</th>
+                                                        <th>Reason</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <t t-foreach="fines" t-as="fine">
+                                                        <tr>
+                                                            <td><t t-esc="fine.name"/></td>
+                                                            <td><t t-esc="fine.book_id.name"/></td>
+                                                            <td><span class="badge bg-warning"><t t-esc="fine.fine_type"/></span></td>
+                                                            <td class="text-danger">
+                                                                <strong>
+                                                                    <t t-esc="'%s %s' % (fine.amount, fine.currency_id.symbol or fine.currency_id.name)"/>
+                                                                </strong>
+                                                            </td>
+                                                            <td>
+                                                                <span t-if="fine.state == 'pending'" class="badge bg-danger">Pending</span>
+                                                                <span t-elif="fine.state == 'paid'" class="badge bg-success">Paid</span>
+                                                                <span t-elif="fine.state == 'waived'" class="badge bg-secondary">Waived</span>
+                                                            </td>
+                                                            <td><small><t t-esc="fine.reason"/></small></td>
+                                                        </tr>
+                                                    </t>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+
+                        <!-- Library History -->
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fa fa-history text-secondary"></i> Recent History
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="list-group">
+                                        <t t-foreach="history" t-as="hist">
+                                            <div class="list-group-item">
+                                                <div class="d-flex w-100 justify-content-between">
+                                                    <h6 class="mb-1"><t t-esc="hist.book_id.name"/></h6>
+                                                    <small><t t-esc="hist.return_date"/></small>
+                                                </div>
+                                                <p class="mb-1">
+                                                    <small>
+                                                        Issued: <t t-esc="hist.issue_date"/><br/>
+                                                        Days: <t t-esc="hist.issue_days"/>
+                                                    </small>
+                                                </p>
+                                                <small class="text-muted">
+                                                    <span class="badge bg-success">Returned</span>
+                                                </small>
+                                            </div>
+                                        </t>
+                                        <t t-if="not history">
+                                            <div class="text-center text-muted py-3">
+                                                No history available
+                                            </div>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Library Stats -->
+                            <div class="card mt-4">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">Library Statistics</h5>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <td>Currently Issued:</td>
+                                            <td class="text-end"><t t-esc="len(issued_books)"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Total History:</td>
+                                            <td class="text-end"><t t-esc="len(history)"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Pending Fines:</td>
+                                            <td class="text-end">
+                                                <t t-set="total_fines" t-value="sum(f.amount for f in fines if f.state == 'pending')"/>
+                                                <t t-if="total_fines > 0" class="text-danger">
+                                                    <strong>
+                                                        <t t-esc="'%s %s' % (total_fines, student.currency_id.symbol or student.currency_id.name)"/>
+                                                    </strong>
+                                                </t>
+                                                <t t-else="" class="text-success">-</t>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <!-- ==================== EVENTS ==================== -->
+        <template id="student_events" name="Student Events">
+            <t t-call="portal.portal_layout">
+                <div class="container mt-3">
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fa fa-calendar text-danger"></i> Registered Events
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Event Name</th>
+                                                    <th>Date</th>
+                                                    <th>Venue</th>
+                                                    <th>Registration Fee</th>
+                                                    <th>Status</th>
+                                                    <th>Attendance</th>
+                                                    <th>Certificate</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-foreach="registrations" t-as="reg">
+                                                    <tr>
+                                                        <td>
+                                                            <strong><t t-esc="reg.event_id.name"/></strong><br/>
+                                                            <small class="text-muted"><t t-esc="reg.event_id.event_type"/></small>
+                                                        </td>
+                                                        <td>
+                                                            <t t-esc="reg.event_id.start"/>
+                                                            <t t-if="reg.event_id.stop">
+                                                                <br/><small>to <t t-esc="reg.event_id.stop"/></small>
+                                                            </t>
+                                                        </td>
+                                                        <td>
+                                                            <t t-if="reg.event_id.venue_address">
+                                                                <t t-esc="reg.event_id.venue_address"/>
+                                                            </t>
+                                                            <t t-elif="reg.event_id.venue_type">
+                                                                <span class="badge bg-secondary text-capitalize">
+                                                                    <t t-esc="reg.event_id.venue_type"/>
+                                                                </span>
+                                                            </t>
+                                                            <t t-else="">—</t>
+                                                        </td>
+                                                        <td>
+                                                            <t t-if="reg.registration_fee > 0">
+                                                                <span class="badge"
+                                                                      t-att-class="'bg-success' if reg.fee_paid else 'bg-warning'">
+                                                                    <t t-esc="'%s %s' % (reg.registration_fee, reg.currency_id.symbol or reg.currency_id.name)"/>
+                                                                </span>
+                                                            </t>
+                                                            <t t-else="">
+                                                                <span class="badge bg-info">Free</span>
+                                                            </t>
+                                                        </td>
+                                                        <td>
+                                                            <span t-if="reg.state == 'registered'" class="badge bg-primary">Registered</span>
+                                                            <span t-elif="reg.state == 'attended'" class="badge bg-success">Attended</span>
+                                                            <span t-elif="reg.state == 'cancelled'" class="badge bg-secondary">Cancelled</span>
+                                                            <span t-else="" class="badge bg-warning"><t t-esc="reg.state"/></span>
+                                                        </td>
+                                                        <td>
+                                                            <t t-if="reg.attended">
+                                                                <span class="badge bg-success">Yes</span><br/>
+                                                                <small><t t-esc="reg.attendance_time"/></small>
+                                                            </t>
+                                                            <t t-else="">
+                                                                <span class="badge bg-warning">No</span>
+                                                            </t>
+                                                        </td>
+                                                        <td>
+                                                            <t t-if="reg.certificate_issued">
+                                                                <span class="badge bg-success">Issued</span><br/>
+                                                                <small><t t-esc="reg.certificate_number"/></small>
+                                                            </t>
+                                                            <t t-else="">
+                                                                <span class="badge bg-secondary">Pending</span>
+                                                            </t>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="not registrations">
+                                                    <tr>
+                                                        <td colspan="7" class="text-center text-muted">
+                                                            No event registrations found
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <!-- ==================== HOSTEL ==================== -->
+        <template id="student_hostel" name="Student Hostel">
+            <t t-call="portal.portal_layout">
+                <div class="container mt-3">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                            <t t-if="allocation">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fa fa-home text-primary"></i> Hostel Allocation Details
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row mb-4">
+                                            <div class="col-md-6">
+                                                <h6>Allocation Information</h6>
+                                                <table class="table table-sm">
+                                                    <tr>
+                                                        <td><strong>Allocation Number:</strong></td>
+                                                        <td><t t-esc="allocation.name"/></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Allocation Date:</strong></td>
+                                                        <td><t t-esc="allocation.allocation_date"/></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Status:</strong></td>
+                                                        <td>
+                                                            <span t-if="allocation.state == 'allocated'" class="badge bg-success">Allocated</span>
+                                                            <span t-elif="allocation.state == 'vacated'" class="badge bg-secondary">Vacated</span>
+                                                            <span t-else="" class="badge bg-warning"><t t-esc="allocation.state"/></span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Period:</strong></td>
+                                                        <td>
+                                                            <t t-esc="allocation.from_date"/>
+                                                            <t t-if="allocation.to_date">
+                                                                to <t t-esc="allocation.to_date"/>
+                                                            </t>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6>Room Details</h6>
+                                                <table class="table table-sm">
+                                                    <tr>
+                                                        <td><strong>Hostel:</strong></td>
+                                                        <td><t t-esc="allocation.hostel_id.name"/></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Room Number:</strong></td>
+                                                        <td><t t-esc="allocation.room_id.room_number"/></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Bed Number:</strong></td>
+                                                        <td><t t-esc="allocation.bed_number"/></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Room Type:</strong></td>
+                                                        <td><t t-esc="allocation.room_id.room_type"/></td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        <!-- Fee Details -->
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <h6>Fee Details</h6>
+                                                <table class="table table-sm">
+                                                    <tr>
+                                                        <td><strong>Monthly Rent:</strong></td>
+                                                        <td class="text-end">
+                                                            <t t-esc="'%s %s' % (allocation.monthly_rent, allocation.currency_id.symbol or allocation.currency_id.name)"/>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Security Deposit:</strong></td>
+                                                        <td class="text-end">
+                                                            <t t-esc="'%s %s' % (allocation.security_deposit, allocation.currency_id.symbol or allocation.currency_id.name)"/>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="table-active">
+                                                        <td><strong>Total Paid:</strong></td>
+                                                        <td class="text-end fw-bold">
+                                                            <t t-esc="'%s %s' % (allocation.total_paid, allocation.currency_id.symbol or allocation.currency_id.name)"/>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        <!-- Assets Issued -->
+                                        <t t-if="allocation.asset_ids">
+                                            <div class="row mt-4">
+                                                <div class="col-12">
+                                                    <h6>Assets Issued</h6>
+                                                    <div class="d-flex flex-wrap gap-2">
+                                                        <t t-foreach="allocation.asset_ids" t-as="asset">
+                                                            <span class="badge bg-info"><t t-esc="asset.name"/></span>
+                                                        </t>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div class="card">
+                                    <div class="card-body text-center py-5">
+                                        <i class="fa fa-home fa-5x text-muted mb-3"></i>
+                                        <h4>No Hostel Allocation</h4>
+                                        <p class="text-muted">You are not currently allocated to any hostel.</p>
+                                        <a href="/my" class="btn btn-primary">Return to Dashboard</a>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <!-- ==================== TRANSPORT ==================== -->
+        <template id="student_transport" name="Student Transport">
+            <t t-call="portal.portal_layout">
+                <div class="container mt-3">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                            <t t-if="transport">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fa fa-bus text-success"></i> Transport Allocation Details
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row mb-4">
+                                            <div class="col-md-6">
+                                                <h6>Allocation Information</h6>
+                                                <table class="table table-sm">
+                                                    <tr>
+                                                        <td><strong>Allocation Number:</strong></td>
+                                                        <td><t t-esc="transport.name"/></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Allocation Date:</strong></td>
+                                                        <td><t t-esc="transport.allocation_date"/></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Status:</strong></td>
+                                                        <td>
+                                                            <span t-if="transport.state == 'active'" class="badge bg-success">Active</span>
+                                                            <span t-else="" class="badge bg-warning"><t t-esc="transport.state"/></span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Period:</strong></td>
+                                                        <td>
+                                                            <t t-esc="transport.from_date"/>
+                                                            <t t-if="transport.to_date">
+                                                                to <t t-esc="transport.to_date"/>
+                                                            </t>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6>Route &amp; Vehicle Details</h6>
+                                                <table class="table table-sm">
+                                                    <tr>
+                                                        <td><strong>Route:</strong></td>
+                                                        <td><t t-esc="transport.route_id.name"/></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Boarding Point:</strong></td>
+                                                        <td><t t-esc="transport.stop_id.name"/></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Vehicle:</strong></td>
+                                                        <td>
+                                                            <t t-if="vehicle_name">
+                                                                <t t-esc="vehicle_name"/> (<t t-esc="vehicle_number"/>)
+                                                            </t>
+                                                            <t t-else="">
+                                                                Not Assigned
+                                                            </t>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Driver:</strong></td>
+                                                        <td>
+                                                            <t t-if="driver_name">
+                                                                <t t-esc="driver_name"/><br/>
+                                                                <t t-if="driver_mobile">
+                                                                    <small><t t-esc="driver_mobile"/></small>
+                                                                </t>
+                                                            </t>
+                                                            <t t-else="">
+                                                                Not Assigned
+                                                            </t>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        <!-- Fee Details -->
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <h6>Fee Details</h6>
+                                                <table class="table table-sm">
+                                                    <tr>
+                                                        <td><strong>Monthly Fee:</strong></td>
+                                                        <td class="text-end">
+                                                            <t t-esc="'%s %s' % (transport.monthly_fee, transport.currency_id.symbol or transport.currency_id.name)"/>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="table-active">
+                                                        <td><strong>Payment Status:</strong></td>
+                                                        <td class="text-end">
+                                                            <span class="badge bg-success">Active</span>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        <!-- Schedule -->
+                                        <div class="row mt-4">
+                                            <div class="col-12">
+                                                <h6>Pickup &amp; Drop Schedule</h6>
+                                                <div class="table-responsive">
+                                                    <table class="table table-sm table-bordered">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Day</th>
+                                                                <th>Morning Pickup</th>
+                                                                <th>Evening Drop</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <t t-foreach="transport.route_id.stop_ids" t-as="stop">
+                                                                <t t-if="stop.id == transport.stop_id.id">
+                                                                    <tr>
+                                                                        <td>Monday - Friday</td>
+                                                                        <td><t t-esc="stop.arrival_time or 'N/A'"/></td>
+                                                                        <td><t t-esc="stop.departure_time or 'N/A'"/></td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>Saturday</td>
+                                                                        <!-- Using same times for Saturday as no separate Saturday fields exist -->
+                                                                        <td><t t-esc="stop.arrival_time or 'N/A'"/></td>
+                                                                        <td><t t-esc="stop.departure_time or 'N/A'"/></td>
+                                                                    </tr>
+                                                                </t>
+                                                            </t>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div class="card">
+                                    <div class="card-body text-center py-5">
+                                        <i class="fa fa-bus fa-5x text-muted mb-3"></i>
+                                        <h4>No Transport Allocation</h4>
+                                        <p class="text-muted">You are not currently allocated to any transport service.</p>
+                                        <a href="/my" class="btn btn-primary">Return to Dashboard</a>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+    </data>
+</odoo>

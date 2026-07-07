@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List View for Wizard Line (to be used in wizard) -->
+    <record id="generate_examination_hall_ticket_wizard_line_view_list" model="ir.ui.view">
+        <field name="name">generate.examination.hall.ticket.wizard.line.view.list</field>
+        <field name="model">generate.examination.hall.ticket.wizard.line</field>
+        <field name="arch" type="xml">
+            <list string="Students Preview" create="false" edit="false" delete="false">
+                <field name="student_id"/>
+                <field name="registration_number"/>
+                <field name="program_id"/>
+                <field name="department_id"/>
+                <field name="attendance_percentage" widget="percentage"/>
+                <field name="total_fee_due" widget="monetary"/>
+                <field name="eligible" widget="boolean"/>
+                <field name="reason"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View for Wizard Line (for reference, though not typically used) -->
+    <record id="generate_hall_ticket_wizard_line_view_form" model="ir.ui.view">
+        <field name="name">generate.examination.hall.ticket.wizard.line.view.form</field>
+        <field name="model">generate.examination.hall.ticket.wizard.line</field>
+        <field name="arch" type="xml">
+            <form string="Student Eligibility">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="wizard_id" widget="many2one" readonly="1"/>
+                            <field name="student_id" widget="many2one" readonly="1"/>
+                            <field name="registration_number" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="program_id" readonly="1"/>
+                            <field name="department_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="attendance_percentage" widget="percentage" readonly="1"/>
+                            <field name="total_fee_due" widget="monetary" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="eligible" widget="boolean" readonly="1"/>
+                            <field name="reason" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

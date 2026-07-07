@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="bulk_attendance_wizard_view_form" model="ir.ui.view">
+        <field name="name">bulk.attendance.wizard.view.form</field>
+        <field name="model">bulk.attendance.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Bulk Student Attendance Entry">
+                <sheet>
+
+                    <div class="alert alert-info mb-3" role="alert">
+                        <i class="fa fa-info-circle"/>
+                        <strong>How to use:</strong> Select Department → Program → Batch
+                        to narrow down students. Then click <strong>Load Students</strong>,
+                        mark attendance, and click <strong>Save Attendance</strong>.
+                    </div>
+
+                    <!-- Step 1: Filters -->
+                    <group string="Step 1 — Select Filters">
+                        <group string="Date and Class">
+                            <field name="date"/>
+                            <field name="course_id"
+                                   options="{'no_create': True}"
+                                   invisible="not batch_id"/>
+                            <field name="faculty_id"
+                                   options="{'no_create': True}"/>
+                        </group>
+                        <group string="Filter Students By">
+                            <field name="department_id"
+                                   options="{'no_create': True}"/>
+                            <field name="program_id"
+                                   options="{'no_create': True}"
+                                   invisible="not department_id"/>
+                            <field name="batch_id"
+                                   options="{'no_create': True}"
+                                   invisible="not program_id"/>
+                        </group>
+                    </group>
+
+                    <!-- Buttons -->
+                    <div class="o_row mb-3 mt-2">
+                        <button name="action_load_students"
+                                string="⟳  Load Students"
+                                type="object"
+                                class="btn btn-secondary me-2"/>
+                        <button name="action_mark_all_present"
+                                string="✓  Mark All Present"
+                                type="object"
+                                class="btn btn-success me-2"
+                                invisible="not line_ids"/>
+                    </div>
+
+                    <!-- Live Summary -->
+                    <div class="o_row mb-3" invisible="not line_ids">
+                        <span class="badge text-bg-secondary me-2">
+                            Total: <field name="total_count" readonly="1" nolabel="1"/>
+                        </span>
+                        <span class="badge text-bg-success me-2">
+                            Present: <field name="present_count" readonly="1" nolabel="1"/>
+                        </span>
+                        <span class="badge text-bg-danger me-2">
+                            Absent: <field name="absent_count" readonly="1" nolabel="1"/>
+                        </span>
+                        <span class="badge text-bg-warning">
+                            Late: <field name="late_count" readonly="1" nolabel="1"/>
+                        </span>
+                    </div>
+
+                    <!-- Step 2: Student List -->
+                    <group string="Step 2 — Mark Attendance" invisible="not line_ids">
+                        <field name="line_ids" nolabel="1">
+                            <list editable="bottom"
+                                  decoration-success="status == 'present'"
+                                  decoration-danger="status == 'absent'"
+                                  decoration-warning="status == 'late'"
+                                  decoration-info="status == 'on_leave'">
+                                <field name="registration_number" readonly="1"/>
+                                <field name="student_id" readonly="1"/>
+                                <field name="batch_id" readonly="1"/>
+                                <field name="department_id" readonly="1" optional="hide"/>
+                                <field name="status" widget="selection"/>
+                            </list>
+                        </field>
+                    </group>
+
+                </sheet>
+
+                <footer>
+                    <button name="action_save_attendance"
+                            string="Save Attendance"
+                            type="object"
+                            class="btn-primary"
+                            invisible="not line_ids"/>
+                    <button string="Cancel" class="btn-default" special="cancel"/>
+                </footer>
+
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bulk_attendance_wizard" model="ir.actions.act_window">
+        <field name="name">Bulk Attendance Entry</field>
+        <field name="res_model">bulk.attendance.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

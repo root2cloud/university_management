@@ -1,0 +1,587 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Faculty List Page Template -->
+    <template id="faculty_page" name="Faculty List">
+        <t t-call="website.layout">
+            <t t-set="title">Faculty Members - University</t>
+            <div class="container mt-4 mb-5">
+                <!-- Page Header -->
+                <div class="row mb-4">
+                    <div class="col-lg-12">
+                        <h1 class="display-5 mb-3">Our Faculty Members</h1>
+                        <p class="lead text-muted">
+                            Meet our distinguished faculty members who are dedicated to excellence in teaching and research.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Department Filter -->
+                <div class="row mb-4">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Filter by Department</h5>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <!-- All Departments Button -->
+                                    <t t-set="all_departments_class" t-value="selected_department and 'btn btn-outline-primary' or 'btn btn-primary'"/>
+                                    <a href="/faculty" t-att-class="all_departments_class">
+                                        All Departments
+                                    </a>
+                                    <t t-foreach="departments" t-as="dept">
+                                        <t t-set="dept_class" t-value="selected_department == dept.id and 'btn btn-primary' or 'btn btn-outline-primary'"/>
+                                        <a t-att-href="'/faculty?department=' + str(dept.id)" t-att-class="dept_class">
+                                            <t t-esc="dept.name"/>
+                                        </a>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Faculty Grid -->
+                <div class="row" id="faculty-grid">
+                    <t t-foreach="faculty" t-as="fac">
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card faculty-card h-100 shadow-sm">
+                                <!-- Faculty Photo -->
+                                <div class="text-center pt-4">
+                                    <t t-if="fac.faculty_photo">
+                                        <img t-att-src="'data:image/png;base64,' + str(fac.faculty_photo)"
+                                             class="rounded-circle border faculty-photo"
+                                             alt="Faculty Photo"
+                                             style="width: 150px; height: 150px; object-fit: cover;"/>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center"
+                                             style="width: 150px; height: 150px;">
+                                            <i class="fas fa-user fa-4x text-muted"></i>
+                                        </div>
+                                    </t>
+                                </div>
+
+                                <!-- Faculty Info -->
+                                <div class="card-body text-center">
+                                    <h5 class="card-title mb-2">
+                                        <t t-esc="fac.name"/>
+                                    </h5>
+
+                                    <!-- Designation -->
+                                    <t t-if="fac.designation_id">
+                                        <div class="text-muted mb-2">
+                                            <i class="fas fa-id-badge me-1"></i>
+                                            <t t-esc="fac.designation_id.name"/>
+                                        </div>
+                                    </t>
+
+                                    <!-- Department -->
+                                    <t t-if="fac.department_id">
+                                        <div class="text-muted mb-3">
+                                            <i class="fas fa-building me-1"></i>
+                                            <t t-esc="fac.department_id.name"/>
+                                        </div>
+                                    </t>
+
+                                    <!-- Employment Type -->
+                                    <div class="mb-3">
+                                        <t t-if="fac.employment_type">
+                                            <span class="badge bg-info me-1">
+                                                <t t-esc="fac.employment_type"/>
+                                            </span>
+                                        </t>
+
+                                        <!-- Highest Qualification -->
+                                        <t t-if="fac.highest_qualification">
+                                            <span class="badge bg-warning">
+                                                <t t-esc="fac.highest_qualification"/>
+                                            </span>
+                                        </t>
+                                    </div>
+
+                                    <!-- Specialization -->
+                                    <t t-if="fac.specialization">
+                                        <p class="card-text">
+                                            <small class="text-muted">
+                                                <i class="fas fa-lightbulb me-1"></i>
+                                                <em><t t-esc="fac.specialization"/></em>
+                                            </small>
+                                        </p>
+                                    </t>
+
+                                    <!-- Experience -->
+                                    <t t-if="fac.experience_years">
+                                        <p class="card-text">
+                                            <small>
+                                                <i class="fas fa-clock me-1"></i>
+                                                <t t-esc="fac.experience_years"/> Years Experience
+                                            </small>
+                                        </p>
+                                    </t>
+                                </div>
+
+                                <!-- Card Footer -->
+                                <div class="card-footer bg-transparent border-top-0 pt-0">
+                                    <div class="d-grid">
+                                        <a t-att-href="'/faculty/' + str(fac.id)"
+                                           class="btn btn-outline-primary">
+                                            View Profile <i class="fas fa-arrow-right ms-1"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+
+                    <!-- No Faculty Message -->
+                    <t t-if="not faculty">
+                        <div class="col-12 text-center py-5">
+                            <i class="fas fa-users fa-4x text-muted mb-3"></i>
+                            <h3 class="text-muted">No faculty members found</h3>
+                            <p class="text-muted">Try selecting a different department</p>
+                        </div>
+                    </t>
+                </div>
+
+                <!-- Pagination -->
+                <t t-if="pager and pager.get('page_count', 0) > 1">
+                    <div class="row mt-4">
+                        <div class="col-lg-12">
+                            <nav aria-label="Faculty pagination">
+                                <ul class="pagination justify-content-center">
+                                    <!-- Previous Button -->
+                                    <t t-set="prev_disabled" t-value="pager.page == 1"/>
+                                    <t t-set="prev_href" t-value="prev_disabled and '#' or pager.previous.url"/>
+                                    <li t-att-class="prev_disabled and 'page-item disabled' or 'page-item'">
+                                        <a class="page-link" t-att-href="prev_href">
+                                            Previous
+                                        </a>
+                                    </li>
+
+                                    <!-- Page Numbers -->
+                                    <t t-foreach="range(1, pager.get('page_count', 0) + 1)" t-as="page_num">
+                                        <t t-set="page_active" t-value="page_num == pager.page"/>
+                                        <t t-set="page_href" t-value="'/faculty/page/' + str(page_num) + (selected_department and '?department=' + str(selected_department) or '')"/>
+                                        <li t-att-class="page_active and 'page-item active' or 'page-item'">
+                                            <a class="page-link" t-att-href="page_href">
+                                                <t t-esc="page_num"/>
+                                            </a>
+                                        </li>
+                                    </t>
+
+                                    <!-- Next Button -->
+                                    <t t-set="next_disabled" t-value="pager.page == pager.get('page_count', 0)"/>
+                                    <t t-set="next_href" t-value="next_disabled and '#' or pager.next.url"/>
+                                    <li t-att-class="next_disabled and 'page-item disabled' or 'page-item'">
+                                        <a class="page-link" t-att-href="next_href">
+                                            Next
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <!-- Faculty Detail Page Template -->
+    <template id="faculty_detail_page" name="Faculty Detail">
+        <t t-call="website.layout">
+            <t t-set="title">
+                <t t-esc="faculty.name"/> - Faculty Profile
+            </t>
+            <div class="container mt-4 mb-5">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="/">Home</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="/faculty">Faculty</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            <t t-esc="faculty.name"/>
+                        </li>
+                    </ol>
+                </nav>
+
+                <!-- Faculty Profile Header -->
+                <div class="row mb-5">
+                    <div class="col-lg-4 col-md-5">
+                        <!-- Faculty Photo -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-body text-center p-4">
+                                <t t-if="faculty.faculty_photo">
+                                    <img t-att-src="'data:image/png;base64,' + str(faculty.faculty_photo)"
+                                         class="rounded-circle border mb-3"
+                                         alt="Faculty Photo"
+                                         style="width: 200px; height: 200px; object-fit: cover;"/>
+                                </t>
+                                <t t-else="">
+                                    <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mb-3"
+                                         style="width: 200px; height: 200px;">
+                                        <i class="fas fa-user fa-5x text-muted"></i>
+                                    </div>
+                                </t>
+
+                                <h4 class="mb-2"><t t-esc="faculty.name"/></h4>
+
+                                <!-- Designation -->
+                                <t t-if="faculty.designation_id">
+                                    <h5 class="text-primary mb-3">
+                                        <t t-esc="faculty.designation_id.name"/>
+                                    </h5>
+                                </t>
+
+                                <!-- Department -->
+                                <t t-if="faculty.department_id">
+                                    <div class="mb-3">
+                                        <i class="fas fa-building text-muted me-2"></i>
+                                        <strong><t t-esc="faculty.department_id.name"/></strong>
+                                    </div>
+                                </t>
+
+                                <!-- Employment Type and Qualification -->
+                                <div class="mb-3">
+                                    <t t-if="faculty.employment_type">
+                                        <span class="badge bg-info me-1">
+                                            <t t-esc="faculty.employment_type"/>
+                                        </span>
+                                    </t>
+                                    <t t-if="faculty.highest_qualification">
+                                        <span class="badge bg-warning">
+                                            <t t-esc="faculty.highest_qualification"/>
+                                        </span>
+                                    </t>
+                                </div>
+
+                                <!-- Faculty Code -->
+                                <t t-if="faculty.faculty_code and faculty.faculty_code != '/'">
+                                    <div class="text-muted">
+                                        <small>ID: <t t-esc="faculty.faculty_code"/></small>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-address-card me-2"></i> Contact Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Work Email -->
+                                <t t-if="faculty.work_email">
+                                    <div class="mb-3">
+                                        <i class="fas fa-envelope text-primary me-2"></i>
+                                        <a t-att-href="'mailto:' + faculty.work_email">
+                                            <t t-esc="faculty.work_email"/>
+                                        </a>
+                                    </div>
+                                </t>
+
+                                <!-- Personal Email -->
+                                <t t-if="faculty.personal_email">
+                                    <div class="mb-3">
+                                        <i class="fas fa-envelope text-secondary me-2"></i>
+                                        <a t-att-href="'mailto:' + faculty.personal_email">
+                                            <t t-esc="faculty.personal_email"/>
+                                        </a>
+                                        <div><small class="text-muted">Personal</small></div>
+                                    </div>
+                                </t>
+
+                                <!-- Work Mobile -->
+                                <t t-if="faculty.work_mobile">
+                                    <div class="mb-3">
+                                        <i class="fas fa-phone text-success me-2"></i>
+                                        <a t-att-href="'tel:' + faculty.work_mobile">
+                                            <t t-esc="faculty.work_mobile"/>
+                                        </a>
+                                    </div>
+                                </t>
+
+                                <!-- Personal Mobile -->
+                                <t t-if="faculty.personal_mobile">
+                                    <div class="mb-3">
+                                        <i class="fas fa-phone text-secondary me-2"></i>
+                                        <a t-att-href="'tel:' + faculty.personal_mobile">
+                                            <t t-esc="faculty.personal_mobile"/>
+                                        </a>
+                                        <div><small class="text-muted">Personal</small></div>
+                                    </div>
+                                </t>
+
+                                <!-- Department Contact -->
+                                <t t-if="faculty.department_id and faculty.department_id.email">
+                                    <div class="mb-3">
+                                        <i class="fas fa-university text-muted me-2"></i>
+                                        <small class="text-muted">
+                                            Department:
+                                            <a t-att-href="'mailto:' + faculty.department_id.email">
+                                                <t t-esc="faculty.department_id.email"/>
+                                            </a>
+                                        </small>
+                                    </div>
+                                </t>
+
+                                <!-- Emergency Contact -->
+                                <t t-if="faculty.emergency_contact_name and faculty.emergency_contact">
+                                    <div class="mt-3 pt-3 border-top">
+                                        <h6 class="text-muted">Emergency Contact</h6>
+                                        <div>
+                                            <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+                                            <t t-esc="faculty.emergency_contact_name"/>
+                                        </div>
+                                        <div class="ms-4">
+                                            <i class="fas fa-phone text-danger me-2"></i>
+                                            <a t-att-href="'tel:' + faculty.emergency_contact">
+                                                <t t-esc="faculty.emergency_contact"/>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Faculty Details -->
+                    <div class="col-lg-8 col-md-7">
+                        <!-- Professional Summary -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0"><i class="fas fa-user-graduate me-2"></i> Professional Profile</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Specialization -->
+                                <t t-if="faculty.specialization">
+                                    <div class="mb-3">
+                                        <h6 class="text-primary">Specialization / Area of Interest</h6>
+                                        <p class="lead">
+                                            <t t-esc="faculty.specialization"/>
+                                        </p>
+                                    </div>
+                                </t>
+
+                                <!-- Experience and Joining Date -->
+                                <div class="row">
+                                    <t t-if="faculty.experience_years">
+                                        <div class="col-md-6 mb-3">
+                                            <h6 class="text-muted">Experience</h6>
+                                            <p class="h4">
+                                                <t t-esc="faculty.experience_years"/> Years
+                                            </p>
+                                        </div>
+                                    </t>
+
+                                    <t t-if="faculty.date_of_joining">
+                                        <div class="col-md-6 mb-3">
+                                            <h6 class="text-muted">Joined On</h6>
+                                            <p class="h4">
+                                                <t t-esc="faculty.date_of_joining.strftime('%d %B %Y')"/>
+                                            </p>
+                                        </div>
+                                    </t>
+                                </div>
+
+                                <!-- Qualification Details -->
+                                <t t-if="faculty.qualification_details">
+                                    <div class="mt-3">
+                                        <h6 class="text-primary">Qualification Details</h6>
+                                        <p style="white-space: pre-line;">
+                                            <t t-esc="faculty.qualification_details"/>
+                                        </p>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+
+                        <!-- Personal Information -->
+                        <t t-if="faculty.date_of_birth or faculty.gender or faculty.blood_group or faculty.marital_status">
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-header bg-info text-white">
+                                    <h5 class="mb-0"><i class="fas fa-user me-2"></i> Personal Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <t t-if="faculty.date_of_birth">
+                                            <div class="col-md-3 mb-2">
+                                                <h6 class="text-muted">Date of Birth</h6>
+                                                <p><t t-esc="faculty.date_of_birth.strftime('%d %B %Y')"/></p>
+                                            </div>
+                                        </t>
+
+                                        <t t-if="faculty.age">
+                                            <div class="col-md-3 mb-2">
+                                                <h6 class="text-muted">Age</h6>
+                                                <p><t t-esc="faculty.age"/> Years</p>
+                                            </div>
+                                        </t>
+
+                                        <t t-if="faculty.gender">
+                                            <div class="col-md-3 mb-2">
+                                                <h6 class="text-muted">Gender</h6>
+                                                <p><t t-esc="faculty.gender.title()"/></p>
+                                            </div>
+                                        </t>
+
+                                        <t t-if="faculty.blood_group">
+                                            <div class="col-md-3 mb-2">
+                                                <h6 class="text-muted">Blood Group</h6>
+                                                <p><t t-esc="faculty.blood_group.upper()"/></p>
+                                            </div>
+                                        </t>
+
+                                        <t t-if="faculty.marital_status">
+                                            <div class="col-md-3 mb-2">
+                                                <h6 class="text-muted">Marital Status</h6>
+                                                <p><t t-esc="faculty.marital_status.title()"/></p>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+
+                        <!-- Courses and Subjects -->
+                        <div class="row">
+                            <!-- Courses Taught -->
+                            <t t-if="faculty.courses_taught_ids">
+                                <div class="col-md-6 mb-4">
+                                    <div class="card shadow-sm h-100">
+                                        <div class="card-header bg-success text-white">
+                                            <h6 class="mb-0"><i class="fas fa-book me-2"></i> Courses Taught</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="list-group list-group-flush">
+                                                <t t-foreach="faculty.courses_taught_ids" t-as="course">
+                                                    <div class="list-group-item border-0 px-0 py-2">
+                                                        <div class="d-flex w-100 justify-content-between">
+                                                            <h6 class="mb-1">
+                                                                <t t-esc="course.name"/>
+                                                            </h6>
+                                                            <small class="text-muted">
+                                                                <t t-esc="course.code"/>
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                </t>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+
+                            <!-- Subjects Can Teach -->
+                            <t t-if="faculty.subjects_taught_ids">
+                                <div class="col-md-6 mb-4">
+                                    <div class="card shadow-sm h-100">
+                                        <div class="card-header bg-warning text-dark">
+                                            <h6 class="mb-0"><i class="fas fa-chalkboard-teacher me-2"></i> Subjects Expertise</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="d-flex flex-wrap gap-2">
+                                                <t t-foreach="faculty.subjects_taught_ids" t-as="subject">
+                                                    <span class="badge bg-light text-dark border">
+                                                        <t t-esc="subject.name"/>
+                                                    </span>
+                                                </t>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+
+                        <!-- Research and Publications -->
+                        <t t-if="faculty.research_papers or faculty.conferences_attended or faculty.awards">
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-header bg-dark text-white">
+                                    <h5 class="mb-0"><i class="fas fa-flask me-2"></i> Research &amp; Achievements</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <t t-if="faculty.research_papers">
+                                            <div class="col-md-4 mb-3">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-primary rounded-circle p-3 me-3">
+                                                        <i class="fas fa-file-alt text-white fa-lg"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h3 class="mb-0"><t t-esc="faculty.research_papers"/></h3>
+                                                        <small class="text-muted">Research Papers</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </t>
+
+                                        <t t-if="faculty.conferences_attended">
+                                            <div class="col-md-4 mb-3">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-success rounded-circle p-3 me-3">
+                                                        <i class="fas fa-calendar-alt text-white fa-lg"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h3 class="mb-0"><t t-esc="faculty.conferences_attended"/></h3>
+                                                        <small class="text-muted">Conferences</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </div>
+
+                                    <!-- Awards -->
+                                    <t t-if="faculty.awards">
+                                        <div class="mt-3">
+                                            <h6 class="text-primary">Awards &amp; Recognitions</h6>
+                                            <div style="white-space: pre-line;">
+                                                <t t-esc="faculty.awards"/>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+
+                        <!-- Back Button -->
+                        <div class="mt-4">
+                            <a href="/faculty" class="btn btn-outline-primary">
+                                <i class="fas fa-arrow-left me-2"></i> Back to Faculty List
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom CSS -->
+            <style>
+                .faculty-card {
+                    transition: transform 0.3s ease, box-shadow 0.3s ease;
+                }
+                .faculty-card:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+                }
+                .faculty-photo {
+                    border: 5px solid #f8f9fa;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                }
+                .card-header h5, .card-header h6 {
+                    font-weight: 600;
+                }
+                .badge {
+                    font-size: 0.75em;
+                    font-weight: 500;
+                }
+                .list-group-item:hover {
+                    background-color: #f8f9fa;
+                }
+                .rounded-circle.bg-light {
+                    border: 2px solid #e9ecef;
+                }
+            </style>
+        </t>
+    </template>
+</odoo>

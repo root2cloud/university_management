@@ -1,0 +1,474 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="university_management.IICDashboard">
+        <div class="o_iic_dashboard p-4">
+
+            <!-- ══ Loading ══════════════════════════════════════════════════ -->
+            <t t-if="state.loading">
+                <div class="iic-loading">
+                    <div class="iic-spinner"/>
+                    <span style="font-size:0.83rem;">Loading dashboard data…</span>
+                </div>
+            </t>
+
+            <!-- ══ Error ════════════════════════════════════════════════════ -->
+            <t t-if="state.error">
+                <div class="alert alert-danger m-4" t-esc="state.error"/>
+            </t>
+
+            <t t-if="!state.loading and !state.error">
+
+                <!-- ══ Hero Header ═══════════════════════════════════════════ -->
+                <div class="iic-hero-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2>IIC Quarterly Dashboard</h2>
+                        <div class="subtitle">Institute Innovation Council — MSME Compliance Monitoring</div>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <!-- Compliance score badge -->
+                        <div style="text-align:center;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:12px;padding:10px 18px;">
+                            <div style="font-size:1.5rem;font-weight:800;color:#fff;line-height:1;">
+                                <t t-esc="state.complianceScore"/>%
+                            </div>
+                            <div style="font-size:0.67rem;color:rgba(255,255,255,0.55);text-transform:uppercase;letter-spacing:0.06em;margin-top:3px;">
+                                Compliance
+                            </div>
+                        </div>
+                        <div class="iic-header-badge">
+                            <span class="quarter-dot"/>
+                            Current: <t t-esc="state.currentQuarter"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ══ KPI Row 1 — Events ════════════════════════════════════ -->
+                <div class="iic-kpi-grid">
+                    <div class="iic-kpi-card kpi-blue">
+                        <div class="iic-kpi-icon"><i class="fa fa-calendar-check-o"/></div>
+                        <div class="iic-kpi-label">Total Events</div>
+                        <div class="iic-kpi-value"><t t-esc="state.totalEvents"/></div>
+                        <div class="iic-kpi-sub">All academic year activities</div>
+                    </div>
+                    <div class="iic-kpi-card kpi-purple">
+                        <div class="iic-kpi-icon"><i class="fa fa-star"/></div>
+                        <div class="iic-kpi-label">Mandatory (MSME)</div>
+                        <div class="iic-kpi-value"><t t-esc="state.mandatoryCount"/></div>
+                        <div class="iic-kpi-sub">MSME-required activities</div>
+                    </div>
+                    <div class="iic-kpi-card kpi-green">
+                        <div class="iic-kpi-icon"><i class="fa fa-check-circle"/></div>
+                        <div class="iic-kpi-label">Reports Approved</div>
+                        <div class="iic-kpi-value"><t t-esc="state.completedEvents"/></div>
+                        <div class="iic-kpi-sub">Completed + report approved</div>
+                    </div>
+                    <div class="iic-kpi-card kpi-gold">
+                        <div class="iic-kpi-icon"><i class="fa fa-file-text-o"/></div>
+                        <div class="iic-kpi-label">Reports Submitted</div>
+                        <div class="iic-kpi-value"><t t-esc="state.reportSubmitted"/></div>
+                        <div class="iic-kpi-sub">Submitted to MSME portal</div>
+                    </div>
+                </div>
+
+                <!-- ══ KPI Row 2 — Attendance ════════════════════════════════
+                     FIX: The original "Total Attendance" was a single opaque
+                     number. It is now split into three meaningful metrics:
+                     total registered, total present, and overall participation
+                     percentage — all aggregated event-wise from iic.attendance.
+                ═══════════════════════════════════════════════════════════════ -->
+                <div class="iic-kpi-grid" style="margin-top:0;">
+                    <div class="iic-kpi-card kpi-teal">
+                        <div class="iic-kpi-icon"><i class="fa fa-users"/></div>
+                        <div class="iic-kpi-label">Total Registered</div>
+                        <div class="iic-kpi-value"><t t-esc="state.totalRegistered"/></div>
+                        <div class="iic-kpi-sub">Student slots across all events</div>
+                    </div>
+                    <div class="iic-kpi-card kpi-green">
+                        <div class="iic-kpi-icon"><i class="fa fa-user-circle-o"/></div>
+                        <div class="iic-kpi-label">Total Present</div>
+                        <div class="iic-kpi-value"><t t-esc="state.totalPresent"/></div>
+                        <div class="iic-kpi-sub">Marked present (QR verified)</div>
+                    </div>
+                    <div class="iic-kpi-card kpi-red">
+                        <div class="iic-kpi-icon"><i class="fa fa-user-times"/></div>
+                        <div class="iic-kpi-label">Total Absent</div>
+                        <div class="iic-kpi-value"><t t-esc="state.totalAbsent"/></div>
+                        <div class="iic-kpi-sub">Registered but did not attend</div>
+                    </div>
+                    <div class="iic-kpi-card kpi-blue">
+                        <div class="iic-kpi-icon"><i class="fa fa-percent"/></div>
+                        <div class="iic-kpi-label">Overall Participation</div>
+                        <div class="iic-kpi-value"><t t-esc="state.overallPct"/>%</div>
+                        <div class="iic-kpi-sub">Avg across completed events: <t t-esc="state.avgParticipationPct"/>%</div>
+                    </div>
+                </div>
+
+                <!-- ══ Charts Row ════════════════════════════════════════════ -->
+                <div class="iic-charts-grid">
+                    <!-- Quarterly Activity Breakdown -->
+                    <div class="iic-section-card">
+                        <div class="iic-card-header">
+                            <div class="iic-card-title">
+                                <span class="title-dot"/>
+                                Quarterly Activity Breakdown
+                            </div>
+                            <span style="font-size:0.75rem;color:var(--iic-text-light);">
+                                Events · Completed · Students Present
+                            </span>
+                        </div>
+                        <div class="iic-card-body">
+                            <div class="iic-chart-wrap">
+                                <canvas id="iicQuarterlyChart"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Activity Types Doughnut -->
+                    <div class="iic-section-card">
+                        <div class="iic-card-header">
+                            <div class="iic-card-title">
+                                <span class="title-dot"/>
+                                Activity Types
+                            </div>
+                        </div>
+                        <div class="iic-card-body">
+                            <!-- Fallback: text list when chart canvas isn't ready -->
+                            <t t-if="state.activityBreakdown.length === 0">
+                                <div class="iic-empty">
+                                    <i class="fa fa-pie-chart"/>
+                                    <p>No activity data yet.</p>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div class="iic-chart-wrap">
+                                    <canvas id="iicActivityTypeChart"/>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ══ Quarter-wise Summary Tiles ════════════════════════════ -->
+                <div class="iic-section-card">
+                    <div class="iic-card-header">
+                        <div class="iic-card-title">
+                            <span class="title-dot"/>
+                            Quarter-wise Summary
+                        </div>
+                    </div>
+                    <div class="iic-card-body">
+                        <div class="iic-quarter-grid">
+                            <t t-foreach="['Q1','Q2','Q3','Q4']" t-as="q" t-key="q">
+                                <div class="iic-quarter-tile">
+                                    <div class="iic-quarter-label"><t t-esc="q"/></div>
+                                    <div class="iic-quarter-total">
+                                        <t t-esc="(state.quarterlyBreakdown[q] || {}).total || 0"/>
+                                    </div>
+                                    <div class="iic-quarter-sub">
+                                        <t t-esc="(state.quarterlyBreakdown[q] || {}).completed || 0"/> completed
+                                    </div>
+                                    <!-- Attendance sub-line -->
+                                    <div style="font-size:0.68rem;color:var(--iic-teal-dark);margin-top:4px;font-weight:600;">
+                                        <i class="fa fa-users" style="margin-right:3px;"/>
+                                        <t t-esc="(state.quarterlyBreakdown[q] || {}).present || 0"/> present
+                                        <t t-if="(state.quarterlyBreakdown[q] || {}).registered">
+                                            / <t t-esc="(state.quarterlyBreakdown[q] || {}).registered"/>
+                                            (<t t-esc="(state.quarterlyBreakdown[q] || {}).participation_pct || 0"/>%)
+                                        </t>
+                                    </div>
+                                    <div class="iic-quarter-bar">
+                                        <div class="iic-quarter-bar-fill"
+                                             t-attf-style="width: {{ Math.round(((state.quarterlyBreakdown[q] || {}).completed || 0) / (((state.quarterlyBreakdown[q] || {}).total || 0) || 1) * 100) }}%"/>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ══ Attendance Breakdown (tabbed) ═════════════════════════
+                     FIX: Replaces the single attendance number with three
+                     tabbed views: per-event, per-department, per-batch.
+                     All data is computed server-side from iic.attendance.
+                ═══════════════════════════════════════════════════════════════ -->
+                <div class="iic-section-card">
+                    <div class="iic-card-header">
+                        <div class="iic-card-title">
+                            <span class="title-dot"/>
+                            Attendance Breakdown
+                        </div>
+                        <!-- Tab switcher -->
+                        <div class="d-flex gap-2">
+                            <button
+                                t-attf-class="btn btn-sm {{ state.activeTab === 'event'  ? 'btn-primary' : 'btn-outline-secondary' }}"
+                                t-on-click="() => this.setTab('event')">
+                                Event-wise
+                            </button>
+                            <button
+                                t-attf-class="btn btn-sm {{ state.activeTab === 'dept'   ? 'btn-primary' : 'btn-outline-secondary' }}"
+                                t-on-click="() => this.setTab('dept')">
+                                Department
+                            </button>
+                            <button
+                                t-attf-class="btn btn-sm {{ state.activeTab === 'batch'  ? 'btn-primary' : 'btn-outline-secondary' }}"
+                                t-on-click="() => this.setTab('batch')">
+                                Batch
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="overflow-x:auto;">
+
+                        <!-- ── Event-wise tab ────────────────────────────── -->
+                        <t t-if="state.activeTab === 'event'">
+                            <t t-if="state.eventAttendance.length">
+                                <table class="iic-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Event Name</th>
+                                            <th>Date</th>
+                                            <th>Quarter</th>
+                                            <th>Type</th>
+                                            <th>Status</th>
+                                            <th style="text-align:right;">Registered</th>
+                                            <th style="text-align:right;">Present</th>
+                                            <th style="text-align:right;">Absent</th>
+                                            <th style="text-align:right;">Participation %</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="state.eventAttendance" t-as="ev" t-key="ev.id">
+                                            <tr style="cursor:pointer;" t-on-click="() => this.openEvent(ev.id)">
+                                                <td style="font-weight:600;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                                    <t t-esc="ev.name"/>
+                                                </td>
+                                                <td style="color:var(--iic-text-mid);white-space:nowrap;">
+                                                    <t t-esc="ev.date"/>
+                                                </td>
+                                                <td>
+                                                    <span class="iic-badge" style="background:#f0f4f8;color:var(--iic-text-mid);">
+                                                        <t t-esc="ev.quarter || '—'"/>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span t-attf-class="iic-badge badge-{{ ev.type }}">
+                                                        <t t-esc="this.activityLabel(ev.type)"/>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span t-attf-class="iic-badge badge-{{ ev.state }}">
+                                                        <t t-esc="this.stateLabel(ev.state)"/>
+                                                    </span>
+                                                </td>
+                                                <td style="text-align:right;color:var(--iic-text-mid);">
+                                                    <t t-esc="ev.registered"/>
+                                                </td>
+                                                <td style="text-align:right;font-weight:700;color:#10b981;">
+                                                    <t t-esc="ev.present"/>
+                                                </td>
+                                                <td style="text-align:right;color:#ef4444;">
+                                                    <t t-esc="ev.absent"/>
+                                                </td>
+                                                <td style="text-align:right;">
+                                                    <!-- Inline mini-progress -->
+                                                    <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;">
+                                                        <div style="width:56px;height:5px;background:var(--iic-border);border-radius:4px;overflow:hidden;">
+                                                            <div t-attf-style="width:{{ev.pct}}%;height:100%;background:linear-gradient(90deg,var(--iic-teal),#33e8c7);border-radius:4px;"/>
+                                                        </div>
+                                                        <span style="font-weight:700;font-size:0.8rem;color:var(--iic-text-mid);min-width:36px;text-align:right;">
+                                                            <t t-esc="ev.pct"/>%
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                    <!-- Totals footer -->
+                                    <tfoot>
+                                        <tr style="background:#f8fafc;font-weight:700;">
+                                            <td colspan="5" style="padding:10px 16px;font-size:0.78rem;color:var(--iic-text-mid);">
+                                                TOTAL (<t t-esc="state.totalEvents"/> events)
+                                            </td>
+                                            <td style="text-align:right;padding:10px 16px;">
+                                                <t t-esc="state.totalRegistered"/>
+                                            </td>
+                                            <td style="text-align:right;padding:10px 16px;color:#10b981;">
+                                                <t t-esc="state.totalPresent"/>
+                                            </td>
+                                            <td style="text-align:right;padding:10px 16px;color:#ef4444;">
+                                                <t t-esc="state.totalAbsent"/>
+                                            </td>
+                                            <td style="text-align:right;padding:10px 16px;color:var(--iic-teal-dark);">
+                                                <t t-esc="state.overallPct"/>%
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </t>
+                            <t t-else="">
+                                <div class="iic-empty">
+                                    <i class="fa fa-calendar-o"/>
+                                    <p>No events with attendance records yet.</p>
+                                </div>
+                            </t>
+                        </t>
+
+                        <!-- ── Department tab ────────────────────────────── -->
+                        <t t-if="state.activeTab === 'dept'">
+                            <t t-if="state.deptBreakdown.length">
+                                <table class="iic-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Department</th>
+                                            <th style="text-align:right;">Registered</th>
+                                            <th style="text-align:right;">Present</th>
+                                            <th style="text-align:right;">Absent</th>
+                                            <th>Participation</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="state.deptBreakdown" t-as="row" t-key="row.department">
+                                            <tr>
+                                                <td style="font-weight:600;"><t t-esc="row.department"/></td>
+                                                <td style="text-align:right;color:var(--iic-text-mid);"><t t-esc="row.registered"/></td>
+                                                <td style="text-align:right;color:#10b981;font-weight:700;"><t t-esc="row.present"/></td>
+                                                <td style="text-align:right;color:#ef4444;"><t t-esc="row.absent"/></td>
+                                                <td>
+                                                    <div style="display:flex;align-items:center;gap:8px;">
+                                                        <div style="flex:1;height:6px;background:var(--iic-border);border-radius:4px;overflow:hidden;min-width:80px;">
+                                                            <div t-attf-style="width:{{row.pct}}%;height:100%;background:linear-gradient(90deg,var(--iic-teal),#33e8c7);border-radius:4px;"/>
+                                                        </div>
+                                                        <span style="font-weight:700;font-size:0.8rem;min-width:40px;">
+                                                            <t t-esc="row.pct"/>%
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </t>
+                            <t t-else="">
+                                <div class="iic-empty">
+                                    <i class="fa fa-building-o"/>
+                                    <p>No department-wise attendance data yet.</p>
+                                </div>
+                            </t>
+                        </t>
+
+                        <!-- ── Batch tab ─────────────────────────────────── -->
+                        <t t-if="state.activeTab === 'batch'">
+                            <t t-if="state.batchBreakdown.length">
+                                <table class="iic-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Batch</th>
+                                            <th style="text-align:right;">Registered</th>
+                                            <th style="text-align:right;">Present</th>
+                                            <th style="text-align:right;">Absent</th>
+                                            <th>Participation</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="state.batchBreakdown" t-as="row" t-key="row.batch">
+                                            <tr>
+                                                <td style="font-weight:600;"><t t-esc="row.batch"/></td>
+                                                <td style="text-align:right;color:var(--iic-text-mid);"><t t-esc="row.registered"/></td>
+                                                <td style="text-align:right;color:#10b981;font-weight:700;"><t t-esc="row.present"/></td>
+                                                <td style="text-align:right;color:#ef4444;"><t t-esc="row.absent"/></td>
+                                                <td>
+                                                    <div style="display:flex;align-items:center;gap:8px;">
+                                                        <div style="flex:1;height:6px;background:var(--iic-border);border-radius:4px;overflow:hidden;min-width:80px;">
+                                                            <div t-attf-style="width:{{row.pct}}%;height:100%;background:linear-gradient(90deg,#8b5cf6,#a78bfa);border-radius:4px;"/>
+                                                        </div>
+                                                        <span style="font-weight:700;font-size:0.8rem;min-width:40px;">
+                                                            <t t-esc="row.pct"/>%
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </t>
+                            <t t-else="">
+                                <div class="iic-empty">
+                                    <i class="fa fa-graduation-cap"/>
+                                    <p>No batch-wise attendance data yet.</p>
+                                </div>
+                            </t>
+                        </t>
+
+                    </div>
+                </div>
+
+                <!-- ══ Recent Events Table ═══════════════════════════════════ -->
+                <div class="iic-section-card">
+                    <div class="iic-card-header">
+                        <div class="iic-card-title">
+                            <span class="title-dot"/>
+                            Recent Events
+                        </div>
+                        <span style="font-size:0.75rem;color:var(--iic-text-light);">Latest 10 activities</span>
+                    </div>
+                    <div style="overflow-x:auto;">
+                        <t t-if="state.recentEvents.length">
+                            <table class="iic-table">
+                                <thead>
+                                    <tr>
+                                        <th>Event Name</th>
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th>Status</th>
+                                        <th style="text-align:right;">Registered</th>
+                                        <th style="text-align:right;">Present</th>
+                                        <th style="text-align:right;">Participation %</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.recentEvents" t-as="event" t-key="event_index">
+                                        <tr style="cursor:pointer;" t-on-click="() => this.openEvent(event.id)">
+                                            <td style="font-weight:600;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                                <t t-esc="event.name"/>
+                                            </td>
+                                            <td style="color:var(--iic-text-mid);white-space:nowrap;">
+                                                <t t-esc="event.date"/>
+                                            </td>
+                                            <td>
+                                                <span t-attf-class="iic-badge badge-{{ event.type }}">
+                                                    <t t-esc="this.activityLabel(event.type)"/>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span t-attf-class="iic-badge badge-{{ event.state }}">
+                                                    <t t-esc="this.stateLabel(event.state)"/>
+                                                </span>
+                                            </td>
+                                            <td style="text-align:right;color:var(--iic-text-mid);">
+                                                <t t-esc="event.registered"/>
+                                            </td>
+                                            <td style="text-align:right;font-weight:700;color:#10b981;">
+                                                <t t-esc="event.participants"/>
+                                            </td>
+                                            <td style="text-align:right;font-weight:700;color:var(--iic-text-mid);">
+                                                <t t-esc="event.pct"/>%
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+                        <t t-else="">
+                            <div class="iic-empty">
+                                <i class="fa fa-calendar-o"/>
+                                <p>No events recorded yet.</p>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+
+            </t><!-- end !loading -->
+        </div>
+    </t>
+
+</templates>

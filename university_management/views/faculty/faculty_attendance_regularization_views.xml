@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── List View ─────────────────────────────────────────────── -->
+    <record id="view_faculty_attendance_regularization_list" model="ir.ui.view">
+        <field name="name">faculty.attendance.regularization.list</field>
+        <field name="model">faculty.attendance.regularization</field>
+        <field name="arch" type="xml">
+            <list string="Attendance Regularization Requests"
+                  decoration-info="state == 'submitted'"
+                  decoration-warning="state == 'hod_approved'"
+                  decoration-success="state == 'approved'"
+                  decoration-danger="state == 'rejected'"
+                  decoration-muted="state in ('cancelled','draft')">
+                <field name="name"/>
+                <field name="faculty_id"/>
+                <field name="department_id"/>
+                <field name="date"/>
+                <field name="reason"/>
+                <field name="corrected_check_in"/>
+                <field name="corrected_check_out"/>
+                <field name="window_deadline"/>
+                <field name="is_window_open" widget="boolean_toggle"/>
+                <field name="applied_date"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'submitted'"
+                       decoration-warning="state == 'hod_approved'"
+                       decoration-success="state == 'approved'"
+                       decoration-danger="state == 'rejected'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ── Form View ─────────────────────────────────────────────── -->
+    <record id="view_faculty_attendance_regularization_form" model="ir.ui.view">
+        <field name="name">faculty.attendance.regularization.form</field>
+        <field name="model">faculty.attendance.regularization</field>
+        <field name="arch" type="xml">
+            <form string="Attendance Regularization Request">
+                <header>
+                    <button name="action_submit" string="Submit"
+                            type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_hod_approve" string="HOD Approve"
+                            type="object" class="btn-primary"
+                            groups="university_management.group_hod"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_hr_approve" string="HR Approve"
+                            type="object" class="btn-success"
+                            groups="hr.group_hr_manager"
+                            invisible="state != 'hod_approved'"/>
+                    <button name="action_reject" string="Reject"
+                            type="object" class="btn-danger"
+                            groups="hr.group_hr_manager"
+                            invisible="state in ('approved','rejected','cancelled','draft')"/>
+                    <button name="action_cancel" string="Cancel"
+                            type="object"
+                            invisible="state in ('approved','rejected','cancelled')"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft"
+                            type="object"
+                            invisible="state not in ('cancelled','rejected')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,hod_approved,approved"/>
+                </header>
+
+                <sheet>
+                    <!-- Window closed warning -->
+                    <div class="alert alert-warning" role="alert"
+                         invisible="is_window_open or state in ('approved','rejected','cancelled')">
+                        <strong>Regularization Window Closed!</strong>
+                        Deadline for this attendance date was
+                        <field name="window_deadline" readonly="1" nolabel="1"/>.
+                        No further corrections can be submitted.
+                    </div>
+
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <group>
+                        <group string="Faculty Details">
+                            <field name="faculty_id"
+                                   readonly="state != 'draft'"/>
+                            <field name="employee_id"/>
+                            <field name="department_id"/>
+                            <field name="date"
+                                   readonly="state != 'draft'"/>
+                            <field name="window_deadline"/>
+                            <field name="is_window_open" widget="boolean_toggle" readonly="1"/>
+                        </group>
+                        <group string="Existing Attendance">
+                            <field name="attendance_id"
+                                   domain="[('faculty_id','=',faculty_id)]"
+                                   readonly="state != 'draft'"/>
+                            <field name="existing_check_in"/>
+                            <field name="existing_check_out"/>
+                            <field name="existing_state" widget="badge"/>
+                        </group>
+                    </group>
+
+                    <group string="Correction Details">
+                        <group>
+                            <field name="corrected_check_in"
+                                   readonly="state != 'draft'"/>
+                            <field name="corrected_check_out"
+                                   readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="reason" readonly="state != 'draft'"/>
+                            <field name="applied_by"/>
+                            <field name="applied_date"/>
+                        </group>
+                    </group>
+
+                    <group string="Reason Details">
+                        <field name="reason_details" nolabel="1"
+                               readonly="state != 'draft'"
+                               placeholder="Provide detailed explanation..."/>
+                    </group>
+
+                    <group string="Supporting Document">
+                        <field name="supporting_document"
+                               filename="supporting_document_name"
+                               readonly="state != 'draft'"/>
+                        <field name="supporting_document_name" invisible="1"/>
+                    </group>
+
+                    <notebook>
+                        <page string="Approval Details">
+                            <group>
+                                <group string="HOD Approval">
+                                    <field name="hod_id"/>
+                                    <field name="hod_approval_date"/>
+                                    <field name="hod_remarks"
+                                           placeholder="HOD remarks..."/>
+                                </group>
+                                <group string="HR Approval">
+                                    <field name="hr_approver_id"/>
+                                    <field name="hr_approval_date"/>
+                                    <field name="hr_remarks"
+                                           placeholder="HR remarks..."/>
+                                </group>
+                            </group>
+                            <group invisible="state != 'rejected'">
+                                <field name="rejection_reason"
+                                       placeholder="Reason for rejection..."/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ── Search View ────────────────────────────────────────────── -->
+    <record id="view_faculty_attendance_regularization_search" model="ir.ui.view">
+        <field name="name">faculty.attendance.regularization.search</field>
+        <field name="model">faculty.attendance.regularization</field>
+        <field name="arch" type="xml">
+            <search string="Search Regularization Requests">
+                <field name="name"/>
+                <field name="faculty_id"/>
+                <field name="department_id"/>
+                <filter name="my_requests" string="My Requests"
+                        domain="[('applied_by','=',uid)]"/>
+                <filter name="pending" string="Pending"
+                        domain="[('state','in',['submitted','hod_approved'])]"/>
+                <filter name="approved" string="Approved"
+                        domain="[('state','=','approved')]"/>
+                <filter name="rejected" string="Rejected"
+                        domain="[('state','=','rejected')]"/>
+                <filter name="window_open" string="Window Open"
+                        domain="[('window_deadline','&gt;=',context_today().strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Group By">
+                    <filter name="by_faculty" string="Faculty"
+                            context="{'group_by':'faculty_id'}"/>
+                    <filter name="by_department" string="Department"
+                            context="{'group_by':'department_id'}"/>
+                    <filter name="by_state" string="Status"
+                            context="{'group_by':'state'}"/>
+                    <filter name="by_month" string="Month"
+                            context="{'group_by':'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ── Action ─────────────────────────────────────────────────── -->
+    <record id="action_faculty_attendance_regularization" model="ir.actions.act_window">
+        <field name="name">Attendance Regularization</field>
+        <field name="res_model">faculty.attendance.regularization</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id"
+               ref="view_faculty_attendance_regularization_search"/>
+        <field name="context">{'search_default_pending': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No regularization requests found.
+            </p>
+            <p>
+                Faculty can raise attendance correction requests here
+                for missed punches, biometric failures, or off-campus duties.
+            </p>
+        </field>
+    </record>
+
+</odoo>

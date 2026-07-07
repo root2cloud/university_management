@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- About Us Page -->
+    <template id="about_page" name="About Page">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure">
+                <div class="container mt-4">
+                    <!-- Hero Section -->
+                    <div class="row mb-5">
+                        <div class="col-12 text-center">
+                            <h1 class="display-4">
+                                <i class="fa fa-university me-2"></i>
+                                About Our University
+                            </h1>
+                            <p class="lead text-muted">
+                                Excellence in Education Since 1990
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Mission & Vision -->
+                    <div class="row mb-5">
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100 border-primary">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0">
+                                        <i class="fa fa-bullseye me-2"></i>
+                                        Our Mission
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">
+                                        To provide quality education that transforms students into competent professionals
+                                        and responsible citizens through innovative teaching, research, and community engagement.
+                                    </p>
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2">
+                                            <i class="fa fa-check-circle text-success me-2"></i>
+                                            Academic Excellence
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fa fa-check-circle text-success me-2"></i>
+                                            Research Innovation
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fa fa-check-circle text-success me-2"></i>
+                                            Community Service
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fa fa-check-circle text-success me-2"></i>
+                                            Global Perspective
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100 border-info">
+                                <div class="card-header bg-info text-white">
+                                    <h5 class="mb-0">
+                                        <i class="fa fa-eye me-2"></i>
+                                        Our Vision
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">
+                                        To be a globally recognized center of excellence in education, research, and innovation,
+                                        creating leaders who make a positive impact on society.
+                                    </p>
+                                    <div class="row mt-4">
+                                        <div class="col-6 text-center">
+                                            <h3 class="text-primary">25,000+</h3>
+                                            <p class="text-muted small">Alumni Worldwide</p>
+                                        </div>
+                                        <div class="col-6 text-center">
+                                            <h3 class="text-primary">150+</h3>
+                                            <p class="text-muted small">Programs Offered</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- University History -->
+                    <div class="row mb-5">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header bg-dark text-white">
+                                    <h5 class="mb-0">
+                                        <i class="fa fa-history me-2"></i>
+                                        Our History
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <div class="text-center">
+                                                <div class="display-1 text-muted mb-2">1990</div>
+                                                <h5>Foundation</h5>
+                                                <p class="text-muted small">
+                                                    University was established with 3 departments and 200 students.
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <div class="text-center">
+                                                <div class="display-1 text-muted mb-2">2005</div>
+                                                <h5>Expansion</h5>
+                                                <p class="text-muted small">
+                                                    Added 5 new campuses and introduced postgraduate programs.
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <div class="text-center">
+                                                <div class="display-1 text-muted mb-2">2020</div>
+                                                <h5>Modernization</h5>
+                                                <p class="text-muted small">
+                                                    Digital transformation and international accreditation achieved.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Leadership Team -->
+                    <div class="row mb-5">
+                        <div class="col-12">
+                            <h3 class="text-center mb-4">
+                                <i class="fa fa-users me-2"></i>
+                                Leadership Team
+                            </h3>
+                            <div class="row">
+                                <div class="col-md-3 mb-4">
+                                    <div class="card text-center h-100">
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <div class="bg-secondary rounded-circle mx-auto d-flex align-items-center justify-content-center"
+                                                     style="width: 100px; height: 100px;">
+                                                    <i class="fa fa-user fa-3x text-white"></i>
+                                                </div>
+                                            </div>
+                                            <h5 class="card-title">Dr. John Smith</h5>
+                                            <p class="text-muted small">Chancellor</p>
+                                            <p class="card-text small">
+                                                30+ years in academia. PhD in Educational Leadership.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-4">
+                                    <div class="card text-center h-100">
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <div class="bg-secondary rounded-circle mx-auto d-flex align-items-center justify-content-center"
+                                                     style="width: 100px; height: 100px;">
+                                                    <i class="fa fa-user fa-3x text-white"></i>
+                                                </div>
+                                            </div>
+                                            <h5 class="card-title">Prof. Sarah Johnson</h5>
+                                            <p class="text-muted small">Vice Chancellor</p>
+                                            <p class="card-text small">
+                                                Former Dean of Science. Research excellence award winner.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-4">
+                                    <div class="card text-center h-100">
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <div class="bg-secondary rounded-circle mx-auto d-flex align-items-center justify-content-center"
+                                                     style="width: 100px; height: 100px;">
+                                                    <i class="fa fa-graduation-cap fa-3x text-white"></i>
+                                                </div>
+                                            </div>
+                                            <h5 class="card-title">Dr. Michael Chen</h5>
+                                            <p class="text-muted small">Dean of Academics</p>
+                                            <p class="card-text small">
+                                                Specializes in curriculum development and quality assurance.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-4">
+                                    <div class="card text-center h-100">
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <div class="bg-secondary rounded-circle mx-auto d-flex align-items-center justify-content-center"
+                                                     style="width: 100px; height: 100px;">
+                                                    <i class="fa fa-user fa-3x text-white"></i>
+                                                </div>
+                                            </div>
+                                            <h5 class="card-title">Ms. Emily Davis</h5>
+                                            <p class="text-muted small">Dean of Students</p>
+                                            <p class="card-text small">
+                                                Focuses on student welfare and extracurricular development.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campus Facilities -->
+                    <div class="row mb-5">
+                        <div class="col-12">
+                            <h3 class="text-center mb-4">
+                                <i class="fa fa-building me-2"></i>
+                                Campus Facilities
+                            </h3>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-body text-center">
+                                            <i class="fa fa-book fa-3x text-primary mb-3"></i>
+                                            <h5>Modern Library</h5>
+                                            <p class="text-muted small">
+                                                100,000+ books, digital resources, and 24/7 study spaces.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-body text-center">
+                                            <i class="fa fa-flask fa-3x text-success mb-3"></i>
+                                            <h5>Research Labs</h5>
+                                            <p class="text-muted small">
+                                                State-of-the-art laboratories for science and technology research.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-body text-center">
+                                            <i class="fa fa-bicycle fa-3x text-warning mb-3"></i>
+                                            <h5>Sports Complex</h5>
+                                            <p class="text-muted small">
+                                                Olympic-size swimming pool, gymnasium, and outdoor fields.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-body text-center">
+                                            <i class="fa fa-laptop fa-3x text-info mb-3"></i>
+                                            <h5>Computer Centers</h5>
+                                            <p class="text-muted small">
+                                                High-speed internet and latest hardware for all students.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-body text-center">
+                                            <i class="fa fa-cutlery fa-3x text-danger mb-3"></i>
+                                            <h5>Cafeterias</h5>
+                                            <p class="text-muted small">
+                                                Multiple dining options with healthy and affordable food.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-body text-center">
+                                            <i class="fa fa-bed fa-3x text-secondary mb-3"></i>
+                                            <h5>Hostels</h5>
+                                            <p class="text-muted small">
+                                                Comfortable accommodation with security and amenities.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Accreditation & Recognition -->
+                    <div class="row mb-5">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="mb-0">
+                                        <i class="fa fa-star-o me-2"></i>
+                                        Accreditation &amp; Recognition
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <ul class="list-unstyled">
+                                                <li class="mb-2">
+                                                    <i class="fa fa-check-circle text-success me-2"></i>
+                                                    Accredited by National Board of Accreditation (NBA)
+                                                </li>
+                                                <li class="mb-2">
+                                                    <i class="fa fa-check-circle text-success me-2"></i>
+                                                    Recognized by University Grants Commission (UGC)
+                                                </li>
+                                                <li class="mb-2">
+                                                    <i class="fa fa-check-circle text-success me-2"></i>
+                                                    ISO 9001:2015 Certified
+                                                </li>
+                                                <li class="mb-2">
+                                                    <i class="fa fa-check-circle text-success me-2"></i>
+                                                    Member of Association of Indian Universities (AIU)
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <ul class="list-unstyled">
+                                                <li class="mb-2">
+                                                    <i class="fa fa-star text-warning me-2"></i>
+                                                    Ranked among Top 50 Universities Nationally
+                                                </li>
+                                                <li class="mb-2">
+                                                    <i class="fa fa-star text-warning me-2"></i>
+                                                    Best Industry-Academia Interface Award 2023
+                                                </li>
+                                                <li class="mb-2">
+                                                    <i class="fa fa-star text-warning me-2"></i>
+                                                    Green Campus Award for Environmental Initiatives
+                                                </li>
+                                                <li class="mb-2">
+                                                    <i class="fa fa-star text-warning me-2"></i>
+                                                    Excellence in Research Award 2022
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Facts -->
+                    <div class="row">
+                        <div class="col-12">
+                            <h3 class="text-center mb-4">
+                                <i class="fa fa-bar-chart me-2"></i>
+                                University at a Glance
+                            </h3>
+                            <div class="row">
+                                <div class="col-md-3 col-6 mb-4">
+                                    <div class="card text-center border-0 shadow-sm">
+                                        <div class="card-body">
+                                            <div class="display-4 text-primary">500+</div>
+                                            <p class="text-muted mb-0">Faculty Members</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6 mb-4">
+                                    <div class="card text-center border-0 shadow-sm">
+                                        <div class="card-body">
+                                            <div class="display-4 text-success">15,000+</div>
+                                            <p class="text-muted mb-0">Current Students</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6 mb-4">
+                                    <div class="card text-center border-0 shadow-sm">
+                                        <div class="card-body">
+                                            <div class="display-4 text-info">50+</div>
+                                            <p class="text-muted mb-0">Departments</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6 mb-4">
+                                    <div class="card text-center border-0 shadow-sm">
+                                        <div class="card-body">
+                                            <div class="display-4 text-warning">100+</div>
+                                            <p class="text-muted mb-0">Acres Campus</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Call to Action -->
+                    <div class="row mt-5">
+                        <div class="col-12 text-center">
+                            <div class="card bg-light border-0">
+                                <div class="card-body py-5">
+                                    <h3 class="mb-3">Ready to Join Our Community?</h3>
+                                    <p class="lead mb-4">
+                                        Take the first step towards an exceptional educational journey.
+                                    </p>
+                                    <div class="d-flex justify-content-center flex-wrap gap-3">
+                                        <a href="/admissions" class="btn btn-primary btn-lg">
+                                            <i class="fa fa-graduation-cap me-2"></i>
+                                            Apply Now
+                                        </a>
+                                        <a href="/contact" class="btn btn-outline-primary btn-lg">
+                                            <i class="fa fa-envelope me-2"></i>
+                                            Contact Us
+                                        </a>
+                                        <a href="/campus-tour" class="btn btn-outline-info btn-lg">
+                                            <i class="fa fa-video-camera me-2"></i>
+                                            Virtual Tour
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

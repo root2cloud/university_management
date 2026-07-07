@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View - Transport Fee -->
+    <record id="transport_fee_view_form" model="ir.ui.view">
+        <field name="name">transport.fee.view.form</field>
+        <field name="model">transport.fee</field>
+        <field name="arch" type="xml">
+            <form string="Transport Fee Payment">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="Receipt Number"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Student Details">
+                            <field name="student_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="allocation_id"
+                                   domain="[('student_id', '=', student_id)]"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="route_id"/>
+                        </group>
+                        <group string="Payment Details">
+                            <field name="payment_date"/>
+                            <field name="month"/>
+                            <field name="year"/>
+                            <field name="state" widget="badge"
+                                   decoration-success="state == 'paid'"
+                                   decoration-warning="state == 'pending'"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Fee Amount">
+                            <field name="amount" widget="monetary"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="Payment Information">
+                            <field name="payment_method" widget="radio"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View - Transport Fee -->
+    <record id="transport_fee_view_list" model="ir.ui.view">
+        <field name="name">transport.fee.view.list</field>
+        <field name="model">transport.fee</field>
+        <field name="arch" type="xml">
+            <list string="Transport Fee Payments"
+                  default_order="payment_date desc"
+                  multi_edit="1"
+                  sample="1"
+                  decoration-success="state == 'paid'"
+                  decoration-warning="state == 'pending'">
+                <field name="name"/>
+                <field name="payment_date"/>
+                <field name="student_id"/>
+                <field name="route_id" optional="show"/>
+                <field name="month" optional="show"/>
+                <field name="year" optional="show"/>
+                <field name="amount" widget="monetary" sum="Total Amount"/>
+                <field name="payment_method" optional="show" widget="badge"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'paid'"
+                       decoration-warning="state == 'pending'"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View - Transport Fee -->
+    <record id="transport_fee_view_search" model="ir.ui.view">
+        <field name="name">transport.fee.view.search</field>
+        <field name="model">transport.fee</field>
+        <field name="arch" type="xml">
+            <search string="Search Transport Fee">
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="route_id"/>
+                <field name="allocation_id"/>
+
+                <separator/>
+
+                <filter name="filter_paid" string="Paid"
+                        domain="[('state', '=', 'paid')]"/>
+                <filter name="filter_pending" string="Pending"
+                        domain="[('state', '=', 'pending')]"/>
+
+                <separator/>
+
+                <filter name="filter_cash" string="Cash Payments"
+                        domain="[('payment_method', '=', 'cash')]"/>
+                <filter name="filter_online" string="Online Payments"
+                        domain="[('payment_method', '=', 'online')]"/>
+                <filter name="filter_cheque" string="Cheque Payments"
+                        domain="[('payment_method', '=', 'cheque')]"/>
+
+                <separator/>
+
+                <filter name="filter_today" string="Today"
+                        domain="[('payment_date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_this_week"
+                        string="This Week"
+                        domain="[('payment_date', '>=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_this_month"
+                        string="This Month"
+                        domain="[('payment_date', '>=', context_today().strftime('%Y-%m') + '-01')]"/>
+                <filter name="filter_this_year"
+                        string="This Year"
+                        domain="[('payment_date', '>=', context_today().strftime('%Y') + '-01-01')]"/>
+
+                <separator/>
+
+                <filter name="filter_january" string="January"
+                        domain="[('month', '=', '1')]"/>
+                <filter name="filter_february" string="February"
+                        domain="[('month', '=', '2')]"/>
+                <filter name="filter_march" string="March"
+                        domain="[('month', '=', '3')]"/>
+                <filter name="filter_april" string="April"
+                        domain="[('month', '=', '4')]"/>
+                <filter name="filter_may" string="May"
+                        domain="[('month', '=', '5')]"/>
+                <filter name="filter_june" string="June"
+                        domain="[('month', '=', '6')]"/>
+                <filter name="filter_july" string="July"
+                        domain="[('month', '=', '7')]"/>
+                <filter name="filter_august" string="August"
+                        domain="[('month', '=', '8')]"/>
+                <filter name="filter_september" string="September"
+                        domain="[('month', '=', '9')]"/>
+                <filter name="filter_october" string="October"
+                        domain="[('month', '=', '10')]"/>
+                <filter name="filter_november" string="November"
+                        domain="[('month', '=', '11')]"/>
+                <filter name="filter_december" string="December"
+                        domain="[('month', '=', '12')]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_student" string="Student"
+                            context="{'group_by': 'student_id'}"/>
+                    <filter name="group_by_route" string="Route"
+                            context="{'group_by': 'route_id'}"/>
+                    <filter name="group_by_payment_method" string="Payment Method"
+                            context="{'group_by': 'payment_method'}"/>
+                    <filter name="group_by_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_by_month" string="Month"
+                            context="{'group_by': 'month'}"/>
+                    <filter name="group_by_year" string="Year"
+                            context="{'group_by': 'year'}"/>
+                    <filter name="group_by_payment_date" string="Payment Date"
+                            context="{'group_by': 'payment_date'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="route_id" string="Route"
+                           select="multi"
+                           icon="fa-bus"/>
+                    <field name="state" string="Status"
+                           select="multi"
+                           icon="fa-flag"/>
+                    <field name="payment_method" string="Payment Method"
+                           select="multi"
+                           icon="fa-credit-card"/>
+                    <field name="month" string="Month"
+                           select="multi"
+                           icon="fa-calendar"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View - Transport Fee -->
+    <record id="transport_fee_view_kanban" model="ir.ui.view">
+        <field name="name">transport.fee.view.kanban</field>
+        <field name="model">transport.fee</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="state"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="route_id"/>
+                <field name="payment_date"/>
+                <field name="month"/>
+                <field name="year"/>
+                <field name="amount"/>
+                <field name="payment_method"/>
+                <field name="state"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="ribbon ribbon-top-right" t-if="record.state.raw_value == 'paid'">
+                                <span class="text-bg-success">Paid</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.state.raw_value == 'pending'">
+                                <span class="text-bg-warning">Pending</span>
+                            </div>
+
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <i class="fa fa-receipt"/> <field name="name"/>
+                                        </strong>
+                                        <div class="text-muted">
+                                            <i class="fa fa-calendar"/> <field name="payment_date"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body mt-3">
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="card bg-primary text-white">
+                                                <div class="card-body p-2">
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="fa fa-user fa-2x me-2"/>
+                                                        <div>
+                                                            <h6 class="mb-0"><field name="student_id"/></h6>
+                                                            <small t-if="record.route_id.raw_value">
+                                                                <i class="fa fa-bus"/> <field name="route_id"/>
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="card bg-warning text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h4 class="mb-0">
+                                                        <i class="fa fa-rupee-sign"/> <field name="amount"/>
+                                                    </h4>
+                                                    <small>Transport Fee</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-6">
+                                            <div class="bg-light p-2 rounded text-center">
+                                                <small class="text-muted">Month</small>
+                                                <div><strong><field name="month"/></strong></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="bg-light p-2 rounded text-center">
+                                                <small class="text-muted">Year</small>
+                                                <div><strong><field name="year"/></strong></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="card bg-info text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h6 class="mb-0">
+                                                        <i class="fa fa-credit-card"/>
+                                                        Payment Method: <field name="payment_method"/>
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom mt-2">
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Calendar View - Transport Fee -->
+    <record id="transport_fee_view_calendar" model="ir.ui.view">
+        <field name="name">transport.fee.view.calendar</field>
+        <field name="model">transport.fee</field>
+        <field name="arch" type="xml">
+            <calendar string="Fee Payment Calendar"
+                      date_start="payment_date"
+                      mode="month"
+                      color="state"
+                      quick_create="0"
+                      event_limit="5">
+                <field name="student_id"/>
+                <field name="amount"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Pivot View - Transport Fee -->
+    <record id="transport_fee_view_pivot" model="ir.ui.view">
+        <field name="name">transport.fee.view.pivot</field>
+        <field name="model">transport.fee</field>
+        <field name="arch" type="xml">
+            <pivot string="Transport Fee Analysis">
+                <field name="month" type="row"/>
+                <field name="route_id" type="col"/>
+                <field name="amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View - Transport Fee -->
+    <record id="transport_fee_view_graph" model="ir.ui.view">
+        <field name="name">transport.fee.view.graph</field>
+        <field name="model">transport.fee</field>
+        <field name="arch" type="xml">
+            <graph string="Fee Collection Statistics" type="bar" stacked="1">
+                <field name="month"/>
+                <field name="amount" type="measure"/>
+                <field name="state" type="col"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_transport_fee" model="ir.actions.act_window">
+        <field name="name">Transport Fee</field>
+        <field name="res_model">transport.fee</field>
+        <field name="view_mode">kanban,list,form,calendar,pivot,graph</field>
+        <field name="context">{'search_default_filter_this_month': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Record Transport Fee Payment
+            </p>
+            <p>
+                Manage transport fee payments. System auto-generates name (receipt number from sequence,
+                unique, readonly). Select student_id (Many2one to student.student, required, tracked,
+                indexed, no-create). Select allocation_id (Many2one to transport.allocation, optional,
+                no-create, domain filtered by student_id). Shows route_id (Many2one related from
+                allocation_id.route_id, stored, readonly). Enter amount (monetary widget, required).
+                Enter payment_date (date, default today, required). Select month (12 month selection,
+                required): 1-January through 12-December. Enter year (integer, default current year).
+                Select payment_method (3 options, default cash, radio widget): cash (Cash - physical
+                currency), online (Online - UPI/net banking), cheque (Cheque - bank cheque). Select
+                state (2 options, default paid, tracked, badge widget): paid (Paid - payment received),
+                pending (Pending - payment due). List view shows 2-color row decorations: Green (paid),
+                Yellow (pending). Badge widgets for payment_method and state. Amount field shows sum
+                (Total Amount). Kanban view shows dynamic double ribbon (Paid green, Pending yellow)
+                with student card (primary/blue), amount card (warning/yellow, large), month/year cards
+                (2 cards 6/6 grid), and payment method card (info/blue). Calendar view displays payments
+                by date (date_start: payment_date, color by state, month mode, event_limit 5). Pivot
+                view for analysis (month × route matrix, measure: amount sum). Graph view for statistics
+                (stacked bar chart, month vs. amount, stacked by state). Ordered by payment_date desc
+                (most recent first). Default filter: This Month payments. Full chatter support for
+                communication.
+            </p>
+        </field>
+    </record>
+
+</odoo>

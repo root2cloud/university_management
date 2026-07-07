@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="nba_compute_wizard_view_form" model="ir.ui.view">
+        <field name="name">nba.compute.wizard.form</field>
+        <field name="model">nba.compute.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Auto-Compute NBA Criteria">
+                <group string="SAR">
+                    <field name="sar_id" readonly="1"/>
+                </group>
+                <group string="Select Criteria to Compute">
+                    <group>
+                        <field name="compute_c1"/>
+                        <field name="compute_c2"/>
+                        <field name="compute_c3"/>
+                    </group>
+                    <group>
+                        <field name="compute_c4"/>
+                        <field name="compute_c5"/>
+                        <field name="compute_c6"/>
+                    </group>
+                </group>
+                <group string="Data Sources">
+                    <field name="pull_from_admissions"/>
+                    <field name="pull_from_placements"/>
+                    <field name="pull_from_exams"/>
+                </group>
+                <group string="Current Scores (before compute)">
+                    <field name="preview_c4_er" readonly="1"/>
+                    <field name="preview_c5_sfr" readonly="1"/>
+                    <field name="preview_total" readonly="1"/>
+                </group>
+                <footer>
+                    <button name="action_compute" string="Compute Now" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="nba_compute_wizard_action" model="ir.actions.act_window">
+        <field name="name">Auto-Compute NBA Criteria</field>
+        <field name="res_model">nba.compute.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

@@ -1,0 +1,714 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data>
+
+<!-- ======================================================================= -->
+<!-- OPAC Home Page                                                            -->
+<!-- ======================================================================= -->
+<template id="opac_home" name="OPAC — Library Catalog">
+    <t t-call="website.layout">
+        <div id="wrap">
+
+            <!-- Hero / Search Bar -->
+            <section class="bg-primary text-white py-5">
+                <div class="container text-center">
+                    <h1 class="display-5 fw-bold mb-2">
+                        <i class="fa fa-search me-2"/>
+                        Online Library Catalog (OPAC)
+                    </h1>
+                    <p class="lead mb-4">Search books, e-books, journals, videos and more</p>
+                    <form action="/library/opac/search" method="get" class="row justify-content-center g-2">
+                        <div class="col-md-7">
+                            <input type="text" name="search" class="form-control form-control-lg"
+                                   placeholder="Search by title, author, keyword, DOI..."/>
+                        </div>
+                        <div class="col-md-2">
+                            <select name="res_type" class="form-select form-select-lg">
+                                <option value="">All Types</option>
+                                <option value="physical">Physical Books</option>
+                                <option value="ebook">E-Books</option>
+                                <option value="journal">Journals</option>
+                                <option value="video">Video Lectures</option>
+                                <option value="thesis">Theses</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold">
+                                <i class="fa fa-search me-1"/> Search
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Stats Bar -->
+            <section class="bg-light py-3 border-bottom">
+                <div class="container">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="fw-bold text-primary fs-4">
+                                <t t-esc="total_books"/>
+                            </div>
+                            <small class="text-muted">Physical Books</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="fw-bold text-success fs-4">
+                                <t t-esc="total_resources"/>
+                            </div>
+                            <small class="text-muted">Digital Resources</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="fw-bold text-warning fs-4">
+                                <t t-esc="total_collections"/>
+                            </div>
+                            <small class="text-muted">Databases Subscribed</small>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Digital Collections -->
+            <section class="py-5">
+                <div class="container">
+                    <h3 class="fw-bold mb-4">
+                        <i class="fa fa-database text-primary me-2"/>
+                        Digital Databases &amp; Collections
+                    </h3>
+                    <div class="row g-3">
+                        <t t-foreach="collections" t-as="col">
+                            <div class="col-md-3 col-sm-6">
+                                <a t-attf-href="/library/collection/#{col.id}"
+                                   class="card h-100 border-0 shadow-sm text-decoration-none text-dark">
+                                    <div class="card-body text-center py-4">
+                                        <t t-if="col.logo">
+                                            <img t-att-src="'data:image/png;base64,' + col.logo.decode()"
+                                                 class="mb-3" style="max-height:50px;max-width:120px;object-fit:contain;" alt=""/>
+                                        </t>
+                                        <t t-else="">
+                                            <i class="fa fa-database fa-2x text-primary mb-3 d-block"/>
+                                        </t>
+                                        <h6 class="fw-bold mb-1">
+                                            <t t-esc="col.name"/>
+                                        </h6>
+                                        <small class="text-muted">
+                                            <t t-esc="col.resource_count"/> resources
+                                        </small>
+                                        <div class="mt-2">
+                                            <span class="badge text-bg-success">
+                                                <t t-esc="dict(col._fields['access_type'].selection).get(col.access_type, col.access_type)"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </t>
+                        <t t-if="not collections">
+                            <p class="text-muted">No subscribed databases configured yet.</p>
+                        </t>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Featured / New Resources -->
+            <section class="py-5 bg-light">
+                <div class="container">
+                    <h3 class="fw-bold mb-4">
+                        <i class="fa fa-star text-warning me-2"/>
+                        Newly Added Resources
+                    </h3>
+                    <div class="row g-3">
+                        <t t-foreach="featured_resources" t-as="res">
+                            <div class="col-md-3 col-sm-6">
+                                <a t-attf-href="/library/resource/#{res.id}"
+                                   class="card h-100 border-0 shadow-sm text-decoration-none text-dark">
+                                    <div class="card-body">
+                                        <div class="mb-2">
+                                            <span t-attf-class="badge text-bg-#{
+                                                'primary' if res.resource_type == 'ebook' else
+                                                'success' if res.resource_type == 'journal' else
+                                                'warning' if res.resource_type == 'video' else
+                                                'info' if res.resource_type == 'thesis' else 'secondary'}">
+                                                <t t-esc="dict(res._fields['resource_type'].selection).get(res.resource_type, res.resource_type)"/>
+                                            </span>
+                                        </div>
+                                        <h6 class="fw-bold">
+                                            <t t-esc="res.title"/>
+                                        </h6>
+                                        <small class="text-muted d-block">
+                                            <t t-esc="res.primary_author or '—'"/>
+                                        </small>
+                                        <small class="text-muted">
+                                            <t t-esc="res.collection_id.name if res.collection_id else ''"/>
+                                        </small>
+                                    </div>
+                                    <div class="card-footer bg-transparent border-0">
+                                        <small>
+                                            <i class="fa fa-eye text-muted me-1"/>
+                                            <t t-esc="res.total_access_count"/> views
+                                        </small>
+                                    </div>
+                                </a>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Most Popular -->
+            <section class="py-5">
+                <div class="container">
+                    <h3 class="fw-bold mb-4">
+                        <i class="fa fa-fire text-danger me-2"/>
+                        Most Accessed
+                    </h3>
+                    <div class="row g-3">
+                        <t t-foreach="popular_resources" t-as="res">
+                            <div class="col-md-4">
+                                <a t-attf-href="/library/resource/#{res.id}"
+                                   class="d-flex align-items-center text-decoration-none text-dark border rounded p-3 bg-white shadow-sm">
+                                    <div class="me-3 text-center" style="min-width:40px;">
+                                        <span class="fw-bold text-primary fs-5">
+                                            <t t-esc="res_index + 1"/>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold">
+                                            <t t-esc="res.title"/>
+                                        </div>
+                                        <small class="text-muted">
+                                            <t t-esc="res.primary_author or '—'"/>
+                                        </small>
+                                        <div>
+                                            <small>
+                                                <i class="fa fa-eye text-muted me-1"/>
+                                                <t t-esc="res.total_access_count"/> views
+                                            </small>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </t>
+</template>
+
+<!-- ======================================================================= -->
+<!-- OPAC Search Results                                                       -->
+<!-- ======================================================================= -->
+<template id="opac_search_results" name="OPAC — Search Results">
+    <t t-call="website.layout">
+        <div id="wrap">
+            <div class="container py-4">
+
+                <!-- Search bar repeat -->
+                <form action="/library/opac/search" method="get" class="row g-2 mb-4">
+                    <div class="col-md-6">
+                        <input type="text" name="search" class="form-control"
+                               t-att-value="search" placeholder="Search catalog..."/>
+                    </div>
+                    <div class="col-md-2">
+                        <select name="res_type" class="form-select">
+                            <option value="">All Types</option>
+                            <option value="physical" t-att-selected="res_type == 'physical' or None">Physical Books</option>
+                            <option value="ebook" t-att-selected="res_type == 'ebook' or None">E-Books</option>
+                            <option value="journal" t-att-selected="res_type == 'journal' or None">Journals</option>
+                            <option value="video" t-att-selected="res_type == 'video' or None">Video Lectures</option>
+                            <option value="thesis" t-att-selected="res_type == 'thesis' or None">Theses</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select name="category_id" class="form-select">
+                            <option value="">All Categories</option>
+                            <t t-foreach="categories" t-as="cat">
+                                <option t-att-value="cat.id"
+                                        t-att-selected="category_id == cat.id or None">
+                                    <t t-esc="cat.name"/>
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fa fa-search me-1"/> Search
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Result count -->
+                <p class="text-muted mb-3">
+                    <strong><t t-esc="total_count"/></strong> results
+                    <t t-if="search"> for "<t t-esc="search"/>"</t>
+                    — <t t-esc="book_count"/> physical books,
+                    <t t-esc="resource_count"/> digital resources
+                </p>
+
+                <div class="row">
+
+                    <!-- LEFT: Physical Books -->
+                    <div class="col-md-6" t-if="books">
+                        <h5 class="fw-bold mb-3">
+                            <i class="fa fa-book text-primary me-2"/>
+                            Physical Books (<t t-esc="book_count"/>)
+                        </h5>
+                        <t t-foreach="books" t-as="book">
+                            <a t-attf-href="/library/book/#{book.id}"
+                               class="card mb-3 border-0 shadow-sm text-decoration-none text-dark">
+                                <div class="card-body d-flex">
+                                    <div class="me-3">
+                                        <t t-if="book.cover_image">
+                                            <img t-att-src="'data:image/png;base64,' + book.cover_image.decode()"
+                                                 style="width:50px;height:70px;object-fit:cover;" alt=""/>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="bg-light d-flex align-items-center justify-content-center"
+                                                 style="width:50px;height:70px;">
+                                                <i class="fa fa-book text-muted"/>
+                                            </div>
+                                        </t>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold"><t t-esc="book.title"/></div>
+                                        <small class="text-muted d-block"><t t-esc="book.primary_author"/></small>
+                                        <small class="text-muted"><t t-esc="book.category_id.name if book.category_id else ''"/></small>
+                                        <div class="mt-1">
+                                            <t t-if="book.available_copies > 0">
+                                                <span class="badge text-bg-success">
+                                                    <t t-esc="book.available_copies"/> Available
+                                                </span>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="badge text-bg-danger">Not Available</span>
+                                            </t>
+                                            <t t-if="book.has_digital">
+                                                <span class="badge text-bg-info ms-1">
+                                                    <i class="fa fa-laptop me-1"/>Digital Available
+                                                </span>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </t>
+                    </div>
+
+                    <!-- RIGHT: Digital Resources -->
+                    <div class="col-md-6" t-if="resources">
+                        <h5 class="fw-bold mb-3">
+                            <i class="fa fa-laptop text-success me-2"/>
+                            Digital Resources (<t t-esc="resource_count"/>)
+                        </h5>
+                        <t t-foreach="resources" t-as="res">
+                            <a t-attf-href="/library/resource/#{res.id}"
+                               class="card mb-3 border-0 shadow-sm text-decoration-none text-dark">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <span t-attf-class="badge me-1 text-bg-#{
+                                                'primary' if res.resource_type == 'ebook' else
+                                                'success' if res.resource_type == 'journal' else
+                                                'warning' if res.resource_type == 'video' else 'secondary'}">
+                                                <t t-esc="dict(res._fields['resource_type'].selection).get(res.resource_type, res.resource_type)"/>
+                                            </span>
+                                            <t t-if="res.access_type == 'open'">
+                                                <span class="badge text-bg-success">Open Access</span>
+                                            </t>
+                                        </div>
+                                        <small class="text-muted">
+                                            <i class="fa fa-eye me-1"/>
+                                            <t t-esc="res.total_access_count"/>
+                                        </small>
+                                    </div>
+                                    <div class="fw-bold mt-1"><t t-esc="res.title"/></div>
+                                    <small class="text-muted d-block"><t t-esc="res.primary_author or '—'"/></small>
+                                    <small class="text-muted">
+                                        <t t-esc="res.collection_id.name if res.collection_id else ''"/>
+                                        <t t-if="res.publication_year">
+                                            · <t t-esc="res.publication_year"/>
+                                        </t>
+                                    </small>
+                                </div>
+                            </a>
+                        </t>
+                    </div>
+
+                </div>
+
+                <!-- No results -->
+                <t t-if="not books and not resources">
+                    <div class="text-center py-5">
+                        <i class="fa fa-search fa-3x text-muted mb-3 d-block"/>
+                        <h5 class="text-muted">No results found</h5>
+                        <p class="text-muted">Try different keywords or remove filters.</p>
+                        <a href="/library/opac" class="btn btn-primary mt-2">Back to Catalog</a>
+                    </div>
+                </t>
+
+            </div>
+        </div>
+    </t>
+</template>
+
+<!-- ======================================================================= -->
+<!-- Physical Book Detail                                                      -->
+<!-- ======================================================================= -->
+<template id="opac_book_detail" name="OPAC — Book Detail">
+    <t t-call="website.layout">
+        <div id="wrap">
+            <div class="container py-5">
+                <div class="row">
+                    <!-- Cover -->
+                    <div class="col-md-3 text-center">
+                        <t t-if="book.cover_image">
+                            <img t-att-src="'data:image/png;base64,' + book.cover_image.decode()"
+                                 class="img-fluid rounded shadow mb-3" style="max-height:300px;" alt="Cover"/>
+                        </t>
+                        <t t-else="">
+                            <div class="bg-light rounded d-flex align-items-center justify-content-center mb-3"
+                                 style="height:250px;">
+                                <i class="fa fa-book fa-5x text-muted"/>
+                            </div>
+                        </t>
+
+                        <!-- Availability badge -->
+                        <t t-if="book.available_copies > 0">
+                            <span class="badge text-bg-success fs-6 d-block mb-2">
+                                <i class="fa fa-check me-1"/>
+                                <t t-esc="book.available_copies"/> Copy Available
+                            </span>
+                        </t>
+                        <t t-else="">
+                            <span class="badge text-bg-danger fs-6 d-block mb-2">
+                                Not Available
+                            </span>
+                        </t>
+
+                        <!-- Reserve button -->
+                        <t t-if="member and book.available_copies == 0">
+                            <t t-if="existing_reservation">
+                                <span class="badge text-bg-warning d-block">Already Reserved</span>
+                            </t>
+                            <t t-else="">
+                                <form t-attf-action="/library/book/#{book.id}/reserve" method="post">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <button type="submit" class="btn btn-warning w-100">
+                                        <i class="fa fa-bookmark me-1"/> Reserve
+                                    </button>
+                                </form>
+                            </t>
+                        </t>
+                        <t t-if="not member">
+                            <a href="/web/login" class="btn btn-outline-primary w-100 mt-2">
+                                Login to Reserve
+                            </a>
+                        </t>
+                    </div>
+
+                    <!-- Details -->
+                    <div class="col-md-9">
+                        <nav aria-label="breadcrumb" class="mb-3">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/library/opac">OPAC</a></li>
+                                <li class="breadcrumb-item active"><t t-esc="book.title"/></li>
+                            </ol>
+                        </nav>
+
+                        <h2 class="fw-bold"><t t-esc="book.title"/></h2>
+                        <h5 class="text-muted" t-if="book.subtitle"><t t-esc="book.subtitle"/></h5>
+
+                        <p class="text-muted mt-2">
+                            by <strong><t t-esc="book.primary_author"/></strong>
+                        </p>
+
+                        <table class="table table-borderless table-sm mt-3">
+                            <tr t-if="book.isbn"><th>ISBN</th><td><t t-esc="book.isbn"/></td></tr>
+                            <tr t-if="book.category_id"><th>Category</th><td><t t-esc="book.category_id.name"/></td></tr>
+                            <tr t-if="book.publisher_id"><th>Publisher</th><td><t t-esc="book.publisher_id.name"/></td></tr>
+                            <tr t-if="book.publication_year"><th>Year</th><td><t t-esc="book.publication_year"/></td></tr>
+                            <tr t-if="book.edition"><th>Edition</th><td><t t-esc="book.edition"/></td></tr>
+                            <tr t-if="book.language"><th>Language</th><td><t t-esc="book.language"/></td></tr>
+                            <tr t-if="book.pages"><th>Pages</th><td><t t-esc="book.pages"/></td></tr>
+                            <tr><th>Total Copies</th><td><t t-esc="book.total_copies"/></td></tr>
+                            <tr><th>Available</th>
+                                <td>
+                                    <span t-attf-class="badge text-bg-#{'success' if book.available_copies > 0 else 'danger'}">
+                                        <t t-esc="book.available_copies"/>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr t-if="book.rack_id"><th>Location</th><td><t t-esc="book.rack_id.name"/> — <t t-esc="book.rack_id.code"/></td></tr>
+                        </table>
+
+                        <t t-if="book.opac_description">
+                            <h5 class="fw-bold mt-3">Description</h5>
+                            <p><t t-esc="book.opac_description"/></p>
+                        </t>
+
+                        <!-- Digital versions -->
+                        <t t-if="book.digital_resource_ids">
+                            <h5 class="fw-bold mt-4">
+                                <i class="fa fa-laptop text-success me-2"/>
+                                Digital Versions Available
+                            </h5>
+                            <t t-foreach="book.digital_resource_ids.filtered(lambda r: r.state == 'published')" t-as="res">
+                                <a t-attf-href="/library/resource/#{res.id}"
+                                   class="btn btn-outline-success me-2 mb-2">
+                                    <i class="fa fa-external-link me-1"/>
+                                    <t t-esc="dict(res._fields['resource_type'].selection).get(res.resource_type, res.resource_type)"/>
+                                    — <t t-esc="res.collection_id.name if res.collection_id else 'Digital'"/>
+                                </a>
+                            </t>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</template>
+
+<!-- ======================================================================= -->
+<!-- Digital Resource Detail                                                   -->
+<!-- ======================================================================= -->
+<template id="opac_resource_detail" name="OPAC — Resource Detail">
+    <t t-call="website.layout">
+        <div id="wrap">
+            <div class="container py-5">
+                <div class="row">
+                    <div class="col-md-3 text-center">
+                        <t t-if="resource.cover_image">
+                            <img t-att-src="'data:image/png;base64,' + resource.cover_image.decode()"
+                                 class="img-fluid rounded shadow mb-3" style="max-height:280px;" alt="Cover"/>
+                        </t>
+                        <t t-else="">
+                            <div class="bg-light rounded d-flex align-items-center justify-content-center mb-3"
+                                 style="height:220px;">
+                                <i class="fa fa-file-text fa-5x text-muted"/>
+                            </div>
+                        </t>
+
+                        <!-- Access Button -->
+                        <t t-if="can_access">
+                            <a t-attf-href="/library/resource/#{resource.id}/access"
+                               class="btn btn-success w-100 mb-2">
+                                <i class="fa fa-eye me-1"/> Access Now
+                            </a>
+                            <t t-if="resource.download_allowed">
+                                <a t-attf-href="/library/resource/#{resource.id}/access?download=1"
+                                   class="btn btn-outline-primary w-100">
+                                    <i class="fa fa-download me-1"/> Download
+                                </a>
+                            </t>
+                        </t>
+                        <t t-elif="resource.access_type == 'open'">
+                            <a t-attf-href="/library/resource/#{resource.id}/access"
+                               class="btn btn-success w-100">
+                                <i class="fa fa-eye me-1"/> Open Access — Read Free
+                            </a>
+                        </t>
+                        <t t-else="">
+                            <div class="alert alert-warning text-center p-2">
+                                <i class="fa fa-lock me-1"/>
+                                Members Only
+                            </div>
+                            <t t-if="not member">
+                                <a href="/web/login" class="btn btn-primary w-100">Login to Access</a>
+                            </t>
+                        </t>
+
+                        <div class="mt-3 text-muted small">
+                            <div><i class="fa fa-eye me-1"/> <t t-esc="resource.total_access_count"/> views</div>
+                            <div><i class="fa fa-download me-1"/> <t t-esc="resource.total_download_count"/> downloads</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-9">
+                        <nav aria-label="breadcrumb" class="mb-3">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/library/opac">OPAC</a></li>
+                                <t t-if="resource.collection_id">
+                                    <li class="breadcrumb-item">
+                                        <a t-attf-href="/library/collection/#{resource.collection_id.id}">
+                                            <t t-esc="resource.collection_id.name"/>
+                                        </a>
+                                    </li>
+                                </t>
+                                <li class="breadcrumb-item active"><t t-esc="resource.title"/></li>
+                            </ol>
+                        </nav>
+
+                        <div class="mb-2">
+                            <span t-attf-class="badge text-bg-primary me-1">
+                                <t t-esc="dict(resource._fields['resource_type'].selection).get(resource.resource_type, resource.resource_type)"/>
+                            </span>
+                            <t t-if="resource.access_type == 'open'">
+                                <span class="badge text-bg-success">Open Access</span>
+                            </t>
+                        </div>
+
+                        <h2 class="fw-bold"><t t-esc="resource.title"/></h2>
+                        <h6 class="text-muted" t-if="resource.subtitle"><t t-esc="resource.subtitle"/></h6>
+                        <p class="text-muted" t-if="resource.primary_author">
+                            by <strong><t t-esc="resource.primary_author"/></strong>
+                        </p>
+
+                        <table class="table table-sm table-borderless mt-3">
+                            <tr t-if="resource.publisher"><th>Publisher</th><td><t t-esc="resource.publisher"/></td></tr>
+                            <tr t-if="resource.publication_year"><th>Year</th><td><t t-esc="resource.publication_year"/></td></tr>
+                            <tr t-if="resource.edition"><th>Edition / Volume</th><td><t t-esc="resource.edition"/></td></tr>
+                            <tr t-if="resource.doi"><th>DOI</th><td><t t-esc="resource.doi"/></td></tr>
+                            <tr t-if="resource.isbn"><th>ISBN</th><td><t t-esc="resource.isbn"/></td></tr>
+                            <tr t-if="resource.issn"><th>ISSN</th><td><t t-esc="resource.issn"/></td></tr>
+                            <tr t-if="resource.language"><th>Language</th><td><t t-esc="resource.language"/></td></tr>
+                            <tr t-if="resource.collection_id"><th>Database</th><td><t t-esc="resource.collection_id.name"/></td></tr>
+                            <tr t-if="resource.category_id"><th>Category</th><td><t t-esc="resource.category_id.name"/></td></tr>
+                        </table>
+
+                        <t t-if="resource.description">
+                            <h5 class="fw-bold mt-3">Abstract / Description</h5>
+                            <div t-raw="resource.description"/>
+                        </t>
+
+                        <!-- Embed viewer -->
+                        <t t-if="show_embed and resource.embed_code">
+                            <h5 class="fw-bold mt-4">Resource Viewer</h5>
+                            <div t-raw="resource.embed_code" class="ratio ratio-16x9 mt-2"/>
+                        </t>
+
+                        <!-- Related physical book -->
+                        <t t-if="resource.physical_book_id">
+                            <div class="mt-4 p-3 bg-light rounded">
+                                <strong>
+                                    <i class="fa fa-book me-2"/>
+                                    Physical copy also available:
+                                </strong>
+                                <a t-attf-href="/library/book/#{resource.physical_book_id.id}"
+                                   class="ms-2">
+                                    <t t-esc="resource.physical_book_id.title"/>
+                                </a>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</template>
+
+<!-- ======================================================================= -->
+<!-- Collection Detail                                                         -->
+<!-- ======================================================================= -->
+<template id="opac_collection_detail" name="OPAC — Collection Detail">
+    <t t-call="website.layout">
+        <div id="wrap">
+            <div class="container py-5">
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/library/opac">OPAC</a></li>
+                        <li class="breadcrumb-item active"><t t-esc="collection.name"/></li>
+                    </ol>
+                </nav>
+
+                <div class="d-flex align-items-center mb-4">
+                    <t t-if="collection.logo">
+                        <img t-att-src="'data:image/png;base64,' + collection.logo.decode()"
+                             style="max-height:60px;max-width:150px;object-fit:contain;" class="me-3" alt=""/>
+                    </t>
+                    <div>
+                        <h2 class="fw-bold mb-0"><t t-esc="collection.name"/></h2>
+                        <span class="text-muted"><t t-esc="collection.provider"/></span>
+                        <t t-if="collection.access_type == 'ip'">
+                            <span class="badge text-bg-warning ms-2">
+                                <i class="fa fa-wifi me-1"/>Campus Network Only
+                            </span>
+                        </t>
+                    </div>
+                    <div class="ms-auto">
+                        <t t-if="collection.access_url">
+                            <a t-att-href="collection.access_url" target="_blank"
+                               class="btn btn-primary">
+                                <i class="fa fa-external-link me-1"/> Access Database
+                            </a>
+                        </t>
+                        <t t-elif="collection.website_url">
+                            <a t-att-href="collection.website_url" target="_blank"
+                               class="btn btn-outline-primary">
+                                <i class="fa fa-globe me-1"/> Visit Website
+                            </a>
+                        </t>
+                    </div>
+                </div>
+
+                <t t-if="collection.description">
+                    <div t-raw="collection.description" class="mb-4"/>
+                </t>
+
+                <h5 class="fw-bold mb-3">
+                    Resources in this collection (<t t-esc="len(resources)"/>)
+                </h5>
+                <div class="row g-3">
+                    <t t-foreach="resources" t-as="res">
+                        <div class="col-md-4">
+                            <a t-attf-href="/library/resource/#{res.id}"
+                               class="card h-100 border-0 shadow-sm text-decoration-none text-dark">
+                                <div class="card-body">
+                                    <span t-attf-class="badge text-bg-primary mb-2">
+                                        <t t-esc="dict(res._fields['resource_type'].selection).get(res.resource_type, res.resource_type)"/>
+                                    </span>
+                                    <div class="fw-bold"><t t-esc="res.title"/></div>
+                                    <small class="text-muted"><t t-esc="res.primary_author or '—'"/></small>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <small>
+                                        <i class="fa fa-eye me-1 text-muted"/>
+                                        <t t-esc="res.total_access_count"/> views
+                                    </small>
+                                </div>
+                            </a>
+                        </div>
+                    </t>
+                    <t t-if="not resources">
+                        <p class="text-muted">No resources published in this collection yet.</p>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+</template>
+
+<!-- ======================================================================= -->
+<!-- Access Denied                                                             -->
+<!-- ======================================================================= -->
+<template id="opac_access_denied" name="OPAC — Access Denied">
+    <t t-call="website.layout">
+        <div id="wrap">
+            <div class="container py-5 text-center">
+                <i class="fa fa-lock fa-4x text-danger mb-3 d-block"/>
+                <h3 class="fw-bold">Access Restricted</h3>
+                <t t-if="reason == 'download_quota_exceeded'">
+                    <p class="text-muted">You have reached the maximum download limit for this resource.</p>
+                </t>
+                <t t-elif="reason == 'download_not_allowed'">
+                    <p class="text-muted">Downloads are not permitted for this resource.</p>
+                </t>
+                <t t-else="">
+                    <p class="text-muted">
+                        This resource requires an active library membership to access.
+                    </p>
+                    <t t-if="not member">
+                        <a href="/web/login" class="btn btn-primary me-2">Login</a>
+                    </t>
+                </t>
+                <a t-attf-href="/library/resource/#{resource.id}"
+                   class="btn btn-outline-secondary mt-2">
+                    Back to Resource
+                </a>
+            </div>
+        </div>
+    </t>
+</template>
+
+</data>
+</odoo>

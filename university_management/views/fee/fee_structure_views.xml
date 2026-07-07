@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ========================================= -->
+    <!-- FEE STRUCTURE VIEWS -->
+    <!-- ========================================= -->
+
+    <!-- Form View -->
+    <record id="fee_structure_view_form" model="ir.ui.view">
+        <field name="name">fee.structure.view.form</field>
+        <field name="model">fee.structure</field>
+        <field name="arch" type="xml">
+            <form string="Fee Structure">
+                <header>
+                    <button name="action_activate" string="Activate"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'draft'"
+                            confirm="Activate this fee structure?"/>
+                    <button name="action_archive" string="Archive"
+                            type="object"
+                            invisible="state != 'active'"
+                            confirm="Archive this fee structure?"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft"
+                            type="object"
+                            invisible="state == 'draft'"
+                            confirm="This will reset the Fee Structure to draft. Are you sure?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,active,archived"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object"
+                                class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button"
+                                   options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+
+                    <widget name="web_ribbon" title="Active"
+                            bg_color="text-bg-success"
+                            invisible="state != 'active'"/>
+                    <widget name="web_ribbon" title="Archived"
+                            bg_color="text-bg-secondary"
+                            invisible="state != 'archived'"/>
+
+                    <div class="oe_title">
+                        <label for="name" string="Fee Structure Name"/>
+                        <h1>
+                            <field name="name"
+                                   placeholder="e.g., B.Tech ECE 2024-25 Semester I Fee"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Basic Information">
+                            <field name="code" placeholder="e.g., BTECH-ECE-2425-SEM1"/>
+                            <field name="program_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="department_id" readonly="1"/>
+                        </group>
+                        <group string="Academic Period">
+                            <field name="academic_year_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <!-- Semester filtered by academic year -->
+                            <field name="semester_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"
+                                   domain="[('academic_year_id', '=', academic_year_id)]"/>
+                            <!-- Auto-computed from semester -->
+                            <field name="payment_term" readonly="1"/>
+                            <field name="due_date" widget="date"/>
+                        </group>
+                    </group>
+
+                    <group string="Accounting Information">
+                        <group>
+                            <field name="income_account_id" widget="many2one"/>
+                            <field name="expense_account_id" widget="many2one"/>
+                            <field name="late_fee_account_id" widget="many2one"/>
+                            <field name="payment_term_id" widget="many2one"/>
+                        </group>
+                        <group>
+                            <field name="journal_id" widget="many2one"/>
+                            <field name="analytic_account_id" widget="many2one"/>
+                            <field name="product_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="company_id" widget="many2one"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Fee Components" name="fee_components">
+                            <field name="fee_line_ids" widget="one2many">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="fee_type"/>
+                                    <field name="amount" widget="monetary" sum="Total"/>
+                                    <field name="is_mandatory" widget="boolean_toggle"/>
+                                    <field name="is_refundable" widget="boolean_toggle"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right">
+                                <field name="total_amount" widget="monetary"
+                                       options="{'currency_field': 'currency_id'}"
+                                       readonly="1"
+                                       class="oe_subtotal_footer_separator"/>
+                                <field name="currency_id" invisible="1"/>
+                            </group>
+                        </page>
+
+                        <page string="Late Fee Settings" name="late_fee">
+                            <group>
+                                <group>
+                                    <field name="has_late_fee" widget="boolean_toggle"/>
+                                    <field name="grace_period_days"
+                                           invisible="not has_late_fee"/>
+                                </group>
+                                <group>
+                                    <field name="late_fee_amount" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"
+                                           invisible="not has_late_fee"/>
+                                    <field name="late_fee_percentage"
+                                           invisible="not has_late_fee"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Applicable Discounts" name="discounts">
+                            <field name="discount_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="code"/>
+                                    <field name="discount_type"/>
+                                    <field name="discount_method"/>
+                                    <field name="discount_percentage"/>
+                                    <field name="discount_amount" widget="monetary"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Description" name="description">
+                            <field name="description"
+                                   placeholder="Enter description for this fee structure..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="fee_structure_view_list" model="ir.ui.view">
+        <field name="name">fee.structure.view.list</field>
+        <field name="model">fee.structure</field>
+        <field name="arch" type="xml">
+            <list string="Fee Structures"
+                  decoration-success="state == 'active'"
+                  decoration-muted="state == 'archived'">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="program_id"/>
+                <field name="department_id" optional="hide"/>
+                <field name="academic_year_id"/>
+                <field name="semester_id"/>
+                <field name="payment_term" optional="show"/>
+                <field name="due_date" optional="show"/>
+                <field name="total_amount" widget="monetary" sum="Total"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'active'"
+                       decoration-warning="state == 'draft'"
+                       decoration-muted="state == 'archived'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="fee_structure_view_search" model="ir.ui.view">
+        <field name="name">fee.structure.view.search</field>
+        <field name="model">fee.structure</field>
+        <field name="arch" type="xml">
+            <search string="Search Fee Structures">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="program_id"/>
+                <field name="academic_year_id"/>
+                <field name="semester_id"/>
+                <field name="payment_term"/>
+
+                <separator/>
+
+                <filter name="filter_active" string="Active"
+                        domain="[('state', '=', 'active')]"/>
+                <filter name="filter_draft" string="Draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_archived" string="Archived"
+                        domain="[('state', '=', 'archived')]"/>
+
+                <separator/>
+
+                <filter name="filter_term1" string="Term 1"
+                        domain="[('payment_term', '=', 'Term 1')]"/>
+                <filter name="filter_term2" string="Term 2"
+                        domain="[('payment_term', '=', 'Term 2')]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_program" string="Program"
+                            context="{'group_by': 'program_id'}"/>
+                    <filter name="group_by_academic_year" string="Academic Year"
+                            context="{'group_by': 'academic_year_id'}"/>
+                    <filter name="group_by_semester" string="Semester"
+                            context="{'group_by': 'semester_id'}"/>
+                    <filter name="group_by_payment_term" string="Payment Term"
+                            context="{'group_by': 'payment_term'}"/>
+                    <filter name="group_by_department" string="Department"
+                            context="{'group_by': 'department_id'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="academic_year_id" string="Academic Year"
+                           select="multi" icon="fa-calendar"/>
+                    <field name="program_id" string="Program"
+                           select="multi" icon="fa-graduation-cap"/>
+                    <field name="state" string="Status"
+                           select="multi" icon="fa-filter"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="fee_structure_view_kanban" model="ir.ui.view">
+        <field name="name">fee.structure.view.kanban</field>
+        <field name="model">fee.structure</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="academic_year_id"
+                    quick_create="false"
+                    sample="1">
+                <field name="name"/>
+                <field name="program_id"/>
+                <field name="academic_year_id"/>
+                <field name="semester_id"/>
+                <field name="payment_term"/>
+                <field name="total_amount"/>
+                <field name="state"/>
+                <field name="due_date"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                    </div>
+                                    <div class="o_kanban_record_top_right">
+                                        <field name="state" widget="badge"
+                                               decoration-success="state == 'active'"
+                                               decoration-warning="state == 'draft'"
+                                               decoration-muted="state == 'archived'"/>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body">
+                                    <div class="row mb-1">
+                                        <div class="col-12">
+                                            <i class="fa fa-graduation-cap text-primary me-1"/>
+                                            <field name="program_id"/>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-1">
+                                        <div class="col-6">
+                                            <small class="text-muted">
+                                                <field name="semester_id"/>
+                                            </small>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-info fw-semibold">
+                                                <field name="payment_term"/>
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <strong>₹ <field name="total_amount"/></strong>
+                                        </div>
+                                    </div>
+                                    <div class="row" t-if="record.due_date.value">
+                                        <div class="col-12">
+                                            <small class="text-muted">
+                                                Due: <field name="due_date"/>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="fee_structure_view_pivot" model="ir.ui.view">
+        <field name="name">fee.structure.view.pivot</field>
+        <field name="model">fee.structure</field>
+        <field name="arch" type="xml">
+            <pivot string="Fee Structure Analysis">
+                <field name="program_id" type="row"/>
+                <field name="payment_term" type="col"/>
+                <field name="total_amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View -->
+    <record id="fee_structure_view_graph" model="ir.ui.view">
+        <field name="name">fee.structure.view.graph</field>
+        <field name="model">fee.structure</field>
+        <field name="arch" type="xml">
+            <graph string="Fee Structure Statistics" type="bar">
+                <field name="program_id" type="row"/>
+                <field name="total_amount" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_fee_structure" model="ir.actions.act_window">
+        <field name="name">Fee Structures</field>
+        <field name="res_model">fee.structure</field>
+        <field name="view_mode">kanban,list,form,pivot,graph</field>
+        <field name="context">{'search_default_filter_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Fee Structure
+            </p>
+            <p>
+                Define comprehensive fee structures with multiple components (tuition, lab,
+                library, hostel, etc.), late fee policies, and discount schemes.
+            </p>
+        </field>
+    </record>
+
+    <!-- ========================================= -->
+    <!-- FEE STRUCTURE LINE VIEWS -->
+    <!-- ========================================= -->
+
+    <record id="fee_structure_line_view_form" model="ir.ui.view">
+        <field name="name">fee.structure.line.view.form</field>
+        <field name="model">fee.structure.line</field>
+        <field name="arch" type="xml">
+            <form string="Fee Component">
+                <sheet>
+                    <group string="Fee">
+                        <field name="fee_structure_id"/>
+                    </group>
+                    <group string="Component Details">
+                        <group>
+                            <field name="sequence"/>
+                            <field name="name"/>
+                            <field name="fee_type"/>
+                        </group>
+                        <group>
+                            <field name="amount" widget="monetary"
+                                   options="{'currency_field': 'currency_id'}"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="is_mandatory" widget="boolean_toggle"/>
+                            <field name="is_refundable" widget="boolean_toggle"/>
+                        </group>
+                        <group>
+                            <field name="description"
+                                   placeholder="Enter description for this fee component..."/>
+                        </group>
+                    </group>
+
+                    <group string="Accounting Configuration">
+                        <group>
+                            <field name="income_account_id" widget="many2one"/>
+                            <field name="late_fee_account_id" widget="many2one"/>
+                            <field name="payment_term_id" widget="many2one"/>
+                        </group>
+                        <group>
+                            <field name="journal_id" widget="many2one"/>
+                            <field name="analytic_account_id" widget="many2one"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="fee_structure_line_view_list" model="ir.ui.view">
+        <field name="name">fee.structure.line.view.list</field>
+        <field name="model">fee.structure.line</field>
+        <field name="arch" type="xml">
+            <list string="Fee Components">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="fee_structure_id"/>
+                <field name="fee_type"/>
+                <field name="amount" widget="monetary" sum="Total"/>
+                <field name="is_mandatory" widget="boolean_toggle"/>
+                <field name="is_refundable" widget="boolean_toggle"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_fee_structure_line" model="ir.actions.act_window">
+        <field name="name">Fee Structure Lines</field>
+        <field name="res_model">fee.structure.line</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

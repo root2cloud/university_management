@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ========================================== -->
+        <!-- SMS TEMPLATES -->
+        <!-- ========================================== -->
+
+        <!-- Note: SMS templates in Odoo 17 use sms.template model -->
+        <!-- These templates work with SMS gateway integration -->
+
+        <!-- 1. Fee Payment Reminder SMS -->
+        <record id="sms_template_fee_reminder" model="sms.template">
+            <field name="name">Fee Payment Reminder</field>
+            <field name="model_id" ref="model_student_student"/>
+            <field name="body">Dear {{ object.name }},
+Your fee payment of Rs.{{ "{:,.0f}".format(object.total_fee_due) }} is pending. Please clear your dues at the earliest to avoid late fees.
+- {{ object.company_id.name }}</field>
+        </record>
+
+        <!-- 2. Exam Hall Ticket SMS -->
+        <record id="sms_template_hall_ticket" model="sms.template">
+            <field name="name">Hall Ticket Available</field>
+            <field name="model_id" ref="model_examination_hall_ticket"/>
+            <field name="body">Dear {{ object.student_id.name }},
+Your Hall Ticket ({{ object.name }}) for {{ object.examination_id.name }} is ready. Download from student portal: {{ object.get_portal_url() }}
+Exam Date: {{ object.examination_id.start_date }}
+- Exam Controller</field>
+        </record>
+
+        <!-- 3. Result Published SMS -->
+        <record id="sms_template_result_published" model="sms.template">
+            <field name="name">Result Published</field>
+            <field name="model_id" ref="model_examination_result"/>
+            <field name="body">Dear {{ object.student_id.name }},
+Your {{ object.examination_id.name }} results are published. CGPA: {{ object.cgpa }}, Grade: {{ object.grade }}
+View details: {{ object.get_portal_url() }}
+- {{ object.company_id.name }}</field>
+        </record>
+
+        <!-- 4. Admission Approval SMS -->
+        <record id="sms_template_admission_approved" model="sms.template">
+            <field name="name">Admission Approved</field>
+            <field name="model_id" ref="model_student_admission"/>
+            <field name="body">Congratulations {{ object.applicant_name }}!
+Your admission to {{ object.program_id.name }} is approved. Application No: {{ object.name }}
+Complete payment and registration before {{ object.admission_deadline }}
+- Admission Office, {{ object.company_id.name }}</field>
+        </record>
+
+        <!-- 5. Admission Rejected SMS -->
+        <record id="sms_template_admission_rejected" model="sms.template">
+            <field name="name">Admission Rejected</field>
+            <field name="model_id" ref="model_student_admission"/>
+            <field name="body">Dear {{ object.applicant_name }},
+We regret to inform that your application ({{ object.name }}) for {{ object.program_id.name }} could not be approved at this time.
+Thank you for your interest.
+- {{ object.company_id.name }}</field>
+        </record>
+
+        <!-- 6. Class Cancelled/Substitute SMS -->
+        <record id="sms_template_class_substitute" model="sms.template">
+            <field name="name">Class Substitution Notice</field>
+            <field name="model_id" ref="model_timetable_substitution"/>
+            <field name="body">NOTICE: {{ object.subject_id.name }} class on {{ object.date }} will be taken by {{ object.substitute_faculty_id.name }} (Substitute for {{ object.original_faculty_id.name }})
+- Academic Office</field>
+        </record>
+
+        <!-- 7. Library Book Overdue SMS -->
+        <record id="sms_template_library_overdue" model="sms.template">
+            <field name="name">Library Book Overdue</field>
+            <field name="model_id" ref="model_library_issue"/>
+            <field name="body">Dear {{ object.member_id.name }},
+Library book "{{ object.book_id.title }}" is overdue by {{ object.days_overdue }} days. Fine: Rs.{{ "{:.0f}".format(object.fine_amount) }}
+Please return immediately.
+- Library, {{ object.company_id.name }}</field>
+        </record>
+
+        <!-- 8. Hostel Allocation Confirmation SMS -->
+        <record id="sms_template_hostel_allocation" model="sms.template">
+            <field name="name">Hostel Allocation Confirmed</field>
+            <field name="model_id" ref="model_hostel_allocation"/>
+            <field name="body">Dear {{ object.student_id.name }},
+Hostel room allocated: {{ object.hostel_id.name }}, Room {{ object.room_id.room_number }}, Bed {{ object.bed_number }}
+Report to hostel warden for check-in.
+- Hostel Office</field>
+        </record>
+
+        <!-- 9. Placement Drive Notification SMS -->
+        <record id="sms_template_placement_drive" model="sms.template">
+            <field name="name">Placement Drive Notification</field>
+            <field name="model_id" ref="model_placement_drive"/>
+            <field name="body">NEW PLACEMENT DRIVE
+Company: {{ object.company_id.name }}
+Position: {{ object.job_title }}
+CTC: {{ object.ctc_min }}-{{ object.ctc_max }} LPA
+Register before: {{ object.registration_end }}
+- Placement Cell</field>
+        </record>
+
+        <!-- 10. Placement Offer SMS -->
+        <record id="sms_template_placement_offer" model="sms.template">
+            <field name="name">Placement Offer</field>
+            <field name="model_id" ref="model_placement_offer"/>
+            <field name="body">CONGRATULATIONS {{ object.student_id.name }}!
+You are selected by {{ object.company_id.name }} as {{ object.job_title }}
+CTC: Rs.{{ "{:,.0f}".format(object.ctc) }}
+Accept/Reject before: {{ object.acceptance_deadline }}
+- Placement Cell</field>
+        </record>
+
+        <!-- 11. Event Registration Confirmation SMS -->
+        <record id="sms_template_event_registration" model="sms.template">
+            <field name="name">Event Registration</field>
+            <field name="model_id" ref="model_university_event_registration"/>
+            <field name="body">Dear {{ object.participant_name }},
+Registration confirmed for {{ object.event_id.name }}
+Date: {{ object.event_id.start }}
+Venue: {{ object.event_id.venue_address or 'Online' }}
+Reg No: {{ object.name }}
+- Event Team</field>
+        </record>
+
+        <!-- 12. Attendance Low Alert SMS -->
+        <record id="sms_template_attendance_alert" model="sms.template">
+            <field name="name">Low Attendance Alert</field>
+            <field name="model_id" ref="model_student_student"/>
+            <field name="body">ATTENDANCE ALERT
+Dear {{ object.name }},
+Your attendance is {{ "{:.1f}".format(object.attendance_percentage) }}% which is below required 75%.
+Please improve attendance to avoid detention.
+- Academic Office</field>
+        </record>
+
+        <!-- 13. Scholarship Approval SMS -->
+        <record id="sms_template_scholarship_approved" model="sms.template">
+            <field name="name">Scholarship Approved</field>
+            <field name="model_id" ref="model_scholarship_application"/>
+            <field name="body">Congratulations {{ object.student_id.name }}!
+Your scholarship application ({{ object.name }}) for {{ object.scholarship_id.name }} is approved.
+Amount: Rs.{{ "{:,.0f}".format(object.scholarship_id.amount) }}
+- Scholarship Committee</field>
+        </record>
+
+        <!-- 14. Faculty Leave Approval SMS -->
+        <record id="sms_template_faculty_leave_approved" model="sms.template">
+            <field name="name">Faculty Leave Approved</field>
+            <field name="model_id" ref="model_faculty_leave"/>
+            <field name="body">Dear {{ object.faculty_id.name }},
+Your leave request ({{ object.name }}) from {{ object.start_date }} to {{ object.end_date }} has been approved.
+- HR Department</field>
+        </record>
+
+        <!-- 15. Transport Allocation SMS -->
+        <record id="sms_template_transport_allocation" model="sms.template">
+            <field name="name">Transport Allocation</field>
+            <field name="model_id" ref="model_transport_allocation"/>
+            <field name="body">Dear {{ object.student_id.name }},
+Bus allocated for Route: {{ object.route_id.name }}
+Stop: {{ object.stop_id.name }}
+Vehicle: {{ object.vehicle_id.vehicle_number if object.vehicle_id else 'TBA' }}
+Monthly Fee: Rs.{{ object.monthly_fee }}
+- Transport Office</field>
+        </record>
+
+        <!-- 16. Project Submission Reminder SMS -->
+        <record id="sms_template_project_reminder" model="sms.template">
+            <field name="name">Project Submission Reminder</field>
+            <field name="model_id" ref="model_student_project"/>
+            <field name="body">Dear {{ object.team_leader_id.name }},
+Reminder: Project "{{ object.project_title }}" submission deadline is {{ object.expected_completion }}
+Current progress: {{ object.progress_percentage }}%
+- Project Coordinator</field>
+        </record>
+
+        <!-- 17. Internship Approval SMS -->
+        <record id="sms_template_internship_approved" model="sms.template">
+            <field name="name">Internship Approved</field>
+            <field name="model_id" ref="model_internship_internship"/>
+            <field name="body">Dear {{ object.student_id.name }},
+Your internship with {{ object.company_id.name }} as {{ object.designation }} is approved.
+Duration: {{ object.start_date }} to {{ object.end_date }}
+- Training &amp; Placement</field>
+        </record>
+
+        <!-- 18. Exam Timetable Published SMS -->
+        <record id="sms_template_exam_timetable" model="sms.template">
+            <field name="name">Exam Timetable Published</field>
+            <field name="model_id" ref="model_examination_examination"/>
+            <field name="body">{{ object.name }} timetable published.
+Start Date: {{ object.start_date }}
+Download from student portal.
+Register before: {{ object.registration_end }}
+- Exam Controller</field>
+        </record>
+
+        <!-- 19. Mess Menu Update SMS -->
+        <record id="sms_template_mess_menu" model="sms.template">
+            <field name="name">Mess Menu Update</field>
+            <field name="model_id" ref="model_mess_menu"/>
+            <field name="body">Today's {{ object.meal_type }} menu at {{ object.mess_id.name }}:
+{{ object.description }}
+- Mess Management</field>
+        </record>
+
+        <!-- 20. Disciplinary Action SMS -->
+        <record id="sms_template_discipline_action" model="sms.template">
+            <field name="name">Disciplinary Action Notice</field>
+            <field name="model_id" ref="model_student_discipline"/>
+            <field name="body">Dear {{ object.student_id.name }},
+A disciplinary case ({{ object.name }}) has been registered.
+Please report to Disciplinary Committee on {{ object.action_date or 'as scheduled' }}
+- Discipline Committee</field>
+        </record>
+
+        <!-- 21. Birthday Wishes SMS -->
+        <record id="sms_template_birthday" model="sms.template">
+            <field name="name">Birthday Wishes</field>
+            <field name="model_id" ref="model_student_student"/>
+            <field name="body">🎂 Happy Birthday {{ object.name }}! 🎉
+Wishing you a wonderful year ahead filled with success and happiness!
+- {{ object.company_id.name }} Family</field>
+        </record>
+
+        <!-- 22. Parent Meeting Notice SMS -->
+        <record id="sms_template_parent_meeting" model="sms.template">
+            <field name="name">Parent Meeting Notice</field>
+            <field name="model_id" ref="model_student_parent"/>
+            <field name="body">Dear Parent,
+Parent-Teacher meeting scheduled for {{ ctx.get('meeting_date', 'TBA') }}
+Student: {{ object.student_ids[0].name if object.student_ids else 'your ward' }}
+Attendance is mandatory.
+- {{ object.company_id.name }}</field>
+        </record>
+
+        <!-- 23. Hostel Leave Request SMS -->
+        <record id="sms_template_hostel_leave" model="sms.template">
+            <field name="name">Hostel Leave Status</field>
+            <field name="model_id" ref="model_student_student"/>
+            <field name="body">Dear Parent,
+Hostel leave request for {{ object.name }} from {{ ctx.get('leave_from') }} to {{ ctx.get('leave_to') }} is {{ ctx.get('status', 'pending') }}.
+- Hostel Warden</field>
+        </record>
+
+        <!-- 24. Vehicle Maintenance Alert SMS -->
+        <record id="sms_template_vehicle_maintenance" model="sms.template">
+            <field name="name">Vehicle Maintenance Alert</field>
+            <field name="model_id" ref="model_transport_vehicle"/>
+            <field name="body">ALERT: Vehicle {{ object.vehicle_number }}
+Insurance/Fitness certificate expiring on {{ object.insurance_expiry or object.fitness_certificate }}
+Please renew immediately.
+- Transport Dept</field>
+        </record>
+
+        <!-- 25. Alumni Event Invitation SMS -->
+        <record id="sms_template_alumni_event" model="sms.template">
+            <field name="name">Alumni Event Invitation</field>
+            <field name="model_id" ref="model_alumni_event"/>
+            <field name="body">Dear Alumni,
+You are cordially invited to {{ object.name }}
+Date: {{ object.start }}
+Venue: {{ object.venue_details }}
+Register: {{ object.get_portal_url() }}
+- Alumni Relations</field>
+        </record>
+
+        <!-- 26. Hackathon Registration Confirmation SMS -->
+        <record id="sms_template_hackathon_registration" model="sms.template">
+            <field name="name">Hackathon Registration</field>
+            <field name="model_id" ref="model_hackathon_team"/>
+            <field name="body">Team {{ object.name }} registered for {{ object.hackathon_id.name }}!
+Team Code: {{ object.code }}
+Team Leader: {{ object.team_leader_id.name }}
+Event Date: {{ object.hackathon_id.start_date }}
+Good luck!
+- Event Team</field>
+        </record>
+
+        <!-- 27. Revaluation Result SMS -->
+        <record id="sms_template_revaluation_result" model="sms.template">
+            <field name="name">Revaluation Result</field>
+            <field name="model_id" ref="model_examination_revaluation"/>
+            <field name="body">Dear {{ object.student_id.name }},
+Revaluation result for {{ object.subject_id.name }}:
+Original: {{ object.original_marks }}, After Revaluation: {{ object.revalued_marks }}
+Status: {{ object.state }}
+- Exam Controller</field>
+        </record>
+
+        <!-- 28. Salary Credited SMS -->
+        <record id="sms_template_salary_credited" model="sms.template">
+            <field name="name">Salary Credited</field>
+            <field name="model_id" ref="model_faculty_salary"/>
+            <field name="body">Dear {{ object.faculty_id.name }},
+Salary for {{ object.month }}/{{ object.year }} has been credited.
+Net Pay: Rs.{{ "{:,.2f}".format(object.net_salary) }}
+Download payslip from portal.
+- Accounts</field>
+        </record>
+
+        <!-- 29. Certificate Ready SMS -->
+        <record id="sms_template_certificate_ready" model="sms.template">
+            <field name="name">Certificate Ready</field>
+            <field name="model_id" ref="model_student_student"/>
+            <field name="body">Dear {{ object.name }},
+Your {{ ctx.get('certificate_type', 'certificate') }} is ready for collection.
+Visit office with ID card during working hours.
+- Administrative Office</field>
+        </record>
+
+        <!-- 30. Emergency Alert SMS -->
+        <record id="sms_template_emergency_alert" model="sms.template">
+            <field name="name">Emergency Alert</field>
+            <field name="model_id" ref="model_student_student"/>
+            <field name="body">EMERGENCY ALERT
+{{ ctx.get('emergency_message', 'Emergency situation') }}
+For updates: {{ ctx.get('contact_number', 'contact administration') }}
+- {{ object.company_id.name }} Admin</field>
+        </record>
+
+    </data>
+</odoo>

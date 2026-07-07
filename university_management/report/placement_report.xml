@@ -1,0 +1,513 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Report Action -->
+    <record id="action_report_placement_statistics" model="ir.actions.report">
+        <field name="name">Placement Statistics Report</field>
+        <field name="model">placement.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">university_management.report_placement_statistics</field>
+        <field name="report_file">university_management.report_placement_statistics</field>
+        <field name="binding_model_id" ref="model_placement_report_wizard"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Report Template -->
+    <template id="report_placement_statistics">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+
+                        <!-- Header -->
+                        <div class="row" style="border-bottom: 3px solid #00BCD4; padding-bottom: 15px; margin-bottom: 20px;">
+                            <div class="col-3 text-center">
+                                <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="max-height: 70px;"/>
+                            </div>
+                            <div class="col-9 text-center">
+                                <h2 style="color: #00BCD4; margin: 0; font-weight: bold;">
+                                    <t t-esc="o.company_id.name"/>
+                                </h2>
+                                <p style="margin: 5px 0;">
+                                    <t t-esc="o.company_id.street"/>, <t t-esc="o.company_id.city"/>
+                                </p>
+                                <h3 style="margin: 10px 0 0 0; background: #00BCD4; color: white; padding: 8px;">
+                                    CAMPUS PLACEMENT REPORT
+                                </h3>
+                            </div>
+                        </div>
+
+                        <!-- Report Parameters -->
+                        <div style="background: #E0F7FA; border-left: 4px solid #00BCD4; padding: 15px; margin-bottom: 20px;">
+                            <div class="row">
+                                <div class="col-3">
+                                    <strong>Academic Year:</strong><br/>
+                                    <t t-esc="o.academic_year_id.name"/>
+                                </div>
+                                <div class="col-3">
+                                    <strong>Program:</strong><br/>
+                                    <t t-esc="o.program_id.name if o.program_id else 'All Programs'"/>
+                                </div>
+                                <div class="col-3">
+                                    <strong>Department:</strong><br/>
+                                    <t t-esc="o.department_id.name if o.department_id else 'All Departments'"/>
+                                </div>
+                                <div class="col-3">
+                                    <strong>Report Date:</strong><br/>
+                                    <t t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%b-%Y')"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Key Performance Indicators -->
+                        <div class="row" style="margin-bottom: 20px;">
+                            <div class="col-3">
+                                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; text-align: center; height: 100%;">
+                                    <div style="font-size: 40pt; font-weight: bold; margin-bottom: 10px;">
+                                        <t t-esc="o.total_eligible_students"/>
+                                    </div>
+                                    <div style="font-size: 11pt;">Eligible Students</div>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div style="background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%); color: white; padding: 20px; border-radius: 8px; text-align: center; height: 100%;">
+                                    <div style="font-size: 40pt; font-weight: bold; margin-bottom: 10px;">
+                                        <t t-esc="o.students_placed"/>
+                                    </div>
+                                    <div style="font-size: 11pt;">Students Placed</div>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div style="background: linear-gradient(135deg, #FF9800 0%, #FFC107 100%); color: white; padding: 20px; border-radius: 8px; text-align: center; height: 100%;">
+                                    <div style="font-size: 40pt; font-weight: bold; margin-bottom: 10px;">
+                                        <t t-esc="'{:.1f}'.format(o.placement_percentage)"/>%
+                                    </div>
+                                    <div style="font-size: 11pt;">Placement Rate</div>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div style="background: linear-gradient(135deg, #2196F3 0%, #03A9F4 100%); color: white; padding: 20px; border-radius: 8px; text-align: center; height: 100%;">
+                                    <div style="font-size: 40pt; font-weight: bold; margin-bottom: 10px;">
+                                        <t t-esc="o.total_companies"/>
+                                    </div>
+                                    <div style="font-size: 11pt;">Recruiters</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Package Statistics -->
+                        <div class="row" style="margin-bottom: 20px;">
+                            <div class="col-12">
+                                <h4 style="background: #00BCD4; color: white; padding: 8px; margin-bottom: 10px;">
+                                    💰 PACKAGE STATISTICS (Annual CTC in Lakhs)
+                                </h4>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-bottom: 20px;">
+                            <div class="col-4">
+                                <div style="border: 2px solid #4CAF50; background: #F1F8E9; padding: 15px; border-radius: 5px; text-align: center; height: 100%;">
+                                    <div style="font-size: 11pt; color: #666; margin-bottom: 10px;">Highest Package</div>
+                                    <div style="font-size: 32pt; font-weight: bold; color: #4CAF50;">
+                                        ₹ <t t-esc="'{:.2f}'.format(o.highest_package)"/> L
+                                    </div>
+                                    <div style="font-size: 9pt; color: #666; margin-top: 5px;">
+                                        <t t-esc="o.highest_package_company or ''"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div style="border: 2px solid #2196F3; background: #E3F2FD; padding: 15px; border-radius: 5px; text-align: center; height: 100%;">
+                                    <div style="font-size: 11pt; color: #666; margin-bottom: 10px;">Average Package</div>
+                                    <div style="font-size: 32pt; font-weight: bold; color: #2196F3;">
+                                        ₹ <t t-esc="'{:.2f}'.format(o.average_package)"/> L
+                                    </div>
+                                    <div style="font-size: 9pt; color: #666; margin-top: 5px;">Mean CTC</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div style="border: 2px solid #FF9800; background: #FFF3E0; padding: 15px; border-radius: 5px; text-align: center; height: 100%;">
+                                    <div style="font-size: 11pt; color: #666; margin-bottom: 10px;">Median Package</div>
+                                    <div style="font-size: 32pt; font-weight: bold; color: #FF9800;">
+                                        ₹ <t t-esc="'{:.2f}'.format(o.median_package)"/> L
+                                    </div>
+                                    <div style="font-size: 9pt; color: #666; margin-top: 5px;">Middle Value</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Package Distribution -->
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="background: #00BCD4; color: white; padding: 8px; margin-bottom: 10px;">
+                                📊 PACKAGE DISTRIBUTION
+                            </h4>
+                            <table class="table table-bordered">
+                                <thead style="background: #B2EBF2;">
+                                    <tr>
+                                        <th style="width: 30%;">Package Range (LPA)</th>
+                                        <th style="width: 15%; text-align: center;">Students</th>
+                                        <th style="width: 15%; text-align: center;">Percentage</th>
+                                        <th style="width: 40%;">Visual Distribution</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Above 10 LPA</strong></td>
+                                        <td class="text-center"><t t-esc="o.package_above_10"/></td>
+                                        <td class="text-center">
+                                            <t t-esc="'{:.1f}'.format((o.package_above_10 / o.students_placed * 100) if o.students_placed > 0 else 0)"/>%
+                                        </td>
+                                        <td>
+                                            <div style="background: #4CAF50; height: 25px; border-radius: 3px;"
+                                                 t-att-style="'width: %s%%;' % ((o.package_above_10 / o.students_placed * 100) if o.students_placed > 0 else 0)">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>7 - 10 LPA</strong></td>
+                                        <td class="text-center"><t t-esc="o.package_7_10"/></td>
+                                        <td class="text-center">
+                                            <t t-esc="'{:.1f}'.format((o.package_7_10 / o.students_placed * 100) if o.students_placed > 0 else 0)"/>%
+                                        </td>
+                                        <td>
+                                            <div style="background: #8BC34A; height: 25px; border-radius: 3px;"
+                                                 t-att-style="'width: %s%%;' % ((o.package_7_10 / o.students_placed * 100) if o.students_placed > 0 else 0)">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>5 - 7 LPA</strong></td>
+                                        <td class="text-center"><t t-esc="o.package_5_7"/></td>
+                                        <td class="text-center">
+                                            <t t-esc="'{:.1f}'.format((o.package_5_7 / o.students_placed * 100) if o.students_placed > 0 else 0)"/>%
+                                        </td>
+                                        <td>
+                                            <div style="background: #FFC107; height: 25px; border-radius: 3px;"
+                                                 t-att-style="'width: %s%%;' % ((o.package_5_7 / o.students_placed * 100) if o.students_placed > 0 else 0)">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>3 - 5 LPA</strong></td>
+                                        <td class="text-center"><t t-esc="o.package_3_5"/></td>
+                                        <td class="text-center">
+                                            <t t-esc="'{:.1f}'.format((o.package_3_5 / o.students_placed * 100) if o.students_placed > 0 else 0)"/>%
+                                        </td>
+                                        <td>
+                                            <div style="background: #FF9800; height: 25px; border-radius: 3px;"
+                                                 t-att-style="'width: %s%%;' % ((o.package_3_5 / o.students_placed * 100) if o.students_placed > 0 else 0)">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Below 3 LPA</strong></td>
+                                        <td class="text-center"><t t-esc="o.package_below_3"/></td>
+                                        <td class="text-center">
+                                            <t t-esc="'{:.1f}'.format((o.package_below_3 / o.students_placed * 100) if o.students_placed > 0 else 0)"/>%
+                                        </td>
+                                        <td>
+                                            <div style="background: #F44336; height: 25px; border-radius: 3px;"
+                                                 t-att-style="'width: %s%%;' % ((o.package_below_3 / o.students_placed * 100) if o.students_placed > 0 else 0)">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Department-wise Placement -->
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="background: #00BCD4; color: white; padding: 8px; margin-bottom: 10px;">
+                                🏢 DEPARTMENT-WISE PLACEMENT ANALYSIS
+                            </h4>
+                            <table class="table table-bordered table-sm" style="font-size: 9pt;">
+                                <thead style="background: #B2EBF2;">
+                                    <tr>
+                                        <th style="width: 5%; text-align: center;">S.No</th>
+                                        <th style="width: 30%;">Department</th>
+                                        <th style="width: 13%; text-align: center;">Eligible</th>
+                                        <th style="width: 13%; text-align: center;">Placed</th>
+                                        <th style="width: 13%; text-align: center;">Percentage</th>
+                                        <th style="width: 13%; text-align: center;">Avg Package</th>
+                                        <th style="width: 13%; text-align: center;">Highest</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="counter" t-value="1"/>
+                                    <t t-foreach="o.department_wise_ids" t-as="dept">
+                                        <tr>
+                                            <td class="text-center"><t t-esc="counter"/></td>
+                                            <td><t t-esc="dept.department_id.name"/></td>
+                                            <td class="text-center"><t t-esc="dept.eligible_students"/></td>
+                                            <td class="text-center" style="color: #4CAF50; font-weight: bold;">
+                                                <t t-esc="dept.placed_students"/>
+                                            </td>
+                                            <td class="text-center">
+                                                <strong t-att-style="'color: %s;' % ('#4CAF50' if dept.placement_percentage >= 70 else '#FF9800' if dept.placement_percentage >= 50 else '#F44336')">
+                                                    <t t-esc="'{:.1f}'.format(dept.placement_percentage)"/>%
+                                                </strong>
+                                            </td>
+                                            <td class="text-center">₹ <t t-esc="'{:.2f}'.format(dept.avg_package)"/> L</td>
+                                            <td class="text-center" style="color: #4CAF50; font-weight: bold;">
+                                                ₹ <t t-esc="'{:.2f}'.format(dept.highest_package)"/> L
+                                            </td>
+                                        </tr>
+                                        <t t-set="counter" t-value="counter + 1"/>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Top Recruiters -->
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="background: #00BCD4; color: white; padding: 8px; margin-bottom: 10px;">
+                                🏆 TOP RECRUITING COMPANIES
+                            </h4>
+                            <table class="table table-bordered table-sm" style="font-size: 9pt;">
+                                <thead style="background: #B2EBF2;">
+                                    <tr>
+                                        <th style="width: 5%; text-align: center;">Rank</th>
+                                        <th style="width: 30%;">Company Name</th>
+                                        <th style="width: 20%;">Industry</th>
+                                        <th style="width: 15%; text-align: center;">Students Hired</th>
+                                        <th style="width: 15%; text-align: center;">Avg CTC (LPA)</th>
+                                        <th style="width: 15%; text-align: center;">Highest CTC</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="rank" t-value="1"/>
+                                    <t t-foreach="o.top_companies_ids" t-as="company">
+                                        <tr>
+                                            <td class="text-center">
+                                                <t t-if="rank == 1">🥇</t>
+                                                <t t-elif="rank == 2">🥈</t>
+                                                <t t-elif="rank == 3">🥉</t>
+                                                <t t-else=""><t t-esc="rank"/></t>
+                                            </td>
+                                            <td><strong><t t-esc="company.company_id.name"/></strong></td>
+                                            <td><t t-esc="company.industry or 'N/A'"/></td>
+                                            <td class="text-center" style="font-weight: bold; color: #00BCD4;">
+                                                <t t-esc="company.students_hired"/>
+                                            </td>
+                                            <td class="text-center">₹ <t t-esc="'{:.2f}'.format(company.avg_ctc)"/></td>
+                                            <td class="text-center" style="color: #4CAF50; font-weight: bold;">
+                                                ₹ <t t-esc="'{:.2f}'.format(company.highest_ctc)"/></td>
+                                        </tr>
+                                        <t t-set="rank" t-value="rank + 1"/>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Multiple Offers -->
+                        <div class="row" style="margin-bottom: 20px;">
+                            <div class="col-6">
+                                <div style="border: 2px solid #9C27B0; background: #F3E5F5; padding: 15px; border-radius: 5px; height: 100%;">
+                                    <h5 style="color: #9C27B0; margin-top: 0; text-align: center;">
+                                        🎯 MULTIPLE OFFERS
+                                    </h5>
+                                    <table style="width: 100%; font-size: 10pt;">
+                                        <tr>
+                                            <td style="padding: 8px; font-weight: bold;">Students with Multiple Offers:</td>
+                                            <td style="padding: 8px; text-align: right;">
+                                                <span style="font-size: 18pt; color: #9C27B0; font-weight: bold;">
+                                                    <t t-esc="o.students_multiple_offers"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px; font-weight: bold;">Total Offers Generated:</td>
+                                            <td style="padding: 8px; text-align: right;">
+                                                <span style="font-size: 18pt; color: #9C27B0; font-weight: bold;">
+                                                    <t t-esc="o.total_offers"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px; font-weight: bold;">Offer to Student Ratio:</td>
+                                            <td style="padding: 8px; text-align: right;">
+                                                <span style="font-size: 18pt; color: #9C27B0; font-weight: bold;">
+                                                    <t t-esc="'{:.2f}'.format(o.offer_ratio)"/>:1
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div style="border: 2px solid #E91E63; background: #FCE4EC; padding: 15px; border-radius: 5px; height: 100%;">
+                                    <h5 style="color: #E91E63; margin-top: 0; text-align: center;">
+                                        📈 PLACEMENT DRIVES
+                                    </h5>
+                                    <table style="width: 100%; font-size: 10pt;">
+                                        <tr>
+                                            <td style="padding: 8px; font-weight: bold;">Total Drives Conducted:</td>
+                                            <td style="padding: 8px; text-align: right;">
+                                                <span style="font-size: 18pt; color: #E91E63; font-weight: bold;">
+                                                    <t t-esc="o.total_drives"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px; font-weight: bold;">On-Campus Drives:</td>
+                                            <td style="padding: 8px; text-align: right;">
+                                                <span style="font-size: 18pt; color: #E91E63; font-weight: bold;">
+                                                    <t t-esc="o.oncampus_drives"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px; font-weight: bold;">Virtual Drives:</td>
+                                            <td style="padding: 8px; text-align: right;">
+                                                <span style="font-size: 18pt; color: #E91E63; font-weight: bold;">
+                                                    <t t-esc="o.virtual_drives"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Job Roles Distribution -->
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="background: #00BCD4; color: white; padding: 8px; margin-bottom: 10px;">
+                                💼 TOP JOB ROLES
+                            </h4>
+                            <table class="table table-bordered table-sm" style="font-size: 9pt;">
+                                <thead style="background: #B2EBF2;">
+                                    <tr>
+                                        <th style="width: 10%; text-align: center;">S.No</th>
+                                        <th style="width: 40%;">Job Role</th>
+                                        <th style="width: 20%; text-align: center;">No. of Students</th>
+                                        <th style="width: 30%; text-align: center;">Avg Package (LPA)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="counter" t-value="1"/>
+                                    <t t-foreach="o.job_role_ids" t-as="role">
+                                        <tr>
+                                            <td class="text-center"><t t-esc="counter"/></td>
+                                            <td><t t-esc="role.job_title"/></td>
+                                            <td class="text-center"><t t-esc="role.student_count"/></td>
+                                            <td class="text-center">₹ <t t-esc="'{:.2f}'.format(role.avg_package)"/></td>
+                                        </tr>
+                                        <t t-set="counter" t-value="counter + 1"/>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Year-wise Comparison (if available) -->
+                        <t t-if="o.show_comparison">
+                            <div style="margin-bottom: 20px; page-break-before: always;">
+                                <h4 style="background: #00BCD4; color: white; padding: 8px; margin-bottom: 10px;">
+                                    📊 YEAR-WISE COMPARISON
+                                </h4>
+                                <table class="table table-bordered">
+                                    <thead style="background: #B2EBF2;">
+                                        <tr>
+                                            <th>Academic Year</th>
+                                            <th class="text-center">Eligible</th>
+                                            <th class="text-center">Placed</th>
+                                            <th class="text-center">%</th>
+                                            <th class="text-center">Avg Package</th>
+                                            <th class="text-center">Highest</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="o.year_comparison_ids" t-as="year">
+                                            <tr>
+                                                <td><strong><t t-esc="year.academic_year"/></strong></td>
+                                                <td class="text-center"><t t-esc="year.eligible"/></td>
+                                                <td class="text-center"><t t-esc="year.placed"/></td>
+                                                <td class="text-center">
+                                                    <strong><t t-esc="'{:.1f}'.format(year.percentage)"/>%</strong>
+                                                </td>
+                                                <td class="text-center">₹ <t t-esc="'{:.2f}'.format(year.avg_package)"/> L</td>
+                                                <td class="text-center">₹ <t t-esc="'{:.2f}'.format(year.highest_package)"/> L</td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </t>
+
+                        <!-- Key Highlights -->
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+                            <h4 style="margin-top: 0; border-bottom: 2px solid white; padding-bottom: 10px;">
+                                ⭐ KEY HIGHLIGHTS
+                            </h4>
+                            <ul style="margin-bottom: 0; line-height: 2; font-size: 10pt;">
+                                <li><strong><t t-esc="'{:.1f}'.format(o.placement_percentage)"/>%</strong> of eligible students successfully placed</li>
+                                <li>Highest package: <strong>₹ <t t-esc="'{:.2f}'.format(o.highest_package)"/> LPA</strong> offered by <strong><t t-esc="o.highest_package_company"/></strong></li>
+                                <li>Average package: <strong>₹ <t t-esc="'{:.2f}'.format(o.average_package)"/> LPA</strong></li>
+                                <li><strong><t t-esc="o.total_companies"/></strong> companies participated in campus recruitment</li>
+                                <li><strong><t t-esc="o.students_multiple_offers"/></strong> students received multiple job offers</li>
+                                <li><strong><t t-esc="o.package_above_10"/></strong> students placed with packages above 10 LPA</li>
+                            </ul>
+                        </div>
+
+                        <!-- Remarks -->
+                        <div style="background: #E8F5E9; border-left: 4px solid #4CAF50; padding: 15px; margin-bottom: 20px;">
+                            <h5 style="color: #4CAF50; margin-top: 0;">📝 REMARKS</h5>
+                            <p style="margin-bottom: 10px; line-height: 1.8;">
+                                <t t-if="o.placement_percentage >= 90">
+                                    Excellent placement record achieved this year. The department has demonstrated outstanding performance with over 90% placement rate.
+                                </t>
+                                <t t-elif="o.placement_percentage >= 75">
+                                    Good placement performance with satisfactory results. Continue efforts to improve further.
+                                </t>
+                                <t t-elif="o.placement_percentage >= 60">
+                                    Moderate placement results. Need to focus on skill development and industry connect to improve placement percentage.
+                                </t>
+                                <t t-else="">
+                                    Placement percentage needs significant improvement. Recommend intensive training programs and increased industry partnerships.
+                                </t>
+                            </p>
+                            <t t-if="o.remarks">
+                                <p style="margin: 0; line-height: 1.8;">
+                                    <strong>Additional Remarks:</strong> <t t-esc="o.remarks"/>
+                                </p>
+                            </t>
+                        </div>
+
+                        <!-- Signatures -->
+                        <div class="row" style="margin-top: 50px;">
+                            <div class="col-4">
+                                <div style="border-top: 2px solid #333; padding-top: 5px; text-align: center;">
+                                    <strong>Placement Officer</strong><br/>
+                                    <span style="font-size: 9pt;">Training &amp; Placement Cell</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div style="border-top: 2px solid #333; padding-top: 5px; text-align: center;">
+                                    <strong>Head of Department</strong><br/>
+                                    <span style="font-size: 9pt;">Department</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div style="border-top: 2px solid #333; padding-top: 5px; text-align: center;">
+                                    <strong>Principal/Director</strong><br/>
+                                    <span style="font-size: 9pt;">Institution Head</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="text-center" style="margin-top: 30px; padding-top: 10px; border-top: 2px solid #00BCD4; font-size: 9pt; color: #666;">
+                            <p style="margin: 0;">
+                                <strong>Confidential Document</strong> - For internal use and official purposes only
+                            </p>
+                            <p style="margin: 5px 0 0 0;">
+                                Report Generated: <t t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%b-%Y %H:%M')"/> |
+                                Contact: <t t-esc="o.company_id.phone"/> | <t t-esc="o.company_id.email"/>
+                            </p>
+                        </div>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

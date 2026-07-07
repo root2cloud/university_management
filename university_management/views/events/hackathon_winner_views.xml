@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View - Hackathon Winner -->
+    <record id="hackathon_winner_view_form" model="ir.ui.view">
+        <field name="name">hackathon.winner.view.form</field>
+        <field name="model">hackathon.winner</field>
+        <field name="arch" type="xml">
+            <form string="Hackathon Winner">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="team_id" string="Winning Team"/>
+                        <h1>
+                            <field name="team_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Winner Details">
+                            <field name="hackathon_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="position" widget="radio"/>
+                        </group>
+                        <group string="Prize">
+                            <field name="currency_id" invisible="1"/>
+                            <field name="prize_amount"
+                                   widget="monetary"
+                                   options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Certificate" name="certificate">
+                            <group>
+                                <field name="certificate"
+                                       filename="certificate_filename"/>
+                            </group>
+                        </page>
+
+                        <page string="Remarks" name="remarks">
+                            <group>
+                                <field name="remarks" nolabel="1"
+                                       placeholder="Add remarks, special achievements, highlights, etc..."/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View - Hackathon Winner -->
+    <record id="hackathon_winner_view_list" model="ir.ui.view">
+        <field name="name">hackathon.winner.view.list</field>
+        <field name="model">hackathon.winner</field>
+        <field name="arch" type="xml">
+            <list string="Hackathon Winners"
+                  default_order="position"
+                  multi_edit="1"
+                  sample="1"
+                  decoration-danger="position == '1'"
+                  decoration-warning="position == '2'"
+                  decoration-info="position == '3'"
+                  decoration-muted="position == 'special'">
+                <field name="hackathon_id"/>
+                <field name="team_id"/>
+                <field name="position" widget="badge"
+                       decoration-danger="position == '1'"
+                       decoration-warning="position == '2'"
+                       decoration-info="position == '3'"
+                       decoration-muted="position == 'special'"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="prize_amount" widget="monetary"/>
+                <field name="certificate" optional="hide"/>
+                <field name="remarks" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View - Hackathon Winner -->
+    <record id="hackathon_winner_view_search" model="ir.ui.view">
+        <field name="name">hackathon.winner.view.search</field>
+        <field name="model">hackathon.winner</field>
+        <field name="arch" type="xml">
+            <search string="Search Winners">
+                <field name="hackathon_id"/>
+                <field name="team_id"/>
+
+                <separator/>
+
+                <filter name="filter_first_prize" string="First Prize"
+                        domain="[('position', '=', '1')]"/>
+                <filter name="filter_second_prize" string="Second Prize"
+                        domain="[('position', '=', '2')]"/>
+                <filter name="filter_third_prize" string="Third Prize"
+                        domain="[('position', '=', '3')]"/>
+                <filter name="filter_special_mention" string="Special Mention"
+                        domain="[('position', '=', 'special')]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_hackathon" string="Hackathon"
+                            context="{'group_by': 'hackathon_id'}"/>
+                    <filter name="group_by_position" string="Position"
+                            context="{'group_by': 'position'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="hackathon_id" string="Hackathon"
+                           select="multi"
+                           operator="in"
+                           icon="fa-trophy"/>
+                    <field name="position" string="Position"
+                           select="multi"
+                           icon="fa-medal"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View - Hackathon Winner -->
+    <record id="hackathon_winner_view_kanban" model="ir.ui.view">
+        <field name="name">hackathon.winner.view.kanban</field>
+        <field name="model">hackathon.winner</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="position"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="hackathon_id"/>
+                <field name="team_id"/>
+                <field name="position"/>
+                <field name="prize_amount"/>
+                <field name="currency_id"/>
+                <field name="certificate"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top mb-3">
+                                    <div class="row">
+                                        <div class="col-12 text-center">
+                                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle"
+                                                 t-attf-style="width: 100px; height: 100px; font-size: 48px; {{
+                                                    record.position.raw_value == '1' ? 'background: linear-gradient(135deg, #FFD700, #FFA500);' :
+                                                    (record.position.raw_value == '2' ? 'background: linear-gradient(135deg, #C0C0C0, #A8A8A8);' :
+                                                    (record.position.raw_value == '3' ? 'background: linear-gradient(135deg, #CD7F32, #B87333);' : 'background: linear-gradient(135deg, #4CAF50, #45a049);'))
+                                                 }} color: white;">
+                                                <i class="fa fa-trophy"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body">
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="card"
+                                                 t-attf-class="{{
+                                                    record.position.raw_value == '1' ? 'bg-danger' :
+                                                    (record.position.raw_value == '2' ? 'bg-warning' :
+                                                    (record.position.raw_value == '3' ? 'bg-info' : 'bg-secondary'))
+                                                 }} text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h5 class="mb-0">
+                                                        <field name="position"/>
+                                                    </h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12 text-center">
+                                            <strong class="o_kanban_record_title">
+                                                <h5><field name="team_id"/></h5>
+                                            </strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded">
+                                                <small class="text-muted">Hackathon</small>
+                                                <h6 class="mb-0">
+                                                    <i class="fa fa-trophy text-warning"/> <field name="hackathon_id"/>
+                                                </h6>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.prize_amount.raw_value &gt; 0">
+                                        <div class="col-12">
+                                            <div class="alert alert-success mb-0 p-2 text-center">
+                                                <small class="text-muted d-block mb-1">Prize Amount</small>
+                                                <h4 class="mb-0">
+                                                    <strong>
+                                                        <field name="prize_amount" widget="monetary"
+                                                               options="{'currency_field': 'currency_id'}"/>
+                                                    </strong>
+                                                </h4>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.certificate.raw_value">
+                                        <div class="col-12">
+                                            <div class="text-center">
+                                                <span class="badge bg-primary">
+                                                    <i class="fa fa-certificate"/> Certificate Available
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_hackathon_winner" model="ir.actions.act_window">
+        <field name="name">Winners</field>
+        <field name="res_model">hackathon.winner</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_group_by_hackathon': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add Hackathon Winner
+            </p>
+            <p>
+                Manage hackathon winners and prizes. Select hackathon_id (Many2one to hackathon.hackathon
+                required indexed ondelete cascade, no-create). Select team_id (Many2one to hackathon.team
+                required tracked, no-create, displayed as h1 title labeled "Winning Team"). Select position
+                (4 options required tracked, radio widget): 1 (First Prize - danger/red badge and row
+                decoration), 2 (Second Prize - warning/yellow badge and row decoration), 3 (Third Prize -
+                info/blue badge and row decoration), special (Special Mention - muted/gray badge and row
+                decoration). Enter prize_amount (monetary with currency_field and monetary widget with
+                currency_field option). View currency_id (Many2one to res.currency default company currency,
+                invisible/column_invisible). Upload certificate (binary attachment with filename
+                certificate_filename). Enter remarks (text, placeholder "Add remarks, special achievements,
+                highlights, etc..."). Form view with team_id as h1 title, 2 groups: Winner Details
+                (hackathon_id/position radio widget) and Prize (prize_amount monetary widget), notebook
+                having 2 pages: Certificate (certificate binary with filename), Remarks (remarks text). List
+                view with 4-color row decorations: Danger/Red (position 1), Warning/Yellow (position 2),
+                Info/Blue (position 3), Muted/Gray (position special). Badge widget for position with 4-color
+                decorations. Monetary widget for prize_amount. Optional field controls. Kanban view grouped
+                by position showing centered circular trophy icon (100px, 48px font, dynamic 4-gradient
+                backgrounds: Gold-Orange for 1st, Silver-Gray for 2nd, Bronze-Brown for 3rd, Green for
+                special), position card (dynamic 4-color background: danger/1st, warning/2nd, info/3rd,
+                secondary/special, centered h5), centered team_id h5, hackathon_id card (light background,
+                trophy icon warning, small "Hackathon" label), conditional prize_amount alert (success/green
+                background, centered, small "Prize Amount" label, h4 bold monetary field, shown if
+                prize_amount &gt; 0), conditional certificate badge (primary background, certificate icon,
+                "Certificate Available" text, centered, shown if certificate exists). Ordered by position
+                (ascending: 1st, 2nd, 3rd, special). Default grouped by Hackathon. Comprehensive search
+                filters for 4 positions/group by hackathon-position. Searchpanel for hackathon_id and
+                position multi-select. Simple winner management without chatter support. Complete winner
+                recognition and prize distribution management.
+            </p>
+        </field>
+    </record>
+
+</odoo>

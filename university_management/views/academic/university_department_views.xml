@@ -1,0 +1,507 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="university_department_view_form" model="ir.ui.view">
+        <field name="name">university.department.view.form</field>
+        <field name="model">university.department</field>
+        <field name="arch" type="xml">
+            <form string="University Department">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_university_program)d"
+                                type="action"
+                                class="oe_stat_button"
+                                icon="fa-graduation-cap"
+                                context="{'search_default_department_id': id}">
+                            <field name="total_programs" widget="statinfo"
+                                   string="Programs"/>
+                        </button>
+                        <button name="action_view_faculty"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-users">
+                            <field name="total_faculty" widget="statinfo"
+                                   string="Faculty"/>
+                        </button>
+                        <button name="action_view_students"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-user-graduate">
+                            <field name="total_students" widget="statinfo"
+                                   string="Students"/>
+                        </button>
+                        <button name="action_view_courses"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-book"
+                                context="{'search_default_department_id': id}">
+                            <field name="total_courses" widget="statinfo"
+                                   string="Courses"/>
+                        </button>
+                    </div>
+
+                    <widget name="web_ribbon" title="Accredited"
+                            bg_color="text-bg-success"
+                            invisible="is_accredited == False"/>
+
+                    <field name="image_128" widget="image" class="oe_avatar"/>
+
+                    <div class="oe_title">
+                        <label for="name" string="Department Name"/>
+                        <h1>
+                            <field name="name"
+                                   placeholder="e.g., Computer Science &amp; Engineering"
+                                   required="1"/>
+                        </h1>
+                        <h2>
+                            <field name="code" placeholder="e.g., CSE" required="1"/>
+                        </h2>
+                    </div>
+
+                    <group>
+                        <group string="Basic Information">
+                            <field name="hod_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                        <group string="Contact Details">
+                            <field name="email" widget="email" placeholder="dept@university.edu"/>
+                            <field name="phone" widget="phone" placeholder="+91-XXXXXXXXXX"/>
+                            <field name="website" widget="url" placeholder="https://dept.university.edu"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Location">
+                            <field name="building_name_id" placeholder="e.g., Main Block"/>
+                            <field name="floor_id" placeholder="e.g., 2nd Floor"/>
+                            <field name="room_number_id" placeholder="e.g., Room 201"/>
+                        </group>
+                        <group string="Lab &amp; Research">
+                            <field name="lab_count"/>
+                            <field name="publications_count"/>
+                            <field name="is_accredited" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Overview" name="overview">
+                            <group>
+                                <field name="description"
+                                       placeholder="Enter department description..."/>
+                            </group>
+                            <group>
+                                <group string="Vision">
+                                    <field name="vision"
+                                           placeholder="Enter department vision..."
+                                           nolabel="1"/>
+                                </group>
+                                <group string="Mission">
+                                    <field name="mission"
+                                           placeholder="Enter department mission..."
+                                           nolabel="1"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Programs" name="programs">
+                            <field name="program_ids" mode="list">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="code"/>
+                                    <field name="program_type"/>
+                                    <field name="duration_years"/>
+                                    <field name="total_semesters"/>
+                                    <field name="total_students"/>
+                                    <field name="active" widget="boolean_toggle"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Faculty" name="faculty">
+                            <field name="faculty_ids" mode="kanban">
+                                <kanban>
+                                    <field name="name"/>
+                                    <field name="employee_id"/>
+                                    <field name="designation_id"/>
+                                    <field name="email"/>
+                                    <field name="phone"/>
+                                    <field name="specialization"/>
+                                    <templates>
+                                        <t t-name="kanban-box">
+                                            <div class="oe_kanban_card oe_kanban_global_click">
+                                                <div class="o_kanban_card_content">
+                                                    <div class="row">
+                                                        <div class="col-3">
+                                                            <img t-att-src="kanban_image('faculty.faculty', 'image_128', record.id.raw_value)"
+                                                                 alt="Faculty"
+                                                                 class="o_image_64_max rounded"/>
+                                                        </div>
+                                                        <div class="col-9">
+                                                            <strong class="o_kanban_record_title">
+                                                                <field name="name"/>
+                                                            </strong>
+                                                            <div class="text-muted">
+                                                                <field name="designation_id"/>
+                                                            </div>
+                                                            <div class="mt-1">
+                                                                <i class="fa fa-envelope text-primary"/>
+                                                                <field name="email"/>
+                                                            </div>
+                                                            <div t-if="record.specialization">
+                                                                <i class="fa fa-lightbulb-o text-warning"/>
+                                                                <field name="specialization"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </templates>
+                                </kanban>
+                            </field>
+                        </page>
+
+                        <page string="Students" name="students">
+                            <field name="student_ids" mode="list" readonly="1">
+                                <list create="false" delete="false">
+                                    <field name="registration_number"/>
+                                    <field name="name"/>
+                                    <field name="program_id"/>
+                                    <field name="batch_id"/>
+                                    <field name="current_semester"/>
+                                    <field name="email"/>
+                                    <field name="phone"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Courses" name="courses">
+                            <field name="course_ids" mode="list">
+                                <list>
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="semester_id"/>
+                                    <field name="subject_id"/>
+                                    <field name="course_type"/>
+                                    <field name="credits"/>
+                                    <field name="faculty_id"/>
+                                    <field name="total_enrolled"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Subjects" name="subjects">
+                            <field name="subject_ids" mode="list">
+                                <list>
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="subject_type"/>
+                                    <field name="credits"/>
+                                    <field name="semester_number"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Labs &amp; Research" name="labs_research">
+                            <group>
+                                <group string="Laboratory Details">
+                                    <field name="lab_details"
+                                           placeholder="Enter lab details..."
+                                           nolabel="1"/>
+                                </group>
+                                <group string="Research Areas">
+                                    <field name="research_areas"
+                                           placeholder="Enter research areas..."
+                                           nolabel="1"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Accreditation" name="accreditation">
+                            <group>
+                                <field name="accreditation_details"
+                                       placeholder="Enter accreditation details..."
+                                       nolabel="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="university_department_view_list" model="ir.ui.view">
+        <field name="name">university.department.view.list</field>
+        <field name="model">university.department</field>
+        <field name="arch" type="xml">
+            <list string="University Departments"
+                  default_order="name"
+                  multi_edit="1">
+                <field name="name" string="Department"/>
+                <field name="code"/>
+                <field name="hod_id"/>
+                <field name="total_programs"/>
+                <field name="total_faculty"/>
+                <field name="total_students"/>
+                <field name="total_courses" optional="show"/>
+                <field name="lab_count" optional="hide"/>
+                <field name="publications_count" optional="hide"/>
+                <field name="is_accredited" widget="boolean_toggle" optional="show"/>
+                <field name="email" optional="hide"/>
+                <field name="phone" optional="hide"/>
+                <field name="active" widget="boolean_toggle"
+                       optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="university_department_view_search" model="ir.ui.view">
+        <field name="name">university.department.view.search</field>
+        <field name="model">university.department</field>
+        <field name="arch" type="xml">
+            <search string="Search Departments">
+                <field name="name" string="Department"
+                       filter_domain="['|', ('name', 'ilike', self), ('code', 'ilike', self)]"/>
+                <field name="code"/>
+                <field name="hod_id"/>
+                <field name="email"/>
+                <field name="building_name_id"/>
+
+                <separator/>
+
+                <filter name="filter_accredited" string="Accredited"
+                        domain="[('is_accredited', '=', True)]"/>
+                <filter name="filter_not_accredited" string="Not Accredited"
+                        domain="[('is_accredited', '=', False)]"/>
+
+                <separator/>
+
+                <filter name="filter_has_hod" string="Has HOD"
+                        domain="[('hod_id', '!=', False)]"/>
+                <filter name="filter_no_hod" string="No HOD Assigned"
+                        domain="[('hod_id', '=', False)]"/>
+
+                <separator/>
+
+                <filter name="filter_has_programs" string="Has Programs"
+                        domain="[('total_programs', '&gt;', 0)]"/>
+                <filter name="filter_has_faculty" string="Has Faculty"
+                        domain="[('total_faculty', '&gt;', 0)]"/>
+                <filter name="filter_has_students" string="Has Students"
+                        domain="[('total_students', '&gt;', 0)]"/>
+
+                <separator/>
+
+                <filter name="filter_has_labs" string="Has Labs"
+                        domain="[('lab_count', '&gt;', 0)]"/>
+                <filter name="filter_has_research" string="Has Publications"
+                        domain="[('publications_count', '&gt;', 0)]"/>
+
+                <separator/>
+
+                <filter name="filter_active" string="Active"
+                        domain="[('active', '=', True)]"/>
+                <filter name="filter_archived" string="Archived"
+                        domain="[('active', '=', False)]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_building" string="Building"
+                            context="{'group_by': 'building_name_id'}"/>
+                    <filter name="group_by_hod" string="HOD"
+                            context="{'group_by': 'hod_id'}"/>
+                    <filter name="group_by_accreditation" string="Accreditation Status"
+                            context="{'group_by': 'is_accredited'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="hod_id" string="Head of Department"
+                            select="multi"
+                            icon="fa-user-circle"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="university_department_view_kanban" model="ir.ui.view">
+        <field name="name">university.department.view.kanban</field>
+        <field name="model">university.department</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    quick_create="false">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="hod_id"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <field name="website"/>
+                <field name="building_name_id"/>
+                <field name="total_programs"/>
+                <field name="total_faculty"/>
+                <field name="total_students"/>
+                <field name="total_courses"/>
+                <field name="lab_count"/>
+                <field name="publications_count"/>
+                <field name="is_accredited"/>
+                <field name="active"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_card_header">
+                                <div class="o_kanban_card_header_title">
+                                    <div class="o_primary">
+                                        <strong>
+                                            <field name="name"/>
+                                        </strong>
+                                        <span t-if="record.is_accredited.raw_value"
+                                              class="badge text-bg-success ms-2">
+                                            <i class="fa fa-certificate"/> Accredited
+                                        </span>
+                                    </div>
+                                    <div class="text-muted">
+                                        <field name="code"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="o_kanban_card_content">
+                                <div class="row" t-if="record.hod_id">
+                                    <div class="col-12 mb-2">
+                                        <i class="fa fa-user-circle text-primary"/>
+                                        HOD: <field name="hod_id"/>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-6">
+                                        <i class="fa fa-graduation-cap text-primary"/>
+                                        <strong><field name="total_programs"/></strong> Programs
+                                    </div>
+                                    <div class="col-6">
+                                        <i class="fa fa-users text-success"/>
+                                        <strong><field name="total_faculty"/></strong> Faculty
+                                    </div>
+                                </div>
+
+                                <div class="row mt-2">
+                                    <div class="col-6">
+                                        <i class="fa fa-user-graduate text-info"/>
+                                        <strong><field name="total_students"/></strong> Students
+                                    </div>
+                                    <div class="col-6">
+                                        <i class="fa fa-book text-warning"/>
+                                        <strong><field name="total_courses"/></strong> Courses
+                                    </div>
+                                </div>
+
+                                <div class="row mt-2">
+                                    <div class="col-6">
+                                        <i class="fa fa-flask text-danger"/>
+                                        <strong><field name="lab_count"/></strong> Labs
+                                    </div>
+                                    <div class="col-6">
+                                        <i class="fa fa-file-text-o text-muted"/>
+                                        <strong><field name="publications_count"/></strong> Publications
+                                    </div>
+                                </div>
+
+                                <div class="row mt-2" t-if="record._id">
+                                    <div class="col-12">
+                                        <i class="fa fa-building text-muted"/>
+                                        <field name="building_name_id"/>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-2">
+                                    <div class="col-12" t-if="record.email">
+                                        <i class="fa fa-envelope"/>
+                                        <field name="email"/>
+                                    </div>
+                                    <div class="col-12" t-if="record.phone">
+                                        <i class="fa fa-phone"/>
+                                        <field name="phone"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="o_kanban_card_footer">
+                                <div class="o_kanban_footer_left">
+                                    <span t-if="record.website">
+                                        <a t-att-href="record.website"
+                                           target="_blank"
+                                           class="btn btn-sm btn-link">
+                                            <i class="fa fa-globe"/> Website
+                                        </a>
+                                    </span>
+                                </div>
+                                <div class="o_kanban_footer_right">
+                                    <field name="activity_ids" widget="kanban_activity"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="university_department_view_pivot" model="ir.ui.view">
+        <field name="name">university.department.view.pivot</field>
+        <field name="model">university.department</field>
+        <field name="arch" type="xml">
+            <pivot string="Department Analysis">
+                <field name="name" type="row"/>
+                <field name="is_accredited" type="col"/>
+                <field name="total_programs" type="measure"/>
+                <field name="total_faculty" type="measure"/>
+                <field name="total_students" type="measure"/>
+                <field name="total_courses" type="measure"/>
+                <field name="lab_count" type="measure"/>
+                <field name="publications_count" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View -->
+    <record id="university_department_view_graph" model="ir.ui.view">
+        <field name="name">university.department.view.graph</field>
+        <field name="model">university.department</field>
+        <field name="arch" type="xml">
+            <graph string="Department Statistics" type="bar">
+                <field name="name"/>
+                <field name="total_students" type="measure"/>
+                <field name="total_faculty" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_university_department" model="ir.actions.act_window">
+        <field name="name">Departments</field>
+        <field name="res_model">university.department</field>
+        <field name="view_mode">kanban,list,form,pivot,graph</field>
+        <field name="context">{
+            'search_default_filter_active': 1,
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Department
+            </p>
+            <p>
+                Manage university departments such as CSE, ECE, Civil, Mechanical, etc.
+                Track programs, faculty, students, courses, labs, and research activities.
+            </p>
+        </field>
+    </record>
+
+</odoo>

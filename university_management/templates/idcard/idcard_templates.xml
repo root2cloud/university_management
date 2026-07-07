@@ -1,0 +1,624 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ==================== STUDENT ID CARD PAGE ==================== -->
+    <template id="student_id_card_page" name="My ID Card">
+        <t t-call="portal.portal_layout">
+            <t t-set="title">My ID Card</t>
+            <div class="container mt-4">
+                <!-- Success/Error Messages -->
+                <t t-if="request.params.get('lost_reported')">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <strong>Success!</strong> Your ID card has been reported as lost. A replacement request has been created.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </t>
+                <t t-if="request.params.get('error')">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Error!</strong> An error occurred. Please try again.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </t>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">
+                            <i class="fa fa-id-card me-2"></i>Student ID Card
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <t t-if="id_card">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <tbody>
+                                                <tr>
+                                                    <th style="width: 30%">Card Number</th>
+                                                    <td>
+                                                        <strong><t t-esc="id_card.name"/></strong>
+                                                        <span class="badge bg-success ms-2">Active</span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Student Name</th>
+                                                    <td><t t-esc="student.name"/></td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Registration Number</th>
+                                                    <td><t t-esc="student.registration_number"/></td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Program</th>
+                                                    <td><t t-esc="student.program_id.name"/></td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Batch</th>
+                                                    <td><t t-esc="student.batch_id.name"/></td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Issue Date</th>
+                                                    <td><t t-esc="id_card.issue_date"/></td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Valid Until</th>
+                                                    <td>
+                                                        <t t-esc="id_card.expiry_date"/>
+                                                        <t t-if="id_card.is_valid">
+                                                            <span class="badge bg-success ms-2">Valid</span>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <span class="badge bg-danger ms-2">Expired</span>
+                                                        </t>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div class="mt-4">
+                                        <a href="/my/id-card/download" class="btn btn-primary me-2">
+                                            <i class="fa fa-download me-1"></i>Download ID Card (PDF)
+                                        </a>
+                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#reportLostModal">
+                                            <i class="fa fa-exclamation-triangle me-1"></i>Report Lost/Stolen
+                                        </button>
+                                        <a href="/my/id-card/request-new" class="btn btn-outline-secondary ms-2">
+                                            <i class="fa fa-plus me-1"></i>Request New/Duplicate
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    <div class="border p-3 rounded" style="background: #f8f9fa;">
+                                        <h5>Quick Actions</h5>
+                                        <div class="mt-3">
+                                            <a href="/my" class="btn btn-outline-secondary btn-sm mb-2 w-100">
+                                                <i class="fa fa-home me-1"></i>Back to Portal
+                                            </a>
+                                            <a href="#" class="btn btn-outline-info btn-sm mb-2 w-100" onclick="window.print()">
+                                                <i class="fa fa-print me-1"></i>Print Details
+                                            </a>
+                                            <div class="text-muted small mt-3">
+                                                <i class="fa fa-info-circle me-1"></i>
+                                                Always carry your ID card on campus
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="alert alert-warning">
+                                <h4 class="alert-heading">No Active ID Card Found</h4>
+                                <p>You don't have an active ID card. This could be because:</p>
+                                <ul>
+                                    <li>Your ID card hasn't been generated yet</li>
+                                    <li>Your ID card is expired</li>
+                                    <li>Your ID card is reported as lost/stolen</li>
+                                </ul>
+                                <hr/>
+                                <div class="mb-0">
+                                    <a href="/my/id-card/request-new" class="btn btn-primary">
+                                        <i class="fa fa-plus me-1"></i>Request New ID Card
+                                    </a>
+                                    <a href="/my" class="btn btn-outline-secondary ms-2">
+                                        <i class="fa fa-home me-1"></i>Back to Portal
+                                    </a>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Lost Modal -->
+            <div class="modal fade" id="reportLostModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="/my/id-card/report-lost" method="post">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <div class="modal-header">
+                                <h5 class="modal-title">Report Lost/Stolen ID Card</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="alert alert-danger">
+                                    <i class="fa fa-exclamation-triangle me-2"></i>
+                                    <strong>Important:</strong> Reporting your ID card as lost will immediately deactivate it. You will need to request a replacement.
+                                </div>
+                                <div class="mb-3">
+                                    <label for="reason" class="form-label">Reason for Loss *</label>
+                                    <textarea class="form-control" id="reason" name="reason" rows="3" required="True"
+                                              placeholder="Please describe how you lost the ID card..."></textarea>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="confirm" required="True"/>
+                                    <label class="form-check-label" for="confirm">
+                                        I confirm that my ID card is lost/stolen and I understand that a replacement fee may apply.
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-danger">Report as Lost</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ==================== ID CARD NOT FOUND ==================== -->
+    <template id="id_card_not_found" name="ID Card Not Found">
+        <t t-call="portal.portal_layout">
+            <t t-set="title">ID Card Not Found</t>
+            <div class="container mt-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body text-center py-5">
+                                <div class="mb-4">
+                                    <i class="fa fa-id-card fa-4x text-muted"></i>
+                                </div>
+                                <h3 class="card-title">ID Card Not Found</h3>
+                                <p class="card-text text-muted" t-esc="message"/>
+                                <div class="mt-4">
+                                    <a href="/my" class="btn btn-primary">
+                                        <i class="fa fa-home me-1"></i>Back to Portal
+                                    </a>
+                                    <a href="/my/id-card/request-new" class="btn btn-outline-secondary ms-2">
+                                        <i class="fa fa-plus me-1"></i>Request New ID Card
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ==================== REQUEST NEW ID CARD ==================== -->
+    <template id="request_new_id_card" name="Request New ID Card">
+        <t t-call="portal.portal_layout">
+            <t t-set="title">Request New ID Card</t>
+            <div class="container mt-4">
+                <!-- Success/Error Messages -->
+                <t t-if="request.params.get('success')">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <strong>Success!</strong> Your ID card request has been submitted successfully.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </t>
+                <t t-if="request.params.get('error')">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Error!</strong> Failed to submit request. Please try again.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </t>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">
+                            <i class="fa fa-id-card me-2"></i>Request New/Duplicate ID Card
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <form action="/my/id-card/request-new/submit" method="post">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                                    <div class="mb-3">
+                                        <label for="request_type" class="form-label">Request Type *</label>
+                                        <select class="form-select" id="request_type" name="request_type" required="True">
+                                            <option value="">-- Select Type --</option>
+                                            <option value="duplicate">Duplicate Card (Lost/Damaged)</option>
+                                            <option value="renewal">Renewal (Expired Card)</option>
+                                            <option value="name_change">Name Change</option>
+                                            <option value="program_change">Program/Batch Change</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="reason" class="form-label">Reason *</label>
+                                        <textarea class="form-control" id="reason" name="reason" rows="4" required="True"
+                                                  placeholder="Please provide detailed reason for this request..."></textarea>
+                                        <div class="form-text">
+                                            For lost cards, please mention when and where you lost it.
+                                            For damaged cards, describe the damage.
+                                        </div>
+                                    </div>
+
+                                    <div class="alert alert-info">
+                                        <i class="fa fa-info-circle me-2"></i>
+                                        <strong>Note:</strong>
+                                        <ul class="mb-0 mt-2">
+                                            <li>Duplicate ID cards may require a fee payment</li>
+                                            <li>Processing time is typically 3-5 working days</li>
+                                            <li>You will be notified via email when your card is ready</li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="mt-4">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fa fa-paper-plane me-1"></i>Submit Request
+                                        </button>
+                                        <a href="/my/id-card" class="btn btn-outline-secondary ms-2">
+                                            <i class="fa fa-arrow-left me-1"></i>Back to ID Card
+                                        </a>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">Previous Requests</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <t t-if="existing_requests">
+                                            <div class="list-group">
+                                                <t t-foreach="existing_requests" t-as="req">
+                                                    <div class="list-group-item">
+                                                        <div class="d-flex w-100 justify-content-between">
+                                                            <small class="text-muted">
+                                                                <t t-esc="req.request_date"/>
+                                                            </small>
+                                                            <span class="badge" t-att-class="'bg-' + {'draft': 'secondary', 'submitted': 'info', 'approved': 'success', 'rejected': 'danger'}.get(req.state, 'secondary')">
+                                                                <t t-esc="req.state"/>
+                                                            </span>
+                                                        </div>
+                                                        <p class="mb-1">
+                                                            <strong><t t-esc="req.request_type"/></strong>
+                                                        </p>
+                                                        <small class="text-muted" t-esc="req.reason"/>
+                                                    </div>
+                                                </t>
+                                            </div>
+                                        </t>
+                                        <t t-else="">
+                                            <p class="text-muted mb-0">No previous requests found.</p>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ==================== ID CARD VERIFICATION PAGE ==================== -->
+    <template id="id_card_verify_page" name="Verify ID Card">
+        <t t-call="website.layout">
+            <t t-set="title">Verify Student ID Card</t>
+            <div class="container mt-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h3 class="card-title mb-0">
+                                    <i class="fa fa-check-circle me-2"></i>ID Card Verification
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted">
+                                    Enter the ID Card number to verify its authenticity and view basic information.
+                                </p>
+
+                                <t t-if="error">
+                                    <div class="alert alert-danger">
+                                        <i class="fa fa-exclamation-triangle me-2"></i>
+                                        <span t-esc="error"/>
+                                    </div>
+                                </t>
+
+                                <form action="/id-card/verify/check" method="post" class="mt-4">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                                    <div class="mb-3">
+                                        <label for="card_number" class="form-label">ID Card Number *</label>
+                                        <input type="text" class="form-control" id="card_number" name="card_number"
+                                               placeholder="Enter the ID card number" required="True"/>
+                                        <div class="form-text">
+                                            You can find the ID card number on the front of the card (e.g., IDC20230001)
+                                        </div>
+                                    </div>
+
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary btn-lg">
+                                            <i class="fa fa-search me-2"></i>Verify ID Card
+                                        </button>
+                                    </div>
+                                </form>
+
+                                <hr class="my-4"/>
+
+                                <div class="text-center">
+                                    <h6 class="text-muted">About Verification</h6>
+                                    <p class="small text-muted">
+                                        This system allows employers, institutions, and other authorized parties
+                                        to verify the authenticity of student ID cards issued by our university.
+                                    </p>
+                                    <div class="small">
+                                        <i class="fa fa-shield-alt me-1"></i>
+                                        Secure verification system |
+                                        <i class="fa fa-lock ms-2 me-1"></i>
+                                        Privacy protected
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ==================== ID CARD VERIFICATION RESULT ==================== -->
+    <template id="id_card_verify_result" name="ID Card Verification Result">
+        <t t-call="website.layout">
+            <t t-set="title">Verification Result</t>
+            <div class="container mt-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header" t-att-class="verified ? 'bg-success text-white' : 'bg-danger text-white'">
+                                <h3 class="card-title mb-0">
+                                    <i t-att-class="verified ? 'fa fa-check-circle' : 'fa fa-times-circle'" class="me-2"></i>
+                                    ID Card Verification Result
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                <t t-if="verified and id_card and student">
+                                    <div class="alert alert-success">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fa fa-check-circle fa-2x me-3"></i>
+                                            <div>
+                                                <h5 class="mb-1">✓ Valid ID Card</h5>
+                                                <p class="mb-0">This ID card has been verified and is currently active.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="table-responsive mt-4">
+                                        <table class="table table-bordered">
+                                            <tbody>
+                                                <tr>
+                                                    <th style="width: 30%">ID Card Number</th>
+                                                    <td><strong><t t-esc="id_card.name"/></strong></td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Status</th>
+                                                    <td>
+                                                        <span class="badge bg-success">Active</span>
+                                                        <span class="badge bg-info ms-2">Verified</span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Student Name</th>
+                                                    <td><t t-esc="student.name"/></td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Registration Number</th>
+                                                    <td><t t-esc="student.registration_number"/></td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Program</th>
+                                                    <td><t t-esc="student.program_id.name"/></td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Batch</th>
+                                                    <td><t t-esc="student.batch_id.name"/></td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Issue Date</th>
+                                                    <td><t t-esc="id_card.issue_date"/></td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Valid Until</th>
+                                                    <td>
+                                                        <t t-esc="id_card.expiry_date"/>
+                                                        <t t-if="id_card.is_valid">
+                                                            <span class="badge bg-success ms-2">Valid</span>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <span class="badge bg-danger ms-2">Expired</span>
+                                                        </t>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div class="alert alert-info mt-4">
+                                        <h6><i class="fa fa-info-circle me-2"></i>Verification Details</h6>
+                                        <p class="mb-0 small">
+                                            Verified on: <t t-esc="datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')"/><br/>
+                                            Verification ID: <code>VRF-<t t-esc="int(datetime.datetime.now().timestamp())"/></code>
+                                        </p>
+                                    </div>
+
+                                    <div class="mt-4 text-center">
+                                        <button onclick="window.print()" class="btn btn-outline-primary me-2">
+                                            <i class="fa fa-print me-1"></i>Print Result
+                                        </button>
+                                        <a href="/id-card/verify" class="btn btn-outline-secondary">
+                                            <i class="fa fa-redo me-1"></i>Verify Another Card
+                                        </a>
+                                    </div>
+                                </t>
+                                <t t-else="">
+                                    <div class="alert alert-danger text-center py-4">
+                                        <i class="fa fa-times-circle fa-4x mb-3"></i>
+                                        <h4>Verification Failed</h4>
+                                        <p class="mb-0">The ID card could not be verified. It may be invalid, expired, or inactive.</p>
+                                        <div class="mt-3">
+                                            <a href="/id-card/verify" class="btn btn-primary">Try Again</a>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ==================== BULK ID CARD GENERATION ==================== -->
+    <template id="generate_bulk_id_cards" name="Bulk Generate ID Cards">
+        <t t-call="portal.portal_layout">
+            <t t-set="title">Bulk ID Card Generation</t>
+            <div class="container mt-4">
+                <!-- Success/Error Messages -->
+                <t t-if="request.params.get('success')">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <strong>Success!</strong> Generated <t t-esc="request.params.get('count')"/> new ID cards.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </t>
+                <t t-if="request.params.get('error')">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Error!</strong> Failed to generate ID cards. Please try again.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </t>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">
+                            <i class="fa fa-id-card me-2"></i>Bulk ID Card Generation
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <form action="/admin/id-cards/generate-bulk/process" method="post" class="row g-3">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                            <div class="col-md-6">
+                                <label for="program_id" class="form-label">Program</label>
+                                <select class="form-select" id="program_id" name="program_id">
+                                    <option value="">All Programs</option>
+                                    <t t-foreach="programs" t-as="program">
+                                        <option t-att-value="program.id" t-esc="program.name"/>
+                                    </t>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="batch_id" class="form-label">Batch</label>
+                                <select class="form-select" id="batch_id" name="batch_id">
+                                    <option value="">All Batches</option>
+                                    <t t-foreach="batches" t-as="batch">
+                                        <option t-att-value="batch.id" t-esc="batch.name"/>
+                                    </t>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="alert alert-warning">
+                                    <i class="fa fa-exclamation-triangle me-2"></i>
+                                    <strong>Note:</strong> This will generate ID cards for students who:
+                                    <ul class="mb-0 mt-2">
+                                        <li>Are in "Enrolled" or "Active" state</li>
+                                        <li>Don't have an active ID card</li>
+                                        <li>Match the selected program and/or batch criteria</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="col-12 mt-3">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa fa-cogs me-1"></i>Generate ID Cards
+                                </button>
+
+                                <!-- Bulk Download Links -->
+                                <div class="btn-group ms-2" role="group">
+                                    <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown">
+                                        <i class="fa fa-download me-1"></i>Download Existing
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a class="dropdown-item" href="/admin/id-cards/download-bulk">
+                                                All ID Cards
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"/></li>
+                                        <t t-foreach="programs" t-as="program">
+                                            <li>
+                                                <a class="dropdown-item" t-att-href="'/admin/id-cards/download-bulk?program_id=' + str(program.id)">
+                                                    <t t-esc="program.name"/> Program
+                                                </a>
+                                            </li>
+                                        </t>
+                                        <li><hr class="dropdown-divider"/></li>
+                                        <t t-foreach="batches" t-as="batch">
+                                            <li>
+                                                <a class="dropdown-item" t-att-href="'/admin/id-cards/download-bulk?batch_id=' + str(batch.id)">
+                                                    <t t-esc="batch.name"/> Batch
+                                                </a>
+                                            </li>
+                                        </t>
+                                    </ul>
+                                </div>
+
+                                <a href="/my" class="btn btn-outline-secondary ms-2">
+                                    <i class="fa fa-arrow-left me-1"></i>Back to Portal
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ==================== NO ID CARDS FOUND ==================== -->
+    <template id="no_id_cards" name="No ID Cards Found">
+        <t t-call="portal.portal_layout">
+            <t t-set="title">No ID Cards Found</t>
+            <div class="container mt-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body text-center py-5">
+                                <div class="mb-4">
+                                    <i class="fa fa-search fa-4x text-muted"></i>
+                                </div>
+                                <h3 class="card-title">No ID Cards Found</h3>
+                                <p class="card-text text-muted" t-esc="message"/>
+                                <div class="mt-4">
+                                    <a href="/admin/id-cards/generate-bulk" class="btn btn-primary">
+                                        <i class="fa fa-arrow-left me-1"></i>Back to Bulk Generation
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="university_timetable_view_form" model="ir.ui.view">
+        <field name="name">university.timetable.view.form</field>
+        <field name="model">university.timetable</field>
+        <field name="arch" type="xml">
+            <form string="Class Timetable">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_calendar_event"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-calendar"
+                                invisible="not calendar_event_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">View</span>
+                                <span class="o_stat_text">Event</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <widget name="web_ribbon" title="Recurring"
+                            bg_color="text-bg-success"
+                            invisible="not is_recurring"/>
+
+                    <div class="oe_title">
+                        <label for="name" string="Class Title"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Course Information">
+                            <field name="course_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="subject_id" readonly="1"/>
+                            <field name="program_id" readonly="1"/>
+                            <field name="department_id" readonly="1"/>
+                            <field name="semester_id" readonly="1"/>
+                            <field name="batch_id" readonly="1"/>
+                            <field name="academic_year_id" readonly="1"/>
+                        </group>
+                        <group string="Faculty &amp; Classroom">
+                            <field name="faculty_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="classroom_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="room_number_id" placeholder="e.g., Room 301"/>
+                            <field name="class_type" widget="radio"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Schedule">
+                            <field name="day_of_week" widget="radio"/>
+                            <field name="start_time" widget="float_time"/>
+                            <field name="end_time" widget="float_time"/>
+                            <field name="duration" readonly="1" widget="float_time"/>
+                        </group>
+                        <group string="Recurrence">
+                            <field name="is_recurring" widget="boolean_toggle"/>
+                            <field name="start_date" widget="date"
+                                   required="is_recurring"/>
+                            <field name="end_date" widget="date"
+                                   required="is_recurring"/>
+                            <field name="calendar_event_id" readonly="1"
+                                   invisible="not calendar_event_id"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <field name="notes" placeholder="Enter any additional notes..."/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="university_timetable_view_list" model="ir.ui.view">
+        <field name="name">university.timetable.view.list</field>
+        <field name="model">university.timetable</field>
+        <field name="arch" type="xml">
+            <list string="Class Timetable"
+                  default_order="day_of_week, start_time"
+                  multi_edit="1">
+                <field name="day_of_week" string="Day"/>
+                <field name="start_time" widget="float_time"/>
+                <field name="end_time" widget="float_time"/>
+                <field name="duration" widget="float_time"/>
+                <field name="course_id"/>
+                <field name="subject_id"/>
+                <field name="program_id" optional="hide"/>
+                <field name="department_id" optional="show"/>
+                <field name="semester_id" optional="hide"/>
+                <field name="batch_id" optional="hide"/>
+                <field name="faculty_id"/>
+                <field name="classroom_id" optional="show"/>
+                <field name="room_number_id" optional="show"/>
+                <field name="class_type" widget="badge"/>
+                <field name="is_recurring" widget="boolean_toggle"
+                       optional="hide"/>
+                <field name="active" widget="boolean_toggle"
+                       optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="university_timetable_view_search" model="ir.ui.view">
+        <field name="name">university.timetable.view.search</field>
+        <field name="model">university.timetable</field>
+        <field name="arch" type="xml">
+            <search string="Search Timetable">
+                <field name="course_id" string="Course"/>
+                <field name="subject_id"/>
+                <field name="faculty_id"/>
+                <field name="program_id"/>
+                <field name="department_id"/>
+                <field name="semester_id"/>
+                <field name="batch_id"/>
+                <field name="classroom_id"/>
+                <field name="room_number_id"/>
+
+                <separator/>
+
+                <filter name="filter_monday" string="Monday"
+                        domain="[('day_of_week', '=', '0')]"/>
+                <filter name="filter_tuesday" string="Tuesday"
+                        domain="[('day_of_week', '=', '1')]"/>
+                <filter name="filter_wednesday" string="Wednesday"
+                        domain="[('day_of_week', '=', '2')]"/>
+                <filter name="filter_thursday" string="Thursday"
+                        domain="[('day_of_week', '=', '3')]"/>
+                <filter name="filter_friday" string="Friday"
+                        domain="[('day_of_week', '=', '4')]"/>
+                <filter name="filter_saturday" string="Saturday"
+                        domain="[('day_of_week', '=', '5')]"/>
+
+                <separator/>
+
+                <filter name="filter_theory" string="Theory"
+                        domain="[('class_type', '=', 'theory')]"/>
+                <filter name="filter_practical" string="Practical"
+                        domain="[('class_type', '=', 'practical')]"/>
+                <filter name="filter_lab" string="Laboratory"
+                        domain="[('class_type', '=', 'lab')]"/>
+                <filter name="filter_tutorial" string="Tutorial"
+                        domain="[('class_type', '=', 'tutorial')]"/>
+
+                <separator/>
+
+                <filter name="filter_morning" string="Morning Classes (6 AM - 12 PM)"
+                        domain="[('start_time', '&gt;=', 6), ('start_time', '&lt;', 12)]"/>
+                <filter name="filter_afternoon" string="Afternoon Classes (12 PM - 4 PM)"
+                        domain="[('start_time', '&gt;=', 12), ('start_time', '&lt;', 16)]"/>
+                <filter name="filter_evening" string="Evening Classes (4 PM - 8 PM)"
+                        domain="[('start_time', '&gt;=', 16), ('start_time', '&lt;', 20)]"/>
+
+                <separator/>
+
+                <filter name="filter_recurring" string="Recurring"
+                        domain="[('is_recurring', '=', True)]"/>
+                <filter name="filter_one_time" string="One-Time"
+                        domain="[('is_recurring', '=', False)]"/>
+
+                <separator/>
+
+                <filter name="filter_this_week" string="This Week"
+                        domain="[('start_date', '&gt;=', (context_today() + relativedelta(weekday=0, days=-6)).strftime('%Y-%m-%d')),
+                                 ('start_date', '&lt;=', (context_today() + relativedelta(weekday=6)).strftime('%Y-%m-%d'))]"/>
+
+                <separator/>
+
+                <filter name="filter_active" string="Active"
+                        domain="[('active', '=', True)]"/>
+                <filter name="filter_archived" string="Archived"
+                        domain="[('active', '=', False)]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_day" string="Day of Week"
+                            context="{'group_by': 'day_of_week'}"/>
+                    <filter name="group_by_course" string="Course"
+                            context="{'group_by': 'course_id'}"/>
+                    <filter name="group_by_subject" string="Subject"
+                            context="{'group_by': 'subject_id'}"/>
+                    <filter name="group_by_faculty" string="Faculty"
+                            context="{'group_by': 'faculty_id'}"/>
+                    <filter name="group_by_department" string="Department"
+                            context="{'group_by': 'department_id'}"/>
+                    <filter name="group_by_program" string="Program"
+                            context="{'group_by': 'program_id'}"/>
+                    <filter name="group_by_semester" string="Semester"
+                            context="{'group_by': 'semester_id'}"/>
+                    <filter name="group_by_batch" string="Batch"
+                            context="{'group_by': 'batch_id'}"/>
+                    <filter name="group_by_class_type" string="Class Type"
+                            context="{'group_by': 'class_type'}"/>
+                    <filter name="group_by_classroom" string="Classroom"
+                            context="{'group_by': 'classroom_id'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="program_id" string="Program"
+                           select="multi"
+                           icon="fa-graduation-cap"/>
+                    <field name="department_id" string="Department"
+                           select="multi"
+                           icon="fa-building"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="university_timetable_view_kanban" model="ir.ui.view">
+        <field name="name">university.timetable.view.kanban</field>
+        <field name="model">university.timetable</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="day_of_week"
+                    quick_create="false">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="course_id"/>
+                <field name="subject_id"/>
+                <field name="faculty_id"/>
+                <field name="day_of_week"/>
+                <field name="start_time"/>
+                <field name="end_time"/>
+                <field name="duration"/>
+                <field name="classroom_id"/>
+                <field name="room_number_id"/>
+                <field name="class_type"/>
+                <field name="is_recurring"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_card_header">
+                                <div class="o_kanban_card_header_title">
+                                    <div class="o_primary">
+                                        <strong>
+                                            <field name="subject_id"/>
+                                        </strong>
+                                        <span t-att-class="'badge ms-2 text-bg-' + (record.class_type.raw_value == 'theory' ? 'primary' : record.class_type.raw_value == 'practical' ? 'success' : record.class_type.raw_value == 'lab' ? 'info' : 'warning')">
+                                            <field name="class_type"/>
+                                        </span>
+                                    </div>
+                                    <div class="text-muted">
+                                        <field name="course_id"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="o_kanban_card_content">
+                                <div class="row mb-2">
+                                    <div class="col-12">
+                                        <i class="fa fa-clock-o text-primary"/>
+                                        <strong>
+                                            <field name="start_time" widget="float_time"/> -
+                                            <field name="end_time" widget="float_time"/>
+                                        </strong>
+                                        <span class="text-muted">
+                                            (<field name="duration" widget="float_time"/>)
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-12">
+                                        <i class="fa fa-user text-success"/>
+                                        <field name="faculty_id"/>
+                                    </div>
+                                </div>
+
+                                <div class="row" t-if="record.classroom_id.value or record.room_number_id.value">
+                                    <div class="col-12">
+                                        <i class="fa fa-map-marker text-danger"/>
+                                        <span t-if="record.classroom_id.value">
+                                            <field name="classroom_id"/>
+                                        </span>
+                                        <span t-if="record.room_number_id.value">
+                                            - <field name="room_number_id"/>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-2" t-if="record.is_recurring.raw_value">
+                                    <div class="col-12">
+                                        <span class="badge text-bg-success">
+                                            <i class="fa fa-repeat"/> Recurring
+                                        </span>
+                                        <span class="text-muted ms-2" t-if="record.start_date.value">
+                                            <field name="start_date"/> to <field name="end_date"/>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="o_kanban_card_footer">
+                                <div class="o_kanban_footer_left">
+                                    <!-- Empty for future use -->
+                                </div>
+                                <div class="o_kanban_footer_right">
+                                    <field name="activity_ids" widget="kanban_activity"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Calendar View -->
+    <record id="university_timetable_view_calendar" model="ir.ui.view">
+        <field name="name">university.timetable.view.calendar</field>
+        <field name="model">university.timetable</field>
+        <field name="arch" type="xml">
+            <calendar string="Class Timetable Calendar"
+                      date_start="start_date"
+                      date_stop="end_date"
+                      color="course_id"
+                      mode="week"
+                      event_open_popup="true"
+                      quick_create="false"
+                      hide_time="false">
+                <field name="name"/>
+                <field name="course_id"/>
+                <field name="subject_id"/>
+                <field name="faculty_id"/>
+                <field name="day_of_week"/>
+                <field name="start_time" widget="float_time"/>
+                <field name="end_time" widget="float_time"/>
+                <field name="classroom_id"/>
+                <field name="room_number_id"/>
+                <field name="class_type"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="university_timetable_view_pivot" model="ir.ui.view">
+        <field name="name">university.timetable.view.pivot</field>
+        <field name="model">university.timetable</field>
+        <field name="arch" type="xml">
+            <pivot string="Timetable Analysis">
+                <field name="day_of_week" type="row"/>
+                <field name="faculty_id" type="row"/>
+                <field name="class_type" type="col"/>
+                <field name="duration" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View -->
+    <record id="university_timetable_view_graph" model="ir.ui.view">
+        <field name="name">university.timetable.view.graph</field>
+        <field name="model">university.timetable</field>
+        <field name="arch" type="xml">
+            <graph string="Timetable Statistics" type="bar" stacked="1">
+                <field name="day_of_week"/>
+                <field name="class_type"/>
+                <field name="duration" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Timeline/Gantt View -->
+    <record id="university_timetable_view_timeline" model="ir.ui.view">
+        <field name="name">university.timetable.view.timeline</field>
+        <field name="model">university.timetable</field>
+        <field name="arch" type="xml">
+            <timeline date_start="start_date"
+                      date_stop="end_date"
+                      string="Timetable Timeline"
+                      default_group_by="faculty_id"
+                      color="class_type">
+                <field name="name"/>
+                <field name="course_id"/>
+                <field name="day_of_week"/>
+                <field name="start_time" widget="float_time"/>
+                <field name="end_time" widget="float_time"/>
+            </timeline>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_university_timetable" model="ir.actions.act_window">
+        <field name="name">Class Timetable</field>
+        <field name="res_model">university.timetable</field>
+        <field name="view_mode">kanban,calendar,list,form,timeline,pivot,graph</field>
+        <field name="context">{
+            'search_default_filter_active': 1,
+            'search_default_group_by_day': 1,
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Timetable Entry
+            </p>
+            <p>
+                Manage class timetables with automatic calendar integration.
+                Schedule theory, practical, lab, and tutorial sessions with faculty and classroom allocation.
+            </p>
+        </field>
+    </record>
+
+</odoo>

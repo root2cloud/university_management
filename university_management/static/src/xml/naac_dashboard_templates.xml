@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="university_management.NAACDashboard">
+        <div class="o_naac_dashboard p-4">
+
+            <!-- Loading State -->
+            <t t-if="state.loading">
+                <div class="iic-loading">
+                    <div class="iic-spinner"/>
+                    <span style="font-size:0.83rem;">Loading NAAC data&#x2026;</span>
+                </div>
+            </t>
+
+            <t t-if="!state.loading">
+
+                <!-- Hero Header -->
+                <div class="naac-hero-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2>NAAC IQAC Dashboard</h2>
+                        <div class="subtitle">Continuous Compliance Monitoring &#8212; Accreditation Readiness</div>
+                    </div>
+                    <div class="naac-readiness-badge">
+                        <div t-attf-class="naac-readiness-pct {{ state.overallReadiness >= 75 ? 'good' : state.overallReadiness >= 50 ? 'avg' : 'poor' }}">
+                            <t t-esc="state.overallReadiness"/>%
+                        </div>
+                        <div class="naac-readiness-label">Overall Readiness</div>
+                    </div>
+                </div>
+
+                <!-- KPI Cards (6 columns) -->
+                <div class="naac-kpi-grid">
+                    <div class="naac-kpi-card nc-blue">
+                        <div class="naac-kpi-value"><t t-esc="state.totalActivities"/></div>
+                        <div class="naac-kpi-label">Total Activities</div>
+                    </div>
+                    <div class="naac-kpi-card nc-green">
+                        <div class="naac-kpi-value"><t t-esc="state.verifiedActivities"/></div>
+                        <div class="naac-kpi-label">Verified</div>
+                    </div>
+                    <div class="naac-kpi-card nc-teal">
+                        <div class="naac-kpi-value"><t t-esc="state.totalEvidence"/></div>
+                        <div class="naac-kpi-label">Evidence Docs</div>
+                    </div>
+                    <div class="naac-kpi-card nc-gray">
+                        <div class="naac-kpi-value"><t t-esc="state.totalPapers"/></div>
+                        <div class="naac-kpi-label">Research Papers</div>
+                    </div>
+                    <div class="naac-kpi-card nc-dark">
+                        <div class="naac-kpi-value"><t t-esc="state.placements"/></div>
+                        <div class="naac-kpi-label">Placements</div>
+                    </div>
+                    <div class="naac-kpi-card nc-amber">
+                        <div class="naac-kpi-value"><t t-esc="state.pendingEvidence"/></div>
+                        <div class="naac-kpi-label">Pending Evidence</div>
+                    </div>
+                </div>
+
+                <!-- Main Content: Criteria + Activity List -->
+                <div class="iic-row cols-2">
+
+                    <!-- Criteria Readiness -->
+                    <div class="iic-section-card">
+                        <div class="iic-card-header">
+                            <div class="iic-card-title">
+                                <span class="title-dot"/>
+                                Criteria Readiness Score
+                            </div>
+                            <span style="font-size:0.75rem;color:var(--iic-text-light);">7 Criteria</span>
+                        </div>
+                        <div class="iic-card-body">
+                            <t t-if="state.criterionScores.length">
+                                <div class="naac-criteria-list">
+                                    <t t-foreach="state.criterionScores" t-as="c" t-key="c_index">
+                                        <div class="naac-criterion-row">
+                                            <div class="naac-criterion-info">
+                                                <div class="naac-criterion-name">
+                                                    C<t t-esc="c.number"/>: <t t-esc="c.name"/>
+                                                </div>
+                                                <div class="naac-criterion-bar-track">
+                                                    <div t-attf-class="naac-criterion-bar-fill {{ c.score >= 75 ? 'bar-good' : c.score >= 50 ? 'bar-avg' : 'bar-poor' }}"
+                                                         t-attf-style="width: {{ c.score || 0 }}%"/>
+                                                </div>
+                                                <div class="naac-criterion-meta">
+                                                    <t t-esc="c.activity_count"/> activities
+                                                    &#183; <t t-esc="c.evidence_count"/> evidence docs
+                                                </div>
+                                            </div>
+                                            <div class="naac-criterion-score">
+                                                <div t-attf-class="naac-criterion-pct {{ c.score >= 75 ? 'good' : c.score >= 50 ? 'avg' : 'poor' }}">
+                                                    <t t-esc="c.score"/>%
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div class="iic-empty">
+                                    <i class="fa fa-bar-chart"/>
+                                    <p>No criteria data available yet.</p>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activities -->
+                    <div class="iic-section-card">
+                        <div class="iic-card-header">
+                            <div class="iic-card-title">
+                                <span class="title-dot"/>
+                                Recent Activities
+                            </div>
+                        </div>
+                        <t t-if="state.recentActivities.length">
+                            <div class="naac-activity-list">
+                                <t t-foreach="state.recentActivities" t-as="act" t-key="act_index">
+                                    <div class="naac-activity-item">
+                                        <div t-attf-class="naac-activity-dot dot-{{ act.state }}"/>
+                                        <div class="naac-activity-name" t-att-title="act.name">
+                                            <t t-esc="act.name"/>
+                                        </div>
+                                        <div class="naac-activity-meta">
+                                            <t t-esc="act.date"/>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="iic-empty">
+                                <i class="fa fa-list"/>
+                                <p>No activities recorded yet.</p>
+                            </div>
+                        </t>
+                    </div>
+
+                </div>
+
+                <!-- Department NAAC Readiness Table -->
+                <div class="iic-section-card">
+                    <div class="iic-card-header">
+                        <div class="iic-card-title">
+                            <span class="title-dot"/>
+                            Department NAAC Readiness
+                        </div>
+                        <span style="font-size:0.75rem;color:var(--iic-text-light);">
+                            <t t-esc="state.deptReadiness.length"/> departments
+                        </span>
+                    </div>
+                    <t t-if="state.deptReadiness.length">
+                        <div style="overflow-x:auto;">
+                            <table class="naac-dept-table">
+                                <thead>
+                                    <tr>
+                                        <th>Department</th>
+                                        <th style="text-align:center;">Verified</th>
+                                        <th style="text-align:center;">Total</th>
+                                        <th style="min-width:200px;">Readiness</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.deptReadiness" t-as="dept" t-key="dept_index">
+                                        <tr>
+                                            <td><div class="naac-dept-name"><t t-esc="dept.dept"/></div></td>
+                                            <td style="text-align:center;font-weight:700;color:var(--status-green);">
+                                                <t t-esc="dept.verified"/>
+                                            </td>
+                                            <td style="text-align:center;color:var(--iic-text-mid);">
+                                                <t t-esc="dept.total"/>
+                                            </td>
+                                            <td>
+                                                <div class="naac-dept-progress">
+                                                    <div class="naac-dept-bar-track">
+                                                        <div t-attf-class="naac-dept-bar-fill {{ dept.pct >= 75 ? 'bar-good' : dept.pct >= 50 ? 'bar-avg' : 'bar-poor' }}"
+                                                             t-attf-style="width: {{ dept.pct || 0 }}%"/>
+                                                    </div>
+                                                    <div class="naac-dept-pct">
+                                                        <t t-esc="dept.pct"/>%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <div class="iic-empty">
+                            <i class="fa fa-building"/>
+                            <p>No department data available yet.</p>
+                        </div>
+                    </t>
+                </div>
+
+            </t>
+        </div>
+    </t>
+
+</templates>

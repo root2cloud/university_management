@@ -1,0 +1,601 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- ============================================================
+     EXAM LIST — /my/exams
+     ============================================================ -->
+<template id="online_exam_list" name="My Online Exams">
+    <t t-call="portal.portal_layout">
+        <t t-set="breadcrumbs_searchbar" t-value="True"/>
+        <t t-call="portal.portal_searchbar">
+            <t t-set="title">Online Exams</t>
+        </t>
+
+        <div class="container py-4">
+            <h2 class="mb-4">
+                <i class="fa fa-laptop me-2 text-primary"/>
+                Available Online Exams
+            </h2>
+
+            <t t-if="not exam_data">
+                <div class="alert alert-info">
+                    <i class="fa fa-info-circle me-2"/>
+                    No online exams are currently available for you.
+                </div>
+            </t>
+
+            <t t-else="">
+                <div class="row g-3">
+                    <t t-foreach="exam_data" t-as="item">
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <strong><t t-esc="item['exam'].name"/></strong>
+                                    <span t-attf-class="badge #{item['exam'].state == 'ongoing' and 'bg-success' or 'bg-primary'}">
+                                        <t t-esc="item['exam'].state.title()"/>
+                                    </span>
+                                </div>
+                                <div class="card-body">
+                                    <p class="mb-1">
+                                        <i class="fa fa-book text-info me-1"/>
+                                        <t t-esc="item['exam'].subject_id.name"/>
+                                    </p>
+                                    <p class="mb-1">
+                                        <i class="fa fa-clock-o text-warning me-1"/>
+                                        Duration: <strong><t t-esc="item['exam'].duration_minutes"/> min</strong>
+                                    </p>
+                                    <p class="mb-1">
+                                        <i class="fa fa-question-circle text-primary me-1"/>
+                                        Questions: <strong><t t-esc="item['exam'].question_count"/></strong>
+                                    </p>
+                                    <p class="mb-1">
+                                        <i class="fa fa-star text-warning me-1"/>
+                                        Total Marks: <strong><t t-esc="item['exam'].total_marks"/></strong>
+                                    </p>
+                                    <p class="mb-1 small text-muted">
+                                        Ends: <t t-esc="item['exam'].end_datetime"/>
+                                    </p>
+                                </div>
+                                <div class="card-footer">
+                                    <t t-if="item['attempt'] and item['attempt'].state in ('submitted','evaluated')">
+                                        <a t-attf-href="/my/exam/attempt/#{item['attempt'].id}/result"
+                                           class="btn btn-outline-success btn-sm w-100">
+                                            <i class="fa fa-bar-chart me-1"/>
+                                            View Result
+                                        </a>
+                                    </t>
+                                    <t t-elif="item['attempt'] and item['attempt'].state == 'in_progress'">
+                                        <a t-attf-href="/my/exam/attempt/#{item['attempt'].id}/q/1"
+                                           class="btn btn-warning btn-sm w-100">
+                                            <i class="fa fa-play me-1"/>
+                                            Resume Exam
+                                        </a>
+                                    </t>
+                                    <t t-else="">
+                                        <a t-attf-href="/my/exam/#{item['exam'].id}"
+                                           class="btn btn-primary btn-sm w-100">
+                                            <i class="fa fa-pencil me-1"/>
+                                            Start Exam
+                                        </a>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </t>
+        </div>
+    </t>
+</template>
+
+
+<!-- ============================================================
+     INSTRUCTIONS — /my/exam/<id>
+     ============================================================ -->
+<template id="online_exam_instructions" name="Exam Instructions">
+    <t t-call="portal.portal_layout">
+        <div class="container py-4" style="max-width:760px">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/my/exams">Online Exams</a></li>
+                    <li class="breadcrumb-item active"><t t-esc="exam.name"/></li>
+                </ol>
+            </nav>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fa fa-laptop me-2"/>
+                        <t t-esc="exam.name"/>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Quick stats -->
+                    <div class="row text-center mb-4 g-2">
+                        <div class="col-6 col-md-3">
+                            <div class="border rounded p-2">
+                                <div class="fs-4 fw-bold text-primary">
+                                    <t t-esc="exam.question_count"/>
+                                </div>
+                                <small class="text-muted">Questions</small>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="border rounded p-2">
+                                <div class="fs-4 fw-bold text-warning">
+                                    <t t-esc="exam.duration_minutes"/> min
+                                </div>
+                                <small class="text-muted">Duration</small>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="border rounded p-2">
+                                <div class="fs-4 fw-bold text-success">
+                                    <t t-esc="exam.total_marks"/>
+                                </div>
+                                <small class="text-muted">Total Marks</small>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="border rounded p-2">
+                                <div class="fs-4 fw-bold text-danger">
+                                    <t t-esc="exam.passing_marks"/>
+                                </div>
+                                <small class="text-muted">Pass Marks</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Custom instructions -->
+                    <t t-if="exam.instructions">
+                        <h5 class="text-secondary">
+                            <i class="fa fa-info-circle me-1"/>Instructions
+                        </h5>
+                        <div class="border rounded p-3 mb-3 bg-light">
+                            <t t-raw="exam.instructions"/>
+                        </div>
+                    </t>
+
+                    <!-- Default instructions -->
+                    <div class="alert alert-warning">
+                        <ul class="mb-0">
+                            <li>Once started, the timer cannot be paused.</li>
+                            <li>You can navigate between questions freely.</li>
+                            <li>Use the <strong>Flag</strong> button to mark questions for review.</li>
+                            <li>The exam will auto-submit when time expires.</li>
+                            <t t-if="exam.negative_marking">
+                                <li class="text-danger">
+                                    <strong>Negative Marking is enabled.</strong>
+                                    Wrong answers will deduct marks.
+                                </li>
+                            </t>
+                        </ul>
+                    </div>
+
+                    <!-- Past attempts -->
+                    <t t-if="existing_attempts">
+                        <h5 class="text-secondary mt-3">Your Previous Attempts</h5>
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Date</th>
+                                    <th>Score</th>
+                                    <th>Result</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="existing_attempts" t-as="att">
+                                    <tr>
+                                        <td><t t-esc="att_index + 1"/></td>
+                                        <td><t t-esc="att.submit_datetime or att.start_datetime"/></td>
+                                        <td><t t-esc="att.total_score"/> / <t t-esc="att.max_score"/></td>
+                                        <td>
+                                            <span t-attf-class="badge #{att.result == 'pass' and 'bg-success' or att.result == 'fail' and 'bg-danger' or 'bg-secondary'}">
+                                                <t t-esc="(att.result or 'pending').title()"/>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a t-attf-href="/my/exam/attempt/#{att.id}/result"
+                                               class="btn btn-outline-secondary btn-sm">View</a>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </t>
+                </div>
+
+                <div class="card-footer text-center">
+                    <t t-if="can_start">
+                        <form t-attf-action="/my/exam/#{exam.id}/start" method="POST">
+                            <input type="hidden" name="csrf_token"
+                                   t-att-value="request.csrf_token()"/>
+                            <button type="submit" class="btn btn-success btn-lg px-5">
+                                <i class="fa fa-play me-2"/>
+                                Start Exam Now
+                            </button>
+                        </form>
+                    </t>
+                    <t t-else="">
+                        <div class="alert alert-secondary mb-0">
+                            You have already completed this exam and multiple attempts are not allowed.
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+</template>
+
+
+<!-- ============================================================
+     QUESTION PAGE — /my/exam/attempt/<id>/q/<n>
+     ============================================================ -->
+<template id="online_exam_question" name="Exam Question">
+    <t t-call="portal.portal_layout">
+        <t t-set="no_header" t-value="True"/>
+
+        <!-- Countdown timer script -->
+        <script type="text/javascript">
+            var REMAINING_SECONDS = <t t-esc="remaining_seconds or 0"/>;
+            var ATTEMPT_ID = <t t-esc="attempt.id"/>;
+
+            function startTimer() {
+                var el = document.getElementById('exam-timer');
+                if (!el || REMAINING_SECONDS &lt;= 0) return;
+                var interval = setInterval(function() {
+                    REMAINING_SECONDS--;
+                    var m = Math.floor(REMAINING_SECONDS / 60);
+                    var s = REMAINING_SECONDS % 60;
+                    el.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+                    if (REMAINING_SECONDS &lt;= 300) el.classList.add('text-danger','fw-bold');
+                    if (REMAINING_SECONDS &lt;= 0) {
+                        clearInterval(interval);
+                        document.getElementById('submit-form').submit();
+                    }
+                }, 1000);
+            }
+            document.addEventListener('DOMContentLoaded', startTimer);
+        </script>
+
+        <div class="bg-light border-bottom py-2 px-3 d-flex justify-content-between align-items-center sticky-top">
+            <div>
+                <strong><t t-esc="exam.name"/></strong>
+                <span class="text-muted ms-2 small">
+                    <t t-esc="exam.subject_id.name"/>
+                </span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <span class="badge bg-secondary">
+                    Q <t t-esc="q_no"/> / <t t-esc="total"/>
+                </span>
+                <span class="badge bg-warning text-dark fs-6 px-3 py-2">
+                    <i class="fa fa-clock-o me-1"/>
+                    <span id="exam-timer">
+                        <t t-esc="'%02d:%02d' % (remaining_seconds // 60, remaining_seconds % 60)"
+                           t-if="remaining_seconds"/>
+                        <t t-else="">--:--</t>
+                    </span>
+                </span>
+            </div>
+        </div>
+
+        <div class="container py-3" style="max-width:900px">
+            <div class="row g-3">
+
+                <!-- Question Navigator (sidebar) -->
+                <div class="col-md-3">
+                    <div class="card shadow-sm sticky-top" style="top:70px">
+                        <div class="card-header py-2 small fw-bold">Questions</div>
+                        <div class="card-body p-2">
+                            <div class="d-flex flex-wrap gap-1">
+                                <t t-foreach="responses" t-as="r">
+                                    <a t-attf-href="/my/exam/attempt/#{attempt.id}/q/#{r.sequence}"
+                                       t-attf-class="btn btn-sm #{r.sequence == q_no and 'btn-primary' or (r.is_flagged and 'btn-warning') or (not r.is_skipped and 'btn-success') or 'btn-outline-secondary'}"
+                                       style="width:36px">
+                                        <t t-esc="r.sequence"/>
+                                    </a>
+                                </t>
+                            </div>
+                            <div class="mt-2 small text-muted">
+                                <span class="badge bg-success me-1">&#160;</span>Answered<br/>
+                                <span class="badge bg-warning me-1">&#160;</span>Flagged<br/>
+                                <span class="badge bg-outline-secondary border me-1">&#160;</span>Skipped
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question + Answer -->
+                <div class="col-md-9">
+                    <form t-attf-action="/my/exam/attempt/#{attempt.id}/answer" method="POST">
+                        <input type="hidden" name="csrf_token"
+                               t-att-value="request.csrf_token()"/>
+                        <input type="hidden" name="q_no" t-att-value="q_no"/>
+
+                        <div class="card shadow-sm mb-3">
+                            <div class="card-header d-flex justify-content-between">
+                                <span class="fw-bold">Question <t t-esc="q_no"/></span>
+                                <div>
+                                    <span t-attf-class="badge #{question.difficulty == 'easy' and 'bg-success' or question.difficulty == 'hard' and 'bg-danger' or 'bg-warning text-dark'} me-2">
+                                        <t t-esc="question.difficulty.title()"/>
+                                    </span>
+                                    <span class="badge bg-secondary">
+                                        <t t-esc="question.marks"/> mark<t t-if="question.marks != 1">s</t>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3 fs-5">
+                                    <t t-out="question.question_text"/>
+                                </div>
+                                <t t-if="question.question_image">
+                                    <img t-attf-src="data:image/png;base64,#{question.question_image}"
+                                         class="img-fluid mb-3 rounded border"
+                                         alt="Question image"/>
+                                </t>
+
+                                <!-- MCQ / True-False options -->
+                                <t t-if="question.question_type in ('mcq', 'true_false')">
+                                    <t t-foreach="options" t-as="opt">
+                                        <div class="form-check mb-2 border rounded p-2"
+                                             t-attf-style="#{response and opt.id in response.selected_option_ids.ids and 'background:#e8f4ff;border-color:#0d6efd!important' or ''}">
+                                            <input class="form-check-input" type="radio"
+                                                   name="option_id"
+                                                   t-att-value="opt.id"
+                                                   t-att-id="'opt_' + str(opt.id)"
+                                                   t-att-checked="response and opt.id in response.selected_option_ids.ids"/>
+                                            <label t-att-for="'opt_' + str(opt.id)"
+                                                   class="form-check-label w-100">
+                                                <t t-esc="opt.option_text"/>
+                                            </label>
+                                        </div>
+                                    </t>
+                                </t>
+
+                                <!-- Multi-select options -->
+                                <t t-if="question.question_type == 'multi_select'">
+                                    <p class="text-muted small mb-2">
+                                        <i class="fa fa-info-circle"/> Select all correct options.
+                                    </p>
+                                    <t t-foreach="options" t-as="opt">
+                                        <div class="form-check mb-2 border rounded p-2"
+                                             t-attf-style="#{response and opt.id in response.selected_option_ids.ids and 'background:#e8f4ff;border-color:#0d6efd!important' or ''}">
+                                            <input class="form-check-input" type="checkbox"
+                                                   name="option_ids"
+                                                   t-att-value="opt.id"
+                                                   t-att-id="'opt_' + str(opt.id)"
+                                                   t-att-checked="response and opt.id in response.selected_option_ids.ids"/>
+                                            <label t-att-for="'opt_' + str(opt.id)"
+                                                   class="form-check-label w-100">
+                                                <t t-esc="opt.option_text"/>
+                                            </label>
+                                        </div>
+                                    </t>
+                                </t>
+
+                                <!-- Short answer -->
+                                <t t-if="question.question_type == 'short_answer'">
+                                    <textarea name="text_answer" class="form-control"
+                                              rows="4"
+                                              placeholder="Type your answer here…"><t t-if="response and response.text_answer" t-esc="response.text_answer"/></textarea>
+                                </t>
+                            </div>
+                        </div>
+
+                        <!-- Navigation buttons -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <button type="submit" name="action" value="prev"
+                                        class="btn btn-outline-secondary me-1"
+                                        t-att-disabled="q_no == 1">
+                                    <i class="fa fa-arrow-left me-1"/> Previous
+                                </button>
+                                <button type="submit" name="action" value="next"
+                                        class="btn btn-outline-primary"
+                                        t-att-disabled="q_no == total">
+                                    Next <i class="fa fa-arrow-right ms-1"/>
+                                </button>
+                            </div>
+                            <div>
+                                <!-- Flag toggle -->
+                                <form t-attf-action="/my/exam/attempt/#{attempt.id}/flag/#{q_no}"
+                                      method="POST" class="d-inline">
+                                    <input type="hidden" name="csrf_token"
+                                           t-att-value="request.csrf_token()"/>
+                                    <button type="submit"
+                                            t-attf-class="btn btn-sm #{response and response.is_flagged and 'btn-warning' or 'btn-outline-warning'} me-2">
+                                        <i class="fa fa-flag me-1"/>
+                                        <t t-if="response and response.is_flagged">Unflag</t>
+                                        <t t-else="">Flag</t>
+                                    </button>
+                                </form>
+
+                                <!-- Submit exam -->
+                                <button type="button" class="btn btn-danger"
+                                        onclick="if(confirm('Submit exam now? You cannot change answers after submission.')) document.getElementById('submit-form').submit()">
+                                    <i class="fa fa-paper-plane me-1"/> Submit Exam
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Hidden submit form -->
+                    <form id="submit-form"
+                          t-attf-action="/my/exam/attempt/#{attempt.id}/submit"
+                          method="POST">
+                        <input type="hidden" name="csrf_token"
+                               t-att-value="request.csrf_token()"/>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </t>
+</template>
+
+
+<!-- ============================================================
+     RESULT PAGE — /my/exam/attempt/<id>/result
+     ============================================================ -->
+<template id="online_exam_result" name="Exam Result">
+    <t t-call="portal.portal_layout">
+        <div class="container py-4" style="max-width:860px">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/my/exams">Online Exams</a></li>
+                    <li class="breadcrumb-item active">Result</li>
+                </ol>
+            </nav>
+
+            <!-- Score card -->
+            <div class="card shadow-sm mb-4">
+                <div t-attf-class="card-header text-white #{attempt.result == 'pass' and 'bg-success' or attempt.result == 'fail' and 'bg-danger' or 'bg-secondary'}">
+                    <h4 class="mb-0">
+                        <i t-attf-class="fa #{attempt.result == 'pass' and 'fa-trophy' or attempt.result == 'fail' and 'fa-times-circle' or 'fa-clock-o'} me-2"/>
+                        <t t-if="attempt.result == 'pass'">Congratulations, you passed!</t>
+                        <t t-elif="attempt.result == 'fail'">Better luck next time</t>
+                        <t t-else="">Submitted — Evaluation pending</t>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <t t-if="show_result">
+                        <div class="row text-center g-3 mb-3">
+                            <div class="col-4">
+                                <div class="border rounded p-3">
+                                    <div class="display-6 fw-bold text-primary">
+                                        <t t-esc="attempt.total_score"/>
+                                    </div>
+                                    <small class="text-muted">Score</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="border rounded p-3">
+                                    <div class="display-6 fw-bold text-secondary">
+                                        <t t-esc="attempt.max_score"/>
+                                    </div>
+                                    <small class="text-muted">Max Marks</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="border rounded p-3">
+                                    <div t-attf-class="display-6 fw-bold #{attempt.percentage >= 60 and 'text-success' or 'text-danger'}">
+                                        <t t-esc="'%.1f' % attempt.percentage"/>%
+                                    </div>
+                                    <small class="text-muted">Percentage</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Progress bar -->
+                        <div class="mb-2 small d-flex justify-content-between">
+                            <span>0</span>
+                            <span>Passing: <t t-esc="exam.passing_marks"/></span>
+                            <span><t t-esc="exam.total_marks"/></span>
+                        </div>
+                        <div class="progress mb-3" style="height:18px">
+                            <div t-attf-class="progress-bar #{attempt.result == 'pass' and 'bg-success' or 'bg-danger'}"
+                                 role="progressbar"
+                                 t-att-style="'width:' + str(min(100, attempt.percentage)) + '%'"
+                                 t-att-aria-valuenow="attempt.percentage"
+                                 aria-valuemin="0" aria-valuemax="100">
+                                <t t-esc="'%.1f' % attempt.percentage"/>%
+                            </div>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <div class="alert alert-info">
+                            Your result will be shown once evaluation is complete.
+                        </div>
+                    </t>
+
+                    <!-- Stats row -->
+                    <div class="row text-center small text-muted border-top pt-3">
+                        <div class="col">
+                            Started:<br/>
+                            <strong><t t-esc="attempt.start_datetime"/></strong>
+                        </div>
+                        <div class="col">
+                            Submitted:<br/>
+                            <strong><t t-esc="attempt.submit_datetime or '–'"/></strong>
+                        </div>
+                        <div class="col">
+                            Answered:<br/>
+                            <strong>
+                                <t t-esc="attempt.answered_count"/> / <t t-esc="attempt.total_questions"/>
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Per-question review -->
+            <t t-if="show_review and responses">
+                <h5 class="mb-3">
+                    <i class="fa fa-list-alt me-2"/>Answer Review
+                </h5>
+                <t t-foreach="responses" t-as="resp">
+                    <div t-attf-class="card mb-3 #{resp.is_correct and 'border-success' or (resp.is_evaluated and not resp.is_correct) and 'border-danger' or 'border-secondary'}">
+                        <div t-attf-class="card-header d-flex justify-content-between #{resp.is_correct and 'bg-success bg-opacity-10' or (resp.is_evaluated and not resp.is_correct) and 'bg-danger bg-opacity-10' or ''}">
+                            <span class="fw-bold">Q<t t-esc="resp.sequence"/>.</span>
+                            <span>
+                                <span t-attf-class="badge #{resp.is_correct and 'bg-success' or (resp.is_evaluated and not resp.is_correct) and 'bg-danger' or 'bg-secondary'}">
+                                    <t t-if="resp.is_correct">
+                                        <i class="fa fa-check"/> Correct
+                                    </t>
+                                    <t t-elif="resp.is_evaluated">
+                                        <i class="fa fa-times"/> Incorrect
+                                    </t>
+                                    <t t-else="">Pending</t>
+                                </span>
+                                <span class="badge bg-primary ms-1">
+                                    <t t-esc="resp.marks_awarded"/> / <t t-esc="resp.max_marks"/> marks
+                                </span>
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-2"><t t-raw="resp.question_id.question_text"/></div>
+
+                            <!-- Show options for objective questions -->
+                            <t t-if="resp.question_type in ('mcq','true_false','multi_select')">
+                                <t t-foreach="resp.question_id.option_ids" t-as="opt">
+                                    <div t-attf-class="p-1 rounded mb-1 small #{opt.is_correct and 'bg-success bg-opacity-10 border border-success' or (opt.id in resp.selected_option_ids.ids and not opt.is_correct) and 'bg-danger bg-opacity-10 border border-danger' or ''}">
+                                        <i t-attf-class="fa #{opt.is_correct and 'fa-check-circle text-success' or (opt.id in resp.selected_option_ids.ids and not opt.is_correct) and 'fa-times-circle text-danger' or 'fa-circle-o text-muted'} me-1"/>
+                                        <t t-esc="opt.option_text"/>
+                                        <span t-if="opt.id in resp.selected_option_ids.ids and not opt.is_correct"
+                                              class="text-muted ms-1">(your answer)</span>
+                                    </div>
+                                </t>
+                            </t>
+
+                            <!-- Short answer -->
+                            <t t-if="resp.question_type == 'short_answer' and resp.text_answer">
+                                <div class="border rounded p-2 bg-light small mt-2">
+                                    <strong>Your answer:</strong><br/>
+                                    <t t-esc="resp.text_answer"/>
+                                </div>
+                            </t>
+
+                            <!-- Explanation -->
+                            <t t-if="resp.question_id.explanation">
+                                <div class="alert alert-info small mt-2 mb-0">
+                                    <i class="fa fa-lightbulb-o me-1"/>
+                                    <t t-raw="resp.question_id.explanation"/>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </t>
+            </t>
+
+            <div class="text-center mt-4">
+                <a href="/my/exams" class="btn btn-outline-primary">
+                    <i class="fa fa-arrow-left me-1"/> Back to Exams
+                </a>
+            </div>
+        </div>
+    </t>
+</template>
+
+</odoo>

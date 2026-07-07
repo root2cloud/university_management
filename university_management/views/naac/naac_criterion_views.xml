@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="naac_criterion_view_form" model="ir.ui.view">
+        <field name="name">naac.criterion.view.form</field>
+        <field name="model">naac.criterion</field>
+        <field name="arch" type="xml">
+            <form string="NAAC Criterion">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_view_activities" icon="fa-tasks">
+                            <field name="readiness_score" widget="statinfo" string="Readiness %"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_view_evidence" icon="fa-files-o">
+                            <field name="evidence_count" widget="statinfo" string="Evidence"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <span>Criterion </span><field name="criterion_number" class="d-inline"/><span>: </span>
+                            <field name="name" class="d-inline" placeholder="Criterion Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="weightage"/>
+                            <field name="achieved_metrics"/>
+                            <field name="total_metrics"/>
+                        </group>
+                        <group>
+                            <field name="readiness_score" widget="progressbar"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1"/>
+                        <field name="key_indicators" nolabel="1" placeholder="List key indicators..."/>
+                    </group>
+                    <notebook>
+                        <page string="Metrics / Key Indicators" name="metrics">
+                            <field name="metric_ids" nolabel="1">
+                                <list editable="bottom">
+                                    <field name="metric_code"/>
+                                    <field name="name"/>
+                                    <field name="unit"/>
+                                    <field name="target_value"/>
+                                    <field name="actual_value"/>
+                                    <field name="achievement_pct" widget="progressbar"/>
+                                    <field name="status" widget="badge"
+                                           decoration-success="status == 'achieved'"
+                                           decoration-warning="status == 'in_progress'"
+                                           decoration-danger="status == 'not_started'"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Activities" name="activities">
+                            <field name="activity_ids" nolabel="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="department_id"/>
+                                    <field name="activity_type"/>
+                                    <field name="activity_date"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="naac_criterion_view_list" model="ir.ui.view">
+        <field name="name">naac.criterion.view.list</field>
+        <field name="model">naac.criterion</field>
+        <field name="arch" type="xml">
+            <list string="NAAC Criteria">
+                <field name="criterion_number"/>
+                <field name="name"/>
+                <field name="weightage"/>
+                <field name="total_metrics"/>
+                <field name="achieved_metrics"/>
+                <field name="readiness_score" widget="progressbar"/>
+                <field name="evidence_count"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="naac_criterion_view_kanban" model="ir.ui.view">
+        <field name="name">naac.criterion.view.kanban</field>
+        <field name="model">naac.criterion</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="criterion_number"/>
+                <field name="name"/>
+                <field name="readiness_score"/>
+                <field name="evidence_count"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong>
+                                            Criterion <field name="criterion_number"/>
+                                        </strong>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <strong><field name="name"/></strong>
+                                    <div class="mt-2">
+                                        <div class="progress" style="height: 10px;">
+                                            <div class="progress-bar bg-success"
+                                                 t-attf-style="width: #{record.readiness_score.raw_value}%"/>
+                                        </div>
+                                        <small><field name="readiness_score"/>% Ready</small>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <span class="badge badge-secondary">
+                                        <field name="evidence_count"/> Evidence
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="naac_criterion_view_search" model="ir.ui.view">
+        <field name="name">naac.criterion.view.search</field>
+        <field name="model">naac.criterion</field>
+        <field name="arch" type="xml">
+            <search string="Search Criteria">
+                <field name="name"/>
+                <field name="criterion_number"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="naac_criterion_view_graph" model="ir.ui.view">
+        <field name="name">naac.criterion.view.graph</field>
+        <field name="model">naac.criterion</field>
+        <field name="arch" type="xml">
+            <graph string="Criteria Readiness" type="bar">
+                <field name="criterion_number" type="row"/>
+                <field name="readiness_score" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="naac_criterion_view_pivot" model="ir.ui.view">
+        <field name="name">naac.criterion.view.pivot</field>
+        <field name="model">naac.criterion</field>
+        <field name="arch" type="xml">
+            <pivot string="Criteria Pivot">
+                <field name="criterion_number" type="row"/>
+                <field name="readiness_score" type="measure"/>
+                <field name="achieved_metrics" type="measure"/>
+                <field name="total_metrics" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_naac_criterion" model="ir.actions.act_window">
+        <field name="name">NAAC Criteria</field>
+        <field name="res_model">naac.criterion</field>
+        <field name="view_mode">kanban,list,graph,pivot,form</field>
+        <field name="search_view_id" ref="naac_criterion_view_search"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="student_parent_view_form" model="ir.ui.view">
+        <field name="name">student.parent.view.form</field>
+        <field name="model">student.parent</field>
+        <field name="arch" type="xml">
+            <form string="Parent/Guardian Details">
+                <header>
+                    <button name="action_create_portal_user" string="Create Portal Access"
+                            type="object" class="oe_highlight"
+                            invisible="has_portal_access or not email"
+                            confirm="This will create a portal user account for this parent. Continue?"/>
+                </header>
+                <sheet>
+                    <field name="photo" widget="image" class="oe_avatar"/>
+
+                    <div class="oe_title">
+                        <label for="name" string="Parent/Guardian Name"/>
+                        <h1>
+                            <field name="name" placeholder="Enter full name" required="1"/>
+                        </h1>
+                        <div class="o_row">
+                            <field name="relationship"/>
+                            <span class="ml-2">of</span>
+                            <field name="student_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"
+                                   placeholder="Select Student"/>
+                        </div>
+                    </div>
+
+                    <group>
+                        <group string="Contact Information">
+                            <field name="mobile" widget="phone" placeholder="+91-9876543210"/>
+                            <field name="phone" widget="phone" placeholder="+91-11-12345678"/>
+                            <field name="email" widget="email" placeholder="parent@example.com"/>
+                            <field name="office_phone" widget="phone" placeholder="Office phone"/>
+                        </group>
+                        <group string="Contact Preferences">
+                            <field name="is_primary_contact" widget="boolean_toggle"/>
+                            <field name="is_emergency_contact" widget="boolean_toggle"/>
+                            <field name="contact_time_preference"/>
+                            <field name="is_alive" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Professional Information">
+                            <field name="occupation" placeholder="e.g., Engineer, Doctor, Teacher"/>
+                            <field name="company_name" placeholder="Company/Organization name"/>
+                            <field name="designation" placeholder="Job designation/title"/>
+                            <field name="annual_income" widget="monetary"
+                                   options="{'currency_field': 'currency_id'}"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="Education &amp; Identity">
+                            <field name="education_qualification"
+                                   placeholder="e.g., B.Tech, MBA, Ph.D."/>
+                            <field name="aadhar_number" placeholder="12-digit Aadhar number"/>
+                            <field name="pan_number" placeholder="PAN: ABCDE1234F"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Address Details" name="address">
+                            <group>
+                                <group string="Home Address">
+                                    <field name="street" placeholder="Street Address"/>
+                                    <field name="street2" placeholder="Street Address 2"/>
+                                    <field name="city" placeholder="City"/>
+                                    <field name="state_id" placeholder="State"/>
+                                    <field name="zip" placeholder="PIN Code"/>
+                                    <field name="country_id" placeholder="Country"/>
+                                </group>
+                                <group string="Office Address">
+                                    <field name="office_address"
+                                           placeholder="Enter complete office address with city and PIN code..."/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Portal Access" name="portal">
+                            <group>
+                                <group>
+                                    <field name="has_portal_access" widget="boolean" readonly="1"/>
+                                    <field name="user_id" readonly="1"/>
+                                </group>
+                            </group>
+                            <div class="alert alert-info" role="alert"
+                                 invisible="has_portal_access">
+                                <p>
+                                    <strong>No Portal Access Yet</strong>
+                                </p>
+                                <p>
+                                    Click "Create Portal Access" button to create a portal account
+                                    for this parent. They will be able to:
+                                </p>
+                                <ul>
+                                    <li>View student academic records</li>
+                                    <li>Track attendance and performance</li>
+                                    <li>Receive notifications about fees and events</li>
+                                    <li>Communicate with faculty</li>
+                                </ul>
+                            </div>
+                            <div class="alert alert-success" role="alert"
+                                 invisible="not has_portal_access">
+                                <p>
+                                    <i class="fa fa-check-circle"/>
+                                    <strong>Portal Access Active</strong>
+                                </p>
+                                <p>
+                                    This parent can login to the parent portal using:
+                                    <strong><field name="email" readonly="1"/></strong>
+                                </p>
+                            </div>
+                        </page>
+
+                        <page string="Notes" name="notes">
+                            <field name="notes"
+                                   placeholder="Enter any additional information about the parent/guardian..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="student_parent_view_list" model="ir.ui.view">
+        <field name="name">student.parent.view.list</field>
+        <field name="model">student.parent</field>
+        <field name="arch" type="xml">
+            <list string="Parents/Guardians"
+                  multi_edit="1"
+                  sample="1">
+                <field name="photo" widget="image" optional="show"/>
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="relationship"/>
+                <field name="mobile" widget="phone" optional="show"/>
+                <field name="email" widget="email" optional="show"/>
+                <field name="occupation" optional="hide"/>
+                <field name="education_qualification" optional="hide"/>
+                <field name="annual_income" widget="monetary" optional="hide"/>
+                <field name="is_primary_contact" widget="boolean_toggle" optional="show"/>
+                <field name="is_emergency_contact" widget="boolean_toggle" optional="show"/>
+                <field name="has_portal_access" widget="boolean_toggle" optional="show"/>
+                <field name="is_alive" widget="boolean_toggle" optional="hide"/>
+                <field name="contact_time_preference" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="student_parent_view_search" model="ir.ui.view">
+        <field name="name">student.parent.view.search</field>
+        <field name="model">student.parent</field>
+        <field name="arch" type="xml">
+            <search string="Search Parents/Guardians">
+                <field name="name" string="Parent Name"
+                       filter_domain="['|', ('name', 'ilike', self), ('mobile', 'ilike', self)]"/>
+                <field name="student_id"/>
+                <field name="student_name"/>
+                <field name="mobile"/>
+                <field name="email"/>
+                <field name="relationship"/>
+
+                <separator/>
+
+                <filter name="filter_father" string="Father"
+                        domain="[('relationship', '=', 'father')]"/>
+                <filter name="filter_mother" string="Mother"
+                        domain="[('relationship', '=', 'mother')]"/>
+                <filter name="filter_guardian" string="Guardian"
+                        domain="[('relationship', '=', 'guardian')]"/>
+
+                <separator/>
+
+                <filter name="filter_primary" string="Primary Contact"
+                        domain="[('is_primary_contact', '=', True)]"/>
+                <filter name="filter_emergency" string="Emergency Contact"
+                        domain="[('is_emergency_contact', '=', True)]"/>
+
+                <separator/>
+
+                <filter name="filter_portal_access" string="Has Portal Access"
+                        domain="[('has_portal_access', '=', True)]"/>
+                <filter name="filter_no_portal" string="No Portal Access"
+                        domain="[('has_portal_access', '=', False)]"/>
+
+                <separator/>
+
+                <filter name="filter_alive" string="Alive"
+                        domain="[('is_alive', '=', True)]"/>
+                <filter name="filter_deceased" string="Deceased"
+                        domain="[('is_alive', '=', False)]"/>
+
+                <separator/>
+
+                <filter name="filter_has_email" string="Has Email"
+                        domain="[('email', '!=', False)]"/>
+                <filter name="filter_has_mobile" string="Has Mobile"
+                        domain="[('mobile', '!=', False)]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_student" string="Student"
+                            context="{'group_by': 'student_id'}"/>
+                    <filter name="group_by_relationship" string="Relationship"
+                            context="{'group_by': 'relationship'}"/>
+                    <filter name="group_by_occupation" string="Occupation"
+                            context="{'group_by': 'occupation'}"/>
+                    <filter name="group_by_education" string="Education Qualification"
+                            context="{'group_by': 'education_qualification'}"/>
+                    <filter name="group_by_contact_time" string="Contact Time Preference"
+                            context="{'group_by': 'contact_time_preference'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="relationship" string="Relationship"
+                           select="multi"
+                           icon="fa-users"/>
+                    <field name="contact_time_preference" string="Contact Time"
+                           select="multi"
+                           icon="fa-clock-o"/>
+                    <field name="user_id" string="Portal User"
+                           select="multi"
+                           icon="fa-key"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="student_parent_view_kanban" model="ir.ui.view">
+        <field name="name">student.parent.view.kanban</field>
+        <field name="model">student.parent</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="relationship"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="photo"/>
+                <field name="student_id"/>
+                <field name="relationship"/>
+                <field name="mobile"/>
+                <field name="email"/>
+                <field name="occupation"/>
+                <field name="is_primary_contact"/>
+                <field name="is_emergency_contact"/>
+                <field name="has_portal_access"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <img t-att-src="kanban_image('student.parent', 'photo', record.id.raw_value)"
+                                     alt="Parent Photo"
+                                     class="o_image_64_max"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                        <div class="text-muted">
+                                            <field name="relationship"/> of <field name="student_id"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body">
+                                    <div class="row mb-2" t-if="record.mobile.raw_value">
+                                        <div class="col-12">
+                                            <i class="fa fa-phone text-primary"/>
+                                            <field name="mobile" widget="phone"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.email.raw_value">
+                                        <div class="col-12">
+                                            <i class="fa fa-envelope text-info"/>
+                                            <field name="email"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.occupation.raw_value">
+                                        <div class="col-12">
+                                            <i class="fa fa-briefcase text-success"/>
+                                            <field name="occupation"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-2">
+                                        <div class="col-6">
+                                            <span t-if="record.is_primary_contact.raw_value"
+                                                  class="badge text-bg-primary">
+                                                <i class="fa fa-star"/> Primary
+                                            </span>
+                                        </div>
+                                        <div class="col-6">
+                                            <span t-if="record.is_emergency_contact.raw_value"
+                                                  class="badge text-bg-warning">
+                                                <i class="fa fa-exclamation-triangle"/> Emergency
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-2">
+                                        <div class="col-12">
+                                            <span t-if="record.has_portal_access.raw_value"
+                                                  class="badge text-bg-success">
+                                                <i class="fa fa-key"/> Portal Access
+                                            </span>
+                                            <span t-else="" class="badge text-bg-secondary">
+                                                <i class="fa fa-lock"/> No Portal
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="student_parent_view_pivot" model="ir.ui.view">
+        <field name="name">student.parent.view.pivot</field>
+        <field name="model">student.parent</field>
+        <field name="arch" type="xml">
+            <pivot string="Parent Analysis">
+                <field name="relationship" type="row"/>
+                <field name="occupation" type="row"/>
+                <field name="has_portal_access" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View -->
+    <record id="student_parent_view_graph" model="ir.ui.view">
+        <field name="name">student.parent.view.graph</field>
+        <field name="model">student.parent</field>
+        <field name="arch" type="xml">
+            <graph string="Parent Statistics" type="bar">
+                <field name="relationship"/>
+                <field name="occupation"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_student_parent" model="ir.actions.act_window">
+        <field name="name">Parents/Guardians</field>
+        <field name="res_model">student.parent</field>
+        <field name="view_mode">kanban,list,form,pivot,graph</field>
+        <field name="context">{
+            'search_default_filter_alive': 1,
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add your first Parent/Guardian Record
+            </p>
+            <p>
+                Manage parent and guardian information including contact details,
+                occupation, education, and portal access for parent communication.
+            </p>
+        </field>
+    </record>
+
+</odoo>

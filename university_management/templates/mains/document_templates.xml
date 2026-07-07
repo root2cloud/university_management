@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Downloads Page Template -->
+    <template id="downloads_page" name="Downloads Page">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure">
+                <div class="container mt-4">
+                    <!-- Page Header -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h1 class="display-4 text-center">
+                                <i class="fa fa-download me-2"></i>
+                                Documents &amp; Forms Download
+                            </h1>
+                            <p class="lead text-center text-muted">
+                                Download official documents, forms, and certificates
+                            </p>
+                            <p class="text-center text-muted small">
+                                <i class="fa fa-shield me-1"></i>
+                                Only verified documents are available for download
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Documents List -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0">
+                                        <i class="fa fa-file-text me-2"></i>
+                                        Available Documents
+                                        <span class="badge bg-light text-dark ms-2">
+                                            <t t-esc="len(documents)"/> documents
+                                        </span>
+                                    </h5>
+                                </div>
+
+                                <div class="list-group list-group-flush">
+                                    <t t-if="not documents">
+                                        <div class="list-group-item text-center py-5">
+                                            <div class="text-muted">
+                                                <i class="fa fa-folder-open fa-3x mb-3"></i>
+                                                <h4>No verified documents available for download</h4>
+                                                <p>Please check back later for verified documents.</p>
+                                            </div>
+                                        </div>
+                                    </t>
+
+                                    <t t-foreach="documents" t-as="doc">
+                                        <div class="list-group-item">
+                                            <div class="row align-items-center">
+                                                <!-- Document Icon and Info -->
+                                                <div class="col-md-8">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="me-3">
+                                                            <t t-if="doc.document_type == 'aadhar'">
+                                                                <i class="fa fa-id-card fa-2x text-primary"></i>
+                                                            </t>
+                                                            <t t-elif="doc.document_type == 'pan'">
+                                                                <i class="fa fa-credit-card fa-2x text-danger"></i>
+                                                            </t>
+                                                            <t t-elif="doc.document_type == 'birth_certificate'">
+                                                                <i class="fa fa-birthday-cake fa-2x text-info"></i>
+                                                            </t>
+                                                            <t t-elif="doc.document_type == 'tc'">
+                                                                <i class="fa fa-exchange fa-2x text-warning"></i>
+                                                            </t>
+                                                            <t t-elif="doc.document_type == 'cc'">
+                                                                <i class="fa fa-user-check fa-2x text-success"></i>
+                                                            </t>
+                                                            <t t-elif="doc.document_type == 'migration'">
+                                                                <i class="fa fa-plane fa-2x text-info"></i>
+                                                            </t>
+                                                            <t t-elif="doc.document_type == 'marksheet_10'">
+                                                                <i class="fa fa-file-text fa-2x text-primary"></i>
+                                                            </t>
+                                                            <t t-elif="doc.document_type == 'marksheet_12'">
+                                                                <i class="fa fa-file-text fa-2x text-success"></i>
+                                                            </t>
+                                                            <t t-elif="doc.document_type == 'degree'">
+                                                                <i class="fa fa-graduation-cap fa-2x text-warning"></i>
+                                                            </t>
+                                                            <t t-elif="doc.document_type == 'caste'">
+                                                                <i class="fa fa-users fa-2x text-purple"></i>
+                                                            </t>
+                                                            <t t-elif="doc.document_type == 'income'">
+                                                                <i class="fa fa-money fa-2x text-success"></i>
+                                                            </t>
+                                                            <t t-elif="doc.document_type == 'passport'">
+                                                                <i class="fa fa-globe fa-2x text-info"></i>
+                                                            </t>
+                                                            <t t-elif="doc.document_type == 'photo'">
+                                                                <i class="fa fa-camera fa-2x text-secondary"></i>
+                                                            </t>
+                                                            <t t-elif="doc.document_type == 'signature'">
+                                                                <i class="fa fa-pencil fa-2x text-dark"></i>
+                                                            </t>
+                                                            <t t-else="">
+                                                                <i class="fa fa-file fa-2x text-secondary"></i>
+                                                            </t>
+                                                        </div>
+                                                        <div>
+                                                            <h5 class="mb-1">
+                                                                <t t-esc="doc.name"/>
+                                                                <t t-if="doc.document_number">
+                                                                    <small class="text-muted ms-2">
+                                                                        (<t t-esc="doc.document_number"/>)
+                                                                    </small>
+                                                                </t>
+                                                            </h5>
+                                                            <div class="text-muted small">
+                                                                <span class="badge bg-light text-dark me-2">
+                                                                    <t t-if="doc.document_type == 'aadhar'">Aadhar Card</t>
+                                                                    <t t-elif="doc.document_type == 'pan'">PAN Card</t>
+                                                                    <t t-elif="doc.document_type == 'birth_certificate'">Birth Certificate</t>
+                                                                    <t t-elif="doc.document_type == 'tc'">Transfer Certificate</t>
+                                                                    <t t-elif="doc.document_type == 'cc'">Character Certificate</t>
+                                                                    <t t-elif="doc.document_type == 'migration'">Migration Certificate</t>
+                                                                    <t t-elif="doc.document_type == 'marksheet_10'">10th Marksheet</t>
+                                                                    <t t-elif="doc.document_type == 'marksheet_12'">12th Marksheet</t>
+                                                                    <t t-elif="doc.document_type == 'degree'">Degree Certificate</t>
+                                                                    <t t-elif="doc.document_type == 'caste'">Caste Certificate</t>
+                                                                    <t t-elif="doc.document_type == 'income'">Income Certificate</t>
+                                                                    <t t-elif="doc.document_type == 'passport'">Passport</t>
+                                                                    <t t-elif="doc.document_type == 'photo'">Passport Size Photo</t>
+                                                                    <t t-elif="doc.document_type == 'signature'">Signature</t>
+                                                                    <t t-else="">Other</t>
+                                                                </span>
+                                                                <t t-if="doc.issuing_authority">
+                                                                    <span class="me-2">
+                                                                        <i class="fa fa-building-o"></i>
+                                                                        <t t-esc="doc.issuing_authority"/>
+                                                                    </span>
+                                                                </t>
+                                                                <t t-if="doc.issue_date">
+                                                                    <span class="me-2">
+                                                                        <i class="fa fa-calendar"></i>
+                                                                        Issued: <t t-esc="doc.issue_date"/>
+                                                                    </span>
+                                                                </t>
+                                                                <t t-if="doc.expiry_date">
+                                                                    <span class="me-2">
+                                                                        <i class="fa fa-clock-o"></i>
+                                                                        Expires: <t t-esc="doc.expiry_date"/>
+                                                                    </span>
+                                                                </t>
+                                                            </div>
+                                                            <t t-if="doc.description">
+                                                                <p class="mt-2 mb-0 small">
+                                                                    <t t-esc="doc.description"/>
+                                                                </p>
+                                                            </t>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Download Button and File Info -->
+                                                <div class="col-md-4 text-end">
+                                                    <div class="d-flex align-items-center justify-content-end">
+                                                        <div class="me-3 text-muted small text-end">
+                                                            <div>
+                                                                <i class="fa fa-paperclip"></i>
+                                                                <t t-if="doc.attachment_name">
+                                                                    <span t-att-title="doc.attachment_name">
+                                                                        <t t-esc="doc.attachment_name[:30]"/>
+                                                                        <t t-if="len(doc.attachment_name) > 30">...</t>
+                                                                    </span>
+                                                                </t>
+                                                                <t t-else="">
+                                                                    No file attached
+                                                                </t>
+                                                            </div>
+                                                            <div class="mt-1">
+                                                                <span class="badge bg-success">
+                                                                    <i class="fa fa-check"></i>
+                                                                    Verified
+                                                                    <t t-if="doc.verified_by">
+                                                                        by <t t-esc="doc.verified_by.name"/>
+                                                                    </t>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <a t-att-href="'/download/%s?download_success=true' % doc.id"
+                                                               class="btn btn-primary"
+                                                               title="Download Document"
+                                                               t-att-disabled="not doc.attachment_id">
+                                                                <i class="fa fa-download"></i>
+                                                                Download
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Verification Information -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <h6 class="alert-heading">
+                                    <i class="fa fa-info-circle me-2"></i>
+                                    Document Verification Process
+                                </h6>
+                                <ul class="mb-0">
+                                    <li>Only verified documents are available for public download</li>
+                                    <li>Documents are verified by:
+                                        <t t-foreach="documents.mapped('verified_by').filtered(lambda x: x)" t-as="verifier">
+                                            <span class="badge bg-secondary ms-1">
+                                                <t t-esc="verifier.name"/>
+                                            </span>
+                                        </t>
+                                    </li>
+                                    <li>Verification date:
+                                        <t t-foreach="documents.mapped('verification_date')" t-as="date">
+                                            <t t-if="date">
+                                                <span class="badge bg-light text-dark ms-1">
+                                                    <t t-esc="date"/>
+                                                </span>
+                                            </t>
+                                        </t>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Statistics -->
+                    <div class="row mt-3">
+                        <div class="col-md-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h2 class="text-primary">
+                                        <t t-esc="len(documents)"/>
+                                    </h2>
+                                    <p class="text-muted mb-0">Total Documents</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h2 class="text-success">
+                                        <t t-esc="len([d for d in documents if d.is_mandatory])"/>
+                                    </h2>
+                                    <p class="text-muted mb-0">Mandatory Documents</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h2 class="text-warning">
+                                        <t t-esc="len(set(documents.mapped('document_type')))"/>
+                                    </h2>
+                                    <p class="text-muted mb-0">Document Types</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Download Success Popup - standalone alert rendered directly, no layout inheritance needed -->
+    <template id="download_success_popup" name="Download Success Popup">
+        <t t-if="request.params.get('download_success')">
+            <div class="alert alert-success alert-dismissible fade show fixed-top m-3" role="alert" style="z-index: 10000;">
+                <i class="fa fa-check-circle me-2"></i>
+                Document downloaded successfully!
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </t>
+    </template>
+</odoo>

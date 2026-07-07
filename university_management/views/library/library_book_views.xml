@@ -1,0 +1,806 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View - Library Book -->
+    <record id="library_book_view_form" model="ir.ui.view">
+        <field name="name">library.book.view.form</field>
+        <field name="model">library.book</field>
+        <field name="arch" type="xml">
+            <form string="Library Book">
+                <header>
+                    <button name="action_make_available" string="Make Available"
+                        type="object" class="oe_highlight"
+                        invisible="state not in ['draft', 'maintenance', 'lost', 'damaged']"/>
+                    <button name="action_maintenance" string="Under Maintenance"
+                            type="object" class="btn-warning"
+                            invisible="state not in ['available', 'issued', 'reserved']"/>
+                    <button name="action_mark_lost" string="Mark Lost"
+                            type="object" class="btn-danger"
+                            invisible="state in ['lost', 'damaged', 'draft', 'maintenance']"/>
+                    <button name="action_mark_damaged" string="Mark Damaged"
+                            type="object" class="btn-warning"
+                            invisible="state in ['lost', 'damaged', 'draft', 'maintenance']"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft"
+                            type="object" class="btn-default"
+                            invisible="state == 'draft'"
+                            confirm="Are you sure you want to reset this book to draft?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,available,issued,reserved,maintenance,lost,damaged"/>
+                </header>
+                <sheet>
+                    <!-- Stat buttons -->
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_digital_versions"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-laptop"
+                                invisible="not has_digital">
+                            <field name="digital_count"
+                                   widget="statinfo"
+                                   string="Digital Versions"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Draft" bg_color="text-bg-secondary"
+                            invisible="state != 'draft'"/>
+                    <widget name="web_ribbon" title="Out of Stock" bg_color="text-bg-danger"
+                            invisible="available_copies &gt; 0"/>
+                    <widget name="web_ribbon" title="Low Stock" bg_color="text-bg-warning"
+                            invisible="available_copies == 0 or available_copies &gt; 3"/>
+                    <widget name="web_ribbon" title="Lost" bg_color="text-bg-danger"
+                            invisible="state != 'lost'"/>
+                    <widget name="web_ribbon" title="Damaged" bg_color="text-bg-warning"
+                            invisible="state != 'damaged'"/>
+                    <widget name="web_ribbon" title="Maintenance" bg_color="text-bg-info"
+                            invisible="state != 'maintenance'"/>
+
+                    <field name="cover_image" widget="image"
+                           class="oe_avatar"
+                           options="{'preview_image': 'cover_image', 'size': [150, 200]}"/>
+
+                    <div class="oe_title">
+                        <label for="title" string="Book Title"/>
+                        <h1>
+                            <field name="title" placeholder="Enter book title..."/>
+                        </h1>
+                        <h3>
+                            <field name="subtitle" placeholder="Subtitle (optional)"/>
+                        </h3>
+                    </div>
+
+                    <group>
+                        <group string="Book Identification">
+                            <field name="isbn" placeholder="e.g., 978-3-16-148410-0"/>
+                            <field name="isbn13" placeholder="e.g., 978-3-16-148410-0"/>
+                            <field name="product_id" invisible="1"/>
+                        </group>
+                        <group string="Availability Status">
+                            <field name="total_copies"/>
+                            <field name="available_copies" readonly="1"/>
+                            <field name="issued_copies" readonly="1"/>
+                            <field name="reserved_copies" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Author Details">
+                            <field name="author_ids" widget="many2many_tags"
+                                   options="{'color_field': 'color', 'no_create_edit': True}"/>
+                            <field name="primary_author" readonly="1"/>
+                        </group>
+                        <group string="Publisher Information">
+                            <field name="publisher_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"
+                                   domain="[('is_company', '=', True)]"/>
+                            <field name="publication_year" placeholder="e.g., 2024"/>
+                            <field name="edition" placeholder="e.g., 1st, 2nd, 3rd"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Classification">
+                            <field name="category_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="subject" placeholder="e.g., Computer Science"/>
+                            <field name="language"/>
+                            <field name="subject_ids" widget="many2many_tags"/>
+                        </group>
+                        <group string="Physical Details">
+                            <field name="pages" placeholder="Number of pages"/>
+                            <field name="binding_type"/>
+                        </group>
+                    </group>
+
+                    <group string="Location">
+                        <group>
+                            <field name="rack_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="code_id" placeholder="e.g., A1-B2-C3"/>
+                        </group>
+                    </group>
+
+                    <group string="Purchase Details">
+                        <group>
+                            <field name="purchase_date" widget="date"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="purchase_price" widget="monetary"/>
+                        </group>
+                        <group>
+                            <field name="vendor_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"
+                                   domain="[('supplier_rank', '&gt;', 0)]"/>
+                        </group>
+                    </group>
+
+                    <!-- OPAC & Digital group -->
+                    <group string="OPAC &amp; Digital">
+                        <group>
+                            <field name="opac_visible"/>
+                            <field name="has_digital" readonly="1"/>
+                            <field name="tags" placeholder="comma-separated keywords..."/>
+                        </group>
+                        <group>
+                            <field name="opac_description"
+                                   placeholder="Short abstract shown in OPAC search results..."/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Description" name="description">
+                            <field name="description" nolabel="1"
+                                   placeholder="Enter book description, summary, or abstract..."/>
+                        </page>
+
+                        <page string="Issue History" name="issue_history">
+                            <field name="issue_ids" nolabel="1">
+                                <list string="Issue Records"
+                                      decoration-danger="state == 'overdue'"
+                                      decoration-success="state == 'returned'"
+                                      decoration-info="state == 'issued'">
+                                    <field name="member_id"/>
+                                    <field name="issue_date"/>
+                                    <field name="due_date"/>
+                                    <field name="return_date"/>
+                                    <field name="overdue_days" optional="hide"/>
+                                    <field name="fine_amount" optional="show" widget="monetary"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'returned'"
+                                           decoration-danger="state == 'overdue'"
+                                           decoration-info="state == 'issued'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Reservations" name="reservations">
+                            <field name="reservation_ids" nolabel="1">
+                                <list string="Reservation Records"
+                                      decoration-info="state == 'reserved'"
+                                      decoration-success="state == 'issued'"
+                                      decoration-muted="state in ['cancelled', 'expired']">
+                                    <field name="member_id"/>
+                                    <field name="reservation_date"/>
+                                    <field name="expiry_date"/>
+                                    <field name="state" widget="badge"
+                                           decoration-info="state == 'reserved'"
+                                           decoration-success="state == 'issued'"
+                                           decoration-danger="state == 'expired'"
+                                           decoration-muted="state == 'cancelled'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <!-- Digital Versions tab -->
+                        <page string="Digital Versions" name="digital_versions">
+                            <field name="digital_resource_ids">
+                                <list>
+                                    <field name="code" readonly="1"/>
+                                    <field name="title"/>
+                                    <field name="resource_type" widget="badge"/>
+                                    <field name="collection_id"/>
+                                    <field name="access_type" widget="badge"/>
+                                    <field name="content_type" widget="badge"/>
+                                    <field name="total_access_count"/>
+                                    <field name="is_available" widget="boolean"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'published'"
+                                           decoration-muted="state == 'draft'"
+                                           decoration-warning="state == 'archived'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Statistics" name="statistics">
+                            <group>
+                                <group string="Circulation Stats">
+                                    <label for="issue_ids"/>
+                                    <div>
+                                        <field name="issue_ids" readonly="1" nolabel="1"
+                                               widget="statinfo"
+                                               string="Total Issues"/>
+                                    </div>
+                                    <label for="reservation_ids"/>
+                                    <div>
+                                        <field name="reservation_ids" readonly="1" nolabel="1"
+                                               widget="statinfo"
+                                               string="Total Reservations"/>
+                                    </div>
+                                </group>
+                                <group string="Inventory Summary">
+                                    <div class="o_td_label">
+                                        <label for="total_copies" string="Total Copies"/>
+                                    </div>
+                                    <div>
+                                        <h2><field name="total_copies" readonly="1" nolabel="1"/></h2>
+                                    </div>
+                                    <div class="o_td_label">
+                                        <label for="available_copies" string="Available Now"/>
+                                    </div>
+                                    <div>
+                                        <h2 class="text-success">
+                                            <field name="available_copies" readonly="1" nolabel="1"/>
+                                        </h2>
+                                    </div>
+                                </group>
+                            </group>
+
+                            <separator string="Visual Inventory Summary"/>
+                            <div class="row mt-3">
+                                <div class="col-md-12">
+                                    <div class="progress mb-2" style="height: 40px;">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: 100%;">
+                                            <strong>
+                                                Available: <field name="available_copies" readonly="1"/>
+                                                (<field name="available_pct" readonly="1"/>%)
+                                            </strong>
+                                        </div>
+                                    </div>
+                                    <div class="progress mb-2" style="height: 40px;">
+                                        <div class="progress-bar bg-primary" role="progressbar" style="width: 100%;">
+                                            <strong>
+                                                Issued: <field name="issued_copies" readonly="1"/>
+                                                (<field name="issued_pct" readonly="1"/>%)
+                                            </strong>
+                                        </div>
+                                    </div>
+                                    <div class="progress mb-2" style="height: 40px;">
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 100%;">
+                                            <strong>
+                                                Reserved: <field name="reserved_copies" readonly="1"/>
+                                                (<field name="reserved_pct" readonly="1"/>%)
+                                            </strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View - Library Book -->
+    <record id="library_book_view_list" model="ir.ui.view">
+        <field name="name">library.book.view.list</field>
+        <field name="model">library.book</field>
+        <field name="arch" type="xml">
+            <list string="Library Books"
+                  default_order="title"
+                  multi_edit="1"
+                  sample="1"
+                  decoration-success="state == 'available' and available_copies &gt; 3"
+                  decoration-warning="state == 'available' and available_copies &lt;= 3 and available_copies &gt; 0"
+                  decoration-danger="available_copies == 0 or state in ['lost', 'damaged']"
+                  decoration-info="state == 'reserved'">
+                <field name="cover_image" widget="image" optional="show"/>
+                <field name="title"/>
+                <field name="primary_author"/>
+                <field name="author_ids" widget="many2many_tags" optional="hide"/>
+                <field name="category_id"/>
+                <field name="isbn" optional="show"/>
+                <field name="publisher_id" optional="hide"/>
+                <field name="publication_year" optional="hide"/>
+                <field name="language" optional="hide"/>
+                <field name="binding_type" optional="hide"/>
+                <field name="total_copies" optional="show"/>
+                <field name="available_copies" optional="show"/>
+                <field name="issued_copies" optional="show"/>
+                <field name="reserved_copies" optional="hide"/>
+                <field name="rack_id" optional="show"/>
+                <field name="code_id" optional="show"/>
+                <field name="opac_visible" widget="boolean_toggle" optional="show"/>
+                <field name="has_digital" widget="boolean" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'available'"
+                       decoration-info="state == 'reserved'"
+                       decoration-warning="state in ['issued', 'maintenance']"
+                       decoration-danger="state in ['lost', 'damaged']"/>
+                <field name="active" widget="boolean_toggle" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View - Library Book -->
+    <record id="library_book_view_search" model="ir.ui.view">
+        <field name="name">library.book.view.search</field>
+        <field name="model">library.book</field>
+        <field name="arch" type="xml">
+            <search string="Search Books">
+                <field name="title"/>
+                <field name="isbn"/>
+                <field name="author_ids"/>
+                <field name="publisher_id"/>
+                <field name="category_id"/>
+                <field name="subject"/>
+                <field name="rack_id"/>
+                <field name="tags"/>
+                <field name="subject_ids"/>
+
+                <separator/>
+
+                <filter name="filter_draft" string="Draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_available" string="Available"
+                        domain="[('state', '=', 'available'), ('available_copies', '&gt;', 0)]"/>
+                <filter name="filter_issued" string="Issued"
+                        domain="[('state', '=', 'issued')]"/>
+                <filter name="filter_reserved" string="Reserved"
+                        domain="[('state', '=', 'reserved')]"/>
+                <filter name="filter_maintenance" string="Under Maintenance"
+                        domain="[('state', '=', 'maintenance')]"/>
+                <filter name="filter_lost" string="Lost"
+                        domain="[('state', '=', 'lost')]"/>
+                <filter name="filter_damaged" string="Damaged"
+                        domain="[('state', '=', 'damaged')]"/>
+
+                <separator/>
+
+                <filter name="filter_out_of_stock" string="Out of Stock"
+                        domain="[('available_copies', '=', 0)]"/>
+                <filter name="filter_low_stock" string="Low Stock (≤3)"
+                        domain="[('available_copies', '&gt;', 0), ('available_copies', '&lt;=', 3)]"/>
+                <filter name="filter_in_stock" string="In Stock"
+                        domain="[('available_copies', '&gt;', 0)]"/>
+
+                <separator/>
+
+                <filter name="filter_hardcover" string="Hardcover"
+                        domain="[('binding_type', '=', 'hardcover')]"/>
+                <filter name="filter_paperback" string="Paperback"
+                        domain="[('binding_type', '=', 'paperback')]"/>
+                <filter name="filter_ebook" string="E-Book"
+                        domain="[('binding_type', '=', 'ebook')]"/>
+
+                <separator/>
+
+                <filter name="filter_opac_visible" string="Visible in OPAC"
+                        domain="[('opac_visible', '=', True)]"/>
+                <filter name="filter_has_digital" string="Has Digital Version"
+                        domain="[('has_digital', '=', True)]"/>
+
+                <separator/>
+
+                <filter name="filter_active" string="Active"
+                        domain="[('active', '=', True)]"/>
+                <filter name="filter_archived" string="Archived"
+                        domain="[('active', '=', False)]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_category" string="Category"
+                            context="{'group_by': 'category_id'}"/>
+                    <filter name="group_by_author" string="Primary Author"
+                            context="{'group_by': 'primary_author'}"/>
+                    <filter name="group_by_publisher" string="Publisher"
+                            context="{'group_by': 'publisher_id'}"/>
+                    <filter name="group_by_language" string="Language"
+                            context="{'group_by': 'language'}"/>
+                    <filter name="group_by_binding_type" string="Binding Type"
+                            context="{'group_by': 'binding_type'}"/>
+                    <filter name="group_by_rack" string="Rack Location"
+                            context="{'group_by': 'rack_id'}"/>
+                    <filter name="group_by_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_by_publication_year" string="Publication Year"
+                            context="{'group_by': 'publication_year'}"/>
+                    <filter name="group_by_has_digital" string="Has Digital"
+                            context="{'group_by': 'has_digital'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="category_id" string="Category"
+                           select="multi"
+                           icon="fa-bookmark"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View - Library Book -->
+    <record id="library_book_view_kanban" model="ir.ui.view">
+        <field name="name">library.book.view.kanban</field>
+        <field name="model">library.book</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="category_id"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="title"/>
+                <field name="subtitle"/>
+                <field name="cover_image"/>
+                <field name="isbn"/>
+                <field name="primary_author"/>
+                <field name="author_ids"/>
+                <field name="publisher_id"/>
+                <field name="publication_year"/>
+                <field name="category_id"/>
+                <field name="language"/>
+                <field name="binding_type"/>
+                <field name="total_copies"/>
+                <field name="available_copies"/>
+                <field name="issued_copies"/>
+                <field name="reserved_copies"/>
+                <field name="rack_id"/>
+                <field name="code_id"/>
+                <field name="state"/>
+                <field name="active"/>
+                <field name="has_digital"/>
+
+                <progressbar field="state"
+                             colors='{"draft": "secondary", "available": "success", "reserved": "info", "issued": "warning", "maintenance": "secondary", "lost": "danger", "damaged": "danger"}'/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="ribbon ribbon-top-right" t-if="record.state.raw_value == 'draft'">
+                                <span class="text-bg-secondary">Draft</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.available_copies.raw_value == 0 and record.state.raw_value != 'lost' and record.state.raw_value != 'damaged'">
+                                <span class="text-bg-danger">Out of Stock</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.available_copies.raw_value &gt; 0 and record.available_copies.raw_value &lt;= 3">
+                                <span class="text-bg-warning">Low Stock</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.state.raw_value == 'lost'">
+                                <span class="text-bg-danger">Lost</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.state.raw_value == 'damaged'">
+                                <span class="text-bg-warning">Damaged</span>
+                            </div>
+
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_top_left">
+                                        <field name="cover_image" widget="image"
+                                               options="{'size': [90, 120]}"
+                                               class="oe_avatar"/>
+                                    </div>
+                                    <div class="o_kanban_record_top_right ml-3 flex-grow-1">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="title"/>
+                                        </strong>
+                                        <div class="text-muted" t-if="record.subtitle.raw_value">
+                                            <field name="subtitle"/>
+                                        </div>
+                                        <div class="mt-2">
+                                            <i class="fa fa-user text-primary"/>
+                                            <field name="primary_author"/>
+                                        </div>
+                                        <div class="text-muted" t-if="record.isbn.raw_value">
+                                            <i class="fa fa-barcode text-info"/>
+                                            ISBN: <field name="isbn"/>
+                                        </div>
+                                        <div t-if="record.has_digital.raw_value" class="mt-1">
+                                            <span class="badge text-bg-info">
+                                                <i class="fa fa-laptop me-1"/>Digital Available
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body mt-3">
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded">
+                                                <div class="mb-1">
+                                                    <i class="fa fa-bookmark text-success"/>
+                                                    <field name="category_id"/>
+                                                </div>
+                                                <div class="mb-1" t-if="record.publisher_id.raw_value">
+                                                    <i class="fa fa-building text-info"/>
+                                                    <field name="publisher_id"/>
+                                                </div>
+                                                <div class="mb-1" t-if="record.publication_year.raw_value">
+                                                    <i class="fa fa-calendar text-warning"/>
+                                                    <field name="publication_year"/>
+                                                </div>
+                                                <div>
+                                                    <i class="fa fa-language text-primary"/>
+                                                    <field name="language"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-4 text-center">
+                                            <div class="card bg-secondary text-white">
+                                                <div class="card-body p-2">
+                                                    <h4 class="mb-0"><field name="total_copies"/></h4>
+                                                    <small>Total</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4 text-center">
+                                            <!-- Show green card if available_copies > 0 -->
+                                            <div t-if="record.available_copies.raw_value > 0" class="card text-white bg-success">
+                                                <div class="card-body p-2">
+                                                    <h4 class="mb-0"><field name="available_copies"/></h4>
+                                                    <small>Available</small>
+                                                </div>
+                                            </div>
+                                            <!-- Show red card if available_copies == 0 -->
+                                            <div t-if="record.available_copies.raw_value == 0" class="card text-white bg-danger">
+                                                <div class="card-body p-2">
+                                                    <h4 class="mb-0"><field name="available_copies"/></h4>
+                                                    <small>Available</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4 text-center">
+                                            <div class="card bg-primary text-white">
+                                                <div class="card-body p-2">
+                                                    <h4 class="mb-0"><field name="issued_copies"/></h4>
+                                                    <small>Issued</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar bg-success" role="progressbar" style="width: 100%;">
+                                                    <span>
+                                                        Avail: <field name="available_copies"/>
+                                                        (<field name="available_pct"/>%)
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="progress mt-1" style="height: 20px;">
+                                                <div class="progress-bar bg-primary" role="progressbar" style="width: 100%;">
+                                                    <span>
+                                                        Issued: <field name="issued_copies"/>
+                                                        (<field name="issued_pct"/>%)
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="progress mt-1" style="height: 20px;">
+                                                <div class="progress-bar bg-warning" role="progressbar" style="width: 100%;">
+                                                    <span>
+                                                        Resv: <field name="reserved_copies"/>
+                                                        (<field name="reserved_pct"/>%)
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row" t-if="record.rack_id.raw_value">
+                                        <div class="col-12">
+                                            <small class="text-muted">
+                                                <i class="fa fa-map-marker"/>
+                                                Location: <field name="rack_id"/>
+                                                <span t-if="record.code_id.raw_value"> - <field name="code_id"/></span>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom mt-2">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="state" widget="badge"
+                                               decoration-success="state == 'available'"
+                                               decoration-info="state == 'reserved'"
+                                               decoration-warning="state in ['issued', 'maintenance']"
+                                               decoration-danger="state in ['lost', 'damaged']"/>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Form View - Library Author -->
+    <record id="library_author_view_form" model="ir.ui.view">
+        <field name="name">library.author.view.form</field>
+        <field name="model">library.author</field>
+        <field name="arch" type="xml">
+            <form string="Author">
+                <sheet>
+                    <field name="photo" widget="image"
+                           class="oe_avatar"
+                           options="{'size': [100, 100]}"/>
+
+                    <div class="oe_title">
+                        <label for="name" string="Author Name"/>
+                        <h1>
+                            <field name="name" placeholder="Enter author name..."/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="total_books" readonly="1"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Biography" name="biography">
+                            <field name="biography" nolabel="1"
+                                   placeholder="Enter author biography..."/>
+                        </page>
+
+                        <page string="Books" name="books">
+                            <field name="book_ids" nolabel="1">
+                                <list string="Books">
+                                    <field name="title"/>
+                                    <field name="isbn"/>
+                                    <field name="category_id"/>
+                                    <field name="publication_year"/>
+                                    <field name="available_copies"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View - Library Author -->
+    <record id="library_author_view_list" model="ir.ui.view">
+        <field name="name">library.author.view.list</field>
+        <field name="model">library.author</field>
+        <field name="arch" type="xml">
+            <list string="Authors" default_order="name">
+                <field name="photo" widget="image" options="{'size': [40, 40]}"/>
+                <field name="name"/>
+                <field name="total_books" readonly="1"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_library_author" model="ir.actions.act_window">
+        <field name="name">Authors</field>
+        <field name="res_model">library.author</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add an Author
+            </p>
+            <p>
+                Manage book authors. Enter author name, upload photo, add biography (HTML).
+                View all books by author. System automatically counts total books.
+            </p>
+        </field>
+    </record>
+
+    <!-- Form View - Library Rack -->
+    <record id="library_rack_view_form" model="ir.ui.view">
+        <field name="name">library.rack.view.form</field>
+        <field name="model">library.rack</field>
+        <field name="arch" type="xml">
+            <form string="Library Rack">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="Rack Name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g., Rack A1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="location" placeholder="e.g., First Floor, East Wing"/>
+                            <field name="floor" placeholder="e.g., Ground Floor"/>
+                        </group>
+                        <group>
+                            <field name="capacity"/>
+                            <field name="total_books" readonly="1"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Books" name="books">
+                            <field name="book_ids" nolabel="1">
+                                <list string="Books">
+                                    <field name="title"/>
+                                    <field name="isbn"/>
+                                    <field name="primary_author"/>
+                                    <field name="category_id"/>
+                                    <field name="available_copies"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View - Library Rack -->
+    <record id="library_rack_view_list" model="ir.ui.view">
+        <field name="name">library.rack.view.list</field>
+        <field name="model">library.rack</field>
+        <field name="arch" type="xml">
+            <list string="Library Racks" default_order="name">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="location"/>
+                <field name="floor"/>
+                <field name="capacity"/>
+                <field name="total_books" readonly="1"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_library_rack" model="ir.actions.act_window">
+        <field name="name">Racks/Shelves</field>
+        <field name="res_model">library.rack</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add a Rack/Shelf
+            </p>
+            <p>
+                Manage library rack/shelf locations. Enter rack name, code, location, floor,
+                capacity. View all books in rack. System automatically counts total books.
+            </p>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_library_book" model="ir.actions.act_window">
+        <field name="name">Books</field>
+        <field name="res_model">library.book</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_filter_available': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add a New Book
+            </p>
+            <p>
+                Manage library book inventory with comprehensive cataloging. System integrates with
+                product.product for inventory management using _inherits. Enter book title (required),
+                subtitle, ISBN/ISBN-13 with validation (10 or 13 digits, unique constraint). Add
+                multiple authors via many2many relation. Primary author automatically computed from
+                first author. Select publisher from res.partner (company only), publication year,
+                edition. Choose category (library.category, required) and subject. Set language
+                (default English). Enter physical details: pages, binding type (hardcover/paperback/
+                spiral/ebook, default paperback). Manage inventory: total_copies (default 1),
+                available_copies (computed from issues/reservations), issued_copies, reserved_copies.
+                Set rack location (library.rack) and code_id for easy retrieval. Track purchase
+                details: date, price, vendor (supplier partners). View issue history (one2many to
+                library.issue) and reservations (one2many to library.reservation). 6-state system
+                computed from availability: Available (copies available), Issued (all copies issued),
+                Reserved (copies reserved), Under Maintenance, Lost, Damaged. Upload cover image.
+                Add HTML description. Full chatter support for communication.
+            </p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="naac_aqar_wizard_view_form" model="ir.ui.view">
+        <field name="name">naac.aqar.wizard.view.form</field>
+        <field name="model">naac.aqar.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate AQAR">
+                <group>
+                    <field name="academic_year_id" placeholder="e.g. 2024-25"/>
+                    <field name="from_date"/>
+                    <field name="to_date"/>
+                    <field name="institute_name"/>
+                    <field name="iqac_coordinator"/>
+                </group>
+                <footer>
+                    <button name="action_generate_aqar" string="Generate AQAR" type="object" class="btn-primary"/>
+                    <button string="Cancel" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_naac_aqar_wizard" model="ir.actions.act_window">
+        <field name="name">Generate New AQAR</field>
+        <field name="res_model">naac.aqar.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

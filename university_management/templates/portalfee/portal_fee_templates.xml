@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="portal_breadcrumbs_fees" inherit_id="portal.portal_breadcrumbs" priority="30">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'fees'" class="breadcrumb-item active">My Fees</li>
+            <li t-if="page_name == 'fee_detail'" class="breadcrumb-item">
+                <a href="/my/fees">My Fees</a>
+            </li>
+        </xpath>
+    </template>
+
+    <template id="portal_my_home_fees" inherit_id="portal.portal_my_home" priority="30">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">My Fees</t>
+                <t t-set="url">/my/fees</t>
+                <t t-set="text">Check fee invoices, outstanding balance, and payment history.</t>
+            </t>
+        </xpath>
+    </template>
+
+    <template id="portal_fee_no_student" name="Portal Fee No Student">
+        <t t-call="portal.portal_layout">
+            <div class="container py-5">
+                <div class="alert alert-warning text-center">
+                    <h4>No Student Record Found</h4>
+                    <p>Your portal user is not linked to any student record.</p>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- Fee List                                                       -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <template id="portal_my_fees" name="My Fees">
+        <t t-call="portal.portal_layout">
+            <div class="container py-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2 class="mb-1">My Fees</h2>
+                        <p class="text-muted mb-0">View your fee records and payment status</p>
+                    </div>
+                </div>
+                <t t-if="not fee_payments">
+                    <div class="alert alert-info">No fee records found.</div>
+                </t>
+                <t t-if="fee_payments">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Reference</th>
+                                            <th>Fee Structure</th>
+                                            <th>Total</th>
+                                            <th>Paid</th>
+                                            <th>Outstanding</th>
+                                            <th>Status</th>
+                                            <th class="text-end">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="fee_payments" t-as="fp">
+                                            <tr>
+                                                <td><span class="fw-semibold"><t t-esc="fp.name"/></span></td>
+                                                <td><t t-esc="fp.fee_structure_id.name"/></td>
+                                                <td>Rs.<t t-esc="'{:,.2f}'.format(fp.total_amount)"/></td>
+                                                <td class="text-success fw-semibold">Rs.<t t-esc="'{:,.2f}'.format(fp.amount_paid)"/></td>
+                                                <td class="text-danger fw-semibold">Rs.<t t-esc="'{:,.2f}'.format(fp.outstanding_amount)"/></td>
+                                                <td>
+                                                    <span t-att-class="'badge rounded-pill text-bg-success' if fp.state == 'paid' else 'badge rounded-pill text-bg-warning' if fp.state == 'partial' else 'badge rounded-pill text-bg-info' if fp.state == 'invoiced' else 'badge rounded-pill text-bg-secondary'">
+                                                        <t t-esc="fp.state"/>
+                                                    </span>
+                                                </td>
+                                                <td class="text-end">
+                                                    <a t-att-href="'/my/fees/' + str(fp.id)" class="btn btn-sm btn-outline-primary">View</a>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- Fee Detail                                                     -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <template id="portal_fee_detail" name="Fee Detail">
+        <t t-call="portal.portal_layout">
+            <div class="container py-4">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/my/home">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/my/fees">My Fees</a></li>
+                        <li class="breadcrumb-item active"><t t-esc="fee_payment.name"/></li>
+                    </ol>
+                </nav>
+
+                <!-- Alerts -->
+                <t t-if="error">
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        <i class="fa fa-exclamation-circle me-2"/>
+                        <t t-esc="error"/>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"/>
+                    </div>
+                </t>
+                <t t-if="success">
+                    <div class="alert alert-success alert-dismissible fade show">
+                        <i class="fa fa-check-circle me-2"/>
+                        <t t-esc="success"/>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"/>
+                    </div>
+                </t>
+
+                <div class="row g-4">
+
+                    <!-- ── LEFT COLUMN ── -->
+                    <div class="col-lg-8">
+
+                        <!-- Fee Details Card -->
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-header bg-light fw-semibold">
+                                <i class="fa fa-file-text-o me-2"/>Fee Details
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="text-muted small">Reference</div>
+                                        <div class="fw-semibold"><t t-esc="fee_payment.name"/></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="text-muted small">Student</div>
+                                        <div class="fw-semibold"><t t-esc="student.name"/></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="text-muted small">Fee Structure</div>
+                                        <div class="fw-semibold"><t t-esc="fee_payment.fee_structure_id.name"/></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="text-muted small">Invoice</div>
+                                        <div class="fw-semibold"><t t-esc="fee_payment.invoice_id.name or '-'"/></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="text-muted small">Due Date</div>
+                                        <div class="fw-semibold"><t t-esc="fee_payment.due_date or '-'"/></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="text-muted small">Status</div>
+                                        <span t-att-class="'badge rounded-pill text-bg-success' if fee_payment.state == 'paid' else 'badge rounded-pill text-bg-warning' if fee_payment.state == 'partial' else 'badge rounded-pill text-bg-info' if fee_payment.state == 'invoiced' else 'badge rounded-pill text-bg-secondary'">
+                                            <t t-esc="fee_payment.state"/>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Transaction History -->
+                        <t t-if="transactions">
+                            <div class="card border-0 shadow-sm mb-4">
+                                <div class="card-header bg-light fw-semibold">
+                                    <i class="fa fa-history me-2"/>Payment History
+                                </div>
+                                <div class="card-body p-0">
+                                    <table class="table table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Reference</th>
+                                                <th>Provider</th>
+                                                <th>Amount</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="transactions" t-as="tx">
+                                                <tr>
+                                                    <td><t t-esc="tx.reference"/></td>
+                                                    <td><t t-esc="tx.provider_id.name"/></td>
+                                                    <td>Rs.<t t-esc="'{:,.2f}'.format(tx.amount)"/></td>
+                                                    <td>
+                                                        <span t-att-class="'badge text-bg-success' if tx.state in ['done','authorized'] else 'badge text-bg-warning' if tx.state == 'pending' else 'badge text-bg-secondary'">
+                                                            <t t-esc="tx.state"/>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+
+                    <!-- ── RIGHT COLUMN ── -->
+                    <div class="col-lg-4">
+
+                        <!-- Payment Summary -->
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-header bg-light fw-semibold">
+                                <i class="fa fa-money me-2"/>Payment Summary
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Total Fee</span>
+                                    <span class="fw-semibold">Rs.<t t-esc="'{:,.2f}'.format(fee_payment.total_amount)"/></span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Amount Paid</span>
+                                    <span class="fw-semibold text-success">Rs.<t t-esc="'{:,.2f}'.format(fee_payment.amount_paid)"/></span>
+                                </div>
+                                <hr class="my-2"/>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span class="fw-bold">Outstanding</span>
+                                    <span t-att-class="'fw-bold fs-5 text-success' if fee_payment.outstanding_amount == 0 else 'fw-bold fs-5 text-danger'">
+                                        Rs.<t t-esc="'{:,.2f}'.format(fee_payment.outstanding_amount)"/>
+                                    </span>
+                                </div>
+                                <t t-if="fee_payment.total_amount > 0">
+                                    <div class="progress mb-1" style="height:10px;border-radius:5px;">
+                                        <div class="progress-bar bg-success"
+                                             t-att-style="'width:' + str(int(min(100,(fee_payment.amount_paid/fee_payment.total_amount)*100))) + '%'"/>
+                                    </div>
+                                    <small class="text-muted">
+                                        <t t-esc="int(min(100,(fee_payment.amount_paid/fee_payment.total_amount)*100))"/>% paid
+                                    </small>
+                                </t>
+                            </div>
+                        </div>
+
+                        <!-- ══════════════════════════════════════════ -->
+                        <!-- COMPONENT-WISE PAYMENT FORM               -->
+                        <!-- ══════════════════════════════════════════ -->
+                        <t t-if="fee_payment.outstanding_amount > 0 and fee_payment.state in ('invoiced', 'partial')">
+                            <div class="card border-0 shadow-sm" style="border:2px solid #0d6efd!important;">
+                                <div class="card-header fw-semibold bg-primary text-white">
+                                    <i class="fa fa-credit-card me-2"/>Make a Payment
+                                </div>
+                                <div class="card-body">
+
+                                    <t t-if="not payment_lines">
+                                        <div class="alert alert-warning mb-0">
+                                            Fee components not available. Please contact admin.
+                                        </div>
+                                    </t>
+
+                                    <t t-if="payment_lines">
+                                        <form method="POST"
+                                              t-att-action="'/my/fees/' + str(fee_payment.id) + '/pay'"
+                                              id="fee_payment_form">
+                                            <input type="hidden" name="csrf_token"
+                                                   t-att-value="request.csrf_token()"/>
+
+                                            <p class="text-muted small mb-3">
+                                                Enter the amount you want to pay for each component.
+                                                Leave blank to skip a component.
+                                            </p>
+
+                                            <!-- Component rows -->
+                                            <t t-foreach="payment_lines" t-as="line">
+                                                <div t-att-class="'mb-3 p-2 rounded ' + ('bg-light opacity-75' if line.state == 'paid' else '')">
+
+                                                    <!-- Component header -->
+                                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                                        <div>
+                                                            <span class="fw-semibold small">
+                                                                <t t-esc="line.name"/>
+                                                            </span>
+                                                            <t t-if="line.is_mandatory">
+                                                                <span class="badge text-bg-danger ms-1" style="font-size:0.65rem;">
+                                                                    Required
+                                                                </span>
+                                                            </t>
+                                                        </div>
+                                                        <!-- Component state badge -->
+                                                        <span t-att-class="'badge ' + ('text-bg-success' if line.state == 'paid' else 'text-bg-warning' if line.state == 'partial' else 'text-bg-secondary')">
+                                                            <t t-esc="line.state"/>
+                                                        </span>
+                                                    </div>
+
+                                                    <!-- Component amount info -->
+                                                    <div class="d-flex justify-content-between mb-1">
+                                                        <small class="text-muted">
+                                                            Total: Rs.<t t-esc="'{:,.0f}'.format(line.component_amount)"/>
+                                                        </small>
+                                                        <small t-att-class="'text-success' if line.outstanding_amount == 0 else 'text-danger'">
+                                                            Outstanding: Rs.<t t-esc="'{:,.0f}'.format(line.outstanding_amount)"/>
+                                                        </small>
+                                                    </div>
+
+                                                    <!-- Progress bar per component -->
+                                                    <t t-if="line.component_amount > 0">
+                                                        <div class="progress mb-2" style="height:4px;">
+                                                            <div class="progress-bar bg-success"
+                                                                 t-att-style="'width:' + str(int(min(100,(line.amount_paid/line.component_amount)*100))) + '%'"/>
+                                                        </div>
+                                                    </t>
+
+                                                    <!-- Amount input — hidden if already paid -->
+                                                    <t t-if="line.state != 'paid'">
+                                                        <div class="input-group input-group-sm">
+                                                            <span class="input-group-text">Rs.</span>
+                                                            <input type="number"
+                                                                   t-att-name="'component_amount_' + str(line.id)"
+                                                                   t-att-id="'comp_' + str(line.id)"
+                                                                   class="form-control component-input"
+                                                                   placeholder="0"
+                                                                   min="0"
+                                                                   t-att-max="line.outstanding_amount"
+                                                                   step="1"
+                                                                   t-att-data-outstanding="line.outstanding_amount"
+                                                                   t-att-data-name="line.name"/>
+                                                            <button type="button"
+                                                                    class="btn btn-outline-secondary btn-sm pay-full-btn"
+                                                                    t-att-data-input-id="'comp_' + str(line.id)"
+                                                                    t-att-data-amount="line.outstanding_amount"
+                                                                    title="Pay full outstanding">
+                                                                Full
+                                                            </button>
+                                                        </div>
+                                                    </t>
+                                                    <t t-if="line.state == 'paid'">
+                                                        <div class="text-success small fw-semibold">
+                                                            <i class="fa fa-check-circle me-1"/>Fully Paid
+                                                        </div>
+                                                    </t>
+                                                </div>
+                                                <hr class="my-2"/>
+                                            </t>
+
+                                            <!-- Total display -->
+                                            <div class="d-flex justify-content-between align-items-center mb-3 mt-2 p-2 bg-light rounded">
+                                                <span class="fw-bold">Total to Pay:</span>
+                                                <span class="fw-bold text-primary fs-5" id="grand_total_display">
+                                                    Rs.0
+                                                </span>
+                                            </div>
+
+                                            <!-- Submit -->
+                                            <button type="submit"
+                                                    class="btn btn-primary btn-lg w-100"
+                                                    id="submit_payment_btn"
+                                                    disabled="disabled">
+                                                <i class="fa fa-lock me-2"/>Proceed to Payment
+                                            </button>
+
+                                            <div class="text-center mt-2">
+                                                <small class="text-muted">
+                                                    <i class="fa fa-shield me-1"/>
+                                                    Secure payment. You will choose Demo or Razorpay on the next page.
+                                                </small>
+                                            </div>
+                                        </form>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+
+                        <!-- Fully Paid -->
+                        <t t-if="fee_payment.state == 'paid'">
+                            <div class="card border-0 shadow-sm" style="border:2px solid #198754!important;">
+                                <div class="card-body text-center py-4">
+                                    <i class="fa fa-check-circle fa-3x text-success mb-3"/>
+                                    <h5 class="text-success fw-bold">Fee Fully Paid!</h5>
+                                    <p class="text-muted mb-0">All fee components have been paid.</p>
+                                </div>
+                            </div>
+                        </t>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── JavaScript ── -->
+            <script type="text/javascript">
+                document.addEventListener('DOMContentLoaded', function () {
+                    const inputs = document.querySelectorAll('.component-input');
+                    const totalDisplay = document.getElementById('grand_total_display');
+                    const submitBtn = document.getElementById('submit_payment_btn');
+
+                    function updateTotal() {
+                        let total = 0;
+                        inputs.forEach(function (inp) {
+                            const val = parseFloat(inp.value) || 0;
+                            const max = parseFloat(inp.dataset.outstanding) || 0;
+                            if (val > 0 &amp;&amp; val &lt;= max) {
+                                total += val;
+                            }
+                        });
+                        if (totalDisplay) {
+                            totalDisplay.textContent = 'Rs.' + total.toLocaleString('en-IN', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 2
+                            });
+                        }
+                        if (submitBtn) {
+                            submitBtn.disabled = total &lt; 100;
+                        }
+                    }
+
+                    // Pay Full buttons
+                    document.querySelectorAll('.pay-full-btn').forEach(function (btn) {
+                        btn.addEventListener('click', function () {
+                            const inputId = this.dataset.inputId;
+                            const amount = parseFloat(this.dataset.amount) || 0;
+                            const input = document.getElementById(inputId);
+                            if (input) {
+                                input.value = Math.ceil(amount);
+                                updateTotal();
+                            }
+                        });
+                    });
+
+                    // Live total update
+                    inputs.forEach(function (inp) {
+                        inp.addEventListener('input', updateTotal);
+                        inp.addEventListener('change', updateTotal);
+                    });
+
+                    // Disable button on submit to prevent double click
+                    const form = document.getElementById('fee_payment_form');
+                    if (form) {
+                        form.addEventListener('submit', function () {
+                            if (submitBtn) {
+                                submitBtn.disabled = true;
+                                submitBtn.innerHTML = '&lt;i class="fa fa-spinner fa-spin me-2"/&gt;Redirecting...';
+                            }
+                        });
+                    }
+
+                    updateTotal();
+                });
+            </script>
+        </t>
+    </template>
+
+</odoo>

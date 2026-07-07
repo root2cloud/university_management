@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="university_management.NBADashboard">
+        <div class="o_nba_dashboard p-4" style="background:#f4f6fb; min-height:100vh;">
+
+            <!-- Loading -->
+            <t t-if="state.loading">
+                <div class="d-flex justify-content-center align-items-center" style="height:200px;">
+                    <div class="spinner-border text-primary" role="status"/>
+                    <span class="ms-3 text-muted">Loading NBA data…</span>
+                </div>
+            </t>
+
+            <t t-if="!state.loading">
+
+                <!-- ── Header ── -->
+                <div class="d-flex justify-content-between align-items-center mb-4"
+                     style="background:#003366; color:white; border-radius:12px; padding:20px 28px;">
+                    <div>
+                        <h3 class="mb-0" style="font-weight:700;">NBA SAR Dashboard</h3>
+                        <div style="font-size:0.85rem; opacity:0.85;">
+                            GAPC V4.0 – Tier I | <t t-esc="state.activeProgram or 'All Programs'"/>
+                        </div>
+                        <div style="font-size:0.8rem; opacity:0.7;">
+                            SAR: <t t-esc="state.activeSarName"/>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <div style="font-size:2.5rem; font-weight:800; line-height:1;">
+                            <t t-esc="state.totalScore"/>
+                        </div>
+                        <div style="font-size:0.75rem; opacity:0.8;">/ 1000 marks</div>
+                        <div style="font-size:1.1rem; font-weight:600; margin-top:4px;">
+                            <t t-esc="state.readinessPct"/>% Readiness
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Program Selector ── -->
+                <t t-if="state.sarList.length > 1">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Switch Program / SAR:</label>
+                        <select class="form-select w-auto d-inline-block ms-2"
+                                t-on-change="switchSar">
+                            <t t-foreach="state.sarList" t-as="sar" t-key="sar.id">
+                                <option t-att-value="sar.id"
+                                        t-att-selected="sar.id === state.activeSarId">
+                                    <t t-esc="sar.program"/> — <t t-esc="sar.name"/>
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                </t>
+
+                <!-- ── KPI Cards ── -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm text-center p-3" style="border-radius:10px;">
+                            <div style="font-size:2rem; font-weight:700; color:#003366;">
+                                <t t-esc="state.coCount"/>
+                            </div>
+                            <div class="text-muted" style="font-size:0.85rem;">COs Defined</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm text-center p-3" style="border-radius:10px;">
+                            <div style="font-size:2rem; font-weight:700; color:#17a2b8;">
+                                <t t-esc="state.researchCount"/>
+                            </div>
+                            <div class="text-muted" style="font-size:0.85rem;">Research / FDP Records</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm text-center p-3" style="border-radius:10px;">
+                            <div style="font-size:2rem; font-weight:700; color:#28a745;">
+                                <t t-esc="state.evidenceCount"/>
+                            </div>
+                            <div class="text-muted" style="font-size:0.85rem;">Evidence Documents</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm text-center p-3" style="border-radius:10px;">
+                            <div style="font-size:2rem; font-weight:700; color:#fd7e14;">
+                                <t t-esc="state.sarList.length"/>
+                            </div>
+                            <div class="text-muted" style="font-size:0.85rem;">Active SAR Records</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Criterion Score Cards ── -->
+                <div class="row g-2 mb-4">
+                    <t t-foreach="state.criterionScores" t-as="cs" t-key="cs.label">
+                        <div class="col-md-4 col-lg-3">
+                            <div class="card border-0 shadow-sm p-3" style="border-radius:10px;">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div style="font-size:0.78rem; font-weight:600; color:#555;">
+                                        <t t-esc="cs.label"/>
+                                    </div>
+                                    <span class="badge"
+                                          t-attf-style="background:{{ cs.status === 'green' ? '#28a745' : cs.status === 'orange' ? '#fd7e14' : '#dc3545' }}; font-size:0.7rem;">
+                                        <t t-esc="cs.pct"/>%
+                                    </span>
+                                </div>
+                                <div style="font-size:1.6rem; font-weight:800; color:#003366; margin-top:4px;">
+                                    <t t-esc="cs.score"/>
+                                    <span style="font-size:0.8rem; color:#999; font-weight:400;">/<t t-esc="cs.max"/></span>
+                                </div>
+                                <div class="progress mt-2" style="height:5px; border-radius:3px;">
+                                    <div class="progress-bar"
+                                         t-attf-style="width:{{ cs.pct }}%; background:{{ cs.status === 'green' ? '#28a745' : cs.status === 'orange' ? '#fd7e14' : '#dc3545' }}"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+
+                <!-- ── Radar Chart + Quick Actions ── -->
+                <div class="row g-3">
+                    <div class="col-md-7">
+                        <div class="card border-0 shadow-sm p-3" style="border-radius:10px;">
+                            <h6 class="fw-bold mb-3">Criterion Coverage — Radar View</h6>
+                            <canvas id="nba_radar_chart" height="280"/>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="card border-0 shadow-sm p-3 h-100" style="border-radius:10px;">
+                            <h6 class="fw-bold mb-3">Quick Actions</h6>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-primary" t-on-click="openSar">
+                                    📋 Open SAR Form
+                                </button>
+                                <button class="btn btn-outline-primary" t-on-click="openResearch">
+                                    🔬 Add Research / FDP
+                                </button>
+                                <button class="btn btn-outline-secondary" t-on-click="openEvidence">
+                                    📁 Upload Evidence
+                                </button>
+                            </div>
+                            <hr/>
+                            <h6 class="fw-bold">All SARs</h6>
+                            <div style="max-height:180px; overflow-y:auto;">
+                                <t t-foreach="state.sarList" t-as="sar" t-key="sar.id">
+                                    <div class="d-flex justify-content-between align-items-center py-1 border-bottom">
+                                        <div style="font-size:0.82rem;">
+                                            <strong><t t-esc="sar.name"/></strong><br/>
+                                            <span class="text-muted" style="font-size:0.75rem;"><t t-esc="sar.program"/></span>
+                                        </div>
+                                        <span class="badge"
+                                              t-attf-style="background:{{ sar.readiness >= 60 ? '#28a745' : sar.readiness >= 40 ? '#fd7e14' : '#dc3545' }}">
+                                            <t t-esc="sar.total"/>/1000
+                                        </span>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </t>
+        </div>
+    </t>
+
+</templates>

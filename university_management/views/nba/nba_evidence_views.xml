@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="nba_evidence_view_list" model="ir.ui.view">
+        <field name="name">nba.evidence.view.list</field>
+        <field name="model">nba.evidence</field>
+        <field name="arch" type="xml">
+            <list string="Evidence Vault" decoration-success="verified">
+                <field name="sar_id"/>
+                <field name="criterion"/>
+                <field name="sub_section"/>
+                <field name="name"/>
+                <field name="document_type"/>
+                <field name="document_file" widget="binary" filename="document_filename"/>
+                <field name="document_filename" column_invisible="1"/>
+                <field name="document_url" optional="show"/>
+                <field name="verified" widget="boolean_toggle"/>
+                <field name="upload_date"/>
+                <field name="uploaded_by"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="nba_evidence_view_form" model="ir.ui.view">
+        <field name="name">nba.evidence.view.form</field>
+        <field name="model">nba.evidence</field>
+        <field name="arch" type="xml">
+            <form string="Evidence Document">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="sar_id"/>
+                            <field name="criterion"/>
+                            <field name="sub_section"/>
+                            <field name="name"/>
+                            <field name="document_type"/>
+                        </group>
+                        <group>
+                            <field name="document_file" widget="binary" filename="document_filename"/>
+                            <field name="document_filename"/>
+                            <field name="document_url"/>
+                            <field name="verified"/>
+                            <field name="upload_date"/>
+                            <field name="uploaded_by"/>
+                        </group>
+                    </group>
+                    <group string="Notes">
+                        <field name="notes" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_nba_evidence" model="ir.actions.act_window">
+        <field name="name">Evidence Vault</field>
+        <field name="res_model">nba.evidence</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

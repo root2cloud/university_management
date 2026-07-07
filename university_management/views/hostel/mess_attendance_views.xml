@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View - Mess Attendance -->
+    <record id="mess_attendance_view_form" model="ir.ui.view">
+        <field name="name">mess.attendance.view.form</field>
+        <field name="model">mess.attendance</field>
+        <field name="arch" type="xml">
+            <form string="Mess Attendance">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="Reference"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Student &amp; Mess">
+                            <field name="student_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="mess_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                        </group>
+                        <group string="Meal Details">
+                            <field name="date"/>
+                            <field name="meal_type"/>
+                            <field name="present" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View - Mess Attendance -->
+    <record id="mess_attendance_view_list" model="ir.ui.view">
+        <field name="name">mess.attendance.view.list</field>
+        <field name="model">mess.attendance</field>
+        <field name="arch" type="xml">
+            <list string="Mess Attendance"
+                  default_order="date desc, student_id"
+                  multi_edit="1"
+                  sample="1"
+                  decoration-success="present == True"
+                  decoration-danger="present == False">
+                <field name="date"/>
+                <field name="student_id"/>
+                <field name="mess_id"/>
+                <field name="meal_type"/>
+                <field name="present" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View - Mess Attendance -->
+    <record id="mess_attendance_view_search" model="ir.ui.view">
+        <field name="name">mess.attendance.view.search</field>
+        <field name="model">mess.attendance</field>
+        <field name="arch" type="xml">
+            <search string="Search Mess Attendance">
+                <field name="student_id"/>
+                <field name="mess_id"/>
+                <field name="date"/>
+                <field name="meal_type"/>
+
+                <separator/>
+
+                <filter name="filter_today" string="Today"
+                        domain="[('date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_yesterday" string="Yesterday"
+                        domain="[('date', '=', (context_today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_this_week" string="This Week"
+                        domain="[('date', '&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_this_month" string="This Month"
+                        domain="[('date', '&gt;=', (context_today().replace(day=1)).strftime('%Y-%m-%d'))]"/>
+
+                <separator/>
+
+                <filter name="filter_present" string="Present"
+                        domain="[('present', '=', True)]"/>
+                <filter name="filter_absent" string="Absent"
+                        domain="[('present', '=', False)]"/>
+
+                <separator/>
+
+                <filter name="filter_breakfast" string="Breakfast"
+                        domain="[('meal_type', '=', 'breakfast')]"/>
+                <filter name="filter_lunch" string="Lunch"
+                        domain="[('meal_type', '=', 'lunch')]"/>
+                <filter name="filter_snacks" string="Snacks"
+                        domain="[('meal_type', '=', 'snacks')]"/>
+                <filter name="filter_dinner" string="Dinner"
+                        domain="[('meal_type', '=', 'dinner')]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_date" string="Date"
+                            context="{'group_by': 'date'}"/>
+                    <filter name="group_by_student" string="Student"
+                            context="{'group_by': 'student_id'}"/>
+                    <filter name="group_by_mess" string="Mess"
+                            context="{'group_by': 'mess_id'}"/>
+                    <filter name="group_by_meal_type" string="Meal Type"
+                            context="{'group_by': 'meal_type'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="mess_id" string="Mess"
+                           select="multi"
+                           icon="fa-cutlery"/>
+                    <field name="meal_type" string="Meal"
+                           select="multi"
+                           icon="fa-coffee"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View - Mess Attendance -->
+    <record id="mess_attendance_view_kanban" model="ir.ui.view">
+        <field name="name">mess.attendance.view.kanban</field>
+        <field name="model">mess.attendance</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="meal_type"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="mess_id"/>
+                <field name="date"/>
+                <field name="meal_type"/>
+                <field name="present"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="ribbon ribbon-top-right" t-if="record.present.raw_value">
+                                <span class="text-bg-success">Present</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="!record.present.raw_value">
+                                <span class="text-bg-danger">Absent</span>
+                            </div>
+
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <i class="fa fa-user text-primary"/> <field name="student_id"/>
+                                        </strong>
+                                        <div class="text-muted">
+                                            <i class="fa fa-calendar"/> <field name="date"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body mt-3">
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="card bg-primary text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h6 class="mb-0">
+                                                        <i class="fa fa-cutlery"/> <field name="meal_type"/>
+                                                    </h6>
+                                                    <small>Meal Type</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded">
+                                                <i class="fa fa-building text-info"/>
+                                                <strong>Mess:</strong> <field name="mess_id"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div t-if="record.present.raw_value" class="card bg-success text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h6 class="mb-0">
+                                                        <i class="fa fa-check-circle"/> Present
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                            <div t-if="!record.present.raw_value" class="card bg-danger text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h6 class="mb-0">
+                                                        <i class="fa fa-times-circle"/> Absent
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Calendar View - Mess Attendance -->
+    <record id="mess_attendance_view_calendar" model="ir.ui.view">
+        <field name="name">mess.attendance.view.calendar</field>
+        <field name="model">mess.attendance</field>
+        <field name="arch" type="xml">
+            <calendar string="Mess Attendance Calendar"
+                      date_start="date"
+                      mode="month"
+                      color="meal_type"
+                      quick_create="0"
+                      event_limit="5">
+                <field name="student_id"/>
+                <field name="meal_type"/>
+                <field name="mess_id"/>
+                <field name="present"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Pivot View - Mess Attendance -->
+    <record id="mess_attendance_view_pivot" model="ir.ui.view">
+        <field name="name">mess.attendance.view.pivot</field>
+        <field name="model">mess.attendance</field>
+        <field name="arch" type="xml">
+            <pivot string="Mess Attendance Analysis">
+                <field name="date" type="row" interval="day"/>
+                <field name="meal_type" type="col"/>
+                <field name="present" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View - Mess Attendance -->
+    <record id="mess_attendance_view_graph" model="ir.ui.view">
+        <field name="name">mess.attendance.view.graph</field>
+        <field name="model">mess.attendance</field>
+        <field name="arch" type="xml">
+            <graph string="Mess Attendance Statistics" type="bar">
+                <field name="date" interval="day"/>
+                <field name="present" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_mess_attendance" model="ir.actions.act_window">
+        <field name="name">Mess Attendance</field>
+        <field name="res_model">mess.attendance</field>
+        <field name="view_mode">kanban,list,form,calendar,pivot,graph</field>
+        <field name="context">{'search_default_filter_today': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Mark Mess Attendance
+            </p>
+            <p>
+                Track mess/meal attendance for students. System computes name (stored reference:
+                "Student Name - Date - Meal Type", e.g., "John Doe - 2025-12-31 - Breakfast"). Select
+                student_id (Many2one to student.student, required, indexed, no-create). Select mess_id
+                (Many2one to hostel.mess, required, no-create). Enter date (date, default today, required,
+                indexed). Select meal_type (4 options, required): Breakfast (morning meal), Lunch
+                (afternoon meal), Snacks (evening snacks), Dinner (night meal). Mark present (boolean,
+                default True, toggle widget): True (student ate meal), False (student did not eat). System
+                enforces unique constraint: One record per student + date + meal_type (cannot mark same
+                meal twice). List view shows 2-color row decorations: Green (present=True), Red
+                (present=False). Kanban view shows dynamic double ribbon: Green "Present", Red "Absent".
+                Calendar view displays attendance by month (date_start: date, color by meal_type, event_limit
+                5). Pivot view for analysis (date by meal_type matrix, measure: present count). Graph view
+                for statistics (bar chart, date vs. present count). Ordered by date desc then student_id
+                (most recent first). Today's attendance default filter. Use for billing, monitoring, and
+                reports.
+            </p>
+        </field>
+    </record>
+
+</odoo>

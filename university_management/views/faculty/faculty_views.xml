@@ -1,0 +1,604 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="faculty_view_form" model="ir.ui.view">
+        <field name="name">faculty.faculty.view.form</field>
+        <field name="model">faculty.faculty</field>
+        <field name="arch" type="xml">
+            <form string="Faculty">
+                <header>
+                    <button name="action_activate" type="object" string="Activate"
+                            class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"
+                            confirm="Are you sure you want to reset this faculty record to draft?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,active,on_leave,retired"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button"
+                                   options='{"terminology": "archive"}'/>
+                        </button>
+                        <button name="action_view_timetable" type="object"
+                                class="oe_stat_button" icon="fa-calendar">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Timetable</span>
+                            </div>
+                        </button>
+                        <button name="action_view_courses" type="object"
+                                class="oe_stat_button" icon="fa-book">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Courses</span>
+                            </div>
+                        </button>
+                        <button name="action_faculty_attendance" type="object"
+                                class="oe_stat_button" icon="fa-calendar-check-o">
+                            <field name="attendance_percentage" widget="statinfo"
+                                   string="Attendance %"/>
+                        </button>
+                        <button name="action_faculty_workload" type="object"
+                                class="oe_stat_button" icon="fa-tasks">
+                            <field name="total_workload_hours" widget="statinfo"
+                                   string="Workload Hours"/>
+                        </button>
+                        <button name="action_faculty_evaluation" type="object"
+                                class="oe_stat_button" icon="fa-star">
+                            <field name="average_rating" widget="statinfo"
+                                   string="Avg Rating"
+                                   options="{'digits': [0,2]}"/>
+                        </button>
+                    </div>
+
+                    <widget name="web_ribbon" title="Draft" bg_color="text-bg-secondary"
+                            invisible="state != 'draft'"/>
+                    <widget name="web_ribbon" title="On Leave"
+                            bg_color="text-bg-warning"
+                            invisible="state != 'on_leave'"/>
+                    <widget name="web_ribbon" title="Suspended"
+                            bg_color="text-bg-danger"
+                            invisible="state != 'suspended'"/>
+                    <widget name="web_ribbon" title="Resigned"
+                            bg_color="text-bg-secondary"
+                            invisible="state != 'resigned'"/>
+                    <widget name="web_ribbon" title="Retired"
+                            bg_color="text-bg-info"
+                            invisible="state != 'retired'"/>
+
+                    <field name="faculty_photo" widget="image" class="oe_avatar"/>
+
+                    <div class="oe_title">
+                        <label for="name" string="Faculty Name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g., Dr. John Doe" required="1"/>
+                        </h1>
+                        <h3>
+                            <field name="faculty_code" readonly="1"/>
+                        </h3>
+                    </div>
+
+                    <group>
+                        <group string="Basic Information">
+                            <field name="faculty_id_number"/>
+                            <field name="department_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="designation_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="employee_id" invisible="1"/>
+                        </group>
+                        <group string="Employment Details">
+                            <field name="employment_type"/>
+                            <field name="date_of_joining" widget="date"/>
+                            <field name="experience_years"/>
+<!--                            <field name="faculty_color" invisible="1"/>-->
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Personal Information">
+                            <field name="date_of_birth" widget="date"/>
+                            <field name="age" readonly="1"/>
+                            <field name="gender" widget="radio"/>
+                            <field name="blood_group"/>
+                            <field name="marital_status"/>
+                        </group>
+                        <group string="Qualification">
+                            <field name="highest_qualification"/>
+                            <field name="specialization"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Contact Information" name="contact">
+                            <group>
+                                <group string="Email">
+                                    <field name="work_email" widget="email"/>
+                                    <field name="personal_email" widget="email"/>
+                                </group>
+                                <group string="Phone">
+                                    <field name="work_mobile" widget="phone"/>
+                                    <field name="personal_mobile" widget="phone"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Emergency Contact">
+                                    <field name="emergency_contact_name"/>
+                                    <field name="emergency_contact" widget="phone"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Current Address">
+                                    <field name="current_address"
+                                           placeholder="Enter current residential address..."/>
+                                </group>
+                                <group string="Permanent Address">
+                                    <field name="permanent_address"
+                                           placeholder="Enter permanent address..."/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Academic Details" name="academic">
+                            <group>
+                                <field name="qualification_details"
+                                       placeholder="Enter detailed qualification information (degrees, universities, years)..."/>
+                            </group>
+                            <group string="Teaching Subjects">
+                                <field name="subjects_taught_ids" widget="many2many_tags"
+                                       options="{'no_create': True}"/>
+                            </group>
+                            <group string="Courses Taught">
+                                <field name="courses_taught_ids" widget="many2many_tags"
+                                       options="{'no_create': True}"/>
+                            </group>
+                        </page>
+
+                        <page string="Qualifications" name="qualifications">
+                            <field name="qualification_ids" nolabel="1">
+                                <list editable="bottom"
+                                      decoration-success="is_verified == True">
+                                    <field name="degree"/>
+                                    <field name="specialization" optional="show"/>
+                                    <field name="institution"/>
+                                    <field name="year_of_passing"/>
+                                    <field name="percentage" optional="show"/>
+                                    <field name="is_verified" widget="boolean_toggle"/>
+                                    <field name="hr_resume_line_id" readonly="1" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Timetable" name="timetable">
+                            <field name="timetable_ids" readonly="1">
+                                <list>
+                                    <field name="day_of_week"/>
+                                    <field name="start_time" widget="float_time"/>
+                                    <field name="end_time" widget="float_time"/>
+                                    <field name="subject_id"/>
+                                    <field name="course_id"/>
+                                    <field name="room_number_id"/>
+                                    <field name="class_type"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Workload" name="workload">
+                            <group>
+                                <field name="total_workload_hours" readonly="1"/>
+                            </group>
+                            <field name="workload_ids" readonly="1">
+                                <list>
+                                    <field name="course_ids"/>
+                                    <field name="academic_year_id"/>
+                                    <field name="semester_id"/>
+                                    <field name="is_overloaded"/>
+                                    <field name="hours_per_week"/>
+                                    <field name="total_students"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Attendance" name="attendance">
+                            <group>
+                                <field name="attendance_percentage" readonly="1"/>
+                            </group>
+                            <field name="attendance_ids" readonly="1">
+                                <list>
+                                    <field name="date"/>
+                                    <field name="check_in" widget="datetime"/>
+                                    <field name="check_out" widget="datetime"/>
+                                    <field name="worked_hours"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'present'"
+                                           decoration-danger="state == 'absent'"
+                                           decoration-warning="state == 'half_day'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Leave Management" name="leave">
+                            <group>
+                                <field name="available_leaves"/>
+                            </group>
+                            <field name="leave_ids" readonly="1">
+                                <list>
+                                    <field name="leave_type"/>
+                                    <field name="date_from"/>
+                                    <field name="date_to"/>
+                                    <field name="number_of_days"/>
+                                    <field name="reason"/>
+                                    <field name="state" widget="badge"
+                                           decoration-warning="state == 'pending'"
+                                           decoration-success="state == 'approved'"
+                                           decoration-danger="state == 'rejected'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Salary" name="salary">
+                            <group>
+                                <field name="current_salary" widget="monetary"
+                                       options="{'currency_field': 'currency_id'}"/>
+                                <field name="currency_id" invisible="1"/>
+                            </group>
+                            <field name="salary_ids" readonly="1">
+                                <list>
+                                    <field name="month"/>
+                                    <field name="basic_salary" widget="monetary"/>
+                                    <field name="hra" widget="monetary"/>
+                                    <field name="da" widget="monetary"/>
+                                    <field name="medical_allowance" widget="monetary"/>
+                                    <field name="pf" widget="monetary"/>
+                                    <field name="esi" widget="monetary"/>
+                                    <field name="net_salary" widget="monetary"/>
+                                    <field name="payment_date"/>
+                                    <field name="state" widget="badge"
+                                           decoration-warning="state == 'draft'"
+                                           decoration-success="state == 'paid'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Performance Evaluation" name="evaluation">
+                            <group>
+                                <field name="average_rating" readonly="1"/>
+                            </group>
+                            <field name="evaluation_ids" readonly="1">
+                                <list>
+                                    <field name="evaluation_date"/>
+                                    <field name="evaluator_faculty_id"/>
+                                    <field name="evaluation_type"/>
+                                    <field name="teaching_quality"/>
+                                    <field name="communication_skills"/>
+                                    <field name="punctuality"/>
+                                    <field name="overall_rating"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Research &amp; Publications" name="research">
+                            <group>
+                                <group>
+                                    <field name="research_papers"/>
+                                    <field name="conferences_attended"/>
+                                </group>
+                            </group>
+                            <separator string="Awards &amp; Recognitions"/>
+                            <field name="awards"
+                                   placeholder="Enter awards, honors, and recognitions received..."/>
+                        </page>
+
+                        <page string="Bank Details" name="bank">
+                            <group>
+                                <group>
+                                    <field name="bank_account_number"/>
+                                    <field name="bank_name"/>
+                                </group>
+                                <group>
+                                    <field name="bank_branch"/>
+                                    <field name="ifsc_code"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Government IDs" name="ids">
+                            <group>
+                                <group>
+                                    <field name="aadhar_number"/>
+                                </group>
+                                <group>
+                                    <field name="pan_number"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Biometric &amp; Work Schedule" name="biometric">
+                            <group string="Biometric Device">
+                                <field name="device_id_num"
+                                       placeholder="e.g. 1234 — must match ZK device registration"/>
+                            </group>
+                            <group string="Work Schedule Rules">
+                                <group>
+                                    <field name="work_start_time"
+                                           widget="float_time"
+                                           help="e.g. 9.0 = 09:00 AM"/>
+                                    <field name="work_end_time"
+                                           widget="float_time"
+                                           help="e.g. 17.5 = 05:30 PM"/>
+                                </group>
+                                <group>
+                                    <field name="grace_minutes"/>
+                                    <field name="half_day_threshold"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Portal Access" name="portal">
+                            <group>
+                                <field name="user_id"
+                                       options="{'no_create': True, 'no_create_edit': True}"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="faculty_view_list" model="ir.ui.view">
+        <field name="name">faculty.faculty.view.list</field>
+        <field name="model">faculty.faculty</field>
+        <field name="arch" type="xml">
+            <list string="Faculty"
+                  multi_edit="1"
+                  sample="1"
+                  decoration-success="state == 'active'"
+                  decoration-warning="state == 'on_leave'"
+                  decoration-danger="state == 'suspended'"
+                  decoration-info="state == 'draft'">
+                <field name="faculty_photo" widget="image" optional="show"/>
+                <field name="name"/>
+<!--                <field name="faculty_color" invisible="1"/>-->
+                <field name="faculty_code"/>
+                <field name="faculty_id_number" optional="hide"/>
+                <field name="department_id"/>
+                <field name="designation_id"/>
+                <field name="employment_type" optional="show"/>
+                <field name="highest_qualification" optional="hide"/>
+                <field name="specialization" optional="hide"/>
+                <field name="experience_years" optional="show"/>
+                <field name="work_email" widget="email" optional="show"/>
+                <field name="work_mobile" widget="phone" optional="show"/>
+                <field name="date_of_joining" optional="hide"/>
+                <field name="total_workload_hours" optional="show"/>
+                <field name="attendance_percentage" optional="show"/>
+                <field name="average_rating" optional="show"/>
+                <field name="active" widget="boolean_toggle" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'active'"
+                       decoration-warning="state == 'on_leave'"
+                       decoration-danger="state == 'suspended'"
+                       decoration-info="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="faculty_view_search" model="ir.ui.view">
+        <field name="name">faculty.faculty.view.search</field>
+        <field name="model">faculty.faculty</field>
+        <field name="arch" type="xml">
+            <search string="Search Faculty">
+                <field name="name"/>
+                <field name="faculty_code"/>
+                <field name="faculty_id_number"/>
+                <field name="department_id"/>
+                <field name="designation_id"/>
+                <field name="work_email"/>
+                <field name="work_mobile"/>
+
+                <separator/>
+
+                <filter name="filter_draft" string="Draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_active" string="Active"
+                        domain="[('state', '=', 'active')]"/>
+                <filter name="filter_on_leave" string="On Leave"
+                        domain="[('state', '=', 'on_leave')]"/>
+                <filter name="filter_suspended" string="Suspended"
+                        domain="[('state', '=', 'suspended')]"/>
+                <filter name="filter_resigned" string="Resigned"
+                        domain="[('state', '=', 'resigned')]"/>
+                <filter name="filter_retired" string="Retired"
+                        domain="[('state', '=', 'retired')]"/>
+
+                <separator/>
+
+                <filter name="filter_permanent" string="Permanent"
+                        domain="[('employment_type', '=', 'permanent')]"/>
+                <filter name="filter_temporary" string="Temporary"
+                        domain="[('employment_type', '=', 'temporary')]"/>
+                <filter name="filter_contract" string="Contract"
+                        domain="[('employment_type', '=', 'contract')]"/>
+                <filter name="filter_visiting" string="Visiting Faculty"
+                        domain="[('employment_type', '=', 'visiting')]"/>
+                <filter name="filter_guest" string="Guest Lecturer"
+                        domain="[('employment_type', '=', 'guest')]"/>
+                <filter name="filter_part_time" string="Part Time"
+                        domain="[('employment_type', '=', 'part_time')]"/>
+
+                <separator/>
+
+                <filter name="filter_phd" string="Ph.D"
+                        domain="[('highest_qualification', '=', 'phd')]"/>
+                <filter name="filter_mphil" string="M.Phil"
+                        domain="[('highest_qualification', '=', 'mphil')]"/>
+                <filter name="filter_postgraduate" string="Post Graduate"
+                        domain="[('highest_qualification', '=', 'postgraduate')]"/>
+
+                <separator/>
+
+                <filter name="filter_male" string="Male"
+                        domain="[('gender', '=', 'male')]"/>
+                <filter name="filter_female" string="Female"
+                        domain="[('gender', '=', 'female')]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_department" string="Department"
+                            context="{'group_by': 'department_id'}"/>
+                    <filter name="group_by_designation" string="Designation"
+                            context="{'group_by': 'designation_id'}"/>
+                    <filter name="group_by_employment_type" string="Employment Type"
+                            context="{'group_by': 'employment_type'}"/>
+                    <filter name="group_by_qualification" string="Highest Qualification"
+                            context="{'group_by': 'highest_qualification'}"/>
+                    <filter name="group_by_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_by_gender" string="Gender"
+                            context="{'group_by': 'gender'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="department_id" string="Department"
+                           select="multi"
+                           icon="fa-building"/>
+                    <field name="designation_id" string="Designation"
+                           select="multi"
+                           icon="fa-id-badge"/>
+                    <field name="state" string="Status"
+                           select="multi"
+                           icon="fa-filter"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="faculty_view_kanban" model="ir.ui.view">
+        <field name="name">faculty.faculty.view.kanban</field>
+        <field name="model">faculty.faculty</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" quick_create="false" sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="faculty_code"/>
+                <field name="faculty_photo"/>
+                <field name="department_id"/>
+                <field name="designation_id"/>
+                <field name="employment_type"/>
+                <field name="work_email"/>
+                <field name="work_mobile"/>
+                <field name="total_workload_hours"/>
+                <field name="attendance_percentage"/>
+                <field name="average_rating"/>
+                <field name="state"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <img t-att-src="kanban_image('faculty.faculty', 'faculty_photo', record.id.raw_value)"
+                                     alt="Faculty Photo" class="o_image_64_cover"/>
+                            </div>
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                        <div class="text-muted">
+                                            <field name="faculty_code"/>
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_record_top_right">
+                                        <field name="state" widget="badge"
+                                               decoration-success="state == 'active'"
+                                               decoration-warning="state == 'on_leave'"
+                                               decoration-danger="state == 'suspended'"
+                                               decoration-info="state == 'draft'"/>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body">
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <i class="fa fa-building text-primary"/>
+                                            <field name="department_id"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <i class="fa fa-id-badge text-info"/>
+                                            <field name="designation_id"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-6">
+                                            <i class="fa fa-envelope text-secondary"/>
+                                            <field name="work_email"/>
+                                        </div>
+                                        <div class="col-6">
+                                            <i class="fa fa-phone text-success"/>
+                                            <field name="work_mobile"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-4 text-center">
+                                            <div><i class="fa fa-tasks text-warning"/></div>
+                                            <strong><field name="total_workload_hours"/></strong>
+                                            <div class="text-muted small">Hours</div>
+                                        </div>
+                                        <div class="col-4 text-center">
+                                            <div><i class="fa fa-calendar-check-o text-info"/></div>
+                                            <strong><field name="attendance_percentage"/>%</strong>
+                                            <div class="text-muted small">Attendance</div>
+                                        </div>
+                                        <div class="col-4 text-center">
+                                            <div><i class="fa fa-star text-warning"/></div>
+                                            <strong><field name="average_rating"/></strong>
+                                            <div class="text-muted small">Rating</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <span class="badge text-bg-secondary">
+                                                <field name="employment_type"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_faculty" model="ir.actions.act_window">
+        <field name="name">Faculty</field>
+        <field name="res_model">faculty.faculty</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_filter_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add your first Faculty Member
+            </p>
+            <p>
+                Manage faculty profiles with comprehensive information including academic qualifications,
+                teaching assignments, workload, attendance, salary, and performance evaluations.
+            </p>
+        </field>
+    </record>
+
+</odoo>

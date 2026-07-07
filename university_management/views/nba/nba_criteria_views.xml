@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- C1 Curriculum list/action -->
+    <record id="nba_c1_curriculum_view_list" model="ir.ui.view">
+        <field name="name">nba.c1.curriculum.view.list</field>
+        <field name="model">nba.c1.curriculum</field>
+        <field name="arch" type="xml">
+            <list string="C1 Curriculum Components" editable="bottom">
+                <field name="sar_id"/>
+                <field name="component"/>
+                <field name="component_other" optional="show"/>
+                <field name="total_credits"/>
+                <field name="total_contact_hours"/>
+                <field name="percentage_credits" readonly="1"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_nba_c1_curriculum" model="ir.actions.act_window">
+        <field name="name">C1 – Curriculum</field>
+        <field name="res_model">nba.c1.curriculum</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- C2 Teaching list/action -->
+    <record id="nba_c2_teaching_view_list" model="ir.ui.view">
+        <field name="name">nba.c2.teaching.view.list</field>
+        <field name="model">nba.c2.teaching</field>
+        <field name="arch" type="xml">
+            <list string="C2 Teaching-Learning Activities" editable="bottom">
+                <field name="sar_id"/>
+                <field name="academic_year_id"/>
+                <field name="activity_type"/>
+                <field name="title"/>
+                <field name="student_count"/>
+                <field name="faculty_id"/>
+                <field name="po_addressed"/>
+                <field name="sdg_addressed"/>
+                <field name="duration"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_nba_c2_teaching" model="ir.actions.act_window">
+        <field name="name">C2 – Teaching-Learning</field>
+        <field name="res_model">nba.c2.teaching</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- C3 Assessment list/action -->
+    <record id="nba_c3_assessment_view_list" model="ir.ui.view">
+        <field name="name">nba.c3.assessment.view.list</field>
+        <field name="model">nba.c3.assessment</field>
+        <field name="arch" type="xml">
+            <list string="C3 PO Attainment (Direct)">
+                <field name="sar_id"/>
+                <field name="course_id"/>
+                <field name="academic_year_id"/>
+                <field name="po1_direct"/><field name="po2_direct"/><field name="po3_direct"/>
+                <field name="po4_direct"/><field name="po5_direct"/><field name="po6_direct"/>
+                <field name="po7_direct"/><field name="po8_direct"/><field name="po9_direct"/>
+                <field name="po10_direct"/><field name="po11_direct"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_nba_c3_assessment" model="ir.actions.act_window">
+        <field name="name">C3 – Assessment</field>
+        <field name="res_model">nba.c3.assessment</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- C3 Indirect Attainment -->
+    <record id="nba_c3_indirect_view_list" model="ir.ui.view">
+        <field name="name">nba.c3.indirect.view.list</field>
+        <field name="model">nba.c3.indirect</field>
+        <field name="arch" type="xml">
+            <list string="C3 Indirect PO Attainment" editable="bottom">
+                <field name="sar_id"/>
+                <field name="survey_name"/>
+                <field name="survey_type"/>
+                <field name="respondent_count"/>
+                <field name="po1"/><field name="po2"/><field name="po3"/>
+                <field name="po4"/><field name="po5"/><field name="po6"/>
+                <field name="po7"/><field name="po8"/><field name="po9"/>
+                <field name="po10"/><field name="po11"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- C4 Students action -->
+    <record id="action_nba_c4_students" model="ir.actions.act_window">
+        <field name="name">C4 – Students' Performance</field>
+        <field name="res_model">nba.c4.students</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <record id="nba_c4_students_view_list" model="ir.ui.view">
+        <field name="name">nba.c4.students.view.list</field>
+        <field name="model">nba.c4.students</field>
+        <field name="arch" type="xml">
+            <list string="C4 Student Data">
+                <field name="sar_id"/>
+                <field name="year_label"/>
+                <field name="academic_year_id"/>
+                <field name="n_sanctioned"/>
+                <field name="n1_first_year"/>
+                <field name="n2_lateral"/>
+                <field name="total_admitted" readonly="1"/>
+                <field name="graduated_stipulated"/>
+                <field name="enrolment_ratio" readonly="1"/>
+                <field name="success_rate" readonly="1"/>
+                <field name="api_yr1" readonly="1"/>
+                <field name="placement_index" readonly="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- C5 Faculty action -->
+    <record id="action_nba_c5_faculty" model="ir.actions.act_window">
+        <field name="name">C5 – Faculty Information</field>
+        <field name="res_model">nba.c5.faculty</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <record id="nba_c5_faculty_view_list" model="ir.ui.view">
+        <field name="name">nba.c5.faculty.view.list</field>
+        <field name="model">nba.c5.faculty</field>
+        <field name="arch" type="xml">
+            <list string="C5 Faculty Data">
+                <field name="sar_id"/>
+                <field name="year_label"/>
+                <field name="s_total"/>
+                <field name="tf_effective" readonly="1"/>
+                <field name="sfr_value" readonly="1"/>
+                <field name="sfr_marks" readonly="1"/>
+                <field name="x_phd"/>
+                <field name="fqi_score" readonly="1"/>
+                <field name="cadre_marks" readonly="1"/>
+                <field name="retention_marks" readonly="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- C6 Contributions action -->
+    <record id="action_nba_c6_contributions" model="ir.actions.act_window">
+        <field name="name">C6 – Faculty Contributions</field>
+        <field name="res_model">nba.c6.contributions</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <record id="nba_c6_view_list" model="ir.ui.view">
+        <field name="name">nba.c6.contributions.view.list</field>
+        <field name="model">nba.c6.contributions</field>
+        <field name="arch" type="xml">
+            <list string="C6 Contributions Summary" editable="bottom">
+                <field name="sar_id"/>
+                <field name="year_label"/>
+                <field name="journal_papers"/>
+                <field name="conference_papers"/>
+                <field name="fdp_participant_count"/>
+                <field name="fdp_organized_count"/>
+                <field name="mooc_certified_count"/>
+                <field name="patents_granted"/>
+                <field name="sponsored_research_amount"/>
+                <field name="sponsored_research_marks" readonly="1"/>
+                <field name="consultancy_amount"/>
+                <field name="consultancy_marks" readonly="1"/>
+                <field name="seed_money_received"/>
+                <field name="seed_money_marks" readonly="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- C7 Facilities action -->
+    <record id="action_nba_c7_facilities" model="ir.actions.act_window">
+        <field name="name">C7 – Facilities</field>
+        <field name="res_model">nba.lab.info</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- C8 Improvement action -->
+    <record id="action_nba_c8_improvement" model="ir.actions.act_window">
+        <field name="name">C8 – Continuous Improvement</field>
+        <field name="res_model">nba.c8.improvement</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <record id="nba_c8_view_list" model="ir.ui.view">
+        <field name="name">nba.c8.improvement.view.list</field>
+        <field name="model">nba.c8.improvement</field>
+        <field name="arch" type="xml">
+            <list string="C8 Improvement Actions" editable="bottom">
+                <field name="sar_id"/>
+                <field name="action_type"/>
+                <field name="academic_year_id"/>
+                <field name="weakness_identified"/>
+                <field name="action_taken"/>
+                <field name="impact"/>
+                <field name="implementation_date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- C9 Governance action -->
+    <record id="action_nba_c9_governance" model="ir.actions.act_window">
+        <field name="name">C9 – Governance</field>
+        <field name="res_model">nba.c9.governance</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <record id="nba_c9_view_list" model="ir.ui.view">
+        <field name="name">nba.c9.governance.view.list</field>
+        <field name="model">nba.c9.governance</field>
+        <field name="arch" type="xml">
+            <list string="C9 Governance">
+                <field name="sar_id"/>
+                <field name="fysfr_ns1"/>
+                <field name="fysfr_ns2"/>
+                <field name="fysfr_pct" readonly="1"/>
+                <field name="fysfr_marks" readonly="1"/>
+                <field name="budget_cfym1"/>
+                <field name="actual_cfym1"/>
+                <field name="expenditure_per_student" readonly="1"/>
+            </list>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View - Hostel Room -->
+    <record id="hostel_room_view_form" model="ir.ui.view">
+        <field name="name">hostel.room.view.form</field>
+        <field name="model">hostel.room</field>
+        <field name="arch" type="xml">
+            <form string="Hostel Room">
+                <header>
+                    <button name="action_make_available" string="Make Available"
+                        type="object" class="oe_highlight"
+                        invisible="state not in ['draft', 'maintenance', 'reserved']"/>
+                    <button name="action_maintenance" string="Under Maintenance"
+                            type="object" class="btn-warning"
+                            invisible="state not in ['available', 'occupied', 'full', 'reserved']"/>
+                    <button name="action_reserve" string="Reserve"
+                            type="object" class="btn-primary"
+                            invisible="state not in ['available']"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft"
+                            type="object" class="btn-default"
+                            invisible="state == 'draft'"
+                            confirm="Are you sure you want to reset this room to draft?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,available,occupied,full,maintenance,reserved"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Available" bg_color="text-bg-success"
+                            invisible="state != 'available'"/>
+                    <widget name="web_ribbon" title="Occupied" bg_color="text-bg-warning"
+                            invisible="state != 'occupied'"/>
+                    <widget name="web_ribbon" title="Full" bg_color="text-bg-danger"
+                            invisible="state != 'full'"/>
+                    <widget name="web_ribbon" title="Under Maintenance" bg_color="text-bg-info"
+                            invisible="state != 'maintenance'"/>
+                    <widget name="web_ribbon" title="Reserved" bg_color="text-bg-primary"
+                            invisible="state != 'reserved'"/>
+
+                    <div class="oe_title">
+                        <label for="name" string="Room Name"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Room Details">
+                            <field name="hostel_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="room_number" placeholder="e.g., 101, 201A, G-12"/>
+                            <field name="floor" placeholder="e.g., Ground Floor, 1st Floor, 2nd Floor"/>
+                            <field name="block" placeholder="e.g., Block A, North Wing, East Wing"/>
+                        </group>
+                        <group string="Room Configuration">
+                            <field name="room_type"/>
+                            <field name="capacity"/>
+                            <field name="monthly_rent" widget="monetary"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Occupancy Status">
+                            <field name="occupied_beds" readonly="1"/>
+                            <field name="available_beds" readonly="1"/>
+                        </group>
+                        <group string="Status">
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Facilities">
+                            <field name="has_ac" widget="boolean_toggle"/>
+                            <field name="has_attached_bathroom" widget="boolean_toggle"/>
+                            <field name="has_balcony" widget="boolean_toggle"/>
+                            <field name="has_study_table" widget="boolean_toggle"/>
+                            <field name="has_wardrobe" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Furniture Details" name="furniture">
+                            <field name="furniture_details" nolabel="1"
+                                   placeholder="Enter furniture details (beds, tables, chairs, cupboards, etc.)..."/>
+                        </page>
+
+                        <page string="Allocations" name="allocations">
+                            <field name="allocation_ids" nolabel="1">
+                                <list string="Student Allocations">
+                                    <field name="name"/>
+                                    <field name="student_id"/>
+                                    <field name="bed_number"/>
+                                    <field name="from_date"/>
+                                    <field name="to_date"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'allocated'"
+                                           decoration-muted="state == 'vacated'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Remarks" name="remarks">
+                            <field name="remarks" nolabel="1"
+                                   placeholder="Enter any remarks or additional information..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View - Hostel Room -->
+    <record id="hostel_room_view_list" model="ir.ui.view">
+        <field name="name">hostel.room.view.list</field>
+        <field name="model">hostel.room</field>
+        <field name="arch" type="xml">
+            <list string="Hostel Rooms"
+                  default_order="hostel_id, room_number"
+                  multi_edit="1"
+                  sample="1"
+                  decoration-success="state == 'available'"
+                  decoration-warning="state == 'occupied'"
+                  decoration-danger="state == 'full'"
+                  decoration-info="state == 'maintenance'"
+                  decoration-primary="state == 'reserved'">
+                <field name="hostel_id"/>
+                <field name="room_number"/>
+                <field name="floor" optional="show"/>
+                <field name="block" optional="hide"/>
+                <field name="room_type"/>
+                <field name="capacity"/>
+                <field name="occupied_beds"/>
+                <field name="available_beds"/>
+                <field name="monthly_rent" widget="monetary" optional="show"/>
+                <field name="has_ac" widget="boolean_toggle" optional="hide"/>
+                <field name="has_attached_bathroom" widget="boolean_toggle" optional="hide"/>
+                <field name="active" widget="boolean_toggle" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'available'"
+                       decoration-warning="state == 'occupied'"
+                       decoration-danger="state == 'full'"
+                       decoration-info="state == 'maintenance'"
+                       decoration-primary="state == 'reserved'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View - Hostel Room -->
+    <record id="hostel_room_view_search" model="ir.ui.view">
+        <field name="name">hostel.room.view.search</field>
+        <field name="model">hostel.room</field>
+        <field name="arch" type="xml">
+            <search string="Search Rooms">
+                <field name="name"/>
+                <field name="hostel_id"/>
+                <field name="room_number"/>
+                <field name="floor"/>
+                <field name="block"/>
+                <field name="room_type"/>
+
+                <separator/>
+
+                <filter name="filter_available" string="Available"
+                        domain="[('state', '=', 'available')]"/>
+                <filter name="filter_occupied" string="Occupied"
+                        domain="[('state', '=', 'occupied')]"/>
+                <filter name="filter_full" string="Full"
+                        domain="[('state', '=', 'full')]"/>
+                <filter name="filter_maintenance" string="Under Maintenance"
+                        domain="[('state', '=', 'maintenance')]"/>
+                <filter name="filter_reserved" string="Reserved"
+                        domain="[('state', '=', 'reserved')]"/>
+
+                <separator/>
+
+                <filter name="filter_has_beds" string="Has Available Beds"
+                        domain="[('available_beds', '&gt;', 0)]"/>
+                <filter name="filter_no_beds" string="No Available Beds"
+                        domain="[('available_beds', '=', 0)]"/>
+
+                <separator/>
+
+                <filter name="filter_single" string="Single Occupancy"
+                        domain="[('room_type', '=', 'single')]"/>
+                <filter name="filter_double" string="Double Sharing"
+                        domain="[('room_type', '=', 'double')]"/>
+                <filter name="filter_triple" string="Triple Sharing"
+                        domain="[('room_type', '=', 'triple')]"/>
+                <filter name="filter_quad" string="Four Sharing"
+                        domain="[('room_type', '=', 'quad')]"/>
+                <filter name="filter_dormitory" string="Dormitory"
+                        domain="[('room_type', '=', 'dormitory')]"/>
+
+                <separator/>
+
+                <filter name="filter_ac" string="AC Available"
+                        domain="[('has_ac', '=', True)]"/>
+                <filter name="filter_attached_bathroom" string="Attached Bathroom"
+                        domain="[('has_attached_bathroom', '=', True)]"/>
+                <filter name="filter_balcony" string="Balcony"
+                        domain="[('has_balcony', '=', True)]"/>
+
+                <separator/>
+
+                <filter name="filter_active" string="Active"
+                        domain="[('active', '=', True)]"/>
+                <filter name="filter_inactive" string="Inactive"
+                        domain="[('active', '=', False)]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_hostel" string="Hostel"
+                            context="{'group_by': 'hostel_id'}"/>
+                    <filter name="group_by_floor" string="Floor"
+                            context="{'group_by': 'floor'}"/>
+                    <filter name="group_by_block" string="Block/Wing"
+                            context="{'group_by': 'block'}"/>
+                    <filter name="group_by_room_type" string="Room Type"
+                            context="{'group_by': 'room_type'}"/>
+                    <filter name="group_by_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="hostel_id" string="Hostel"
+                           select="multi"
+                           icon="fa-building"/>
+                    <field name="room_type" string="Type"
+                           select="multi"
+                           icon="fa-bed"/>
+                    <field name="state" string="Status"
+                           select="multi"
+                           icon="fa-filter"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View - Hostel Room -->
+    <record id="hostel_room_view_kanban" model="ir.ui.view">
+        <field name="name">hostel.room.view.kanban</field>
+        <field name="model">hostel.room</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="state"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="hostel_id"/>
+                <field name="room_number"/>
+                <field name="floor"/>
+                <field name="block"/>
+                <field name="room_type"/>
+                <field name="capacity"/>
+                <field name="occupied_beds"/>
+                <field name="available_beds"/>
+                <field name="monthly_rent"/>
+                <field name="has_ac"/>
+                <field name="has_attached_bathroom"/>
+                <field name="has_balcony"/>
+                <field name="has_study_table"/>
+                <field name="has_wardrobe"/>
+                <field name="state"/>
+
+                <progressbar field="state"
+                             colors='{"available": "success", "occupied": "warning", "full": "danger", "maintenance": "info", "reserved": "primary"}'/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="ribbon ribbon-top-right" t-if="record.state.raw_value == 'draft'">
+                                <span class="text-bg-secondary">Draft</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.state.raw_value == 'available'">
+                                <span class="text-bg-success">Available</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.state.raw_value == 'occupied'">
+                                <span class="text-bg-warning">Occupied</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.state.raw_value == 'full'">
+                                <span class="text-bg-danger">Full</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.state.raw_value == 'maintenance'">
+                                <span class="text-bg-info">Maintenance</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.state.raw_value == 'reserved'">
+                                <span class="text-bg-primary">Reserved</span>
+                            </div>
+
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            Room <field name="room_number"/>
+                                        </strong>
+                                        <div class="text-muted">
+                                            <field name="hostel_id"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body mt-3">
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded">
+                                                <div class="mb-1" t-if="record.floor.raw_value">
+                                                    <i class="fa fa-building text-primary"/>
+                                                    <strong>Floor:</strong> <field name="floor"/>
+                                                </div>
+                                                <div class="mb-1" t-if="record.block.raw_value">
+                                                    <i class="fa fa-map-marker text-info"/>
+                                                    <strong>Block:</strong> <field name="block"/>
+                                                </div>
+                                                <div class="mb-1">
+                                                    <i class="fa fa-bed text-success"/>
+                                                    <strong>Type:</strong> <field name="room_type"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-4">
+                                            <div class="card bg-primary text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h6 class="mb-0"><field name="capacity"/></h6>
+                                                    <small>Total Beds</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="card bg-warning text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h6 class="mb-0"><field name="occupied_beds"/></h6>
+                                                    <small>Occupied</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="card bg-success text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h6 class="mb-0"><field name="available_beds"/></h6>
+                                                    <small>Available</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.monthly_rent.raw_value &gt; 0">
+                                        <div class="col-12">
+                                            <div class="card bg-info text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h6 class="mb-0">₹<field name="monthly_rent"/></h6>
+                                                    <small>Monthly Rent</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded">
+                                                <span t-if="record.has_ac.raw_value" class="badge badge-success me-1">
+                                                    <i class="fa fa-snowflake-o"/> AC
+                                                </span>
+                                                <span t-if="record.has_attached_bathroom.raw_value" class="badge badge-info me-1">
+                                                    <i class="fa fa-bath"/> Bathroom
+                                                </span>
+                                                <span t-if="record.has_balcony.raw_value" class="badge badge-primary me-1">
+                                                    <i class="fa fa-home"/> Balcony
+                                                </span>
+                                                <span t-if="record.has_study_table.raw_value" class="badge badge-warning me-1">
+                                                    <i class="fa fa-table"/> Study Table
+                                                </span>
+                                                <span t-if="record.has_wardrobe.raw_value" class="badge badge-secondary me-1">
+                                                    <i class="fa fa-archive"/> Wardrobe
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom mt-2">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="state" widget="badge"
+                                               decoration-secondary="state == 'draft'"
+                                               decoration-success="state == 'available'"
+                                               decoration-warning="state == 'occupied'"
+                                               decoration-danger="state == 'full'"
+                                               decoration-info="state == 'maintenance'"
+                                               decoration-primary="state == 'reserved'"/>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_hostel_room" model="ir.actions.act_window">
+        <field name="name">Rooms</field>
+        <field name="res_model">hostel.room</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create Hostel Room
+            </p>
+            <p>
+                Manage hostel rooms and beds. System computes room name (hostel_id.name - room_number,
+                stored). Select hostel_id (hostel.hostel, required, tracked, indexed). Enter room_number
+                (char, required, tracked, e.g., "101", "201A", "G-12"). Enter floor (char, e.g., "Ground
+                Floor", "1st Floor", "2nd Floor"). Enter block (char "Block/Wing", e.g., "Block A",
+                "North Wing", "East Wing"). Select room_type (5 options, required, default 'double',
+                tracked): Single Occupancy (1 student), Double Sharing (2 students), Triple Sharing (3
+                students), Four Sharing (4 students), Dormitory (many students). Enter capacity (integer
+                "Bed Capacity", required, default 2, total beds). System computes 2 integers (stored,
+                readonly): occupied_beds (count of allocation_ids filtered by state='allocated'),
+                available_beds (capacity - occupied_beds). System auto-computes state (5 options, computed
+                stored tracked): Available (available_beds > 0 and occupied_beds = 0, green), Occupied
+                (occupied_beds > 0 and available_beds > 0, yellow), Full (available_beds = 0, red),
+                Under Maintenance (manual, blue), Reserved (manual, purple). 5 facility checkboxes with
+                toggle widgets: has_ac (AC Available), has_attached_bathroom (Attached Bathroom),
+                has_balcony (Balcony), has_study_table (Study Table), has_wardrobe (Wardrobe). Enter
+                furniture_details (text, beds, tables, chairs, cupboards). Enter monthly_rent (monetary,
+                rent per month). Allocations page: allocation_ids One2many to hostel.allocation (list
+                with name, student_id, bed_number, from_date, to_date, state badge). Remarks page for
+                additional notes. Active boolean (default True, toggle widget). Unique constraint:
+                hostel_id + room_number (room number unique per hostel). Ordered by hostel_id then
+                room_number. 5-state ribbon system. Full chatter support for communication and tracking.
+            </p>
+        </field>
+    </record>
+
+</odoo>

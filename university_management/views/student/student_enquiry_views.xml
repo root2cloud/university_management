@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         KANBAN VIEW — Admission Pipeline
+    ═══════════════════════════════════════════════════════════════════ -->
+    <record id="student_enquiry_view_kanban" model="ir.ui.view">
+        <field name="name">student.enquiry.view.kanban</field>
+        <field name="model">student.enquiry</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state"
+                    quick_create="false"
+                    group_create="false"
+                    group_delete="false"
+                    class="o_kanban_small_column">
+                <field name="applicant_name"/>
+                <field name="mobile"/>
+                <field name="email"/>
+                <field name="program_id"/>
+                <field name="state"/>
+                <field name="priority"/>
+                <field name="counsellor_id"/>
+                <field name="session_count"/>
+                <field name="seat_blocking_id"/>
+                <field name="admission_id"/>
+                <field name="follow_up_date"/>
+                <field name="create_date"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click o_kanban_record">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <t t-esc="record.applicant_name.value"/>
+                                    </strong>
+                                    <small class="o_kanban_record_subtitle text-muted">
+                                        <t t-esc="record.program_id.value || 'No program selected'"/>
+                                    </small>
+                                </div>
+                                <div class="o_kanban_record_right">
+                                    <field name="priority" widget="priority"/>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <div>
+                                    <i class="fa fa-phone me-1 text-muted"/>
+                                    <t t-esc="record.mobile.value"/>
+                                </div>
+                                <div t-if="record.counsellor_id.value">
+                                    <i class="fa fa-user me-1 text-muted"/>
+                                    <t t-esc="record.counsellor_id.value"/>
+                                </div>
+                                <div t-if="record.follow_up_date.value">
+                                    <i class="fa fa-calendar me-1 text-muted"/>
+                                    Follow-up: <t t-esc="record.follow_up_date.value"/>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_bottom">
+                                <div class="oe_kanban_bottom_left">
+                                    <span t-if="record.session_count.value > 0"
+                                          class="badge text-bg-info me-1">
+                                        <i class="fa fa-comments me-1"/>
+                                        <t t-esc="record.session_count.value"/>
+                                    </span>
+                                    <span t-if="record.seat_blocking_id.value"
+                                          class="badge text-bg-warning me-1">Seat Blocked</span>
+                                    <span t-if="record.admission_id.value"
+                                          class="badge text-bg-success">Admission Created</span>
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <img t-att-src="'/web/image/res.users/' + record.counsellor_id.raw_value + '/image_128'"
+                                         class="oe_kanban_avatar" width="24" height="24"
+                                         t-if="record.counsellor_id.raw_value"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         FORM VIEW
+    ═══════════════════════════════════════════════════════════════════ -->
+    <record id="student_enquiry_view_form" model="ir.ui.view">
+        <field name="name">student.enquiry.view.form</field>
+        <field name="model">student.enquiry</field>
+        <field name="arch" type="xml">
+            <form string="Student Enquiry">
+                <header>
+                    <button name="action_contacted"
+                            string="Mark Contacted"
+                            type="object"
+                            invisible="state != 'new'"/>
+                    <button name="action_schedule_counselling"
+                            string="Schedule Counselling"
+                            type="object"
+                            icon="fa-plus"
+                            invisible="state not in ['new', 'contacted']"/>
+                    <button name="action_mark_interested"
+                            string="Mark Interested"
+                            type="object"
+                            invisible="state not in ['contacted', 'counselling_scheduled']"/>
+                    <button name="action_convert_to_seat_blocking"
+                            string="Block Seat"
+                            type="object"
+                            class="oe_highlight"
+                            invisible="seat_blocking_id or admission_id or not program_id or state in ['admitted', 'lost']"
+                            confirm="Create a seat blocking for this applicant?"/>
+                    <button name="action_convert_to_admission"
+                            string="Create Admission"
+                            type="object"
+                            class="oe_highlight"
+                            invisible="admission_id or not program_id or state in ['admitted', 'lost']"
+                            confirm="Convert directly to an admission application?"/>
+                    <button name="action_mark_won"
+                            string="Mark Admitted"
+                            type="object"
+                            invisible="state in ['admitted', 'lost']"/>
+                    <button name="action_mark_lost"
+                            string="Not Interested"
+                            type="object"
+                            invisible="state in ['admitted', 'lost']"/>
+                    <button name="action_reset_to_new"
+                            string="Reset"
+                            type="object"
+                            invisible="state not in ['lost']"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="new,contacted,counselling_scheduled,interested,seat_blocked,admitted"/>
+                </header>
+
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_sessions"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-comments">
+                            <field name="session_count"
+                                   widget="statinfo"
+                                   string="Sessions"/>
+                        </button>
+                        <button name="action_view_seat_blocking"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-lock"
+                                invisible="not seat_blocking_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Seat</span>
+                                <span class="o_stat_text">Blocking</span>
+                            </div>
+                        </button>
+                        <button name="action_view_admission"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-file-text-o"
+                                invisible="not admission_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Admission</span>
+                                <span class="o_stat_text">Application</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <widget name="web_ribbon" title="Admitted"
+                            bg_color="text-bg-success"
+                            invisible="state != 'admitted'"/>
+                    <widget name="web_ribbon" title="Not Interested"
+                            bg_color="text-bg-danger"
+                            invisible="state != 'lost'"/>
+                    <widget name="web_ribbon" title="Seat Blocked"
+                            bg_color="text-bg-warning"
+                            invisible="state != 'seat_blocked'"/>
+
+                    <div class="oe_title">
+                        <label for="applicant_name" string="Applicant Name"/>
+                        <h1>
+                            <field name="applicant_name"
+                                   placeholder="Applicant Name — e.g. Rahul Kumar"
+                                   required="1"/>
+                        </h1>
+                        <field name="priority" widget="priority"/>
+                    </div>
+
+                    <group>
+                        <group string="Contact Details">
+                            <field name="mobile" required="1"
+                                   placeholder="10-digit mobile number"/>
+                            <field name="email" placeholder="student@email.com"/>
+                            <field name="counsellor_id"
+                                   options="{'no_create': True}"/>
+                            <field name="follow_up_date" widget="date"/>
+                        </group>
+                        <group string="Program of Interest">
+                            <field name="program_id"
+                                   options="{'no_create': True}"/>
+                            <field name="department_id" readonly="1"/>
+                            <field name="alternate_program_id"
+                                   options="{'no_create': True}"/>
+                            <field name="academic_year_id"
+                                   options="{'no_create': True}"/>
+                            <field name="batch_id"
+                                   options="{'no_create': True}"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Education Details" name="education">
+                            <group>
+                                <group string="Personal Details">
+                                    <field name="date_of_birth" widget="date"/>
+                                    <field name="gender"/>
+                                    <field name="city" placeholder="City / Town"/>
+                                    <field name="state_id"
+                                           options="{'no_create': True}"/>
+                                </group>
+                                <group string="Source">
+                                    <field name="source_id"
+                                           options="{'no_create': True}"/>
+                                    <field name="medium_id"
+                                           options="{'no_create': True}"/>
+                                    <field name="referral_name"
+                                           invisible="source_id.name not in ['Referral', 'referral']"
+                                           placeholder="Name of referring person"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Previous Education">
+                                    <field name="previous_qualification"/>
+                                    <field name="previous_school"
+                                           placeholder="School / College name"/>
+                                    <field name="previous_percentage"/>
+                                    <field name="previous_year"/>
+                                </group>
+                                <group string="Entrance Exams">
+                                    <field name="entrance_exam_taken"
+                                           widget="boolean_toggle"/>
+                                    <field name="entrance_exam_name"
+                                           invisible="not entrance_exam_taken"
+                                           placeholder="JEE / KCET / COMEDK / NEET"/>
+                                    <field name="entrance_exam_score"
+                                           invisible="not entrance_exam_taken"/>
+                                    <field name="entrance_exam_rank"
+                                           invisible="not entrance_exam_taken"/>
+                                    <field name="entrance_exam_percentile"
+                                           invisible="not entrance_exam_taken"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Counselling" name="counselling">
+                            <group string="Quick Counselling">
+                                <group>
+                                    <field name="counselling_date"
+                                           widget="datetime"/>
+                                    <field name="counselling_mode"/>
+                                    <field name="counselling_done_date"
+                                           widget="date" readonly="1"
+                                           invisible="not counselling_done_date"/>
+                                </group>
+                            </group>
+
+                            <separator string="Counselling Sessions"/>
+                            <field name="session_ids"
+                                   context="{
+                                       'default_enquiry_id': id,
+                                       'default_counsellor_id': counsellor_id,
+                                       'default_program_discussed_id': program_id
+                                   }">
+                                <list string="Sessions"
+                                      editable="bottom"
+                                      decoration-success="state == 'completed'"
+                                      decoration-warning="state == 'no_show'">
+                                    <field name="session_number" readonly="1" string="#"/>
+                                    <field name="session_date" widget="datetime"/>
+                                    <field name="counsellor_id"
+                                           options="{'no_create': True}"/>
+                                    <field name="session_mode"/>
+                                    <field name="program_discussed_id"
+                                           options="{'no_create': True}"/>
+                                    <field name="eligibility_status" widget="badge"
+                                           decoration-success="eligibility_status == 'eligible'"
+                                           decoration-warning="eligibility_status == 'conditional'"
+                                           decoration-danger="eligibility_status == 'not_eligible'"
+                                           decoration-info="eligibility_status == 'pending'"/>
+                                    <field name="outcome" widget="badge"
+                                           decoration-success="outcome in ['interested', 'seat_blocked', 'applied']"
+                                           decoration-danger="outcome in ['not_interested', 'chose_competitor']"
+                                           decoration-warning="outcome in ['needs_follow_up', 'considering']"/>
+                                    <field name="follow_up_date" optional="show"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'completed'"
+                                           decoration-warning="state == 'no_show'"/>
+                                    <button name="action_complete"
+                                            string="Complete"
+                                            type="object"
+                                            icon="fa-check"
+                                            invisible="state != 'scheduled'"/>
+                                    <button name="action_no_show"
+                                            string="No Show"
+                                            type="object"
+                                            icon="fa-times"
+                                            invisible="state != 'scheduled'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Notes" name="notes">
+                            <field name="notes" nolabel="1"
+                                   placeholder="Internal notes about this enquiry..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         LIST VIEW
+    ═══════════════════════════════════════════════════════════════════ -->
+    <record id="student_enquiry_view_list" model="ir.ui.view">
+        <field name="name">student.enquiry.view.list</field>
+        <field name="model">student.enquiry</field>
+        <field name="arch" type="xml">
+            <list string="Student Enquiries"
+                  decoration-success="state == 'admitted'"
+                  decoration-danger="state == 'lost'"
+                  decoration-warning="state == 'seat_blocked'">
+                <field name="applicant_name"/>
+                <field name="mobile"/>
+                <field name="program_id"/>
+                <field name="academic_year_id" optional="show"/>
+                <field name="counsellor_id"/>
+                <field name="source_id" optional="show"/>
+                <field name="session_count" string="Sessions"/>
+                <field name="follow_up_date" optional="show"/>
+                <field name="create_date" string="Enquiry Date" optional="show"/>
+                <field name="priority" widget="priority"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'admitted'"
+                       decoration-danger="state == 'lost'"
+                       decoration-warning="state == 'seat_blocked'"
+                       decoration-info="state in ['counselling_scheduled', 'interested']"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         SEARCH VIEW
+    ═══════════════════════════════════════════════════════════════════ -->
+    <record id="student_enquiry_view_search" model="ir.ui.view">
+        <field name="name">student.enquiry.view.search</field>
+        <field name="model">student.enquiry</field>
+        <field name="arch" type="xml">
+            <search string="Search Enquiries">
+                <field name="applicant_name"/>
+                <field name="mobile"/>
+                <field name="email"/>
+                <field name="program_id"/>
+                <field name="counsellor_id"/>
+                <field name="source_id"/>
+
+                <filter string="New Enquiry" name="filter_new"
+                        domain="[('state', '=', 'new')]"/>
+                <filter string="Contacted" name="filter_contacted"
+                        domain="[('state', '=', 'contacted')]"/>
+                <filter string="Counselling Scheduled" name="filter_counselling"
+                        domain="[('state', '=', 'counselling_scheduled')]"/>
+                <filter string="Interested" name="filter_interested"
+                        domain="[('state', '=', 'interested')]"/>
+                <filter string="Seat Blocked" name="filter_seat_blocked"
+                        domain="[('state', '=', 'seat_blocked')]"/>
+                <filter string="Admitted" name="filter_admitted"
+                        domain="[('state', '=', 'admitted')]"/>
+                <filter string="Not Interested" name="filter_lost"
+                        domain="[('state', '=', 'lost')]"/>
+                <separator/>
+                <filter string="Hot Leads" name="filter_hot"
+                        domain="[('priority', 'in', ['1', '2'])]"/>
+                <filter string="Follow-up Today" name="filter_followup"
+                        domain="[('follow_up_date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="My Enquiries" name="filter_mine"
+                        domain="[('counsellor_id', '=', uid)]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_state"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Counsellor" name="group_counsellor"
+                            context="{'group_by': 'counsellor_id'}"/>
+                    <filter string="Program" name="group_program"
+                            context="{'group_by': 'program_id'}"/>
+                    <filter string="Source" name="group_source"
+                            context="{'group_by': 'source_id'}"/>
+                    <filter string="Academic Year" name="group_year"
+                            context="{'group_by': 'academic_year_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         ACTION
+    ═══════════════════════════════════════════════════════════════════ -->
+    <record id="action_student_enquiry" model="ir.actions.act_window">
+        <field name="name">Student Enquiry</field>
+        <field name="res_model">student.enquiry</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_filter_mine': 0}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No admission enquiries yet
+            </p>
+            <p>
+                Create a new enquiry to start tracking a prospective student
+                through the admission pipeline.
+                Convert enquiries to Seat Blockings or Admission Applications
+                using the action buttons on each record.
+            </p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="grade_system_view_form" model="ir.ui.view">
+        <field name="name">examination.grade.system.view.form</field>
+        <field name="model">examination.grade.system</field>
+        <field name="arch" type="xml">
+            <form string="Grade System">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+
+                    <div class="oe_title">
+                        <label for="name" string="Grade Name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g., Outstanding, Excellent, Very Good"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Grade Details">
+                            <field name="grade" placeholder="e.g., O, A+, A, B+"/>
+                            <field name="grade_point"/>
+                            <field name="is_pass" widget="boolean_toggle"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                        <group string="Visual Settings">
+                            <field name="color" widget="color_picker"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Percentage Range">
+                            <label for="min_percentage"/>
+                            <div class="o_row">
+                                <field name="min_percentage" class="oe_inline"/>
+                                <span class="text-muted">%</span>
+                            </div>
+                            <label for="max_percentage"/>
+                            <div class="o_row">
+                                <field name="max_percentage" class="oe_inline"/>
+                                <span class="text-muted">%</span>
+                            </div>
+                        </group>
+                        <group string="Marks Range (Optional)">
+                            <field name="min_marks"
+                                   placeholder="e.g., 90 (for max marks 100)"/>
+                            <field name="max_marks"
+                                   placeholder="e.g., 100"/>
+                        </group>
+                    </group>
+
+                    <separator string="Description"/>
+                    <field name="description"
+                           placeholder="Enter grade description or criteria..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="grade_system_view_list" model="ir.ui.view">
+        <field name="name">examination.grade.system.view.list</field>
+        <field name="model">examination.grade.system</field>
+        <field name="arch" type="xml">
+            <list string="Grade System"
+                  default_order="min_percentage desc"
+                  multi_edit="1"
+                  sample="1"
+                  decoration-success="is_pass == True"
+                  decoration-danger="is_pass == False"
+                  decoration-muted="active == False">
+                <field name="name"/>
+                <field name="grade" decoration-bf="1"/>
+                <field name="grade_point" decoration-bf="1"/>
+                <field name="min_percentage"/>
+                <field name="max_percentage"/>
+                <field name="min_marks" optional="hide"/>
+                <field name="max_marks" optional="hide"/>
+                <field name="is_pass" widget="boolean_toggle"/>
+                <field name="color" widget="color_picker" optional="hide"/>
+                <field name="active" widget="boolean_toggle" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="grade_system_view_search" model="ir.ui.view">
+        <field name="name">examination.grade.system.view.search</field>
+        <field name="model">examination.grade.system</field>
+        <field name="arch" type="xml">
+            <search string="Search Grade System">
+                <field name="name"/>
+                <field name="grade"/>
+                <field name="grade_point"/>
+
+                <separator/>
+
+                <filter name="filter_passing" string="Passing Grades"
+                        domain="[('is_pass', '=', True)]"/>
+                <filter name="filter_failing" string="Failing Grades"
+                        domain="[('is_pass', '=', False)]"/>
+
+                <separator/>
+
+                <filter name="filter_active" string="Active"
+                        domain="[('active', '=', True)]"/>
+                <filter name="filter_archived" string="Archived"
+                        domain="[('active', '=', False)]"/>
+
+                <separator/>
+
+                <filter name="filter_high_grade" string="High Grades (80%+)"
+                        domain="[('min_percentage', '&gt;=', 80)]"/>
+                <filter name="filter_medium_grade" string="Medium Grades (50-79%)"
+                        domain="[('min_percentage', '&gt;=', 50), ('max_percentage', '&lt;', 80)]"/>
+                <filter name="filter_low_grade" string="Low Grades (&lt;50%)"
+                        domain="[('max_percentage', '&lt;', 50)]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_is_pass" string="Pass/Fail Status"
+                            context="{'group_by': 'is_pass'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="grade_system_view_kanban" model="ir.ui.view">
+        <field name="name">examination.grade.system.view.kanban</field>
+        <field name="model">examination.grade.system</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="is_pass"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="grade"/>
+                <field name="grade_point"/>
+                <field name="min_percentage"/>
+                <field name="max_percentage"/>
+                <field name="min_marks"/>
+                <field name="max_marks"/>
+                <field name="is_pass"/>
+                <field name="color"/>
+                <field name="active"/>
+
+                <progressbar field="is_pass"
+                             colors='{"True": "success", "False": "danger"}'/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click"
+                             t-attf-style="border-left: 4px solid {{kanban_color(record.color.raw_value)}};">
+                            <div class="ribbon ribbon-top-right" t-if="!record.active.raw_value">
+                                <span class="text-bg-danger">Archived</span>
+                            </div>
+
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top mb-3">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title fs-3">
+                                            <field name="grade"/>
+                                        </strong>
+                                        <div class="text-muted fs-6">
+                                            <field name="name"/>
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_record_top_right">
+                                        <span class="badge rounded-pill fs-5"
+                                              t-attf-class="{{record.is_pass.raw_value ? 'text-bg-success' : 'text-bg-danger'}}">
+                                            <strong><field name="grade_point"/></strong>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="bg-light p-3 rounded">
+                                                <div class="text-center mb-2">
+                                                    <h4 class="mb-0">
+                                                        <span class="text-primary">
+                                                            <field name="min_percentage"/>%
+                                                        </span>
+                                                        <span class="text-muted mx-2">to</span>
+                                                        <span class="text-success">
+                                                            <field name="max_percentage"/>%
+                                                        </span>
+                                                    </h4>
+                                                    <small class="text-muted">Percentage Range</small>
+                                                </div>
+
+                                                <div class="progress" style="height: 25px;">
+                                                    <div class="progress-bar" role="progressbar"
+                                                         t-attf-style="width: {{record.max_percentage.raw_value}}%; background-color: {{kanban_color(record.color.raw_value)}};"
+                                                         t-attf-aria-valuenow="{{record.max_percentage.raw_value}}"
+                                                         aria-valuemin="0"
+                                                         aria-valuemax="100">
+                                                        <strong>
+                                                            <t t-esc="record.max_percentage.raw_value"/>%
+                                                        </strong>
+                                                    </div>
+                                                </div>
+
+                                                <div class="mt-3 text-center" t-if="record.min_marks.raw_value or record.max_marks.raw_value">
+                                                    <small class="text-muted">
+                                                        <i class="fa fa-calculator"/>
+                                                        Marks:
+                                                        <strong>
+                                                            <t t-esc="record.min_marks.raw_value || '0'"/> -
+                                                            <t t-esc="record.max_marks.raw_value || '100'"/>
+                                                        </strong>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-3">
+                                        <div class="col-12 text-center">
+                                            <span class="badge rounded-pill"
+                                                  t-attf-class="{{record.is_pass.raw_value ? 'text-bg-success' : 'text-bg-danger'}}">
+                                                <i t-attf-class="fa {{record.is_pass.raw_value ? 'fa-check-circle' : 'fa-times-circle'}}"/>
+                                                <strong>
+                                                    <t t-if="record.is_pass.raw_value">PASSING GRADE</t>
+                                                    <t t-if="!record.is_pass.raw_value">FAILING GRADE</t>
+                                                </strong>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_grade_system" model="ir.actions.act_window">
+        <field name="name">Grade System</field>
+        <field name="res_model">examination.grade.system</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_filter_active': 1, 'search_default_filter_passing': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create Grade System
+            </p>
+            <p>
+                Define grading system for result evaluation. Configure grade names
+                (Outstanding, Excellent, Very Good, etc.) with grade letters (O, A+, A, B+, B, C, D, F)
+                and grade points (10, 9, 8, 7, etc.). Set percentage ranges (min-max) to automatically
+                assign grades based on marks obtained. Optionally configure marks ranges for direct
+                marks-based grading. Mark grades as passing or failing. Use color coding for
+                visual identification. System validates percentage ranges (0-100) and prevents
+                overlapping grade ranges. Unique constraints ensure no duplicate grade letters
+                or grade points.
+            </p>
+        </field>
+    </record>
+
+</odoo>

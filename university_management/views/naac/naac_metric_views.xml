@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="naac_metric_view_form" model="ir.ui.view">
+        <field name="name">naac.metric.view.form</field>
+        <field name="model">naac.metric</field>
+        <field name="arch" type="xml">
+            <form string="NAAC Metric">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="metric_code"/>
+                        <h1><field name="metric_code" placeholder="e.g. 3.1.1"/> — <field name="name" placeholder="Metric Name"/></h1>
+                    </div>
+                    <group>
+                        <group string="Classification">
+                            <field name="criterion_id"/>
+                            <field name="unit"/>
+                            <field name="academic_year_id"/>
+                        </group>
+                        <group string="Targets">
+                            <field name="target_value"/>
+                            <field name="actual_value"/>
+                            <field name="achievement_pct" widget="progressbar"/>
+                            <field name="status" widget="badge"
+                                   decoration-success="status == 'achieved'"
+                                   decoration-warning="status == 'in_progress'"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Manual Value">
+                            <field name="use_manual"/>
+                            <field name="manual_value" invisible="not use_manual"/>
+                        </group>
+                        <group string="Auto Calculation">
+                            <field name="auto_calculated"/>
+                            <field name="calculation_model" invisible="not auto_calculated"/>
+                            <field name="calculation_domain" invisible="not auto_calculated"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1"/>
+                        <field name="notes" nolabel="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Evidence">
+                            <field name="evidence_ids" nolabel="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="doc_type"/>
+                                    <field name="department_id"/>
+                                    <field name="upload_date"/>
+                                    <field name="is_verified"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="naac_metric_view_list" model="ir.ui.view">
+        <field name="name">naac.metric.view.list</field>
+        <field name="model">naac.metric</field>
+        <field name="arch" type="xml">
+            <list string="NAAC Metrics">
+                <field name="metric_code"/>
+                <field name="criterion_id"/>
+                <field name="name"/>
+                <field name="unit"/>
+                <field name="target_value"/>
+                <field name="actual_value"/>
+                <field name="achievement_pct" widget="progressbar"/>
+                <field name="status" widget="badge"
+                       decoration-success="status == 'achieved'"
+                       decoration-warning="status == 'in_progress'"/>
+                <field name="evidence_count"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="naac_metric_view_search" model="ir.ui.view">
+        <field name="name">naac.metric.view.search</field>
+        <field name="model">naac.metric</field>
+        <field name="arch" type="xml">
+            <search string="Search Metrics">
+                <field name="name"/>
+                <field name="metric_code"/>
+                <field name="criterion_id"/>
+                <separator/>
+                <filter string="Not Started" name="not_started" domain="[('status', '=', 'not_started')]"/>
+                <filter string="In Progress" name="in_progress" domain="[('status', '=', 'in_progress')]"/>
+                <filter string="Achieved" name="achieved" domain="[('status', '=', 'achieved')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Criterion" name="group_criterion" context="{'group_by': 'criterion_id'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="naac_metric_view_pivot" model="ir.ui.view">
+        <field name="name">naac.metric.view.pivot</field>
+        <field name="model">naac.metric</field>
+        <field name="arch" type="xml">
+            <pivot string="Metrics Pivot">
+                <field name="criterion_id" type="row"/>
+                <field name="status" type="col"/>
+                <field name="achievement_pct" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="naac_metric_view_graph" model="ir.ui.view">
+        <field name="name">naac.metric.view.graph</field>
+        <field name="model">naac.metric</field>
+        <field name="arch" type="xml">
+            <graph string="Metrics Analysis" type="bar">
+                <field name="criterion_id" type="row"/>
+                <field name="actual_value" type="measure"/>
+                <field name="target_value" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_naac_metric" model="ir.actions.act_window">
+        <field name="name">NAAC Metrics</field>
+        <field name="res_model">naac.metric</field>
+        <field name="view_mode">list,graph,pivot,form</field>
+        <field name="search_view_id" ref="naac_metric_view_search"/>
+    </record>
+
+</odoo>

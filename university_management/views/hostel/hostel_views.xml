@@ -1,0 +1,519 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View - Hostel -->
+    <record id="hostel_hostel_view_form" model="ir.ui.view">
+        <field name="name">hostel.hostel.view.form</field>
+        <field name="model">hostel.hostel</field>
+        <field name="arch" type="xml">
+            <form string="Hostel">
+                <header>
+                    <button name="action_activate" string="Activate"
+                        type="object" class="oe_highlight"
+                        invisible="state != 'draft'"/>
+                    <button name="action_maintenance" string="Under Maintenance"
+                            type="object" class="btn-warning"
+                            invisible="state not in ['active']"/>
+                    <button name="action_close" string="Close"
+                            type="object" class="btn-danger"
+                            invisible="state not in ['active', 'maintenance']"
+                            confirm="Are you sure you want to close this hostel?"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft"
+                            type="object" class="btn-default"
+                            invisible="state == 'draft'"
+                            confirm="Are you sure you want to reset this hostel to draft?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,active,maintenance,closed"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Active" bg_color="text-bg-success"
+                            invisible="state != 'active'"/>
+                    <widget name="web_ribbon" title="Under Maintenance" bg_color="text-bg-warning"
+                            invisible="state != 'maintenance'"/>
+                    <widget name="web_ribbon" title="Closed" bg_color="text-bg-danger"
+                            invisible="state != 'closed'"/>
+
+                    <div class="oe_title">
+                        <label for="name" string="Hostel Name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g., Gandhi Hostel"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Basic Information">
+                            <field name="code" placeholder="e.g., GH-001"/>
+                            <field name="hostel_type" widget="radio"/>
+                        </group>
+                        <group string="Status">
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Warden Details">
+                            <field name="warden_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="warden_name" readonly="1"
+                                   invisible="not warden_id"/>
+                            <field name="warden_contact" readonly="1" widget="phone"
+                                   invisible="not warden_id"/>
+                        </group>
+                        <group string="Capacity Statistics">
+                            <field name="total_rooms" readonly="1"/>
+                            <field name="total_capacity" readonly="1"/>
+                            <field name="occupied_beds" readonly="1"
+                                   decoration-warning="occupied_beds &gt; total_capacity * 0.8"/>
+                            <field name="available_beds" readonly="1"
+                                   decoration-danger="available_beds &lt; 10"
+                                   decoration-success="available_beds &gt;= 10"/>
+                            <field name="current_students" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Assistant Wardens">
+                            <field name="assistant_warden_ids" nolabel="1"
+                                   widget="many2many_tags"
+                                   options="{'no_create': True, 'color_field': 'color'}"/>
+                        </group>
+                        <group string="Mess">
+                            <field name="mess_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Location">
+                            <field name="address" placeholder="Enter complete address..."/>
+                            <field name="city"/>
+                            <field name="state_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="country_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                        </group>
+                        <group string="Fee Structure">
+                            <field name="currency_id" invisible="1"/>
+                            <field name="monthly_rent" widget="monetary"/>
+                            <field name="security_deposit" widget="monetary"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Facilities Available" col="2">
+                            <field name="has_wifi" widget="boolean_toggle"/>
+                            <field name="has_gym" widget="boolean_toggle"/>
+                            <field name="has_common_room" widget="boolean_toggle"/>
+                            <field name="has_study_room" widget="boolean_toggle"/>
+                            <field name="has_laundry" widget="boolean_toggle"/>
+                            <field name="has_mess" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Rooms" name="rooms">
+                            <field name="room_ids" nolabel="1">
+                                <list string="Hostel Rooms" editable="bottom">
+                                    <field name="name"/>
+                                    <field name="room_number"/>
+                                    <field name="floor"/>
+                                    <field name="room_type"/>
+                                    <field name="capacity"/>
+                                    <field name="occupied_beds"
+                                           decoration-warning="occupied_beds &gt;= capacity"/>
+                                    <field name="available_beds"
+                                           decoration-danger="available_beds == 0"/>
+                                    <field name="monthly_rent" widget="monetary" optional="show"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'available'"
+                                           decoration-warning="state == 'occupied'"
+                                           decoration-danger="state in ['maintenance', 'unavailable']"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Current Allocations" name="current_allocations">
+                            <field name="allocation_ids" nolabel="1"
+                                   domain="[('state', '=', 'allocated')]">
+                                <list string="Current Students">
+                                    <field name="name"/>
+                                    <field name="student_id"/>
+                                    <field name="room_id"/>
+                                    <field name="bed_number" optional="show"/>
+                                    <field name="allocation_date"/>
+                                    <field name="vacate_date" optional="show"/>
+                                    <field name="monthly_rent" widget="monetary" optional="hide"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'allocated'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="All Allocations" name="all_allocations">
+                            <field name="allocation_ids" nolabel="1">
+                                <list string="Student Allocations">
+                                    <field name="name"/>
+                                    <field name="student_id"/>
+                                    <field name="room_id"/>
+                                    <field name="bed_number" optional="show"/>
+                                    <field name="allocation_date"/>
+                                    <field name="vacate_date" optional="show"/>
+                                    <field name="monthly_rent" widget="monetary" optional="hide"/>
+                                    <field name="state" widget="badge"
+                                           decoration-info="state == 'draft'"
+                                           decoration-success="state == 'allocated'"
+                                           decoration-warning="state == 'vacated'"
+                                           decoration-muted="state == 'cancelled'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Rules &amp; Regulations" name="rules">
+                            <field name="rules" nolabel="1"
+                                   placeholder="Enter hostel rules and regulations (HTML formatting supported)..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View - Hostel -->
+    <record id="hostel_hostel_view_list" model="ir.ui.view">
+        <field name="name">hostel.hostel.view.list</field>
+        <field name="model">hostel.hostel</field>
+        <field name="arch" type="xml">
+            <list string="Hostels"
+                  default_order="name"
+                  multi_edit="1"
+                  sample="1"
+                  decoration-info="state == 'draft'"
+                  decoration-success="state == 'active'"
+                  decoration-warning="state == 'maintenance'"
+                  decoration-muted="state == 'closed'">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="hostel_type"/>
+                <field name="warden_id" optional="show"/>
+                <field name="warden_contact" optional="hide"/>
+                <field name="total_rooms" readonly="1" optional="show"/>
+                <field name="total_capacity" readonly="1" optional="show"/>
+                <field name="occupied_beds" readonly="1" optional="show"
+                       decoration-warning="occupied_beds &gt; total_capacity * 0.8"/>
+                <field name="available_beds" readonly="1" optional="show"
+                       decoration-danger="available_beds &lt; 10"
+                       decoration-success="available_beds &gt;= 10"/>
+                <field name="current_students" readonly="1" optional="show"/>
+                <field name="monthly_rent" widget="monetary" optional="hide"/>
+                <field name="has_mess" widget="boolean_toggle" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'active'"
+                       decoration-warning="state == 'maintenance'"
+                       decoration-danger="state == 'closed'"/>
+                <field name="active" widget="boolean_toggle" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View - Hostel -->
+    <record id="hostel_hostel_view_search" model="ir.ui.view">
+        <field name="name">hostel.hostel.view.search</field>
+        <field name="model">hostel.hostel</field>
+        <field name="arch" type="xml">
+            <search string="Search Hostels">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="warden_id"/>
+                <field name="city"/>
+                <field name="state_id"/>
+
+                <separator/>
+
+                <filter name="filter_boys" string="Boy's Hostel"
+                        domain="[('hostel_type', '=', 'boys')]"/>
+                <filter name="filter_girls" string="Girl's Hostel"
+                        domain="[('hostel_type', '=', 'girls')]"/>
+                <filter name="filter_mixed" string="Mixed/Co-ed"
+                        domain="[('hostel_type', '=', 'mixed')]"/>
+
+                <separator/>
+
+                <filter name="filter_draft" string="Draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_active" string="Active"
+                        domain="[('state', '=', 'active')]"/>
+                <filter name="filter_maintenance" string="Under Maintenance"
+                        domain="[('state', '=', 'maintenance')]"/>
+                <filter name="filter_closed" string="Closed"
+                        domain="[('state', '=', 'closed')]"/>
+
+                <separator/>
+
+                <filter name="filter_available_beds" string="Available Beds"
+                        domain="[('available_beds', '&gt;', 0)]"/>
+                <filter name="filter_no_beds" string="No Available Beds"
+                        domain="[('available_beds', '=', 0)]"/>
+                <filter name="filter_low_availability" string="Low Availability (&lt;10 beds)"
+                        domain="[('available_beds', '&gt;', 0), ('available_beds', '&lt;', 10)]"/>
+
+                <separator/>
+
+                <filter name="filter_with_mess" string="With Mess"
+                        domain="[('has_mess', '=', True)]"/>
+                <filter name="filter_with_wifi" string="With WiFi"
+                        domain="[('has_wifi', '=', True)]"/>
+                <filter name="filter_with_gym" string="With Gym"
+                        domain="[('has_gym', '=', True)]"/>
+
+                <separator/>
+
+                <filter name="filter_active_records" string="Active Records"
+                        domain="[('active', '=', True)]"/>
+                <filter name="filter_archived" string="Archived"
+                        domain="[('active', '=', False)]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_hostel_type" string="Hostel Type"
+                            context="{'group_by': 'hostel_type'}"/>
+                    <filter name="group_by_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_by_warden" string="Warden"
+                            context="{'group_by': 'warden_id'}"/>
+                    <filter name="group_by_city" string="City"
+                            context="{'group_by': 'city'}"/>
+                    <filter name="group_by_state_location" string="State"
+                            context="{'group_by': 'state_id'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="hostel_type" string="Hostel Type"
+                           select="multi"
+                           icon="fa-building"/>
+                    <field name="state" string="Status"
+                           select="multi"
+                           icon="fa-filter"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View - Hostel -->
+    <record id="hostel_hostel_view_kanban" model="ir.ui.view">
+        <field name="name">hostel.hostel.view.kanban</field>
+        <field name="model">hostel.hostel</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="hostel_type"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="hostel_type"/>
+                <field name="warden_id"/>
+                <field name="warden_name"/>
+                <field name="warden_contact"/>
+                <field name="city"/>
+                <field name="total_rooms"/>
+                <field name="total_capacity"/>
+                <field name="occupied_beds"/>
+                <field name="available_beds"/>
+                <field name="current_students"/>
+                <field name="monthly_rent"/>
+                <field name="security_deposit"/>
+                <field name="has_wifi"/>
+                <field name="has_gym"/>
+                <field name="has_common_room"/>
+                <field name="has_study_room"/>
+                <field name="has_laundry"/>
+                <field name="has_mess"/>
+                <field name="state"/>
+                <field name="active"/>
+
+                <progressbar field="state"
+                             colors='{"active": "success", "maintenance": "warning", "closed": "danger"}'/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="ribbon ribbon-top-right" t-if="record.state.raw_value == 'active'">
+                                <span class="text-bg-success">Active</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.state.raw_value == 'maintenance'">
+                                <span class="text-bg-warning">Maintenance</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.state.raw_value == 'closed'">
+                                <span class="text-bg-danger">Closed</span>
+                            </div>
+
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                        <div class="text-muted">
+                                            <field name="code"/> - <field name="hostel_type"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body mt-3">
+                                    <div class="row mb-2" t-if="record.warden_id.raw_value">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded">
+                                                <div class="mb-1">
+                                                    <i class="fa fa-user text-primary"/>
+                                                    <strong>Warden:</strong> <field name="warden_name"/>
+                                                </div>
+                                                <div class="mb-1" t-if="record.warden_contact.raw_value">
+                                                    <i class="fa fa-phone text-success"/>
+                                                    <field name="warden_contact"/>
+                                                </div>
+                                                <div class="mb-1" t-if="record.city.raw_value">
+                                                    <i class="fa fa-map-marker text-danger"/>
+                                                    <field name="city"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-6">
+                                            <div class="card bg-primary text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h5 class="mb-0"><field name="total_rooms"/></h5>
+                                                    <small>Total Rooms</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="card bg-info text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h5 class="mb-0"><field name="total_capacity"/></h5>
+                                                    <small>Capacity</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-6">
+                                            <div class="card bg-warning text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h5 class="mb-0"><field name="occupied_beds"/></h5>
+                                                    <small>Occupied</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div t-attf-class="card {{record.available_beds.raw_value &lt; 10 ? 'bg-danger' : 'bg-success'}} text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h5 class="mb-0"><field name="available_beds"/></h5>
+                                                    <small>Available</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="card bg-secondary text-white">
+                                                <div class="card-body p-2 text-center">
+                                                    <h5 class="mb-0"><field name="current_students"/></h5>
+                                                    <small>Current Students</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2" t-if="record.monthly_rent.raw_value &gt; 0">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded text-center">
+                                                <strong>₹<field name="monthly_rent"/></strong> / month
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-2">
+                                        <div class="col-12">
+                                            <div class="d-flex flex-wrap gap-1">
+                                                <span t-if="record.has_wifi.raw_value"
+                                                      class="badge text-bg-primary">
+                                                    <i class="fa fa-wifi"/> WiFi
+                                                </span>
+                                                <span t-if="record.has_gym.raw_value"
+                                                      class="badge text-bg-success">
+                                                    <i class="fa fa-heartbeat"/> Gym
+                                                </span>
+                                                <span t-if="record.has_mess.raw_value"
+                                                      class="badge text-bg-info">
+                                                    <i class="fa fa-cutlery"/> Mess
+                                                </span>
+                                                <span t-if="record.has_laundry.raw_value"
+                                                      class="badge text-bg-warning">
+                                                    <i class="fa fa-tint"/> Laundry
+                                                </span>
+                                                <span t-if="record.has_study_room.raw_value"
+                                                      class="badge text-bg-secondary">
+                                                    <i class="fa fa-book"/> Study
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom mt-2">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="state" widget="badge"
+                                               decoration-success="state == 'active'"
+                                               decoration-warning="state == 'maintenance'"
+                                               decoration-danger="state == 'closed'"/>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_hostel_hostel" model="ir.actions.act_window">
+        <field name="name">Hostels</field>
+        <field name="res_model">hostel.hostel</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_filter_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create Hostel
+            </p>
+            <p>
+                Manage university hostels. Enter hostel_name (required, tracked) and unique hostel_code
+                (required, unique constraint - e.g., GH-001, BH-001). Select hostel_type: Boy's Hostel,
+                Girl's Hostel, or Mixed/Co-ed (required, tracked, radio widget). Assign warden
+                (faculty.faculty, tracked) - displays related warden_name and warden_contact (work_mobile).
+                Assign assistant_warden_ids (Many2many to faculty.faculty, tags widget). Enter location:
+                address (text), city, state_id (res.country.state), country_id (default India). System
+                computes 4 capacity statistics (stored): total_rooms (count of room_ids), total_capacity
+                (sum of room capacities), occupied_beds (sum of occupied beds from rooms), available_beds
+                (total_capacity - occupied_beds, red decoration if &lt;10, green if &gt;=10). System tracks
+                room_ids (one2many to hostel.room, editable list in Rooms page). System tracks
+                allocation_ids (one2many to hostel.allocation, 2 notebook pages: Current Allocations filtered
+                by state='allocated', All Allocations unfiltered). System computes current_students (count
+                of allocations with state='allocated'). Configure 6 facilities (boolean toggles): has_wifi,
+                has_gym, has_common_room, has_study_room, has_laundry, has_mess (default True). Link
+                mess_id (hostel.mess) if applicable. Set fees: monthly_rent (monetary), security_deposit
+                (monetary). Enter rules (HTML field for hostel rules). 3-state system: Active (default),
+                Under Maintenance, Closed (tracked, status bar, triple ribbon). Active boolean (default
+                True) for archiving. Kanban shows facility badges with icons. Full chatter support.
+            </p>
+        </field>
+    </record>
+
+</odoo>

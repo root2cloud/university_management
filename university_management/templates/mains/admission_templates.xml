@@ -1,0 +1,627 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Admissions Information Page Template -->
+        <template id="admissions_page" name="Admissions Page">
+            <t t-call="website.layout">
+                <div id="wrap" class="oe_structure">
+                    <div class="container mt-4">
+                        <!-- Header Section -->
+                        <div class="row mb-5">
+                            <div class="col-12 text-center">
+                                <h1 class="display-4 text-primary">Admissions</h1>
+                                <p class="lead">Apply to our prestigious programs and start your journey to success</p>
+                            </div>
+                        </div>
+
+                        <!-- Available Programs -->
+                        <div class="row mb-5">
+                            <div class="col-12">
+                                <h2 class="mb-4">Available Programs</h2>
+                                <div class="row">
+                                    <t t-foreach="programs" t-as="program">
+                                        <div class="col-md-4 mb-4">
+                                            <div class="card h-100 shadow-sm">
+                                                <div class="card-body">
+                                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                                        <h5 class="card-title text-primary mb-0">
+                                                            <t t-esc="program.name"/>
+                                                        </h5>
+                                                        <t t-if="program.is_accredited">
+                                                            <span class="badge bg-success">
+                                                                <i class="fa fa-certificate"/>
+                                                                <t t-esc="program.accreditation_grade or 'Accredited'"/>
+                                                            </span>
+                                                        </t>
+                                                    </div>
+                                                    <h6 class="card-subtitle mb-2 text-muted">
+                                                        <t t-esc="program.code"/>
+                                                        <span class="mx-2">•</span>
+                                                        <t t-esc="program.program_type"/>
+                                                    </h6>
+                                                    <p class="card-text">
+                                                        <i class="fa fa-building text-muted me-2"/>
+                                                        <t t-esc="program.department_id.name"/>
+                                                    </p>
+                                                    <div class="row mb-3">
+                                                        <div class="col-6">
+                                                            <small class="text-muted">
+                                                                <i class="fa fa-clock-o me-1"/>
+                                                                <t t-esc="program.duration_years"/> Years
+                                                            </small>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <small class="text-muted">
+                                                                <i class="fa fa-calendar me-1"/>
+                                                                <t t-esc="program.total_semesters"/> Semesters
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <div>
+                                                            <span class="badge bg-info">
+                                                                <i class="fa fa-users me-1"/>
+                                                                <t t-esc="program.available_seats"/> seats available
+                                                            </span>
+                                                        </div>
+                                                        <a t-att-href="'/admission/apply?program_id=' + str(program.id)"
+                                                           class="btn btn-primary btn-sm">
+                                                            Apply Now
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Admission Process -->
+                        <div class="row mb-5">
+                            <div class="col-12">
+                                <h2 class="mb-4">Admission Process</h2>
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card text-center h-100 border-0">
+                                            <div class="card-body">
+                                                <div class="mb-3">
+                                                    <span class="display-4 text-primary">1</span>
+                                                </div>
+                                                <h5 class="card-title">Fill Application</h5>
+                                                <p class="card-text">Complete the online application form with your details</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card text-center h-100 border-0">
+                                            <div class="card-body">
+                                                <div class="mb-3">
+                                                    <span class="display-4 text-primary">2</span>
+                                                </div>
+                                                <h5 class="card-title">Submit Documents</h5>
+                                                <p class="card-text">Upload required documents for verification</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card text-center h-100 border-0">
+                                            <div class="card-body">
+                                                <div class="mb-3">
+                                                    <span class="display-4 text-primary">3</span>
+                                                </div>
+                                                <h5 class="card-title">Application Review</h5>
+                                                <p class="card-text">Our admission committee reviews your application</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card text-center h-100 border-0">
+                                            <div class="card-body">
+                                                <div class="mb-3">
+                                                    <span class="display-4 text-primary">4</span>
+                                                </div>
+                                                <h5 class="card-title">Admission Decision</h5>
+                                                <p class="card-text">Receive admission decision and fee payment details</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Call to Action -->
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <div class="jumbotron bg-light p-5 rounded">
+                                    <h3 class="mb-3">Ready to Apply?</h3>
+                                    <p class="lead mb-4">Start your application process today and join our community of learners</p>
+                                    <a href="/admission/apply" class="btn btn-primary btn-lg">
+                                        <i class="fa fa-pencil-square-o me-2"/>
+                                        Start Application
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <!-- Admission Application Form Template -->
+        <template id="admission_apply_page" name="Admission Application Form">
+            <t t-call="website.layout">
+                <div id="wrap" class="oe_structure">
+                    <div class="container mt-4 mb-5">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-10">
+                                <!-- Header -->
+                                <div class="row mb-5">
+                                    <div class="col-12 text-center">
+                                        <h1 class="display-4 text-primary">Admission Application</h1>
+                                        <p class="lead">Fill in the form below to apply for admission</p>
+                                    </div>
+                                </div>
+
+                                <!-- Application Form -->
+                                <form id="admission-form" t-att-action="'/admission/submit'" method="POST" class="needs-validation" novalidate="novalidate">
+                                    <!-- novalidate kept intentionally — JS below handles validation including custom messages -->
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                                    <!-- Personal Information -->
+                                    <div class="card mb-4 shadow-sm">
+                                        <div class="card-header bg-primary text-white">
+                                            <h5 class="mb-0">
+                                                <i class="fa fa-user me-2"/>
+                                                Personal Information
+                                            </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="applicant_name" class="form-label">Full Name *</label>
+                                                    <input type="text" class="form-control" id="applicant_name" name="applicant_name" required="required"/>
+                                                    <div class="invalid-feedback">
+                                                        Please enter your full name.
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="email" class="form-label">Email Address *</label>
+                                                    <input type="email" class="form-control" id="email" name="email" required="required"/>
+                                                    <div class="invalid-feedback">
+                                                        Please enter a valid email address.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="mobile" class="form-label">Mobile Number *</label>
+                                                    <input type="tel" class="form-control" id="mobile" name="mobile" required="required"/>
+                                                    <div class="invalid-feedback">
+                                                        Please enter your mobile number.
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="date_of_birth" class="form-label">Date of Birth *</label>
+                                                    <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" required="required"/>
+                                                    <div class="invalid-feedback">
+                                                        Please enter your date of birth.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">Gender *</label>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="gender" id="gender_male" value="male" required="required"/>
+                                                        <label class="form-check-label" for="gender_male">
+                                                            Male
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="gender" id="gender_female" value="female" required="required"/>
+                                                        <label class="form-check-label" for="gender_female">
+                                                            Female
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="gender" id="gender_other" value="other" required="required"/>
+                                                        <label class="form-check-label" for="gender_other">
+                                                            Other
+                                                        </label>
+                                                    </div>
+                                                    <div class="invalid-feedback">
+                                                        Please select your gender.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Program Selection -->
+                                    <div class="card mb-4 shadow-sm">
+                                        <div class="card-header bg-primary text-white">
+                                            <h5 class="mb-0">
+                                                <i class="fa fa-graduation-cap me-2"/>
+                                                Program Selection
+                                            </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="program_id" class="form-label">Select Program *</label>
+                                                    <select class="form-select" id="program_id" name="program_id" required="required">
+                                                        <option value="">-- Select Program --</option>
+                                                        <t t-foreach="programs" t-as="program">
+                                                            <option t-att-value="program.id">
+                                                                <t t-esc="program.name"/> (<t t-esc="program.code"/>)
+                                                            </option>
+                                                        </t>
+                                                    </select>
+                                                    <div class="invalid-feedback">
+                                                        Please select a program.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Educational Background -->
+                                    <div class="card mb-4 shadow-sm">
+                                        <div class="card-header bg-primary text-white">
+                                            <h5 class="mb-0">
+                                                <i class="fa fa-book me-2"/>
+                                                Educational Background
+                                            </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="previous_school" class="form-label">Previous School/College *</label>
+                                                    <input type="text" class="form-control" id="previous_school" name="previous_school" required="required"/>
+                                                    <div class="invalid-feedback">
+                                                        Please enter your previous school/college name.
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="previous_percentage" class="form-label">Percentage/CGPA *</label>
+                                                    <input type="number" class="form-control" id="previous_percentage" name="previous_percentage" step="0.01" min="0" max="100" required="required"/>
+                                                    <div class="invalid-feedback">
+                                                        Please enter your percentage (0-100).
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Address Information -->
+                                    <div class="card mb-4 shadow-sm">
+                                        <div class="card-header bg-primary text-white">
+                                            <h5 class="mb-0">
+                                                <i class="fa fa-home me-2"/>
+                                                Address Information
+                                            </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row mb-3">
+                                                <div class="col-12">
+                                                    <label for="permanent_address" class="form-label">Permanent Address *</label>
+                                                    <textarea class="form-control" id="permanent_address" name="permanent_address" rows="3" required="required"/>
+                                                    <div class="invalid-feedback">
+                                                        Please enter your permanent address.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="city" class="form-label">City *</label>
+                                                    <input type="text" class="form-control" id="city" name="city" required="required"/>
+                                                    <div class="invalid-feedback">
+                                                        Please enter your city.
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="state_id" class="form-label">State</label>
+                                                    <select class="form-select" id="state_id" name="state_id">
+                                                        <option value="">-- Select State --</option>
+                                                        <t t-foreach="states" t-as="state">
+                                                            <option t-att-value="state.id">
+                                                                <t t-esc="state.name"/>
+                                                            </option>
+                                                        </t>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="country_id" class="form-label">Country *</label>
+                                                    <select class="form-select" id="country_id" name="country_id" required="required">
+                                                        <option value="">-- Select Country --</option>
+                                                        <t t-foreach="countries" t-as="country">
+                                                            <option t-att-value="country.id">
+                                                                <t t-esc="country.name"/>
+                                                            </option>
+                                                        </t>
+                                                    </select>
+                                                    <div class="invalid-feedback">
+                                                        Please select your country.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="zip" class="form-label">ZIP/Postal Code</label>
+                                                    <input type="text" class="form-control" id="zip" name="zip"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Parent/Guardian Information -->
+                                    <div class="card mb-4 shadow-sm">
+                                        <div class="card-header bg-primary text-white">
+                                            <h5 class="mb-0">
+                                                <i class="fa fa-users me-2"/>
+                                                Parent/Guardian Information
+                                            </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="father_name" class="form-label">Father's Name *</label>
+                                                    <input type="text" class="form-control" id="father_name" name="father_name" required="required"/>
+                                                    <div class="invalid-feedback">
+                                                        Please enter father's name.
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="mother_name" class="form-label">Mother's Name *</label>
+                                                    <input type="text" class="form-control" id="mother_name" name="mother_name" required="required"/>
+                                                    <div class="invalid-feedback">
+                                                        Please enter mother's name.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="guardian_mobile" class="form-label">Guardian's Mobile Number *</label>
+                                                    <input type="tel" class="form-control" id="guardian_mobile" name="guardian_mobile" required="required"/>
+                                                    <div class="invalid-feedback">
+                                                        Please enter guardian's mobile number.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Terms and Conditions -->
+                                    <div class="card mb-4 shadow-sm">
+                                        <div class="card-body">
+                                            <div class="form-check mb-3">
+                                                <input class="form-check-input" type="checkbox" id="terms" name="terms" required="required"/>
+                                                <label class="form-check-label" for="terms">
+                                                    I hereby declare that the information provided is true and correct to the best of my knowledge.
+                                                    I understand that any false statement may lead to disqualification of my application.
+                                                </label>
+                                                <div class="invalid-feedback">
+                                                    You must agree to the terms and conditions.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Submit Button -->
+                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                        <a href="/admissions" class="btn btn-dark btn-lg me-md-2">
+                                            <i class="fa fa-arrow-left me-2"/>
+                                            Back
+                                        </a>
+                                        <button type="submit" id="submit-btn" class="btn btn-dark btn-lg">
+                                            <i class="fa fa-paper-plane me-2"/>
+                                            Submit Application
+                                        </button>
+                                    </div>
+                                </form>
+
+                                <script>
+                                (function () {
+                                    'use strict';
+
+                                    var form = document.getElementById('admission-form');
+                                    var termsCheckbox = document.getElementById('terms');
+
+                                    // Validate declaration checkbox
+                                    function validateTerms() {
+                                        var feedback = termsCheckbox.parentElement.querySelector('.invalid-feedback');
+                                        if (!termsCheckbox.checked) {
+                                            termsCheckbox.classList.add('is-invalid');
+                                            if (feedback) { feedback.style.display = 'block'; }
+                                            return false;
+                                        }
+                                        termsCheckbox.classList.remove('is-invalid');
+                                        if (feedback) { feedback.style.display = 'none'; }
+                                        return true;
+                                    }
+
+                                    // Validate gender radio group (browser won't highlight radios by default)
+                                    function validateGender() {
+                                        var radios = form.querySelectorAll('input[name="gender"]');
+                                        var isChecked = false;
+                                        var i = 0;
+                                        while (i &lt; radios.length) {
+                                            if (radios[i].checked) { isChecked = true; }
+                                            i++;
+                                        }
+                                        var container = document.getElementById('gender_male').closest('.col-md-6');
+                                        var feedback = container ? container.querySelector('.invalid-feedback') : null;
+                                        if (!isChecked) {
+                                            var j = 0;
+                                            while (j &lt; radios.length) { radios[j].classList.add('is-invalid'); j++; }
+                                            if (feedback) { feedback.style.display = 'block'; }
+                                            return false;
+                                        }
+                                        var k = 0;
+                                        while (k &lt; radios.length) { radios[k].classList.remove('is-invalid'); k++; }
+                                        if (feedback) { feedback.style.display = 'none'; }
+                                        return true;
+                                    }
+
+                                    form.addEventListener('submit', function (event) {
+                                        event.preventDefault();
+                                        event.stopPropagation();
+
+                                        var nativeValid = form.checkValidity();
+                                        var termsValid = validateTerms();
+                                        var genderValid = validateGender();
+
+                                        // Apply Bootstrap red/green borders to all fields
+                                        form.classList.add('was-validated');
+
+                                        if (nativeValid &amp;&amp; termsValid &amp;&amp; genderValid) {
+                                            var btn = document.getElementById('submit-btn');
+                                            btn.disabled = true;
+                                            btn.innerHTML = 'Submitting...';
+                                            form.submit();
+                                        } else {
+                                            var firstInvalid = form.querySelector('.is-invalid');
+                                            if (firstInvalid) {
+                                                firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                            }
+                                        }
+                                    });
+
+                                    // Clear checkbox error in real time when user checks it
+                                    termsCheckbox.addEventListener('change', validateTerms);
+                                })();
+                                </script>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <!-- Admission Success Page Template -->
+        <template id="admission_success_page" name="Admission Success Page">
+            <t t-call="website.layout">
+                <div id="wrap" class="oe_structure">
+                    <div class="container mt-5 mb-5">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-8 text-center">
+                                <!-- Success Icon -->
+                                <div class="mb-4">
+                                    <div class="display-1 text-success">
+                                        <i class="fa fa-check-circle"/>
+                                    </div>
+                                </div>
+
+                                <!-- Success Message -->
+                                <h1 class="display-5 mb-3">Application Submitted Successfully!</h1>
+                                <p class="lead mb-4">
+                                    Thank you for submitting your application. Your application has been received and is under review.
+                                </p>
+
+                                <!-- Application Details -->
+                                <div class="card shadow-sm mb-5">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">Application Details</h5>
+                                    </div>
+                                    <div class="card-body text-start">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <p><strong>Reference ID:</strong> ENQ-<t t-esc="admission.id"/></p>
+                                                <p><strong>Applicant Name:</strong> <t t-esc="admission.applicant_name"/></p>
+                                                <p><strong>Email:</strong> <t t-esc="admission.email"/></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p><strong>Program:</strong> <t t-esc="admission.program_id.name"/></p>
+                                                <p><strong>Mobile:</strong> <t t-esc="admission.mobile"/></p>
+                                                <p><strong>Status:</strong> <span class="badge bg-info">Enquiry Received</span></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Next Steps -->
+                                <div class="alert alert-info" role="alert">
+                                    <h4 class="alert-heading">What's Next?</h4>
+                                    <ul class="mb-0">
+                                        <li>You will receive a confirmation email shortly</li>
+                                        <li>Our admission team will review your application</li>
+                                        <li>You may be contacted for additional information or documents</li>
+                                        <li>Admission decision will be communicated via email</li>
+                                    </ul>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="mt-5">
+                                    <a href="/" class="btn btn-primary me-3">
+                                        <i class="fa fa-home me-2"/>
+                                        Go to Homepage
+                                    </a>
+                                    <a href="/admissions" class="btn btn-outline-primary">
+                                        <i class="fa fa-graduation-cap me-2"/>
+                                        View Other Programs
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <!-- Admission Error Page Template -->
+        <template id="admission_error_page" name="Admission Error Page">
+            <t t-call="website.layout">
+                <div id="wrap" class="oe_structure">
+                    <div class="container mt-5 mb-5">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-8 text-center">
+                                <!-- Error Icon -->
+                                <div class="mb-4">
+                                    <div class="display-1 text-danger">
+                                        <i class="fa fa-exclamation-circle"/>
+                                    </div>
+                                </div>
+
+                                <!-- Error Message -->
+                                <h1 class="display-5 mb-3">Application Submission Failed</h1>
+                                <p class="lead mb-4">
+                                    We encountered an error while processing your application. Please try again.
+                                </p>
+
+                                <!-- Error Details -->
+                                <div class="alert alert-danger" role="alert">
+                                    <h4 class="alert-heading">Error Details</h4>
+                                    <p class="mb-0"><t t-esc="error"/></p>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="mt-5">
+                                    <a href="javascript:history.back()" class="btn btn-secondary me-3">
+                                        <i class="fa fa-arrow-left me-2"/>
+                                        Go Back
+                                    </a>
+                                    <a href="/admission/apply" class="btn btn-primary">
+                                        <i class="fa fa-refresh me-2"/>
+                                        Try Again
+                                    </a>
+                                </div>
+
+                                <!-- Contact Information -->
+                                <div class="mt-5 pt-5">
+                                    <p class="text-muted">
+                                        If the problem persists, please contact our admission office:
+                                        <br/>
+                                        <strong>Email:</strong> admissions@university.edu
+                                        <br/>
+                                        <strong>Phone:</strong> +1 (555) 123-4567
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+    </data>
+</odoo>

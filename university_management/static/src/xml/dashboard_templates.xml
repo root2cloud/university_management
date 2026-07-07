@@ -1,0 +1,1328 @@
+<templates xml:space="preserve">
+    <!--  ============================================================  -->
+    <!--  MAIN UNIVERSITY DASHBOARD TEMPLATE                            -->
+    <!--  Sidebar navigation + per-module dashboard views               -->
+    <!--  ============================================================  -->
+    <t t-name="university_management.DashboardMain">
+        <div class="o_university_dashboard">
+            <!--  LOADING STATE  -->
+            <div t-if="state.isLoading" class="uni-loading-overlay">
+                <div class="uni-spinner">
+                    <i class="fa fa-circle-o-notch fa-spin fa-3x"/>
+                    <p>Loading Dashboard...</p>
+                </div>
+            </div>
+            <!--  MAIN LAYOUT: Sidebar + Content  -->
+            <div t-else="" class="uni-dashboard-layout">
+                <!--  ===================== SIDEBAR =====================  -->
+                <aside class="uni-sidebar">
+                    <div class="uni-sidebar-header">
+                        <div class="uni-logo">
+                            <i class="fa fa-university"/>
+                        </div>
+                        <div class="uni-brand">
+                            <span class="uni-brand-title">University</span>
+                            <span class="uni-brand-sub">Management System</span>
+                        </div>
+                    </div>
+                    <nav class="uni-nav">
+                        <t t-foreach="navModules" t-as="mod" t-key="mod.key">
+                            <button t-attf-class="uni-nav-item #{state.activeModule === mod.key ? 'active' : ''}" t-on-click="() => this.setActiveModule(mod.key)">
+                                <i t-attf-class="fa #{mod.icon}"/>
+                                <span t-esc="mod.label"/>
+                            </button>
+                        </t>
+                    </nav>
+                </aside>
+                <!--  ===================== MAIN CONTENT =====================  -->
+                <main class="uni-main-content">
+                    <!--  MODULE: OVERVIEW  -->
+                    <t t-if="state.activeModule === 'overview'">
+                        <t t-call="university_management.DashboardOverview"/>
+                    </t>
+                    <!--  MODULE: STUDENTS  -->
+                    <t t-if="state.activeModule === 'students'">
+                        <t t-call="university_management.DashboardStudents"/>
+                    </t>
+                    <!--  MODULE: FACULTY  -->
+                    <t t-if="state.activeModule === 'faculty'">
+                        <t t-call="university_management.DashboardFaculty"/>
+                    </t>
+                    <!--  MODULE: FEES  -->
+                    <t t-if="state.activeModule === 'fees'">
+                        <t t-call="university_management.DashboardFees"/>
+                    </t>
+                    <!--  MODULE: EXAMINATIONS  -->
+                    <t t-if="state.activeModule === 'exams'">
+                        <t t-call="university_management.DashboardExams"/>
+                    </t>
+                    <!--  MODULE: HOSTEL  -->
+                    <t t-if="state.activeModule === 'hostel'">
+                        <t t-call="university_management.DashboardHostel"/>
+                    </t>
+                    <!--  MODULE: LIBRARY  -->
+                    <t t-if="state.activeModule === 'library'">
+                        <t t-call="university_management.DashboardLibrary"/>
+                    </t>
+                    <!--  MODULE: PLACEMENT  -->
+                    <t t-if="state.activeModule === 'placement'">
+                        <t t-call="university_management.DashboardPlacement"/>
+                    </t>
+                    <!--  MODULE: TRANSPORT  -->
+                    <t t-if="state.activeModule === 'transport'">
+                        <t t-call="university_management.DashboardTransport"/>
+                    </t>
+                    <t t-if="state.activeModule === 'assets'">
+                        <t t-call="university_management.DashboardAssets"/>
+                    </t>
+                </main>
+            </div>
+        </div>
+    </t>
+
+    <!--  ============================================================  -->
+    <!--  OVERVIEW DASHBOARD                                            -->
+    <!--  ============================================================  -->
+    <t t-name="university_management.DashboardOverview">
+        <div class="uni-page">
+            <div class="uni-page-header">
+                <h2>University Overview</h2>
+                <span class="uni-date" t-esc="new Date().toLocaleDateString('en-IN', {weekday:'long', year:'numeric', month:'long', day:'numeric'})"/>
+            </div>
+            <!--  KPI ROW 1  -->
+            <div class="uni-kpi-row">
+                <div class="uni-kpi-card uni-kpi-blue" t-on-click="openStudents">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-graduation-cap"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Total Students</div>
+                        <div class="uni-kpi-value" t-esc="state.overview.total_students || 0"/>
+                        <div class="uni-kpi-change positive">
+                            <i class="fa fa-arrow-up"/>
+                            <t t-esc="state.overview.new_admissions_this_month || 0"/>
+                            this month
+                        </div>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-green" t-on-click="openFaculty">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-users"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Faculty Members</div>
+                        <div class="uni-kpi-value" t-esc="state.overview.total_faculty || 0"/>
+                        <div class="uni-kpi-change">
+                            <i class="fa fa-star"/>
+                            Active staff
+                        </div>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-gold" t-on-click="openStudents">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-star"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Avg CGPA</div>
+                        <div class="uni-kpi-value" t-esc="(state.overview.avg_cgpa || 0).toFixed(1)"/>
+                        <div class="uni-kpi-change positive">
+                            <i class="fa fa-arrow-up"/>
+                            Academic excellence
+                        </div>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-red" t-on-click="openFeeCollectionMonth">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-money"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Fee Collection (Month)</div>
+                        <div class="uni-kpi-value">
+                            ₹
+                            <t t-esc="((state.fees.monthly_collection || 0)/100000).toFixed(1)"/>
+                            L
+                        </div>
+                        <div class="uni-kpi-change positive">
+                            <i class="fa fa-arrow-up"/>
+                            This month
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--  KPI ROW 2  -->
+            <div class="uni-kpi-row">
+                <div class="uni-kpi-card uni-kpi-purple" t-on-click="openExaminations">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-file-text"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Active Exams</div>
+                        <div class="uni-kpi-value" t-esc="state.exams.active_exams || 0"/>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-teal" t-on-click="openHostel">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-building"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Hostel Occupancy</div>
+                        <div class="uni-kpi-value" t-esc="(state.hostel.occupancy_rate || 0) + '%'"/>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-orange" t-on-click="openLibraryIssues">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-book"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Library Books Issued</div>
+                        <div class="uni-kpi-value" t-esc="state.library.books_issued || 0"/>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-navy" t-on-click="openPlacement">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-briefcase"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Placement Rate</div>
+                        <div class="uni-kpi-value" t-esc="(state.overview.placement_rate || 0) + '%'"/>
+                    </div>
+                </div>
+            </div>
+            <!--  CHARTS ROW  -->
+            <div class="uni-charts-row">
+                <!--  Department Doughnut Chart  -->
+                <div class="uni-chart-card">
+                    <div class="uni-chart-header">
+                        <h3>Students by Department</h3>
+                        <select class="uni-batch-filter" t-on-change="filterDeptByBatch">
+                            <option value="">Batches</option>
+                            <t t-foreach="state.batches" t-as="batch" t-key="batch.id">
+                                <option t-att-value="batch.id"
+                                        t-att-selected="state.selectedBatch === batch.id"
+                                        t-esc="batch.name"/>
+                            </t>
+                        </select>
+                    </div>
+                    <div class="uni-canvas-wrap">
+                        <canvas id="uni-department-chart"/>
+                    </div>
+                </div>
+                <!--  Fee Trend Chart  -->
+                <div class="uni-chart-card wide">
+                    <div class="uni-chart-header">
+                        <h3>Monthly Fee Collection Trend</h3>
+                        <div class="uni-filter-group">
+                            <select class="uni-batch-filter" data-field="batch" t-on-change="filterFeeTrend">
+                                <option value="">Batch</option>
+                                <t t-foreach="state.batches" t-as="batch" t-key="batch.id">
+                                    <option t-att-value="batch.id"
+                                            t-att-selected="state.feeTrendBatch === batch.id"
+                                            t-esc="batch.name"/>
+                                </t>
+                            </select>
+                            <select class="uni-batch-filter" data-field="dept" t-on-change="filterFeeTrend">
+                                <option value="">Department</option>
+                                <t t-foreach="state.departments" t-as="dept" t-key="dept.id">
+                                    <option t-att-value="dept.id"
+                                            t-att-selected="state.feeTrendDept === dept.id"
+                                            t-esc="dept.name"/>
+                                </t>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="uni-canvas-wrap">
+                        <canvas id="uni-fee-trend-chart"/>
+                    </div>
+                </div>
+            </div>
+            <div class="uni-charts-row">
+                <!--  Department Performance Table  -->
+                <div class="uni-chart-card wide has-scroll">
+                    <div class="uni-chart-header">
+                        <h3>Department Performance Comparison</h3>
+                    </div>
+                    <div class="uni-table-scroll">
+                    <table class="uni-table">
+                        <thead>
+                            <tr>
+                                <th>Department</th>
+                                <th>Students</th>
+                                <th>B.Tech</th>
+                                <th>Placement %</th>
+                                <th>Avg CGPA</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="state.departmentStats" t-as="dept" t-key="dept.name">
+                                <tr>
+                                    <td>
+                                        <strong t-esc="dept.name"/>
+                                    </td>
+                                    <td t-esc="dept.students"/>
+                                    <td t-esc="dept.btech_students"/>
+                                    <td>
+                                        <span t-attf-class="uni-badge #{dept.placement_rate >= 90 ? 'success' : 'warning'}" t-esc="dept.placement_rate + '%'"/>
+                                    </td>
+                                    <td t-esc="dept.avg_cgpa"/>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+                <!--  Recent Admissions  -->
+                <div class="uni-chart-card has-scroll">
+                    <div class="uni-chart-header">
+                        <h3>Recent Admissions</h3>
+                        <button class="uni-link-btn" t-on-click="openAdmissions">View All</button>
+                    </div>
+                    <div class="uni-list">
+                        <t t-foreach="state.recentAdmissions" t-as="adm" t-key="adm.id">
+                            <div class="uni-list-item" style="cursor:pointer;" t-on-click="() => this.openAdmissionRecord(adm.id, adm.model)">
+                                <t t-if="adm.photo">
+                                    <img t-attf-src="data:image/png;base64,#{adm.photo}" class="uni-list-avatar-img" alt=""/>
+                                </t>
+                                <t t-else="">
+                                    <div class="uni-list-avatar" t-esc="adm.name[0]"/>
+                                </t>
+                                <div class="uni-list-info">
+                                    <div class="uni-list-name" t-esc="adm.name"/>
+                                    <div class="uni-list-sub" t-esc="adm.program"/>
+                                </div>
+                                <div t-attf-class="uni-status-dot #{adm.state === 'approved' ? 'green' : adm.state === 'pending' ? 'orange' : 'red'}"/>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!--  ============================================================  -->
+    <!--  STUDENTS DASHBOARD                                            -->
+    <!--  ============================================================  -->
+    <t t-name="university_management.DashboardStudents">
+        <div class="uni-page">
+            <div class="uni-page-header">
+                <h2>Students</h2>
+                <button class="uni-action-btn" t-on-click="openStudents">
+                    <i class="fa fa-plus"/>
+                    Add Student
+                </button>
+            </div>
+            <div class="uni-kpi-row">
+                <div class="uni-kpi-card uni-kpi-blue" t-on-click="openStudents">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-graduation-cap"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Total Enrolled</div>
+                        <div class="uni-kpi-value" t-esc="state.students.total_enrolled || 0"/>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-green" t-on-click="openNewThisYear">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-user-plus"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">New This Year</div>
+                        <div class="uni-kpi-value" t-esc="state.students.new_this_year || 0"/>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-orange" t-on-click="openAdmissions">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-clock-o"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Pending Admissions</div>
+                        <div class="uni-kpi-value" t-esc="state.students.pending_admissions || 0"/>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-red" t-on-click="openLowAttendance">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-exclamation-triangle"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Low Attendance (&lt;75%)</div>
+                        <div class="uni-kpi-value" t-esc="state.students.low_attendance || 0"/>
+                    </div>
+                </div>
+            </div>
+            <div class="uni-charts-row">
+                <div class="uni-chart-card">
+                    <div class="uni-chart-header">
+                        <h3>Program Distribution</h3>
+                    </div>
+                    <div class="uni-canvas-wrap">
+                        <canvas id="uni-program-chart"/>
+                    </div>
+                </div>
+                <div class="uni-chart-card wide">
+                    <div class="uni-chart-header">
+                        <h3>Semester-wise Admission Trends</h3>
+                    </div>
+                    <div class="uni-canvas-wrap">
+                        <canvas id="uni-semester-chart"/>
+                    </div>
+                </div>
+            </div>
+            <div class="uni-charts-row">
+                <div class="uni-chart-card wide has-scroll">
+                    <div class="uni-chart-header">
+                        <h3>Recent Admissions</h3>
+                        <button class="uni-link-btn" t-on-click="openAdmissions">View All</button>
+                    </div>
+                    <div class="uni-table-scroll">
+                    <table class="uni-table">
+                        <thead>
+                            <tr>
+                                <th>Applicant</th>
+                                <th>Program</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="state.recentAdmissions" t-as="adm" t-key="adm.id">
+                                <tr style="cursor:pointer;" t-on-click="() => this.openAdmissionRecord(adm.id, adm.model)">
+                                    <td t-esc="adm.name"/>
+                                    <td t-esc="adm.program"/>
+                                    <td t-esc="adm.date"/>
+                                    <td>
+                                        <span t-attf-class="uni-badge #{adm.state === 'approved' ? 'success' : adm.state === 'pending' ? 'warning' : 'danger'}" t-esc="adm.state_label"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!--  ============================================================  -->
+    <!--  FACULTY DASHBOARD                                             -->
+    <!--  ============================================================  -->
+    <t t-name="university_management.DashboardFaculty">
+        <div class="uni-page">
+            <div class="uni-page-header">
+                <h2>Faculty</h2>
+                <button class="uni-action-btn" t-on-click="openFaculty">
+                    <i class="fa fa-plus"/>
+                    Add Faculty
+                </button>
+            </div>
+            <div class="uni-kpi-row">
+                <div class="uni-kpi-card uni-kpi-blue" t-on-click="openFaculty">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-users"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Total Faculty</div>
+                        <div class="uni-kpi-value" t-esc="state.faculty.total || 0"/>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-green" t-on-click="openFacultyPresent">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-check-circle"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Present Today</div>
+                        <div class="uni-kpi-value" t-esc="state.faculty.present_today || 0"/>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-orange" t-on-click="openFacultyOnLeave">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-calendar-times-o"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">On Leave</div>
+                        <div class="uni-kpi-value" t-esc="state.faculty.on_leave || 0"/>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-gold" t-on-click="openFaculty">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-star"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Avg Rating</div>
+                        <div class="uni-kpi-value" t-esc="(state.faculty.avg_rating || 0).toFixed(1)"/>
+                    </div>
+                </div>
+            </div>
+            <!--  Faculty Status Chart  -->
+            <div class="uni-charts-row">
+                <div class="uni-chart-card">
+                    <div class="uni-chart-header">
+                        <h3>Today's Faculty Status</h3>
+                    </div>
+                    <div class="uni-canvas-wrap">
+                        <canvas id="uni-faculty-status-chart"/>
+                    </div>
+                </div>
+                <div class="uni-chart-card wide">
+                    <div class="uni-chart-header">
+                        <h3>Department-wise Avg CGPA</h3>
+                    </div>
+                    <div class="uni-canvas-wrap">
+                        <canvas id="uni-faculty-cgpa-chart"/>
+                    </div>
+                </div>
+            </div>
+            <div class="uni-charts-row">
+                <div class="uni-chart-card wide">
+                    <div class="uni-chart-header">
+                        <h3>Faculty Designation Breakdown</h3>
+                    </div>
+                    <div class="uni-canvas-wrap">
+                        <canvas id="uni-faculty-designation-chart"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!--  ============================================================  -->
+    <!--  FEES DASHBOARD                                                -->
+    <!--  ============================================================  -->
+    <t t-name="university_management.DashboardFees">
+        <div class="uni-page">
+            <div class="uni-page-header">
+                <h2>Fee Management</h2>
+                <div class="uni-header-actions">
+                    <button class="uni-action-btn secondary" t-on-click="openFeeStructures">Fee Structures</button>
+                    <button class="uni-action-btn" t-on-click="openFeePayments">+ New Payment</button>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <!--  ROW 1 – Core Collection KPIs                          -->
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <div class="uni-kpi-row">
+                <!-- Total Collected (Year) -->
+                <div class="uni-kpi-card uni-kpi-green" t-on-click="openFeeCollectionYear">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-check-circle"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Total Collected (Year)</div>
+                        <div class="uni-kpi-value">
+                            ₹<t t-esc="((state.fees.total_collected || 0)/100000).toFixed(1)"/>L
+                        </div>
+                        <div class="uni-kpi-change positive">
+                            <i class="fa fa-arrow-up"/> All time
+                        </div>
+                    </div>
+                </div>
+                <!-- This Month -->
+                <div class="uni-kpi-card uni-kpi-blue" t-on-click="openFeeCollectionMonth">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-money"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">This Month</div>
+                        <div class="uni-kpi-value">
+                            ₹<t t-esc="((state.fees.monthly_collection || 0)/100000).toFixed(1)"/>L
+                        </div>
+                        <div class="uni-kpi-change positive">
+                            <i class="fa fa-exchange"/>
+                            <t t-esc="state.fees.transaction_count_month || 0"/> transactions
+                        </div>
+                    </div>
+                </div>
+                <!-- Today's Collection  (PDF Finance Dashboard – "Today's Fee Collection") -->
+                <div class="uni-kpi-card uni-kpi-teal" t-on-click="openFeeCollectionToday">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-calendar-check-o"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Today's Collection</div>
+                        <div class="uni-kpi-value">
+                            ₹<t t-esc="((state.fees.today_collection || 0)/1000).toFixed(1)"/>K
+                        </div>
+                        <div class="uni-kpi-change positive">
+                            <i class="fa fa-clock-o"/> Live today
+                        </div>
+                    </div>
+                </div>
+                <!-- Pending / Overdue -->
+                <div class="uni-kpi-card uni-kpi-red" t-on-click="openFeeOverdue">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-exclamation-circle"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Pending / Overdue</div>
+                        <div class="uni-kpi-value">
+                            ₹<t t-esc="((state.fees.total_pending || 0)/100000).toFixed(1)"/>L
+                        </div>
+                    </div>
+                </div>
+                <!-- Late Payments -->
+                <div class="uni-kpi-card uni-kpi-orange" t-on-click="openFeeOverdue" t-if="false">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-clock-o"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Late Payments</div>
+                        <div class="uni-kpi-value" t-esc="state.fees.late_payments || 0"/>
+                        <div class="uni-kpi-change negative">Students overdue</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <!--  ROW 2 – Monthly Trend + Recent Payments               -->
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <div class="uni-charts-row">
+                <div class="uni-chart-card wide">
+                    <div class="uni-chart-header">
+                        <h3>Monthly Fee Collection Trend</h3>
+                        <div class="uni-filter-group">
+                            <select class="uni-batch-filter" data-field="batch" t-on-change="filterFeeTrend">
+                                <option value="">Batch</option>
+                                <t t-foreach="state.batches" t-as="batch" t-key="batch.id">
+                                    <option t-att-value="batch.id"
+                                            t-att-selected="state.feeTrendBatch === batch.id"
+                                            t-esc="batch.name"/>
+                                </t>
+                            </select>
+                            <select class="uni-batch-filter" data-field="dept" t-on-change="filterFeeTrend">
+                                <option value="">Department</option>
+                                <t t-foreach="state.departments" t-as="dept" t-key="dept.id">
+                                    <option t-att-value="dept.id"
+                                            t-att-selected="state.feeTrendDept === dept.id"
+                                            t-esc="dept.name"/>
+                                </t>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="uni-canvas-wrap">
+                        <canvas id="uni-fee-trend-chart"/>
+                    </div>
+                </div>
+                <div class="uni-chart-card has-scroll">
+                    <div class="uni-chart-header">
+                        <h3>Recent Payments</h3>
+                        <button class="uni-link-btn" t-on-click="openFeePayments">View All</button>
+                    </div>
+                    <div class="uni-list">
+                        <t t-foreach="state.recentPayments" t-as="pmt" t-key="pmt.id">
+                            <div class="uni-list-item" style="cursor:pointer;" t-on-click="() => this.openPaymentRecord(pmt.id)">
+                                <t t-if="pmt.photo">
+                                    <img t-attf-src="data:image/png;base64,#{pmt.photo}" class="uni-list-avatar-img" alt=""/>
+                                </t>
+                                <t t-else="">
+                                    <div class="uni-list-avatar" t-esc="pmt.student[0]"/>
+                                </t>
+                                <div class="uni-list-info">
+                                    <div class="uni-list-name" t-esc="pmt.student"/>
+                                    <div class="uni-list-sub" t-esc="pmt.method"/>
+                                </div>
+                                <div class="uni-list-amount">
+                                    ₹<t t-esc="pmt.amount"/>
+                                    <div t-attf-class="uni-status-dot #{pmt.state === 'paid' ? 'green' : pmt.state === 'partial' ? 'blue' : 'orange'}"/>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <!--  ROW 3 – Student Ledger + Payment Mode Analysis        -->
+            <!--  PDF section 4  (Student Ledger System)                -->
+            <!--  PDF section 12 (Payment Mode Analysis)                -->
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <div class="uni-charts-row">
+                <!-- Student Ledger Summary -->
+                <div class="uni-chart-card">
+                    <div class="uni-chart-header">
+                        <h3>Student Ledger Summary</h3>
+                    </div>
+                    <div class="uni-accounting-summary">
+                        <div class="uni-acc-row">
+                            <span class="uni-acc-label">Students with Dues</span>
+                            <span class="uni-acc-value danger"
+                                  t-esc="(state.fees.student_ledger_stats || {}).total_students_with_dues || 0"/>
+                        </div>
+                        <div class="uni-acc-row">
+                            <span class="uni-acc-label">Total Outstanding</span>
+                            <span class="uni-acc-value danger">
+                                ₹<t t-esc="(state.fees.student_ledger_stats || {}).total_outstanding_fmt || '0'"/>
+                            </span>
+                        </div>
+                        <div class="uni-acc-row">
+                            <span class="uni-acc-label">Avg Outstanding / Student</span>
+                            <span class="uni-acc-value">
+                                ₹<t t-esc="(state.fees.student_ledger_stats || {}).avg_outstanding_fmt || '0'"/>
+                            </span>
+                        </div>
+                        <div class="uni-acc-row">
+                            <span class="uni-acc-label">Invoices Generated</span>
+                            <span class="uni-acc-value" t-esc="state.fees.invoices_count || 0"/>
+                        </div>
+                        <div class="uni-acc-row">
+                            <span class="uni-acc-label">Scholarships Applied</span>
+                            <span class="uni-acc-value" t-esc="state.fees.scholarships_applied || 0"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Mode Analysis -->
+                <div class="uni-chart-card wide">
+                    <div class="uni-chart-header">
+                        <h3>Payment Mode Analysis</h3>
+                    </div>
+                    <table class="uni-table">
+                        <thead>
+                            <tr>
+                                <th>Payment Mode</th>
+                                <th>Transactions</th>
+                                <th>Amount Collected</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-if="(state.fees.payment_mode_breakdown || []).length">
+                                <t t-foreach="(state.fees.payment_mode_breakdown || [])"
+                                   t-as="mode" t-key="mode.label">
+                                    <tr>
+                                        <td>
+                                            <i class="fa fa-circle"
+                                               t-attf-style="color: #{mode.label === 'UPI' ? '#10b981' : mode.label === 'NEFT / RTGS / IMPS' ? '#3b82f6' : mode.label === 'Cash' ? '#f59e0b' : mode.label === 'Cheque / DD' ? '#8b5cf6' : '#6b7280'}; margin-right: 6px;"/>
+                                            <t t-esc="mode.label"/>
+                                        </td>
+                                        <td t-esc="mode.count"/>
+                                        <td>₹<t t-esc="mode.amount_fmt"/></td>
+                                    </tr>
+                                </t>
+                            </t>
+                            <t t-else="">
+                                <tr>
+                                    <td colspan="3" style="text-align:center; color: var(--uni-text-muted); padding: 24px;">
+                                        No payment mode data available yet.
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <!--  ROW 4 – Bank Reconciliation + Accounting Summary      -->
+            <!--  PDF section 8  (Bank Reconciliation)                  -->
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <div class="uni-charts-row">
+                <!-- Bank Reconciliation Status -->
+                <div class="uni-chart-card">
+                    <div class="uni-chart-header">
+                        <h3>Bank Reconciliation Status</h3>
+                    </div>
+                    <div class="uni-accounting-summary">
+                        <div class="uni-acc-row">
+                            <span class="uni-acc-label">
+                                <i class="fa fa-check-circle" style="color:#10b981; margin-right:6px;"/>
+                                Fully Reconciled
+                            </span>
+                            <span class="uni-acc-value"
+                                  t-esc="(state.fees.reconciliation_stats || {}).fully_reconciled || 0"/>
+                        </div>
+                        <div class="uni-acc-row">
+                            <span class="uni-acc-label">
+                                <i class="fa fa-adjust" style="color:#f59e0b; margin-right:6px;"/>
+                                Partially Reconciled
+                            </span>
+                            <span class="uni-acc-value"
+                                  t-esc="(state.fees.reconciliation_stats || {}).partially_reconciled || 0"/>
+                        </div>
+                        <div class="uni-acc-row">
+                            <span class="uni-acc-label">
+                                <i class="fa fa-times-circle" style="color:#ef4444; margin-right:6px;"/>
+                                Not Reconciled
+                            </span>
+                            <span class="uni-acc-value danger"
+                                  t-esc="(state.fees.reconciliation_stats || {}).not_reconciled || 0"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accounting Summary -->
+                <div class="uni-chart-card">
+                    <div class="uni-chart-header">
+                        <h3>Accounting Summary</h3>
+                    </div>
+                    <div class="uni-accounting-summary">
+                        <div class="uni-acc-row">
+                            <span class="uni-acc-label">Journal Entries</span>
+                            <span class="uni-acc-value" t-esc="state.fees.journal_entries || 0"/>
+                        </div>
+                        <div class="uni-acc-row">
+                            <span class="uni-acc-label">Posted to Accounting</span>
+                            <span class="uni-acc-value" t-esc="state.fees.posted_payments || 0"/>
+                        </div>
+                        <div class="uni-acc-row">
+                            <span class="uni-acc-label">Pending Verification</span>
+                            <span class="uni-acc-value danger" t-esc="state.fees.pending_verification || 0"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fee Collection by Program -->
+                <div class="uni-chart-card wide has-scroll">
+                    <div class="uni-chart-header">
+                        <h3>Fee Collection by Program</h3>
+                    </div>
+                    <div class="uni-table-scroll">
+                    <table class="uni-table">
+                        <thead>
+                            <tr>
+                                <th>Program</th>
+                                <th>Students</th>
+                                <th>Collected</th>
+                                <th>Pending</th>
+                                <th>Collection %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="(state.fees.by_program || [])" t-as="prog" t-key="prog.name">
+                                <tr>
+                                    <td t-esc="prog.name"/>
+                                    <td t-esc="prog.students"/>
+                                    <td>₹<t t-esc="prog.collected_fmt"/></td>
+                                    <td>₹<t t-esc="prog.pending_fmt"/></td>
+                                    <td>
+                                        <div class="uni-progress-bar">
+                                            <div class="uni-progress-fill"
+                                                 t-attf-style="width: #{prog.collection_pct}%"/>
+                                        </div>
+                                        <span t-esc="prog.collection_pct + '%'"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </t>
+
+    <t t-name="university_management.DashboardExams">
+        <div class="uni-page">
+            <div class="uni-page-header">
+                <h2>Examination</h2>
+                <button class="uni-action-btn" t-on-click="openExaminations">
+                    <i class="fa fa-plus"/>
+                    New Exam
+                </button>
+            </div>
+            <div class="uni-kpi-row">
+                <div class="uni-kpi-card uni-kpi-blue" t-on-click="openExaminations">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-file-text"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Active Examinations</div>
+                        <div class="uni-kpi-value" t-esc="state.exams.active_exams || 0"/>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-green" t-on-click="openHallTickets">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-id-card"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Hall Tickets Issued</div>
+                        <div class="uni-kpi-value" t-esc="state.exams.hall_tickets || 0"/>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-gold" t-on-click="openExamResults">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-star"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Results Published</div>
+                        <div class="uni-kpi-value" t-esc="state.exams.results_published || 0"/>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-orange" t-on-click="openExamResults">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-redo"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Revaluation Requests</div>
+                        <div class="uni-kpi-value" t-esc="state.exams.revaluations || 0"/>
+                    </div>
+                </div>
+            </div>
+            <!--  Examination Status Chart  -->
+            <div class="uni-charts-row">
+                <div class="uni-chart-card wide">
+                    <div class="uni-chart-header">
+                        <h3>Examination Overview</h3>
+                    </div>
+                    <div class="uni-canvas-wrap">
+                        <canvas id="uni-exams-chart"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!--  ============================================================  -->
+    <!--  HOSTEL DASHBOARD                                              -->
+    <!--  ============================================================  -->
+    <t t-name="university_management.DashboardHostel">
+        <div class="uni-page">
+            <div class="uni-page-header">
+                <h2>Hostel</h2>
+                <button class="uni-action-btn" t-on-click="openHostel">Manage Hostels</button>
+            </div>
+            <div class="uni-kpi-row">
+                <div class="uni-kpi-card uni-kpi-blue" t-on-click="openHostelRooms">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-building"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Total Rooms</div>
+                        <div class="uni-kpi-value" t-esc="state.hostel.total_rooms || 0"/>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-green" t-on-click="openHostelOccupiedRooms">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-bed"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Occupied Rooms</div>
+                        <div class="uni-kpi-value" t-esc="state.hostel.occupied_beds || 0"/>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-orange" t-on-click="openHostelComplaints">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-exclamation"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Pending Complaints</div>
+                        <div class="uni-kpi-value" t-esc="state.hostel.pending_complaints || 0"/>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-teal" t-on-click="openHostel">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-percent"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Occupancy Rate</div>
+                        <div class="uni-kpi-value" t-esc="(state.hostel.occupancy_rate || 0) + '%'"/>
+                    </div>
+                </div>
+            </div>
+            <!--  Hostel Occupancy Chart  -->
+            <div class="uni-charts-row">
+                <div class="uni-chart-card">
+                    <div class="uni-chart-header">
+                        <h3>Room Occupancy</h3>
+                    </div>
+                    <div class="uni-canvas-wrap">
+                        <canvas id="uni-hostel-chart"/>
+                    </div>
+                </div>
+                <div class="uni-chart-card wide">
+                    <div class="uni-chart-header">
+                        <h3>Rooms Summary</h3>
+                    </div>
+                    <div class="uni-canvas-wrap">
+                        <canvas id="uni-hostel-rooms-chart"/>
+                    </div>
+                </div>
+            </div>
+            <div class="uni-charts-row">
+                <div class="uni-chart-card wide">
+                    <div class="uni-chart-header">
+                        <h3>Complaints Status</h3>
+                    </div>
+                    <div class="uni-canvas-wrap">
+                        <canvas id="uni-hostel-complaints-chart"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!--  ============================================================  -->
+    <!--  LIBRARY DASHBOARD                                             -->
+    <!--  ============================================================  -->
+    <t t-name="university_management.DashboardLibrary">
+        <div class="uni-page">
+            <div class="uni-page-header">
+                <h2>Library</h2>
+                <button class="uni-action-btn" t-on-click="openLibrary">Manage Books</button>
+            </div>
+            <div class="uni-kpi-row">
+                <div class="uni-kpi-card uni-kpi-blue" t-on-click="openLibrary">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-book"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Total Books</div>
+                        <div class="uni-kpi-value" t-esc="state.library.total_books || 0"/>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-green" t-on-click="openLibraryIssues">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-hand-o-right"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Books Issued</div>
+                        <div class="uni-kpi-value" t-esc="state.library.books_issued || 0"/>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-red" t-on-click="openLibraryIssues">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-clock-o"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Overdue Returns</div>
+                        <div class="uni-kpi-value" t-esc="state.library.overdue || 0"/>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-gold" t-on-click="openLibrary">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-money"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Fines Collected</div>
+                        <div class="uni-kpi-value">
+                            ₹
+                            <t t-esc="state.library.fines_collected || 0"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--  Library Activity Chart  -->
+            <div class="uni-charts-row">
+                <div class="uni-chart-card wide">
+                    <div class="uni-chart-header">
+                        <h3>Library Activity</h3>
+                    </div>
+                    <div class="uni-canvas-wrap">
+                        <canvas id="uni-library-chart"/>
+                    </div>
+                </div>
+                <div class="uni-chart-card">
+                    <div class="uni-chart-header">
+                        <h3>Books Status</h3>
+                    </div>
+                    <div class="uni-canvas-wrap">
+                        <canvas id="uni-library-status-chart"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!--  ============================================================  -->
+    <!--  PLACEMENT DASHBOARD                                           -->
+    <!--  ============================================================  -->
+    <t t-name="university_management.DashboardPlacement">
+        <div class="uni-page">
+            <div class="uni-page-header">
+                <h2>Placement</h2>
+            </div>
+            <div class="uni-kpi-row">
+                <div class="uni-kpi-card uni-kpi-blue" t-on-click="openPlacement">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-briefcase"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Active Drives</div>
+                        <div class="uni-kpi-value" t-esc="state.overview.active_placement_drives || 0"/>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-green" t-on-click="openPlacement">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-check"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Students Placed</div>
+                        <div class="uni-kpi-value" t-esc="state.overview.students_placed || 0"/>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-gold" t-on-click="openPlacement">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-trophy"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Highest Package</div>
+                        <div class="uni-kpi-value" t-esc="state.overview.highest_package || 'N/A'"/>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-purple" t-on-click="openPlacement">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-building"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Recruiting Companies</div>
+                        <div class="uni-kpi-value" t-esc="state.overview.recruiting_companies || 0"/>
+                    </div>
+                </div>
+            </div>
+            <!--  Placement Chart  -->
+            <div class="uni-charts-row">
+                <div class="uni-chart-card wide">
+                    <div class="uni-chart-header">
+                        <h3>Department-wise Placement %</h3>
+                    </div>
+                    <div class="uni-canvas-wrap" style="height:260px">
+                        <canvas id="uni-placement-chart"/>
+                    </div>
+                </div>
+                <div class="uni-chart-card">
+                    <div class="uni-chart-header">
+                        <h3>Placement Summary</h3>
+                    </div>
+                    <div class="uni-canvas-wrap">
+                        <canvas id="uni-placement-summary-chart"/>
+                    </div>
+                </div>
+            </div>
+            <div class="uni-charts-row">
+                <div class="uni-chart-card wide">
+                    <div class="uni-chart-header">
+                        <h3>Placed vs Total Students by Department</h3>
+                    </div>
+                    <div class="uni-canvas-wrap" style="height:260px">
+                        <canvas id="uni-placement-stacked-chart"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!--  ============================================================  -->
+    <!--  TRANSPORT DASHBOARD                                           -->
+    <!--  ============================================================  -->
+    <t t-name="university_management.DashboardTransport">
+        <div class="uni-page">
+            <div class="uni-page-header">
+                <h2>Transport</h2>
+            </div>
+            <div class="uni-kpi-row">
+                <div class="uni-kpi-card uni-kpi-blue" t-on-click="openTransport">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-bus"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Total Vehicles</div>
+                        <div class="uni-kpi-value" t-esc="state.overview.total_vehicles || 0"/>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-green" t-on-click="openTransport">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-route"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Active Routes</div>
+                        <div class="uni-kpi-value" t-esc="state.overview.active_routes || 0"/>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-orange" t-on-click="openTransport">
+                    <div class="uni-kpi-icon">
+                        <i class="fa fa-users"/>
+                    </div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Students Using Transport</div>
+                        <div class="uni-kpi-value" t-esc="state.overview.transport_students || 0"/>
+                    </div>
+                </div>
+            </div>
+            <!--  Transport Overview Chart  -->
+            <div class="uni-charts-row">
+                <div class="uni-chart-card wide">
+                    <div class="uni-chart-header">
+                        <h3>Transport Overview</h3>
+                    </div>
+                    <div class="uni-canvas-wrap">
+                        <canvas id="uni-transport-chart"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!-- ═══════════════════════════════════ ASSETS MODULE ═══════════════════════════════════ -->
+    <t t-name="university_management.DashboardAssets">
+        <div class="uni-page">
+            <div class="uni-page-header">
+                <h2>Asset Management</h2>
+                <div style="display:flex;gap:8px;">
+                    <button class="uni-action-btn" t-on-click="() => this.openPurchaseRequests()">
+                        <i class="fa fa-shopping-cart"/> Purchase Requests
+                    </button>
+                    <button class="uni-action-btn" t-on-click="() => this.openAssets()">
+                        <i class="fa fa-cubes"/> All Assets
+                    </button>
+                </div>
+            </div>
+
+            <!-- KPI Row -->
+            <div class="uni-kpi-row">
+                <div class="uni-kpi-card uni-kpi-blue" t-on-click="() => this.openAssets()">
+                    <div class="uni-kpi-icon"><i class="fa fa-cubes"/></div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Total Assets</div>
+                        <div class="uni-kpi-value" t-esc="state.assets.total_assets || 0"/>
+                        <div class="uni-kpi-change positive">
+                            <i class="fa fa-check-circle"/>
+                            <t t-esc="state.assets.available || 0"/> available
+                        </div>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-red" t-on-click="() => this.openAssets()">
+                    <div class="uni-kpi-icon"><i class="fa fa-wrench"/></div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Maintenance Due</div>
+                        <div class="uni-kpi-value" t-esc="state.assets.maintenance_due || 0"/>
+                        <div class="uni-kpi-change">
+                            <i class="fa fa-exclamation-circle"/> Needs attention
+                        </div>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-gold" t-on-click="() => this.openPurchaseRequests()">
+                    <div class="uni-kpi-icon"><i class="fa fa-shopping-cart"/></div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Pending Requests</div>
+                        <div class="uni-kpi-value" t-esc="state.assets.pending_requests || 0"/>
+                        <div class="uni-kpi-change">
+                            <i class="fa fa-clock-o"/> Awaiting approval
+                        </div>
+                    </div>
+                </div>
+                <div class="uni-kpi-card uni-kpi-green" t-on-click="() => this.openHandoverRequests()">
+                    <div class="uni-kpi-icon"><i class="fa fa-exchange"/></div>
+                    <div class="uni-kpi-info">
+                        <div class="uni-kpi-label">Pending Handovers</div>
+                        <div class="uni-kpi-value" t-esc="state.assets.pending_handovers || 0"/>
+                        <div class="uni-kpi-change">
+                            <i class="fa fa-arrow-right"/> In progress
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="uni-charts-row">
+                <div class="uni-chart-card">
+                    <div class="uni-chart-header">
+                        <h3>Assets by Category</h3>
+                    </div>
+                    <div class="uni-canvas-wrap">
+                        <canvas id="uni-asset-category-chart"/>
+                    </div>
+                </div>
+                <div class="uni-chart-card wide">
+                    <div class="uni-chart-header">
+                        <h3>Assets by State</h3>
+                    </div>
+                    <div class="uni-canvas-wrap">
+                        <canvas id="uni-asset-state-chart"/>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tables Row -->
+            <div class="uni-charts-row">
+                <div class="uni-chart-card wide has-scroll">
+                    <div class="uni-chart-header">
+                        <h3><i class="fa fa-shopping-cart" style="color:var(--amber)"/> Recent Purchase Requests</h3>
+                        <button class="uni-link-btn" t-on-click="() => this.openPurchaseRequests()">View All</button>
+                    </div>
+                    <t t-if="state.assetPurchaseRequests and state.assetPurchaseRequests.length">
+                        <div class="uni-table-scroll">
+                        <table class="uni-table">
+                            <thead>
+                                <tr>
+                                    <th>Reference</th>
+                                    <th>Requested By</th>
+                                    <th>Item</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="state.assetPurchaseRequests" t-as="pr" t-key="pr.id">
+                                    <tr style="cursor:pointer;" t-on-click="() => this.openPurchaseRecord(pr.id)">
+                                        <td t-esc="pr.name"/>
+                                        <td t-esc="pr.requested_by"/>
+                                        <td t-esc="pr.item_description"/>
+                                        <td>
+                                            <span t-attf-class="uni-badge #{pr.state === 'done' ? 'success' : pr.state === 'rejected' ? 'danger' : 'warning'}"
+                                                  t-esc="pr.state_label"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <div style="text-align:center;padding:32px;color:var(--text-muted);">
+                            <i class="fa fa-inbox fa-2x" style="display:block;margin-bottom:8px;"/>
+                            No purchase requests yet
+                        </div>
+                    </t>
+                </div>
+            </div>
+
+            <div class="uni-charts-row">
+                <div class="uni-chart-card wide has-scroll">
+                    <div class="uni-chart-header">
+                        <h3><i class="fa fa-exchange" style="color:var(--teal)"/> Recent Handover Requests</h3>
+                        <button class="uni-link-btn" t-on-click="() => this.openHandoverRequests()">View All</button>
+                    </div>
+                    <t t-if="state.assetHandovers and state.assetHandovers.length">
+                        <div class="uni-table-scroll">
+                        <table class="uni-table">
+                            <thead>
+                                <tr>
+                                    <th>Reference</th>
+                                    <th>Asset</th>
+                                    <th>To Department</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="state.assetHandovers" t-as="hv" t-key="hv.id">
+                                    <tr style="cursor:pointer;" t-on-click="() => this.openHandoverRecord(hv.id)">
+                                        <td t-esc="hv.name"/>
+                                        <td t-esc="hv.asset_name"/>
+                                        <td t-esc="hv.to_department"/>
+                                        <td>
+                                            <span t-attf-class="uni-badge #{hv.state === 'approved' or hv.state === 'completed' ? 'success' : hv.state === 'rejected' ? 'danger' : 'warning'}"
+                                                  t-esc="hv.state_label"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <div style="text-align:center;padding:32px;color:var(--text-muted);">
+                            <i class="fa fa-inbox fa-2x" style="display:block;margin-bottom:8px;"/>
+                            No handover requests yet
+                        </div>
+                    </t>
+                </div>
+            </div>
+
+            <!-- Low Stock Alert -->
+            <t t-if="state.assets.low_stock_alerts > 0">
+                <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:12px;padding:16px;display:flex;align-items:center;gap:12px;margin-top:8px;">
+                    <i class="fa fa-exclamation-triangle" style="color:#f59e0b;font-size:1.2em;"/>
+                    <span><strong><t t-esc="state.assets.low_stock_alerts"/> consumable item(s)</strong> are running low on stock.</span>
+                    <button class="uni-link-btn" t-on-click="() => this.openAssets()">Review</button>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

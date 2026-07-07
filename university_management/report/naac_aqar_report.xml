@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_naac_aqar" model="ir.actions.report">
+        <field name="name">NAAC AQAR Report</field>
+        <field name="model">naac.aqar</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">university_management.report_naac_aqar_template</field>
+        <field name="report_file">university_management.report_naac_aqar_template</field>
+        <field name="binding_model_id" ref="model_naac_aqar"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_naac_aqar_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <!-- Cover Page -->
+                        <div class="text-center mb-5">
+                            <h2 class="text-primary">ANNUAL QUALITY ASSURANCE REPORT</h2>
+                            <h3>(AQAR)</h3>
+                            <h4 class="mt-3"><t t-esc="doc.institute_name"/></h4>
+                            <p class="lead">NAAC ID: <t t-esc="doc.naac_id"/></p>
+                            <p class="lead">Academic Year: <t t-esc="doc.academic_year_id"/></p>
+                            <p class="lead">Grade: <t t-esc="doc.accreditation_grade"/></p>
+                        </div>
+
+                        <!-- Key Statistics -->
+                        <h4 class="border-bottom pb-2 mb-3">Key Institutional Data</h4>
+                        <table class="table table-bordered mb-5">
+                            <tr>
+                                <th class="bg-light" style="width:40%">Total Faculty</th>
+                                <td><t t-esc="doc.total_faculty"/></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Total Students</th>
+                                <td><t t-esc="doc.total_students"/></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Total Programs</th>
+                                <td><t t-esc="doc.total_programs"/></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Placement Percentage</th>
+                                <td><t t-esc="doc.placement_percentage"/>%</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Research Papers Published</th>
+                                <td><t t-esc="doc.research_papers"/></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Patents Filed</th>
+                                <td><t t-esc="doc.patents_filed"/></td>
+                            </tr>
+                        </table>
+
+                        <!-- Criterion 1 -->
+                        <t t-if="doc.criterion1_summary">
+                            <div class="page-break"/>
+                            <h4 class="text-primary border-bottom pb-2">
+                                Criterion 1: Curricular Aspects
+                            </h4>
+                            <div class="mb-4"><t t-raw="doc.criterion1_summary"/></div>
+                        </t>
+
+                        <!-- Criterion 2 -->
+                        <t t-if="doc.criterion2_summary">
+                            <h4 class="text-primary border-bottom pb-2">
+                                Criterion 2: Teaching Learning &amp; Evaluation
+                            </h4>
+                            <div class="mb-4"><t t-raw="doc.criterion2_summary"/></div>
+                        </t>
+
+                        <!-- Criterion 3 -->
+                        <t t-if="doc.criterion3_summary">
+                            <h4 class="text-primary border-bottom pb-2">
+                                Criterion 3: Research Innovation &amp; Extension
+                            </h4>
+                            <div class="mb-4"><t t-raw="doc.criterion3_summary"/></div>
+                        </t>
+
+                        <!-- Criterion 4 -->
+                        <t t-if="doc.criterion4_summary">
+                            <h4 class="text-primary border-bottom pb-2">
+                                Criterion 4: Infrastructure &amp; Learning Resources
+                            </h4>
+                            <div class="mb-4"><t t-raw="doc.criterion4_summary"/></div>
+                        </t>
+
+                        <!-- Criterion 5 -->
+                        <t t-if="doc.criterion5_summary">
+                            <h4 class="text-primary border-bottom pb-2">
+                                Criterion 5: Student Support &amp; Progression
+                            </h4>
+                            <div class="mb-4"><t t-raw="doc.criterion5_summary"/></div>
+                        </t>
+
+                        <!-- Criterion 6 -->
+                        <t t-if="doc.criterion6_summary">
+                            <h4 class="text-primary border-bottom pb-2">
+                                Criterion 6: Governance Leadership &amp; Management
+                            </h4>
+                            <div class="mb-4"><t t-raw="doc.criterion6_summary"/></div>
+                        </t>
+
+                        <!-- Criterion 7 -->
+                        <t t-if="doc.criterion7_summary">
+                            <h4 class="text-primary border-bottom pb-2">
+                                Criterion 7: Institutional Values &amp; Best Practices
+                            </h4>
+                            <div class="mb-4"><t t-raw="doc.criterion7_summary"/></div>
+                        </t>
+
+                        <!-- Signatures -->
+                        <div class="row mt-5 pt-3">
+                            <div class="col-4 text-center">
+                                <div class="border-top pt-2">IQAC Coordinator</div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div class="border-top pt-2">IQAC Chairperson</div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div class="border-top pt-2">Head of Institution</div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

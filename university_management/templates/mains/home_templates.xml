@@ -1,0 +1,490 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Homepage Template -->
+    <template id="homepage" name="Homepage">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure">
+                <!-- Hero Section -->
+                <section class="hero-section bg-primary text-white py-5" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
+                    <div class="container">
+                        <div class="row align-items-center">
+                            <div class="col-lg-6">
+                                <h1 class="display-4 fw-bold mb-3">
+                                    Welcome to University Excellence
+                                </h1>
+                                <p class="lead mb-4">
+                                    Where knowledge meets innovation. Join our community of learners,
+                                    thinkers, and creators shaping the future.
+                                </p>
+                                <div class="d-flex flex-wrap gap-3">
+                                    <a href="/admissions" class="btn btn-light btn-lg">
+                                        <i class="fa fa-graduation-cap me-2"></i>
+                                        Apply Now
+                                    </a>
+                                    <a href="/about" class="btn btn-outline-light btn-lg">
+                                        <i class="fa fa-university me-2"></i>
+                                        Learn More
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 text-center mt-4 mt-lg-0">
+                                <div class="bg-white rounded p-4 shadow-lg">
+                                    <i class="fa fa-graduation-cap text-primary display-1 mb-3"></i>
+                                    <h3 class="text-dark mb-3">Admissions Open 2026</h3>
+                                    <p class="text-muted">Fall Semester applications now being accepted</p>
+                                    <a href="/admissions" class="btn btn-primary">
+                                        Apply Online <i class="fa fa-arrow-right ms-2"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Quick Stats -->
+                <section class="py-5 bg-light">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-3 col-6 text-center mb-4">
+                                <div class="display-3 text-primary fw-bold">25,000+</div>
+                                <p class="text-muted">Successful Alumni</p>
+                            </div>
+                            <div class="col-md-3 col-6 text-center mb-4">
+                                <div class="display-3 text-success fw-bold">500+</div>
+                                <p class="text-muted">Expert Faculty</p>
+                            </div>
+                            <div class="col-md-3 col-6 text-center mb-4">
+                                <div class="display-3 text-info fw-bold">150+</div>
+                                <p class="text-muted">Programs Offered</p>
+                            </div>
+                            <div class="col-md-3 col-6 text-center mb-4">
+                                <div class="display-3 text-warning fw-bold">50+</div>
+                                <p class="text-muted">National Awards</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Featured Programs -->
+                <section class="py-5">
+                    <div class="container">
+                        <div class="row mb-5">
+                            <div class="col-12 text-center">
+                                <h2 class="display-5 mb-3">
+                                    <i class="fa fa-graduation-cap text-primary me-2"></i>
+                                    Featured Programs
+                                </h2>
+                                <p class="lead text-muted">Explore our top-rated academic programs</p>
+                            </div>
+                        </div>
+                        <div class="row" t-if="featured_programs">
+                            <t t-foreach="featured_programs" t-as="program">
+                                <div class="col-md-4 mb-4">
+                                    <div class="card h-100 shadow-sm border-0">
+                                        <div class="card-body text-center p-4">
+                                            <div t-if="program.image_128"
+                                                 class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3 overflow-hidden"
+                                                 style="width: 80px; height: 80px;">
+                                                <img t-attf-src="/web/image/university.program/#{program.id}/image_128"
+                                                     class="img-fluid w-100 h-100"
+                                                     style="object-fit: cover;"
+                                                     t-att-alt="program.name"/>
+                                            </div>
+                                            <div t-else=""
+                                                 class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                                                 style="width: 80px; height: 80px;">
+                                                <i class="fa fa-graduation-cap fa-2x"></i>
+                                            </div>
+                                            <h4 class="card-title">
+                                                <t t-esc="program.name"/>
+                                            </h4>
+                                            <p class="card-text text-muted">
+                                                <t t-if="program.department_id">
+                                                    <t t-esc="program.department_id.name"/>
+                                                </t>
+                                                <t t-if="program.duration_years">
+                                                    — <t t-esc="program.duration_years"/> Years
+                                                </t>
+                                            </p>
+                                            <a t-attf-href="/program/#{program.id}" class="btn btn-outline-primary">
+                                                Learn More
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                        <div class="row" t-else="">
+                            <div class="col-12 text-center text-muted py-4">
+                                <i class="fa fa-graduation-cap fa-3x mb-3 d-block"></i>
+                                <p>No active programs found.</p>
+                            </div>
+                        </div>
+                        <div class="text-center mt-4">
+                            <a href="/programs" class="btn btn-primary btn-lg">
+                                <i class="fa fa-search me-2"></i>
+                                View All Programs
+                            </a>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Campus Life -->
+                <section class="py-5 bg-light">
+                    <div class="container">
+                        <div class="row mb-5">
+                            <div class="col-12 text-center">
+                                <h2 class="display-5 mb-3">
+                                    <i class="fa fa-users text-warning me-2"></i>
+                                    Campus Life
+                                </h2>
+                                <p class="lead text-muted">Experience vibrant student life</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-img-top" style="height: 200px; background: linear-gradient(45deg, #6a11cb, #2575fc);">
+                                        <div class="h-100 d-flex align-items-center justify-content-center">
+                                            <i class="fa fa-trophy fa-3x text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <h5 class="card-title">Sports &amp; Athletics</h5>
+                                        <p class="card-text text-muted">
+                                            State-of-the-art sports facilities and championship teams.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-img-top" style="height: 200px; background: linear-gradient(45deg, #11998e, #38ef7d);">
+                                        <div class="h-100 d-flex align-items-center justify-content-center">
+                                            <i class="fa fa-music fa-3x text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <h5 class="card-title">Cultural Activities</h5>
+                                        <p class="card-text text-muted">
+                                            Annual fest, music clubs, dance troupes, and art exhibitions.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-img-top" style="height: 200px; background: linear-gradient(45deg, #f46b45, #eea849);">
+                                        <div class="h-100 d-flex align-items-center justify-content-center">
+                                            <i class="fa fa-handshake-o fa-3x text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <h5 class="card-title">Clubs &amp; Societies</h5>
+                                        <p class="card-text text-muted">
+                                            50+ student-run clubs for every interest and passion.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Upcoming Events -->
+                <section class="py-5">
+                    <div class="container">
+                        <div class="row mb-5">
+                            <div class="col-12 text-center">
+                                <h2 class="display-5 mb-3">
+                                    <i class="fa fa-calendar text-danger me-2"></i>
+                                    Upcoming Events
+                                </h2>
+                                <p class="lead text-muted">Don't miss these exciting campus events</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100 border-danger border-2">
+                                    <div class="card-header bg-danger text-white">
+                                        <h5 class="mb-0">
+                                            <i class="fa fa-laptop me-2"></i>
+                                            Tech Summit 2025
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text">
+                                            Annual technology conference featuring industry leaders and workshops.
+                                        </p>
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge bg-light text-dark">
+                                                <i class="fa fa-calendar me-1"></i>
+                                                March 15-17, 2025
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100 border-success border-2">
+                                    <div class="card-header bg-success text-white">
+                                        <h5 class="mb-0">
+                                            <i class="fa fa-graduation-cap me-2"></i>
+                                            Career Fair
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text">
+                                            100+ companies recruiting for internships and full-time positions.
+                                        </p>
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge bg-light text-dark">
+                                                <i class="fa fa-calendar me-1"></i>
+                                                April 10, 2025
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100 border-primary border-2">
+                                    <div class="card-header bg-primary text-white">
+                                        <h5 class="mb-0">
+                                            <i class="fa fa-music me-2"></i>
+                                            Cultural Fest
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text">
+                                            3-day cultural extravaganza with performances, competitions, and food.
+                                        </p>
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge bg-light text-dark">
+                                                <i class="fa fa-calendar me-1"></i>
+                                                February 20-22, 2025
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-4">
+                            <a href="/events" class="btn btn-outline-primary btn-lg">
+                                <i class="fa fa-calendar me-2"></i>
+                                View All Events
+                            </a>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Testimonials -->
+                <section class="py-5">
+                    <div class="container">
+                        <div class="row mb-5">
+                            <div class="col-12 text-center">
+                                <h2 class="display-5 mb-3">
+                                    <i class="fa fa-quote-left text-secondary me-2"></i>
+                                    What Our Students Say
+                                </h2>
+                                <p class="lead text-muted">Hear from our students and alumni</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                                                 style="width: 60px; height: 60px;">
+                                                <i class="fa fa-user fa-2x"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="mb-0">Alex Johnson</h5>
+                                                <p class="text-muted small mb-0">Computer Science '22</p>
+                                            </div>
+                                        </div>
+                                        <p class="card-text">
+                                            "The hands-on projects and industry exposure prepared me perfectly for my career at Google."
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                                                 style="width: 60px; height: 60px;">
+                                                <i class="fa fa-user fa-2x"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="mb-0">Maria Garcia</h5>
+                                                <p class="text-muted small mb-0">Biotechnology '21</p>
+                                            </div>
+                                        </div>
+                                        <p class="card-text">
+                                            "The research facilities and mentorship helped me publish my first paper as an undergraduate."
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                                                 style="width: 60px; height: 60px;">
+                                                <i class="fa fa-user fa-2x"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="mb-0">David Chen</h5>
+                                                <p class="text-muted small mb-0">MBA '20</p>
+                                            </div>
+                                        </div>
+                                        <p class="card-text">
+                                            "The MBA program's industry connections helped me secure my dream job in investment banking."
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Call to Action -->
+                <section class="py-5 bg-primary text-white" style="background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);">
+                    <div class="container">
+                        <div class="row align-items-center">
+                            <div class="col-lg-8">
+                                <h2 class="display-6 mb-3">Ready to Start Your Journey?</h2>
+                                <p class="lead mb-0">
+                                    Join thousands of students who have transformed their lives through quality education.
+                                </p>
+                            </div>
+                            <div class="col-lg-4 text-lg-end">
+                                <a href="/admissions" class="btn btn-light btn-lg px-4">
+                                    <i class="fa fa-rocket me-2"></i>
+                                    Apply Now
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Quick Links -->
+                <section class="py-5 bg-dark text-white">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-3 mb-4">
+                                <h5 class="mb-3">
+                                    <i class="fa fa-university me-2"></i>
+                                    University
+                                </h5>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <a href="/about" class="text-white-50 text-decoration-none">
+                                            <i class="fa fa-chevron-right me-1"></i>
+                                            About Us
+                                        </a>
+                                    </li>
+                                    <li class="mb-2">
+                                        <a href="/leadership" class="text-white-50 text-decoration-none">
+                                            <i class="fa fa-chevron-right me-1"></i>
+                                            Leadership
+                                        </a>
+                                    </li>
+                                    <li class="mb-2">
+                                        <a href="/accreditation" class="text-white-50 text-decoration-none">
+                                            <i class="fa fa-chevron-right me-1"></i>
+                                            Accreditation
+                                        </a>
+                                    </li>
+                                    <li class="mb-2">
+                                        <a href="/careers" class="text-white-50 text-decoration-none">
+                                            <i class="fa fa-chevron-right me-1"></i>
+                                            Careers
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-3 mb-4">
+                                <h5 class="mb-3">
+                                    <i class="fa fa-graduation-cap me-2"></i>
+                                    Academics
+                                </h5>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <a href="/programs" class="text-white-50 text-decoration-none">
+                                            <i class="fa fa-chevron-right me-1"></i>
+                                            Programs
+                                        </a>
+                                    </li>
+                                    <li class="mb-2">
+                                        <a href="/departments" class="text-white-50 text-decoration-none">
+                                            <i class="fa fa-chevron-right me-1"></i>
+                                            Departments
+                                        </a>
+                                    </li>
+                                    <li class="mb-2">
+                                        <a href="/admissions" class="text-white-50 text-decoration-none">
+                                            <i class="fa fa-chevron-right me-1"></i>
+                                            Admissions
+                                        </a>
+                                    </li>
+                                    <li class="mb-2">
+                                        <a href="/calendar" class="text-white-50 text-decoration-none">
+                                            <i class="fa fa-chevron-right me-1"></i>
+                                            Academic Calendar
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-3 mb-4">
+                                <h5 class="mb-3">
+                                    <i class="fa fa-users me-2"></i>
+                                    Campus Life
+                                </h5>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <a href="/clubs" class="text-white-50 text-decoration-none">
+                                            <i class="fa fa-chevron-right me-1"></i>
+                                            Clubs
+                                        </a>
+                                    </li>
+                                    <li class="mb-2">
+                                        <a href="/sports" class="text-white-50 text-decoration-none">
+                                            <i class="fa fa-chevron-right me-1"></i>
+                                            Sports
+                                        </a>
+                                    </li>
+                                    <li class="mb-2">
+                                        <a href="my/hostel" class="text-white-50 text-decoration-none">
+                                            <i class="fa fa-chevron-right me-1"></i>
+                                            Hostels
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
+
+    <!--     This template is to hide menus from faculty -->
+    <!--    <template id="hide_menu_for_faculty" inherit_id="website.layout" name="Hide Menu For Faculty">-->
+    <!--        <xpath expr="//head" position="inside">-->
+    <!--            <t t-if="request.env.user.has_group('university_management.group_faculty')">-->
+    <!--                <style>-->
+    <!--                    a[href='/events'],-->
+    <!--                    a[href='/my/parent/dashboard'],-->
+    <!--                    a[href='/my/student/dashboard'] {-->
+    <!--                        display: none !important;-->
+    <!--                    }-->
+    <!--                </style>-->
+    <!--            </t>-->
+    <!--        </xpath>-->
+    <!--    </template>-->
+
+</odoo>

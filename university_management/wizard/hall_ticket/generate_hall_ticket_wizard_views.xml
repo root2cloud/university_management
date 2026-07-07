@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="generate_examination_hall_ticket_wizard_view_form" model="ir.ui.view">
+        <field name="name">generate.examination.hall.ticket.wizard.view.form</field>
+        <field name="model">generate.examination.hall.ticket.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate Hall Tickets">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Generate Hall Tickets</h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="examination_id"/>
+                            <field name="semester"/>
+                        </group>
+                        <group>
+                            <field name="auto_issue"/>
+                            <field name="send_email"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Student Filters">
+                            <group>
+                                <group>
+                                    <field name="program_id"/>
+                                    <field name="department_id"/>
+                                </group>
+                                <group>
+                                    <field name="batch_id"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Eligibility Criteria">
+                            <group>
+                                <field name="check_eligibility"/>
+                            </group>
+                            <group>
+                                <group>
+                                    <field name="min_attendance"/>
+                                    <field name="check_fee_payment"/>
+                                </group>
+                                <group>
+                                    <field name="check_documents"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Preview">
+                            <field name="preview_lines" nolabel="1">
+                                <!-- Use the list view we defined for the line model -->
+                                <list>
+                                    <field name="student_id"/>
+                                    <field name="registration_number"/>
+                                    <field name="program_id"/>
+                                    <field name="department_id"/>
+                                    <field name="attendance_percentage" widget="percentage"/>
+                                    <field name="total_fee_due" widget="monetary"/>
+                                    <field name="eligible" widget="boolean"/>
+                                    <field name="reason"/>
+                                </list>
+                            </field>
+                            <group>
+                                <group>
+                                    <field name="eligible_student_count" widget="stat_info" string="Eligible"/>
+                                    <field name="ineligible_student_count" widget="stat_info" string="Ineligible"/>
+                                    <field name="total_student_count" widget="stat_info" string="Total"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <footer>
+                    <button name="action_generate"
+                            string="Generate Hall Tickets"
+                            type="object"
+                            class="btn-primary"
+                            invisible="eligible_student_count == 0"/>
+                    <button string="Cancel"
+                            class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_examination_generate_hall_ticket_wizard" model="ir.actions.act_window">
+        <field name="name">Generate Hall Tickets</field>
+        <field name="res_model">generate.examination.hall.ticket.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

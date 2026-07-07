@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ══════════════════════════════════════════════════════
+         INHERIT ticket.helpdesk FORM — add asset fields
+    ══════════════════════════════════════════════════════════ -->
+    <record id="ticket_helpdesk_form_asset_inherit" model="ir.ui.view">
+        <field name="name">ticket.helpdesk.form.asset.inherit</field>
+        <field name="model">ticket.helpdesk</field>
+        <field name="inherit_id" ref="odoo_website_helpdesk.ticket_helpdesk_view_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Add smart buttons for asset, PO, invoices, request -->
+            <div name="button_box" position="inside">
+                <button name="action_view_asset_request" type="object"
+                        class="oe_stat_button" icon="fa-inbox"
+                        invisible="not asset_request_id">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">Asset</span>
+                        <span class="o_stat_text">Request</span>
+                    </div>
+                </button>
+                <button name="action_view_asset" type="object"
+                        class="oe_stat_button" icon="fa-cubes"
+                        invisible="not asset_id">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">Asset</span>
+                    </div>
+                </button>
+                <button name="action_view_purchase" type="object"
+                        class="oe_stat_button" icon="fa-shopping-cart"
+                        invisible="not purchase_order_id">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_value">
+                            <field name="purchase_order_state" widget="badge"
+                                   decoration-success="purchase_order_state == 'purchase'"
+                                   decoration-info="purchase_order_state == 'draft'"/>
+                        </span>
+                        <span class="o_stat_text">Purchase Order</span>
+                    </div>
+                </button>
+                <button name="action_view_invoices" type="object"
+                        class="oe_stat_button" icon="fa-file-text-o"
+                        invisible="invoice_count == 0">
+                    <field name="invoice_count" widget="statinfo" string="Invoices"/>
+                </button>
+            </div>
+
+            <!-- Add asset section below the main subject/description area -->
+            <field name="description" position="after">
+                <group string="Asset Management" col="2"
+                       invisible="ticket_type == 'general'">
+                    <field name="ticket_type" widget="badge"
+                           decoration-warning="ticket_type == 'asset_procurement'"
+                           decoration-info="ticket_type == 'asset_request'"
+                           decoration-success="ticket_type == 'asset_maintenance'"/>
+                    <field name="asset_request_id" options="{'no_create': True}"/>
+                    <field name="asset_id" options="{'no_create': True}"/>
+                    <field name="purchase_order_id" options="{'no_create': True}" readonly="1"/>
+                </group>
+            </field>
+
+            <!-- Add ticket_type field near priority/team area -->
+            <field name="team_id" position="before">
+                <field name="ticket_type"/>
+            </field>
+
+            <!-- Add Create Purchase Order button in header for IT team -->
+            <field name="stage_id" position="before">
+                <button name="action_create_purchase_order"
+                        string="Create Purchase Order"
+                        type="object"
+                        class="btn-warning"
+                        invisible="ticket_type != 'asset_procurement' or purchase_order_id"
+                        confirm="Create a new purchase order for this asset request?"
+                        groups="purchase.group_purchase_user"/>
+            </field>
+
+        </field>
+    </record>
+
+    <!-- ══════════════════════════════════════════════════════
+         INHERIT ticket.helpdesk LIST — add asset columns
+    ══════════════════════════════════════════════════════════ -->
+    <record id="ticket_helpdesk_list_asset_inherit" model="ir.ui.view">
+        <field name="name">ticket.helpdesk.list.asset.inherit</field>
+        <field name="model">ticket.helpdesk</field>
+        <field name="inherit_id" ref="odoo_website_helpdesk.ticket_helpdesk_view_list"/>
+        <field name="arch" type="xml">
+            <field name="stage_id" position="before">
+                <field name="ticket_type" optional="show" widget="badge"
+                       decoration-warning="ticket_type == 'asset_procurement'"
+                       decoration-info="ticket_type == 'asset_request'"/>
+                <field name="asset_id" optional="hide"/>
+                <field name="purchase_order_id" optional="hide"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- ══════════════════════════════════════════════════════
+         ASSET PROCUREMENT TICKETS — dedicated action for IT team
+    ══════════════════════════════════════════════════════════ -->
+    <record id="action_asset_procurement_tickets" model="ir.actions.act_window">
+        <field name="name">Asset Procurement Tickets</field>
+        <field name="res_model">ticket.helpdesk</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('ticket_type','in',['asset_request','asset_procurement'])]</field>
+        <field name="context">{'default_ticket_type': 'asset_request'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No asset tickets yet</p>
+            <p>Asset requests and procurement tickets from staff appear here.</p>
+        </field>
+    </record>
+
+    <!-- ══════════════════════════════════════════════════════
+         INHERIT purchase.order FORM — add asset fields
+    ══════════════════════════════════════════════════════════ -->
+    <record id="purchase_order_form_asset_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.form.asset.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Smart button for assets registered from this PO -->
+            <div name="button_box" position="inside">
+                <button name="action_view_assets" type="object"
+                        class="oe_stat_button" icon="fa-cubes"
+                        invisible="asset_count == 0">
+                    <field name="asset_count" widget="statinfo" string="Assets"/>
+                </button>
+                <button name="action_view_helpdesk_ticket" type="object"
+                        class="oe_stat_button" icon="fa-ticket"
+                        invisible="not helpdesk_ticket_id">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">Helpdesk</span>
+                        <span class="o_stat_text">Ticket</span>
+                    </div>
+                </button>
+                <button name="action_view_asset_request" type="object"
+                        class="oe_stat_button" icon="fa-inbox"
+                        invisible="not asset_request_id">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">Asset</span>
+                        <span class="o_stat_text">Request</span>
+                    </div>
+                </button>
+            </div>
+
+            <!-- Add asset context fields after partner -->
+            <field name="partner_id" position="after">
+                <field name="asset_request_id"
+                       options="{'no_create': True}"
+                       readonly="1"
+                       invisible="not asset_request_id"/>
+                <field name="helpdesk_ticket_id"
+                       options="{'no_create': True}"
+                       readonly="1"
+                       invisible="not helpdesk_ticket_id"/>
+            </field>
+
+            <!-- Register Assets button in header (after PO is confirmed) -->
+            <button name="action_create_invoice" position="after">
+                <button name="action_register_assets_from_po"
+                        string="Register Assets"
+                        type="object"
+                        class="btn-secondary"
+                        invisible="state not in ('purchase','done') or asset_count &gt; 0"
+                        confirm="Create asset records from this purchase order?"
+                        groups="university_management.group_university_admin"/>
+            </button>
+
+        </field>
+    </record>
+
+</odoo>

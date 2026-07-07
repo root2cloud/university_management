@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Report Action -->
+    <record id="action_report_student_profile" model="ir.actions.report">
+        <field name="name">Student Profile Report</field>
+        <field name="model">student.student</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">university_management.report_student_profile</field>
+        <field name="report_file">university_management.report_student_profile</field>
+        <field name="binding_model_id" ref="model_student_student"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Report Template -->
+    <template id="report_student_profile">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+
+                        <!-- Header -->
+                        <div class="row" style="border-bottom: 3px solid #3F51B5; padding-bottom: 15px; margin-bottom: 20px;">
+                            <div class="col-3 text-center">
+                                <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="max-height: 80px;"/>
+                            </div>
+                            <div class="col-6 text-center">
+                                <h2 style="color: #3F51B5; margin: 0; font-weight: bold;">
+                                    <t t-esc="o.company_id.name"/>
+                                </h2>
+                                <p style="margin: 5px 0;">
+                                    <t t-esc="o.company_id.street"/>, <t t-esc="o.company_id.city"/>
+                                </p>
+                                <h3 style="margin: 10px 0 0 0; color: #3F51B5; text-transform: uppercase;">
+                                    Student Profile Report
+                                </h3>
+                            </div>
+                            <div class="col-3 text-right">
+                                <div style="border: 3px solid #3F51B5; padding: 5px; display: inline-block;">
+                                    <img t-if="o.student_photo"
+                                         t-att-src="image_data_uri(o.student_photo)"
+                                         style="width: 100px; height: 120px; object-fit: cover;"/>
+                                    <div t-else="" style="width: 100px; height: 120px; background: #f0f0f0; display: flex; align-items: center; justify-content: center;">
+                                        <span style="color: #999;">No Photo</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Personal Information -->
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="background: #3F51B5; color: white; padding: 8px; margin-bottom: 10px;">
+                                📋 PERSONAL INFORMATION
+                            </h4>
+                            <table class="table table-bordered table-sm">
+                                <tr>
+                                    <td style="width: 25%; background: #f5f5f5; font-weight: bold;">Full Name</td>
+                                    <td style="width: 75%;" colspan="3">
+                                        <span style="text-transform: uppercase; font-weight: bold; font-size: 11pt;">
+                                            <t t-esc="o.name"/>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Registration Number</td>
+                                    <td><t t-esc="o.registration_number"/></td>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Student Code</td>
+                                    <td><t t-esc="o.student_code"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Date of Birth</td>
+                                    <td><t t-esc="o.date_of_birth"/></td>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Age</td>
+                                    <td><t t-esc="o.age"/> years</td>
+                                </tr>
+                                <tr>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Gender</td>
+                                    <td><t t-esc="o.gender.title()"/></td>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Blood Group</td>
+                                    <td><t t-esc="o.blood_group or 'N/A'"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Nationality</td>
+                                    <td><t t-esc="o.nationality_id.name if o.nationality_id else 'N/A'"/></td>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Religion</td>
+                                    <td><t t-esc="o.religion or 'N/A'"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Category</td>
+                                    <td><t t-esc="o.admission_category or 'N/A'"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Aadhar Number</td>
+                                    <td><t t-esc="o.aadhar_number or 'N/A'"/></td>
+                                    <td style="background: #f5f5f5; font-weight: bold;">PAN Number</td>
+                                    <td><t t-esc="o.pan_number or 'N/A'"/></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="background: #3F51B5; color: white; padding: 8px; margin-bottom: 10px;">
+                                📞 CONTACT INFORMATION
+                            </h4>
+                            <table class="table table-bordered table-sm">
+                                <tr>
+                                    <td style="width: 25%; background: #f5f5f5; font-weight: bold;">Mobile Number</td>
+                                    <td style="width: 25%;"><t t-esc="o.mobile or 'N/A'"/></td>
+                                    <td style="width: 25%; background: #f5f5f5; font-weight: bold;">Email Address</td>
+                                    <td style="width: 25%;"><t t-esc="o.email or 'N/A'"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Permanent Address</td>
+                                    <td colspan="3"><t t-esc="o.permanent_address or 'N/A'"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Current Address</td>
+                                    <td colspan="3"><t t-esc="o.current_address or 'Same as Permanent'"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="background: #f5f5f5; font-weight: bold;">City</td>
+                                    <td><t t-esc="o.city or 'N/A'"/></td>
+                                    <td style="background: #f5f5f5; font-weight: bold;">State</td>
+                                    <td><t t-esc="o.state_id.name if o.state_id else 'N/A'"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="background: #f5f5f5; font-weight: bold;">PIN Code</td>
+                                    <td><t t-esc="o.zip or 'N/A'"/></td>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Country</td>
+                                    <td><t t-esc="o.country_id.name if o.country_id else 'N/A'"/></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Academic Information -->
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="background: #3F51B5; color: white; padding: 8px; margin-bottom: 10px;">
+                                🎓 ACADEMIC INFORMATION
+                            </h4>
+                            <table class="table table-bordered table-sm">
+                                <tr>
+                                    <td style="width: 25%; background: #f5f5f5; font-weight: bold;">Program</td>
+                                    <td style="width: 25%;"><t t-esc="o.program_id.name"/></td>
+                                    <td style="width: 25%; background: #f5f5f5; font-weight: bold;">Department</td>
+                                    <td style="width: 25%;"><t t-esc="o.department_id.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Batch</td>
+                                    <td><t t-esc="o.batch_id.name"/></td>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Current Semester</td>
+                                    <td><t t-esc="o.current_semester or 'N/A'"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Academic Year</td>
+                                    <td><t t-esc="o.academic_year_id.name"/></td>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Admission Date</td>
+                                    <td><t t-esc="o.admission_date"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Status</td>
+                                    <td>
+                                        <span t-if="o.state == 'enrolled'" style="color: #4CAF50; font-weight: bold;">● Active</span>
+                                        <span t-elif="o.state == 'graduated'" style="color: #2196F3; font-weight: bold;">● Graduated</span>
+                                        <span t-elif="o.state == 'suspended'" style="color: #FF9800; font-weight: bold;">● Suspended</span>
+                                        <span t-else="" style="color: #F44336; font-weight: bold;">● Inactive</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Academic Performance -->
+                        <div class="row" style="margin-bottom: 20px;">
+                            <div class="col-6">
+                                <div style="border: 2px solid #4CAF50; padding: 15px; background: #F1F8E9; height: 100%;">
+                                    <h5 style="color: #4CAF50; margin-top: 0; text-align: center;">
+                                        📊 ACADEMIC PERFORMANCE
+                                    </h5>
+                                    <table style="width: 100%; font-size: 10pt;">
+                                        <tr>
+                                            <td style="padding: 5px; font-weight: bold;">Current CGPA:</td>
+                                            <td style="padding: 5px; text-align: right;">
+                                                <span style="font-size: 16pt; color: #4CAF50; font-weight: bold;">
+                                                    <t t-esc="'{:.2f}'.format(o.cgpa)" t-if="o.cgpa"/>
+                                                    <t t-else="">N/A</t>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 5px; font-weight: bold;">Current SGPA:</td>
+                                            <td style="padding: 5px; text-align: right;">
+                                                <span style="font-size: 14pt; color: #4CAF50; font-weight: bold;">
+                                                    <t t-if="o.sgpa">
+                                                        <t t-esc="'{:.2f}'.format(o.sgpa)"/>
+                                                    </t>
+                                                    <t t-else="">N/A</t>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div style="border: 2px solid #FF9800; padding: 15px; background: #FFF3E0; height: 100%;">
+                                    <h5 style="color: #FF9800; margin-top: 0; text-align: center;">
+                                        📅 ATTENDANCE RECORD
+                                    </h5>
+                                    <table style="width: 100%; font-size: 10pt;">
+                                        <tr>
+                                            <td style="padding: 5px; font-weight: bold;">Overall Attendance:</td>
+                                            <td style="padding: 5px; text-align: right;">
+                                                <span style="font-size: 16pt; font-weight: bold;" t-att-style="'color: %s;' % ('#4CAF50' if o.attendance_percentage >= 75 else '#F44336')">
+                                                    <t t-esc="'{:.1f}'.format(o.attendance_percentage)" t-if="o.attendance_percentage"/>
+                                                    <t t-else="">N/A</t>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Emergency Contact -->
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="background: #3F51B5; color: white; padding: 8px; margin-bottom: 10px;">
+                                🆘 EMERGENCY CONTACT
+                            </h4>
+                            <table class="table table-bordered table-sm">
+                                <tr>
+                                    <td style="width: 25%; background: #f5f5f5; font-weight: bold;">Emergency Contact Name</td>
+                                    <td style="width: 75%;" colspan="3"><t t-esc="o.emergency_contact_name or 'N/A'"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Emergency Contact Number</td>
+                                    <td colspan="3"><t t-esc="o.emergency_contact or 'N/A'"/></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Financial Information -->
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="background: #3F51B5; color: white; padding: 8px; margin-bottom: 10px;">
+                                💰 FINANCIAL INFORMATION
+                            </h4>
+                            <table class="table table-bordered table-sm">
+                                <tr>
+                                    <td style="width: 25%; background: #f5f5f5; font-weight: bold;">Total Fee Paid</td>
+                                    <td style="width: 25%;">₹ <t t-esc="'{:,.2f}'.format(o.total_fee_paid)" t-if="o.total_fee_paid"/></td>
+                                    <td style="width: 25%; background: #f5f5f5; font-weight: bold;">Fee Due</td>
+                                    <td style="width: 25%;">
+                                        <span t-att-style="'color: %s; font-weight: bold;' % ('#F44336' if o.total_fee_due > 0 else '#4CAF50')">
+                                            ₹ <t t-esc="'{:,.2f}'.format(o.total_fee_due)" t-if="o.total_fee_due"/>
+                                            <t t-else="">0.00</t>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Total Fee</td>
+                                    <td colspan="3">
+                                        ₹ <t t-esc="'{:,.2f}'.format(o.total_fee_paid + o.total_fee_due)" t-if="o.total_fee_paid or o.total_fee_due"/>
+                                        <t t-else="">0.00</t>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Additional Information -->
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="background: #3F51B5; color: white; padding: 8px; margin-bottom: 10px;">
+                                ℹ️ ADDITIONAL INFORMATION
+                            </h4>
+                            <table class="table table-bordered table-sm">
+                                <tr>
+                                    <td style="width: 25%; background: #f5f5f5; font-weight: bold;">Hostel Resident</td>
+                                    <td style="width: 25%;"><t t-esc="'Yes' if o.is_hosteller else 'No'"/></td>
+                                    <td style="width: 25%; background: #f5f5f5; font-weight: bold;">Transport User</td>
+                                    <td style="width: 25%;"><t t-esc="'Yes' if o.uses_transport else 'No'"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="background: #f5f5f5; font-weight: bold;">Library Member</td>
+                                    <td><t t-esc="'Yes' if o.library_member_id else 'No'"/></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="text-center" style="margin-top: 40px; padding-top: 10px; border-top: 2px solid #3F51B5;">
+                            <p style="margin: 0; font-size: 9pt; color: #666;">
+                                This is a computer-generated report. Generated on: <t t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%b-%Y %H:%M')"/>
+                            </p>
+                            <p style="margin: 5px 0 0 0; font-size: 9pt; color: #666;">
+                                For queries, contact: <t t-esc="o.company_id.phone"/> | <t t-esc="o.company_id.email"/>
+                            </p>
+                        </div>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

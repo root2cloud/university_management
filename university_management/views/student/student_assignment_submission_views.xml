@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ================================================================== -->
+    <!-- FORM VIEW                                                           -->
+    <!-- ================================================================== -->
+    <record id="student_assignment_submission_view_form" model="ir.ui.view">
+        <field name="name">student.assignment.submission.view.form</field>
+        <field name="model">student.assignment.submission</field>
+        <field name="arch" type="xml">
+            <form string="Assignment Submission">
+                <header>
+                    <button name="action_submit" type="object"
+                            string="Submit" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_start_review" type="object"
+                            string="Start Review" class="oe_highlight"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_grade" type="object"
+                            string="Confirm Grade" class="oe_highlight"
+                            invisible="state != 'under_review'"/>
+                    <button name="action_return_for_revision" type="object"
+                            string="Return for Revision" class="btn-default"
+                            invisible="state not in ['submitted','under_review']"/>
+                    <button name="action_flag_plagiarism" type="object"
+                            string="🚩 Flag Plagiarism" class="btn-danger"
+                            invisible="is_plagiarised or state == 'draft'"/>
+                    <button name="action_clear_plagiarism" type="object"
+                            string="Clear Plagiarism Flag" class="btn-default"
+                            invisible="not is_plagiarised"/>
+                    <button name="action_reset_draft" type="object"
+                            string="Reset" class="btn-default"
+                            invisible="state != 'returned'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,under_review,graded"/>
+                </header>
+                <sheet>
+                    <!-- Plagiarism ribbon -->
+                    <widget name="web_ribbon" title="Plagiarism Flagged"
+                            bg_color="text-bg-danger"
+                            invisible="not is_plagiarised"/>
+                    <!-- Late ribbon -->
+                    <widget name="web_ribbon" title="Late Submission"
+                            bg_color="text-bg-warning"
+                            invisible="not is_late"/>
+
+                    <group>
+                        <group string="Submission Details">
+                            <field name="assignment_id"/>
+                            <field name="student_id"/>
+                            <!-- FIXED: field is registration_number -->
+                            <field name="student_registration_no"/>
+                            <field name="subject_id"/>
+                            <field name="batch_id"/>
+                            <field name="assignment_type"/>
+                            <field name="deadline"/>
+                            <field name="submission_date"/>
+                            <field name="is_late" widget="boolean_toggle"/>
+                        </group>
+                        <group string="Grading">
+                            <field name="max_marks" readonly="1"/>
+                            <field name="marks_obtained"/>
+                            <field name="percentage" widget="progressbar"/>
+                            <field name="grade"/>
+                            <field name="graded_by"/>
+                            <field name="graded_on"/>
+                        </group>
+                    </group>
+
+                    <!-- Plagiarism note shown only when flagged -->
+                    <group string="Plagiarism Details"
+                           invisible="not is_plagiarised">
+                        <field name="plagiarism_note" nolabel="1"
+                               placeholder="Describe the plagiarism issue..."/>
+                    </group>
+
+                    <notebook>
+                        <page string="Submission Content">
+                            <field name="submission_text"
+                                   placeholder="Student writes or pastes submission here..."/>
+                        </page>
+                        <page string="Submitted Files">
+                            <field name="submission_file_ids"
+                                   widget="many2many_binary"/>
+                        </page>
+                        <page string="Score Breakdown">
+                            <button name="action_compute_marks_from_rubric"
+                                    type="object"
+                                    string="∑ Compute Marks from Scores"
+                                    class="btn-secondary mb-2"/>
+                            <field name="score_ids">
+                                <list editable="bottom">
+                                    <field name="criteria_id"/>
+                                    <field name="max_marks" readonly="1"/>
+                                    <field name="marks_obtained"/>
+                                    <field name="remarks"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Student Notes">
+                            <field name="submission_notes"
+                                   placeholder="Notes from the student to faculty..."/>
+                        </page>
+                        <page string="Faculty Feedback">
+                            <field name="feedback"
+                                   placeholder="Enter detailed feedback for the student..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ================================================================== -->
+    <!-- LIST VIEW                                                           -->
+    <!-- ================================================================== -->
+    <record id="student_assignment_submission_view_list" model="ir.ui.view">
+        <field name="name">student.assignment.submission.view.list</field>
+        <field name="model">student.assignment.submission</field>
+        <field name="arch" type="xml">
+            <list string="Submissions"
+                  decoration-danger="is_plagiarised"
+                  decoration-warning="is_late and state != 'graded'"
+                  decoration-success="state == 'graded'"
+                  decoration-muted="state == 'draft'">
+                <field name="assignment_id"/>
+                <field name="student_id"/>
+                <field name="student_registration_no"/>
+                <field name="subject_id" optional="show"/>
+                <field name="batch_id" optional="show"/>
+                <field name="assignment_type" widget="badge" optional="hide"/>
+                <field name="deadline"/>
+                <field name="submission_date"/>
+                <field name="is_late" widget="boolean"/>
+                <field name="is_plagiarised" widget="boolean" optional="show"/>
+                <field name="max_marks"/>
+                <field name="marks_obtained"/>
+                <field name="percentage" widget="progressbar" optional="show"/>
+                <field name="grade"/>
+                <field name="graded_by" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-muted="state == 'draft'"
+                       decoration-info="state == 'submitted'"
+                       decoration-warning="state == 'under_review'"
+                       decoration-success="state == 'graded'"
+                       decoration-danger="state == 'returned'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ================================================================== -->
+    <!-- SEARCH VIEW                                                         -->
+    <!-- ================================================================== -->
+    <record id="student_assignment_submission_view_search" model="ir.ui.view">
+        <field name="name">student.assignment.submission.view.search</field>
+        <field name="model">student.assignment.submission</field>
+        <field name="arch" type="xml">
+            <search string="Search Submissions">
+                <field name="assignment_id"/>
+                <field name="student_id"/>
+                <field name="student_registration_no"/>
+                <field name="subject_id"/>
+                <field name="batch_id"/>
+                <field name="faculty_id"/>
+                <separator/>
+                <filter string="Not Submitted" name="draft"
+                        domain="[('state','=','draft')]"/>
+                <filter string="Submitted" name="submitted"
+                        domain="[('state','=','submitted')]"/>
+                <filter string="Under Review" name="review"
+                        domain="[('state','=','under_review')]"/>
+                <filter string="Graded" name="graded"
+                        domain="[('state','=','graded')]"/>
+                <filter string="Returned" name="returned"
+                        domain="[('state','=','returned')]"/>
+                <separator/>
+                <filter string="Late Submissions" name="late"
+                        domain="[('is_late','=',True)]"/>
+                <filter string="Plagiarism Flagged" name="plagiarised"
+                        domain="[('is_plagiarised','=',True)]"/>
+                <filter string="Pending Grading" name="pending"
+                        domain="[('state','in',['submitted','under_review'])]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Assignment" name="group_assignment"
+                            context="{'group_by':'assignment_id'}"/>
+                    <filter string="Student" name="group_student"
+                            context="{'group_by':'student_id'}"/>
+                    <filter string="Subject" name="group_subject"
+                            context="{'group_by':'subject_id'}"/>
+                    <filter string="Batch" name="group_batch"
+                            context="{'group_by':'batch_id'}"/>
+                    <filter string="Status" name="group_state"
+                            context="{'group_by':'state'}"/>
+                    <filter string="Assignment Type" name="group_type"
+                            context="{'group_by':'assignment_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ================================================================== -->
+    <!-- WINDOW ACTION                                                       -->
+    <!-- ================================================================== -->
+    <record id="action_student_assignment_submission" model="ir.actions.act_window">
+        <field name="name">Assignment Submissions</field>
+        <field name="res_model">student.assignment.submission</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id"
+               ref="student_assignment_submission_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No submissions yet
+            </p>
+        </field>
+    </record>
+
+</odoo>

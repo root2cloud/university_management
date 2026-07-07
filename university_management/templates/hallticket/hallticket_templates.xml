@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Hall Ticket List Template -->
+    <template id="hall_ticket_list" name="Hall Tickets">
+        <t t-call="website.layout">
+            <div class="container mt-4">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2>My Hall Tickets</h2>
+                        <p class="text-muted">View and download your examination hall tickets</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <t t-if="hall_tickets">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Hall Ticket No.</th>
+                                            <th>Examination</th>
+                                            <th>Exam Date</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="hall_tickets" t-as="ticket">
+                                            <tr>
+                                                <td>
+                                                    <strong><t t-esc="ticket.name"/></strong>
+                                                </td>
+                                                <td>
+                                                    <t t-esc="ticket.examination_id.name"/>
+                                                    <div class="text-muted small">
+                                                        <t t-esc="ticket.examination_id.semester_id.name"/>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <t t-esc="ticket.examination_id.start_date"/>
+                                                </td>
+                                                <td>
+                                                    <span t-attf-class="badge badge-{{ 'success' if ticket.state in ['issued','downloaded','printed'] else 'warning' }}">
+                                                        <t t-esc="ticket.state"/>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <a t-attf-href="/my/hall-ticket/{{ ticket.id }}"
+                                                       class="btn btn-sm btn-outline-primary">
+                                                        View Details
+                                                    </a>
+                                                    <a t-if="ticket.state in ['issued', 'downloaded', 'printed']"
+                                                       t-attf-href="/my/hall-ticket/{{ ticket.id }}/download"
+                                                       class="btn btn-sm btn-success ms-2">
+                                                        <i class="fa fa-download"></i> Download
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="alert alert-info">
+                                <i class="fa fa-info-circle"></i> No hall tickets found.
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Hall Ticket Detail Template -->
+    <template id="hall_ticket_detail" name="Hall Ticket Details">
+        <t t-call="website.layout">
+            <div class="container mt-4">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2>Hall Ticket Details</h2>
+                        <a href="/my/hall-tickets" class="btn btn-outline-secondary btn-sm">
+                            <i class="fa fa-arrow-left"></i> Back to List
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">
+                            <t t-esc="hall_ticket.name"/> - <t t-esc="examination.name"/>
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Student Information</h5>
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td><strong>Name:</strong></td>
+                                        <td><t t-esc="student.name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Registration No:</strong></td>
+                                        <td><t t-esc="student.registration_number"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Program:</strong></td>
+                                        <td><t t-esc="student.program_id.name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Department:</strong></td>
+                                        <td><t t-esc="student.department_id.name"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Examination Details</h5>
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td><strong>Exam Type:</strong></td>
+                                        <td><t t-esc="examination.exam_type"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Academic Year:</strong></td>
+                                        <td><t t-esc="examination.academic_year_id.name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Semester:</strong></td>
+                                        <td><t t-esc="examination.semester_id.name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Exam Period:</strong></td>
+                                        <td>
+                                            <t t-esc="examination.start_date"/> to
+                                            <t t-esc="examination.end_date"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <h5>Exam Schedule</h5>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Day</th>
+                                            <th>Time</th>
+                                            <th>Subject Code</th>
+                                            <th>Subject Name</th>
+                                            <th>Venue</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="examination.timetable_ids" t-as="timetable">
+                                            <tr>
+                                                <td><t t-esc="timetable.exam_date"/></td>
+                                                <td><t t-esc="timetable.exam_date.strftime('%A') if timetable.exam_date else ''"/></td>
+                                                <td>
+                                                    <t t-esc="'{:02.0f}:{:02.0f}'.format(*divmod(timetable.start_time * 60, 60))"/> -
+                                                    <t t-esc="'{:02.0f}:{:02.0f}'.format(*divmod(timetable.end_time * 60, 60))"/>
+                                                </td>
+                                                <td><t t-esc="timetable.subject_id.code"/></td>
+                                                <td><t t-esc="timetable.subject_id.name"/></td>
+                                                <td><t t-esc="timetable.venue"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <h5>Important Instructions</h5>
+                            <div class="alert alert-warning">
+                                <t t-raw="examination.instructions"/>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 text-center">
+                            <t t-if="hall_ticket.state in ['issued', 'downloaded', 'printed']">
+                                <a t-attf-href="/my/hall-ticket/{{ hall_ticket.id }}/download"
+                                   class="btn btn-success btn-lg">
+                                    <i class="fa fa-download"></i> Download Hall Ticket (PDF)
+                                </a>
+
+                            </t>
+                            <t t-else="">
+                                <div class="alert alert-info">
+                                    <i class="fa fa-info-circle"></i> Hall ticket is not yet generated.
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Hall Ticket Not Ready Template -->
+    <template id="hall_ticket_not_ready" name="Hall Ticket Not Ready">
+        <t t-call="website.layout">
+            <div class="container mt-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="card text-center">
+                            <div class="card-body py-5">
+                                <div class="display-1 text-warning mb-4">
+                                    <i class="fa fa-clock-o"></i>
+                                </div>
+                                <h3 class="card-title">Hall Ticket Not Ready</h3>
+                                <p class="card-text text-muted">
+                                    <t t-esc="message"/>
+                                </p>
+                                <a href="/my/hall-tickets" class="btn btn-primary mt-3">
+                                    Back to Hall Tickets
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Hall Ticket Verification Page -->
+    <template id="hall_ticket_verify_page" name="Verify Hall Ticket">
+        <t t-call="website.layout">
+            <div class="container mt-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white text-center">
+                                <h4 class="mb-0">Hall Ticket Verification</h4>
+                            </div>
+                            <div class="card-body">
+                                <t t-if="error">
+                                    <div class="alert alert-danger">
+                                        <i class="fa fa-exclamation-triangle"></i>
+                                        <t t-esc="error"/>
+                                    </div>
+                                </t>
+
+                                <p class="text-muted mb-4">
+                                    Enter hall ticket number and date of birth to verify authenticity.
+                                </p>
+
+                                <form method="POST" action="/hall-ticket/verify/check">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                                    <div class="mb-3">
+                                        <label for="hall_ticket_number" class="form-label">
+                                            Hall Ticket Number
+                                        </label>
+                                        <input type="text"
+                                               class="form-control"
+                                               id="hall_ticket_number"
+                                               name="hall_ticket_number"
+                                               placeholder="Enter hall ticket number"
+                                               required="True"/>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="date_of_birth" class="form-label">
+                                            Date of Birth
+                                        </label>
+                                        <input type="date"
+                                               class="form-control"
+                                               id="date_of_birth"
+                                               name="date_of_birth"
+                                               required="True"/>
+                                    </div>
+
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fa fa-check"></i> Verify Hall Ticket
+                                        </button>
+                                    </div>
+                                </form>
+
+                                <div class="mt-4 text-center">
+                                    <p class="text-muted small">
+                                        This verification is for employers, institutions, and official purposes.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Hall Ticket Verification Result -->
+    <template id="hall_ticket_verify_result" name="Verification Result">
+        <t t-call="website.layout">
+            <div class="container mt-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header bg-success text-white text-center">
+                                <h4 class="mb-0">
+                                    <i class="fa fa-check-circle"></i> Hall Ticket Verified Successfully
+                                </h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="text-center mb-4">
+                                    <div class="display-1 text-success mb-3">
+                                        <i class="fa fa-check-circle"></i>
+                                    </div>
+                                    <h5>Hall Ticket is Valid and Authentic</h5>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6>Student Information</h6>
+                                        <table class="table table-sm">
+                                            <tr>
+                                                <td><strong>Name:</strong></td>
+                                                <td><t t-esc="student.name"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Registration No:</strong></td>
+                                                <td><t t-esc="student.registration_number"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Date of Birth:</strong></td>
+                                                <td><t t-esc="student.date_of_birth"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Program:</strong></td>
+                                                <td><t t-esc="student.program_id.name"/></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Examination Details</h6>
+                                        <table class="table table-sm">
+                                            <tr>
+                                                <td><strong>Hall Ticket No:</strong></td>
+                                                <td><t t-esc="hall_ticket.name"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Examination:</strong></td>
+                                                <td><t t-esc="examination.name"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Academic Year:</strong></td>
+                                                <td><t t-esc="examination.academic_year_id.name"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Semester:</strong></td>
+                                                <td><t t-esc="examination.semester_id.name"/></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4 text-center">
+                                    <div class="alert alert-info">
+                                        <i class="fa fa-info-circle"></i>
+                                        This verification confirms the authenticity of the hall ticket.
+                                        Verified on <t t-esc="datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')"/>
+                                    </div>
+
+                                    <a href="/hall-ticket/verify" class="btn btn-primary">
+                                        <i class="fa fa-search"></i> Verify Another Ticket
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- No Hall Tickets Template -->
+    <template id="no_hall_tickets" name="No Hall Tickets">
+        <t t-call="website.layout">
+            <div class="container mt-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="card text-center">
+                            <div class="card-body py-5">
+                                <div class="display-1 text-info mb-4">
+                                    <i class="fa fa-info-circle"></i>
+                                </div>
+                                <h3 class="card-title">No Hall Tickets Available</h3>
+                                <p class="card-text text-muted">
+                                    <t t-esc="message"/>
+                                </p>
+                                <a href="/my" class="btn btn-primary mt-3">
+                                    Back to Dashboard
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

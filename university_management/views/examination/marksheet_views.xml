@@ -1,0 +1,608 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="examination_marksheet_view_form" model="ir.ui.view">
+        <field name="name">examination.marksheet.view.form</field>
+        <field name="model">examination.marksheet</field>
+        <field name="arch" type="xml">
+            <form string="Marksheet">
+                <header>
+                    <button name="action_verify" type="object" string="Verify"
+                            class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_issue" type="object" string="Issue Marksheet"
+                            class="oe_highlight"
+                            invisible="state != 'verified'"/>
+                    <button name="action_print_marksheet" type="object" string="Print Marksheet"
+                            invisible="state not in ['verified', 'issued', 'downloaded']"/>
+                    <button name="action_download" type="object" string="Download"
+                            invisible="state not in ['issued', 'downloaded']"/>
+                    <button name="action_generate_duplicate" type="object" string="Generate Duplicate"
+                            invisible="state not in ['issued', 'downloaded'] or is_duplicate"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state == 'cancelled'"
+                            confirm="Are you sure you want to cancel this marksheet?"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'"
+                            confirm="Are you sure you want to reset this Marksheet to draft?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,verified,issued,downloaded"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Duplicate" bg_color="text-bg-warning"
+                            invisible="not is_duplicate"/>
+                    <widget name="web_ribbon" title="Downloaded" bg_color="text-bg-info"
+                            invisible="state != 'downloaded' or is_duplicate"/>
+                    <widget name="web_ribbon" title="Verified" bg_color="text-bg-success"
+                            invisible="state != 'verified' or is_duplicate"/>
+                    <widget name="web_ribbon" title="Cancelled" bg_color="text-bg-danger"
+                            invisible="state != 'cancelled'"/>
+
+                    <div class="oe_title">
+                        <label for="name" string="Marksheet Number"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Student Details">
+                            <field name="student_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="registration_number" readonly="1"/>
+                            <field name="program_id" readonly="1"/>
+                            <field name="department_id" readonly="1"/>
+                            <field name="student_photo" widget="image"
+                                   options="{'size': [100, 100]}"
+                                   readonly="1"/>
+                        </group>
+                        <group string="Academic Period">
+                            <field name="academic_year_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="semester_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="marksheet_type"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Issue Details">
+                            <field name="issue_date" widget="date"/>
+                            <field name="issued_by" readonly="1"/>
+                        </group>
+                        <group string="Verification Details">
+                            <field name="verified_by" readonly="1"/>
+                            <field name="verification_date" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group string="Authorized Signatures">
+                        <group>
+                            <field name="principal_name"
+                                   placeholder="Principal Name"/>
+                        </group>
+                        <group>
+                            <field name="controller_name"
+                                   placeholder="Controller of Examinations"/>
+                        </group>
+                    </group>
+
+                    <group invisible="not is_duplicate">
+                        <group string="Duplicate Details">
+                            <field name="is_duplicate" invisible="1"/>
+                            <field name="original_marksheet_id" readonly="1"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="duplicate_fee" widget="monetary"/>
+                            <field name="duplicate_fee_paid" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Exam Results" name="exam_results">
+                            <field name="result_ids" widget="many2many">
+                                <list string="Results"
+                                      decoration-success="is_pass == True"
+                                      decoration-danger="is_pass == False"
+                                      decoration-warning="is_absent == True">
+                                    <field name="subject_id"/>
+                                    <field name="examination_id" optional="hide"/>
+                                    <field name="internal_marks" optional="show"/>
+                                    <field name="external_marks" optional="show"/>
+                                    <field name="total_marks"
+                                           decoration-bf="1"/>
+                                    <field name="max_marks"/>
+                                    <field name="percentage"/>
+                                    <field name="grade_id" decoration-bf="1"/>
+                                    <field name="grade_point" decoration-bf="1"/>
+<!--                                    <field name="credits" optional="hide"/>-->
+                                    <field name="is_pass" widget="boolean_toggle"/>
+                                    <field name="is_absent" widget="boolean_toggle" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Performance Summary" name="performance">
+                            <group>
+                                <group string="Subject Statistics">
+                                    <field name="total_subjects" readonly="1"/>
+                                    <field name="subjects_passed" readonly="1"/>
+                                    <field name="subjects_failed" readonly="1"/>
+                                </group>
+                                <group string="Credit Statistics">
+                                    <field name="total_credits" readonly="1"/>
+                                    <field name="credits_earned" readonly="1"/>
+                                </group>
+                            </group>
+
+                            <group>
+                                <group string="Academic Performance">
+                                    <field name="sgpa" readonly="1"
+                                           widget="float"
+                                           digits="[16, 2]"/>
+                                    <field name="cgpa" readonly="1"
+                                           widget="float"
+                                           digits="[16, 2]"/>
+                                    <field name="percentage" readonly="1"
+                                           widget="float"
+                                           digits="[16, 2]"/>
+                                </group>
+                                <group string="Result Classification">
+                                    <field name="classification" readonly="1"
+                                           widget="badge"
+                                           decoration-success="classification == 'distinction'"
+                                           decoration-info="classification == 'first'"
+                                           decoration-warning="classification == 'second'"/>
+                                    <field name="overall_result" readonly="1"
+                                           widget="badge"
+                                           decoration-success="overall_result == 'pass'"
+                                           decoration-info="overall_result == 'promoted'"
+                                           decoration-danger="overall_result in ['fail', 'detained']"/>
+                                </group>
+                            </group>
+
+                            <separator string="Visual Performance Summary"/>
+
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Subject Performance</h5>
+                                            <div class="progress mb-2" style="height: 30px;">
+                                                <div class="progress-bar bg-success" role="progressbar" style="width: 100%;">
+                                                    <strong>
+                                                        Passed: <field name="subjects_passed" readonly="1"/>
+                                                        (<field name="subject_pass_pct" readonly="1"/>%)
+                                                    </strong>
+                                                </div>
+                                            </div>
+                                            <div class="progress mb-2" style="height: 30px;">
+                                                <div class="progress-bar bg-danger" role="progressbar" style="width: 100%;">
+                                                    <strong>
+                                                        Failed: <field name="subjects_failed" readonly="1"/>
+                                                        (<field name="subject_fail_pct" readonly="1"/>%)
+                                                    </strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Credit Performance</h5>
+                                            <div class="progress mb-2" style="height: 30px;">
+                                                <div class="progress-bar bg-info" role="progressbar"
+                                                     style="width: 0%;">
+                                                    <field name="credit_progress_width" invisible="1"/>
+                                                </div>
+                                            </div>
+                                            <p class="card-text">
+                                                Earned: <field name="credits_earned" readonly="1"/> /
+                                                <field name="total_credits" readonly="1"/>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </page>
+
+                        <page string="Remarks" name="remarks">
+                            <field name="remarks"
+                                   placeholder="Enter remarks or additional notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="examination_marksheet_view_list" model="ir.ui.view">
+        <field name="name">examination.marksheet.view.list</field>
+        <field name="model">examination.marksheet</field>
+        <field name="arch" type="xml">
+            <list string="Marksheets"
+                  default_order="issue_date desc"
+                  multi_edit="1"
+                  sample="1"
+                  decoration-success="overall_result == 'pass'"
+                  decoration-info="overall_result == 'promoted'"
+                  decoration-danger="overall_result in ['fail', 'detained']"
+                  decoration-warning="is_duplicate == True"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="registration_number" optional="show"/>
+                <field name="program_id" optional="hide"/>
+                <field name="department_id" optional="show"/>
+                <field name="academic_year_id" optional="show"/>
+                <field name="semester_id" optional="show"/>
+                <field name="marksheet_type"/>
+                <field name="sgpa" optional="show" digits="[16, 2]"/>
+                <field name="cgpa" optional="show" digits="[16, 2]"/>
+                <field name="percentage" optional="show" digits="[16, 2]"/>
+                <field name="classification" optional="hide"
+                       widget="badge"
+                       decoration-success="classification == 'distinction'"
+                       decoration-info="classification == 'first'"/>
+                <field name="overall_result"
+                       widget="badge"
+                       decoration-success="overall_result == 'pass'"
+                       decoration-info="overall_result == 'promoted'"
+                       decoration-danger="overall_result in ['fail', 'detained']"/>
+                <field name="issue_date"/>
+                <field name="is_duplicate" optional="hide" widget="boolean_toggle"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'issued'"
+                       decoration-info="state == 'verified'"
+                       decoration-warning="state == 'downloaded'"
+                       decoration-danger="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="examination_marksheet_view_search" model="ir.ui.view">
+        <field name="name">examination.marksheet.view.search</field>
+        <field name="model">examination.marksheet</field>
+        <field name="arch" type="xml">
+            <search string="Search Marksheets">
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="registration_number"/>
+                <field name="academic_year_id"/>
+                <field name="semester_id"/>
+                <field name="department_id"/>
+
+                <separator/>
+
+                <filter name="filter_semester" string="Semester Marksheet"
+                        domain="[('marksheet_type', '=', 'semester')]"/>
+                <filter name="filter_annual" string="Annual Marksheet"
+                        domain="[('marksheet_type', '=', 'annual')]"/>
+                <filter name="filter_final" string="Final Marksheet"
+                        domain="[('marksheet_type', '=', 'final')]"/>
+                <filter name="filter_provisional" string="Provisional Certificate"
+                        domain="[('marksheet_type', '=', 'provisional')]"/>
+                <filter name="filter_duplicate" string="Duplicate Marksheet"
+                        domain="[('marksheet_type', '=', 'duplicate')]"/>
+
+                <separator/>
+
+                <filter name="filter_is_duplicate" string="Duplicate Marksheets"
+                        domain="[('is_duplicate', '=', True)]"/>
+                <filter name="filter_is_original" string="Original Marksheets"
+                        domain="[('is_duplicate', '=', False)]"/>
+
+                <separator/>
+
+                <filter name="filter_pass" string="Pass"
+                        domain="[('overall_result', '=', 'pass')]"/>
+                <filter name="filter_promoted" string="Promoted"
+                        domain="[('overall_result', '=', 'promoted')]"/>
+                <filter name="filter_detained" string="Detained"
+                        domain="[('overall_result', '=', 'detained')]"/>
+                <filter name="filter_fail" string="Fail"
+                        domain="[('overall_result', '=', 'fail')]"/>
+
+                <separator/>
+
+                <filter name="filter_distinction" string="Distinction (75%+)"
+                        domain="[('classification', '=', 'distinction')]"/>
+                <filter name="filter_first_class" string="First Class (60%+)"
+                        domain="[('classification', '=', 'first')]"/>
+                <filter name="filter_second_class" string="Second Class (50%+)"
+                        domain="[('classification', '=', 'second')]"/>
+                <filter name="filter_third_class" string="Third Class (40%+)"
+                        domain="[('classification', '=', 'third')]"/>
+
+                <separator/>
+
+                <filter name="filter_draft" string="Draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_verified" string="Verified"
+                        domain="[('state', '=', 'verified')]"/>
+                <filter name="filter_issued" string="Issued"
+                        domain="[('state', '=', 'issued')]"/>
+                <filter name="filter_downloaded" string="Downloaded"
+                        domain="[('state', '=', 'downloaded')]"/>
+                <filter name="filter_cancelled" string="Cancelled"
+                        domain="[('state', '=', 'cancelled')]"/>
+
+                <separator/>
+
+                <filter name="filter_today" string="Issued Today"
+                        domain="[('issue_date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_this_month" string="Issued This Month"
+                        domain="[('issue_date', '&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d')),
+                                 ('issue_date', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d'))]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_student" string="Student"
+                            context="{'group_by': 'student_id'}"/>
+                    <filter name="group_by_academic_year" string="Academic Year"
+                            context="{'group_by': 'academic_year_id'}"/>
+                    <filter name="group_by_semester" string="Semester"
+                            context="{'group_by': 'semester_id'}"/>
+                    <filter name="group_by_department" string="Department"
+                            context="{'group_by': 'department_id'}"/>
+                    <filter name="group_by_marksheet_type" string="Marksheet Type"
+                            context="{'group_by': 'marksheet_type'}"/>
+                    <filter name="group_by_classification" string="Classification"
+                            context="{'group_by': 'classification'}"/>
+                    <filter name="group_by_overall_result" string="Overall Result"
+                            context="{'group_by': 'overall_result'}"/>
+                    <filter name="group_by_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_by_issue_date" string="Issue Date"
+                            context="{'group_by': 'issue_date'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="academic_year_id" string="Academic Year"
+                           select="multi"
+                           icon="fa-calendar"/>
+                    <field name="semester_id" string="Semester"
+                           select="multi"
+                           icon="fa-list-ol"/>
+                    <field name="department_id" string="Department"
+                           select="multi"
+                           icon="fa-building"/>
+                    <field name="marksheet_type" string="Type"
+                           select="multi"
+                           icon="fa-file-text"/>
+                    <field name="overall_result" string="Result"
+                           select="multi"
+                           icon="fa-check-circle"/>
+                    <field name="state" string="Status"
+                           select="multi"
+                           icon="fa-filter"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="examination_marksheet_view_kanban" model="ir.ui.view">
+        <field name="name">examination.marksheet.view.kanban</field>
+        <field name="model">examination.marksheet</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="overall_result"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="student_id"/>
+                <field name="registration_number"/>
+                <field name="student_photo"/>
+                <field name="program_id"/>
+                <field name="department_id"/>
+                <field name="academic_year_id"/>
+                <field name="semester_id"/>
+                <field name="marksheet_type"/>
+                <field name="sgpa"/>
+                <field name="cgpa"/>
+                <field name="percentage"/>
+                <field name="classification"/>
+                <field name="overall_result"/>
+                <field name="total_subjects"/>
+                <field name="subjects_passed"/>
+                <field name="subjects_failed"/>
+                <field name="is_duplicate"/>
+                <field name="issue_date"/>
+                <field name="state"/>
+
+                <progressbar field="overall_result"
+                             colors='{"pass": "success", "promoted": "info", "detained": "warning", "fail": "danger"}'/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="ribbon ribbon-top-right" t-if="record.is_duplicate.raw_value">
+                                <span class="text-bg-warning">Duplicate</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.classification.raw_value == 'distinction' and !record.is_duplicate.raw_value">
+                                <span class="text-bg-success">Distinction</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.state.raw_value == 'cancelled'">
+                                <span class="text-bg-danger">Cancelled</span>
+                            </div>
+
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="student_id"/>
+                                        </strong>
+                                        <div class="text-muted">
+                                            <field name="name"/>
+                                        </div>
+                                        <div class="text-muted">
+                                            Reg: <field name="registration_number"/>
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_record_top_right">
+                                        <field name="student_photo" widget="image"
+                                               options="{'size': [80, 80]}"
+                                               class="oe_avatar"/>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body mt-3">
+                                    <div class="row mb-2">
+                                        <div class="col-12">
+                                            <div class="bg-light p-2 rounded">
+                                                <div class="mb-1">
+                                                    <i class="fa fa-graduation-cap text-primary"/>
+                                                    <field name="program_id"/>
+                                                </div>
+                                                <div class="mb-1">
+                                                    <i class="fa fa-building text-info"/>
+                                                    <field name="department_id"/>
+                                                </div>
+                                                <div class="mb-1">
+                                                    <i class="fa fa-calendar text-warning"/>
+                                                    <field name="academic_year_id"/> - Sem <field name="semester_id"/>
+                                                </div>
+                                                <div>
+                                                    <i class="fa fa-file-text text-success"/>
+                                                    <field name="marksheet_type"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-4 text-center">
+                                            <div class="card bg-primary text-white">
+                                                <div class="card-body p-2">
+                                                    <h4 class="mb-0"><field name="sgpa"/></h4>
+                                                    <small>SGPA</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4 text-center">
+                                            <div class="card bg-info text-white">
+                                                <div class="card-body p-2">
+                                                    <h4 class="mb-0"><field name="cgpa"/></h4>
+                                                    <small>CGPA</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-4 text-center">
+                                            <div class="card bg-success text-white">
+                                                <div class="card-body p-2">
+                                                    <h4 class="mb-0"><field name="percentage"/>%</h4>
+                                                    <small>Percentage</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-2">
+                                    <div class="col-12">
+                                        <div class="progress" style="height: 25px;">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: 100%;">
+                                                <strong>
+                                                    Pass:
+                                                    <field name="subjects_passed"/>
+                                                    (<field name="subject_pass_pct"/>%)
+                                                </strong>
+                                            </div>
+                                        </div>
+                                        <div class="progress mt-1" style="height: 25px;">
+                                            <div class="progress-bar bg-danger" role="progressbar" style="width: 100%;">
+                                                <strong>
+                                                    Fail:
+                                                    <field name="subjects_failed"/>
+                                                    (<field name="subject_fail_pct"/>%)
+                                                </strong>
+                                            </div>
+                                        </div>
+                                        <div class="text-center mt-1">
+                                            <small class="text-muted">
+                                                Total Subjects: <strong><field name="total_subjects"/></strong>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                    <div class="row mb-2">
+                                        <div class="col-6 text-center">
+                                            <span class="badge rounded-pill"
+                                                  t-attf-class="text-bg-{{record.classification.raw_value == 'distinction' ? 'success' : (record.classification.raw_value == 'first' ? 'info' : (record.classification.raw_value == 'second' ? 'warning' : 'secondary'))}}">
+                                                <field name="classification"/>
+                                            </span>
+                                        </div>
+                                        <div class="col-6 text-center">
+                                            <span class="badge rounded-pill"
+                                                  t-attf-class="text-bg-{{record.overall_result.raw_value == 'pass' ? 'success' : (record.overall_result.raw_value == 'promoted' ? 'info' : 'danger')}}">
+                                                <field name="overall_result"/>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <small class="text-muted">
+                                                <i class="fa fa-calendar"/>
+                                                Issued: <field name="issue_date"/>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom mt-2">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="state" widget="badge"
+                                               decoration-success="state == 'issued'"
+                                               decoration-info="state == 'verified'"
+                                               decoration-warning="state == 'downloaded'"
+                                               decoration-danger="state == 'cancelled'"/>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_examination_marksheet" model="ir.actions.act_window">
+        <field name="name">Marksheets</field>
+        <field name="res_model">examination.marksheet</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_filter_issued': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Generate Marksheet
+            </p>
+            <p>
+                Generate student marksheets for semester/annual/final examinations. System automatically
+                assigns unique marksheet numbers using sequence. Select student and academic period
+                (year/semester). Choose marksheet type: Semester (single semester), Annual (full year),
+                Final/Consolidated (complete program), Provisional Certificate (temporary), or Duplicate
+                (copy of original). Add published exam results via many2many relation. System automatically
+                computes performance metrics: subject counts (total/passed/failed), credit statistics
+                (total/earned), SGPA (semester grade point average), CGPA (cumulative grade point average),
+                percentage. Classification computed based on percentage: Distinction (75%+), First Class
+                (60%+), Second Class (50%+), Third Class (40%+), Pass (35%+). Overall result determined by
+                failed subjects: Pass (0 failed), Promoted (1-2 failed), Detained (3+ failed). 5-state
+                workflow: Draft → Verified → Issued → Downloaded → Cancelled. Verification tracking with
+                verified_by user and verification_date. Issue action sends email to student. Generate
+                duplicate marksheets with fee tracking. Portal mixin provides student portal access.
+            </p>
+        </field>
+    </record>
+
+</odoo>

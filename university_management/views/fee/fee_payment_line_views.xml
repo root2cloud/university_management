@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── fee.payment.line — List View (embedded in fee.payment form) ── -->
+    <record id="fee_payment_line_view_list" model="ir.ui.view">
+        <field name="name">fee.payment.line.view.list</field>
+        <field name="model">fee.payment.line</field>
+        <field name="arch" type="xml">
+            <list string="Fee Components" editable="bottom"
+                  create="false" delete="false">
+                <field name="sequence" widget="handle"/>
+                <field name="name" readonly="1"/>
+                <field name="fee_type" readonly="1"/>
+                <field name="is_mandatory" readonly="1"/>
+                <field name="component_amount" widget="monetary"
+                       options="{'currency_field': 'currency_id'}" readonly="1"/>
+                <field name="amount_paid" widget="monetary"
+                       options="{'currency_field': 'currency_id'}" readonly="1"/>
+                <field name="outstanding_amount" widget="monetary"
+                       options="{'currency_field': 'currency_id'}" readonly="1"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'paid'"
+                       decoration-warning="state == 'partial'"
+                       decoration-muted="state == 'pending'"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ── Inherit fee.payment form — add Component Lines tab ── -->
+    <record id="fee_payment_view_form_component_lines" model="ir.ui.view">
+        <field name="name">fee.payment.view.form.component.lines</field>
+        <field name="model">fee.payment</field>
+        <field name="inherit_id" ref="university_management.fee_payment_view_form"/>
+        <field name="arch" type="xml">
+            <!-- Add Fee Components page inside the notebook -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Fee Components" name="fee_components"
+                      invisible="state not in ['invoiced', 'partial', 'paid']">
+                    <div class="o_field_one2many">
+                        <field name="payment_line_ids"
+                               widget="one2many_list"
+                               mode="list"
+                               readonly="1">
+                            <list string="Fee Components"
+                                  create="false" delete="false">
+                                <field name="sequence" widget="handle"/>
+                                <field name="name"/>
+                                <field name="fee_type"/>
+                                <field name="is_mandatory"/>
+                                <field name="component_amount" widget="monetary"
+                                       options="{'currency_field': 'currency_id'}"/>
+                                <field name="amount_paid" widget="monetary"
+                                       options="{'currency_field': 'currency_id'}"/>
+                                <field name="outstanding_amount" widget="monetary"
+                                       options="{'currency_field': 'currency_id'}"/>
+                                <field name="state" widget="badge"
+                                       decoration-success="state == 'paid'"
+                                       decoration-warning="state == 'partial'"
+                                       decoration-muted="state == 'pending'"/>
+                                <field name="currency_id" column_invisible="1"/>
+                            </list>
+                        </field>
+                    </div>
+
+                    <!-- Component summary -->
+                    <group>
+                        <group string="Component Summary">
+                            <field name="amount_paid" widget="monetary"
+                                   options="{'currency_field': 'currency_id'}"
+                                   readonly="1" string="Total Paid"/>
+                            <field name="outstanding_amount" widget="monetary"
+                                   options="{'currency_field': 'currency_id'}"
+                                   readonly="1" string="Total Outstanding"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

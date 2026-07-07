@@ -1,0 +1,735 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="student_view_form" model="ir.ui.view">
+        <field name="name">student.student.view.form</field>
+        <field name="model">student.student</field>
+        <field name="arch" type="xml">
+            <form string="Student">
+                <header>
+                    <button name="action_admit" string="Admit"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'draft'"
+                            confirm="Are you sure you want to admit this student?"/>
+                    <button name="action_enroll" string="Enroll"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'admitted'"/>
+                    <button name="action_activate" string="Activate"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'enrolled'"/>
+                    <button name="action_suspend" string="Suspend"
+                            type="object"
+                            invisible="state not in ['active', 'enrolled']"/>
+                    <button name="action_graduate" string="Graduate"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'active'"
+                            confirm="Are you sure you want to mark this student as graduated?"/>
+                    <button name="action_create_portal_user" string="Create Portal User"
+                            type="object"
+                            invisible="user_id"
+                            groups="base.group_system"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft"
+                            type="object"
+                            invisible="state == 'draft'"
+                            confirm="Are you sure you want to reset this student to draft?"/>
+                    <button name="action_map_usn"
+                            string="Map USN"
+                            type="object"
+                            class="oe_highlight"
+                            invisible="usn_mapped or not university_usn"
+                            confirm="Permanently map the USN to this student and mark them active?"
+                            groups="base.group_user"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,admitted,enrolled,active,graduated"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_student_attendance"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-calendar-check-o">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="attendance_percentage" widget="float" digits="[6,1]"/><span>%</span>
+                                </span>
+                                <span class="o_stat_text">Attendance</span>
+                            </div>
+                        </button>
+
+                        <button name="action_fee_payment"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-money">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="total_fee_paid" widget="monetary"/>
+                                </span>
+                                <span class="o_stat_text">Fee Paid</span>
+                            </div>
+                        </button>
+
+                        <button name="action_view_fee_due"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-exclamation-circle"
+                                help="Outstanding fee amount — click to see breakdown">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value text-danger">
+                                    <field name="total_fee_due" widget="monetary"/>
+                                </span>
+                                <span class="o_stat_text">Fee Due</span>
+                            </div>
+                        </button>
+
+                        <button name="action_view_fee_transaction_history"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-history"
+                                help="Component-wise payment transaction history">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="fee_transaction_count" nolabel="1"/>
+                                </span>
+                                <span class="o_stat_text">Transactions</span>
+                            </div>
+                        </button>
+
+                        <button name="action_exam_result"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-graduation-cap">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="cgpa" widget="float" digits="[16,2]"/>
+                                </span>
+                                <span class="o_stat_text">CGPA</span>
+                            </div>
+                        </button>
+
+                        <button name="action_student_document"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-file-text">
+                            <field name="documents_verified" widget="boolean"/>
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Documents</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <widget name="web_ribbon" title="Graduated"
+                            bg_color="text-bg-success"
+                            invisible="state != 'graduated'"/>
+                    <widget name="web_ribbon" title="Suspended"
+                            bg_color="text-bg-danger"
+                            invisible="state != 'suspended'"/>
+
+                    <field name="student_photo" widget="image" class="oe_avatar"/>
+
+                    <div class="oe_title">
+                        <label for="name" string="Student Name"/>
+                        <h1>
+                            <field name="name" placeholder="Full Name" required="1"/>
+                        </h1>
+                        <h2>
+                            <field name="registration_number" readonly="1"/>
+                            <span class="text-muted ms-2" invisible="not student_code or student_code == '/'">
+                                <field name="student_code" readonly="1"/>
+                            </span>
+                        </h2>
+                        <h3 invisible="usn_mapped">
+                            <span class="text-muted" invisible="not temp_student_id">Temp ID: </span>
+                            <field name="temp_student_id" readonly="1" invisible="not temp_student_id"/>
+                        </h3>
+                        <h3 invisible="not usn_mapped">
+                            <span class="fw-bold" style="color: green;">USN: </span>
+                            <field name="university_usn" readonly="1"/>
+                        </h3>
+                    </div>
+
+                    <group>
+                        <group string="Personal Information">
+                            <field name="date_of_birth" widget="date"/>
+                            <field name="age" readonly="1"/>
+                            <field name="gender" widget="radio" options="{'horizontal': true}"/>
+                            <field name="blood_group"/>
+                            <field name="nationality_id" options="{'no_create': True}"/>
+                            <field name="is_international" widget="boolean_toggle"/>
+                            <field name="religion"/>
+                            <field name="caste"/>
+                        </group>
+                        <group string="Contact Information">
+                            <field name="email" widget="email" required="1"/>
+                            <field name="mobile" widget="phone"/>
+                            <field name="personal_email" widget="email"/>
+                            <field name="personal_mobile" widget="phone"/>
+                            <field name="emergency_contact_name"/>
+                            <field name="emergency_contact" widget="phone"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Academic Information">
+                            <field name="program_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="department_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="batch_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="current_semester"/>
+                            <field name="academic_year_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="sgpa" readonly="1"/>
+                        </group>
+                        <group string="Admission Details">
+                            <field name="admission_number"/>
+                            <field name="admission_id"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="admission_date" widget="date"/>
+                            <field name="admission_category"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Address">
+                            <field name="current_address" placeholder="Enter current address..."/>
+                            <field name="permanent_address" placeholder="Enter permanent address..."/>
+                        </group>
+                        <group string="Previous Education">
+                            <field name="previous_qualification"
+                                   placeholder="e.g., 10+2, B.Sc"/>
+                            <field name="previous_institution"
+                                   placeholder="School/College Name"/>
+                            <field name="previous_percentage"/>
+                            <field name="previous_year"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Government IDs">
+                            <field name="aadhar_number" placeholder="12 digit Aadhar"/>
+                            <field name="pan_number" placeholder="PAN Number"/>
+                        </group>
+                        <group string="University ID">
+                            <field name="temp_student_id" readonly="1"
+                                   invisible="usn_mapped"/>
+                            <field name="university_usn"
+                                   readonly="usn_mapped"
+                                   placeholder="e.g. 1MV24AR001"
+                                   invisible="usn_mapped"/>
+                            <field name="university_usn" readonly="1"
+                                   invisible="not usn_mapped"/>
+                            <field name="usn_mapped" widget="boolean_toggle" readonly="1"/>
+                            <field name="usn_mapped_date" widget="date" readonly="1"
+                                   invisible="not usn_mapped"/>
+                            <field name="usn_mapped_by" readonly="1"
+                                   invisible="not usn_mapped"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Bank Details">
+                            <field name="bank_account_number"/>
+                            <field name="bank_name"/>
+                            <field name="bank_branch"/>
+                            <field name="ifsc_code"/>
+                            <field name="bank_account_id"
+                                   readonly="1"
+                                   options="{'no_create': True, 'no_open': False}"
+                                   help="Auto-linked contact bank account. Appears under the student contact Bank Accounts tab."/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Facilities">
+                            <field name="is_hosteller" widget="boolean_toggle" readonly="1"/>
+                            <field name="hostel_allocation_id"
+                                   invisible="not is_hosteller"
+                                   readonly="1"
+                                   options="{'no_create': True, 'no_open': False}"/>
+                            <field name="uses_transport" widget="boolean_toggle" readonly="1"/>
+                            <field name="transport_allocation_id"
+                                   invisible="not uses_transport"
+                                   readonly="1"
+                                   options="{'no_create': True, 'no_open': False}"/>
+                            <field name="library_member_id"
+                                   readonly="1"
+                                   options="{'no_create': True, 'no_open': False}"/>
+                        </group>
+                        <group string="Portal Access">
+                            <field name="user_id" readonly="1"/>
+                            <field name="partner_id" invisible="1"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Enrolled Courses" name="courses">
+                            <field name="enrolled_course_ids" mode="list">
+                                <list>
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="subject_id"/>
+                                    <field name="semester_id"/>
+                                    <field name="credits"/>
+                                    <field name="faculty_id"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Registrations" name="registrations">
+                            <field name="registration_ids" mode="list">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="registration_date"/>
+                                    <field name="course_ids"/>
+                                    <field name="semester_id"/>
+                                    <field name="academic_year_id"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Attendance" name="attendance">
+                            <field name="attendance_ids" mode="list">
+                                <list>
+                                    <field name="date"/>
+                                    <field name="course_id"/>
+                                    <field name="faculty_id"/>
+                                    <field name="time_in"/>
+                                    <field name="time_out"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'present'"
+                                           decoration-danger="state == 'absent'"
+                                           decoration-warning="state == 'late'"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Exam Results" name="results">
+                            <field name="exam_result_ids" mode="list">
+                                <list>
+                                    <field name="examination_id"/>
+                                    <field name="subject_id"/>
+                                    <field name="total_marks"/>
+                                    <field name="percentage"/>
+                                    <field name="grade_id"/>
+                                    <field name="grade_point"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Fee Payments" name="fee_payments">
+                            <field name="fee_payment_ids" mode="list">
+                                <list>
+                                    <field name="payment_date"/>
+                                    <field name="fee_structure_id"/>
+                                    <field name="amount" sum="Total Amount"/>
+<!--                                    <field name="payment_method"/>-->
+                                    <field name="name"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Documents" name="documents">
+                            <field name="document_ids" mode="kanban">
+                                <kanban>
+                                    <field name="name"/>
+                                    <field name="document_type"/>
+                                    <field name="is_verified"/>
+                                    <field name="attachment_id"/>
+                                    <templates>
+                                        <t t-name="kanban-box">
+                                            <div class="oe_kanban_card">
+                                                <div class="oe_kanban_content">
+                                                    <div class="o_kanban_record_title">
+                                                        <strong><field name="name"/></strong>
+                                                    </div>
+                                                    <div>
+                                                        <field name="document_type" widget="badge"/>
+                                                        <field name="is_verified" widget="boolean"
+                                                               class="ms-2"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </templates>
+                                </kanban>
+                            </field>
+                        </page>
+
+                        <page string="Parents/Guardians" name="parents">
+                            <field name="parent_ids" mode="list">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="relationship"/>
+                                    <field name="occupation"/>
+                                    <field name="mobile"/>
+                                    <field name="email"/>
+                                    <field name="is_primary_contact" widget="boolean_toggle"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="ID Cards" name="id_cards">
+                            <field name="id_card_ids" mode="list">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="issue_date"/>
+                                    <field name="expiry_date"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Discipline Records" name="discipline">
+                            <field name="discipline_ids" mode="list">
+                                <list>
+                                    <field name="incident_date"/>
+                                    <field name="incident_type"/>
+                                    <field name="severity"/>
+                                    <field name="action_type"/>
+                                    <field name="reported_by"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="student_view_list" model="ir.ui.view">
+        <field name="name">student.student.view.list</field>
+        <field name="model">student.student</field>
+        <field name="arch" type="xml">
+            <list string="Students"
+                  default_order="registration_number"
+                  sample="1">
+                <field name="student_photo" widget="image" optional="show"/>
+                <field name="registration_number"/>
+                <field name="name"/>
+                <field name="email" widget="email"/>
+                <field name="mobile" widget="phone" optional="show"/>
+                <field name="program_id"/>
+                <field name="department_id" optional="show"/>
+                <field name="batch_id" optional="show"/>
+                <field name="current_semester" optional="hide"/>
+                <field name="cgpa" optional="show"
+                       decoration-success="cgpa &gt;= 8.5"
+                       decoration-warning="cgpa &gt;= 6.0 and cgpa &lt; 8.5"
+                       decoration-danger="cgpa &lt; 6.0"/>
+                <field name="attendance_percentage" widget="float" digits="[6,1]" optional="show"
+                       decoration-success="attendance_percentage &gt;= 75"
+                       decoration-warning="attendance_percentage &gt;= 65 and attendance_percentage &lt; 75"
+                       decoration-danger="attendance_percentage &lt; 65"/>
+                <field name="admission_date" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state in ['admitted', 'enrolled']"
+                       decoration-success="state == 'active'"
+                       decoration-primary="state == 'graduated'"
+                       decoration-danger="state in ['suspended', 'expelled']"/>
+                <field name="active" widget="boolean_toggle" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="student_view_search" model="ir.ui.view">
+        <field name="name">student.student.view.search</field>
+        <field name="model">student.student</field>
+        <field name="arch" type="xml">
+            <search string="Search Students">
+                <field name="name" string="Student"
+                       filter_domain="['|', '|', ('name', 'ilike', self), ('registration_number', 'ilike', self), ('student_code', 'ilike', self)]"/>
+                <field name="registration_number"/>
+                <field name="email"/>
+                <field name="mobile"/>
+                <field name="program_id"/>
+                <field name="department_id"/>
+                <field name="batch_id"/>
+                <field name="admission_number"/>
+
+                <separator/>
+
+                <filter name="filter_draft" string="Draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_admitted" string="Admitted"
+                        domain="[('state', '=', 'admitted')]"/>
+                <filter name="filter_enrolled" string="Enrolled"
+                        domain="[('state', '=', 'enrolled')]"/>
+                <filter name="filter_active" string="Active"
+                        domain="[('state', '=', 'active')]"/>
+                <filter name="filter_graduated" string="Graduated"
+                        domain="[('state', '=', 'graduated')]"/>
+                <filter name="filter_suspended" string="Suspended"
+                        domain="[('state', '=', 'suspended')]"/>
+
+                <separator/>
+
+                <filter name="filter_male" string="Male"
+                        domain="[('gender', '=', 'male')]"/>
+                <filter name="filter_female" string="Female"
+                        domain="[('gender', '=', 'female')]"/>
+
+                <separator/>
+
+                <filter name="filter_hosteller" string="Hostellers"
+                        domain="[('is_hosteller', '=', True)]"/>
+                <filter name="filter_transport" string="Transport Users"
+                        domain="[('uses_transport', '=', True)]"/>
+                <filter name="filter_international" string="International"
+                        domain="[('is_international', '=', True)]"/>
+
+                <separator/>
+
+                <filter name="filter_low_attendance" string="Low Attendance (&lt;75%)"
+                        domain="[('attendance_percentage', '&lt;', 75)]"/>
+                <filter name="filter_good_cgpa" string="Good CGPA (&gt;=8.5)"
+                        domain="[('cgpa', '&gt;=', 8.5)]"/>
+                <filter name="filter_documents_verified" string="Documents Verified"
+                        domain="[('documents_verified', '=', True)]"/>
+                <filter name="filter_documents_pending" string="Documents Pending"
+                        domain="[('documents_verified', '=', False)]"/>
+
+                <separator/>
+
+                <filter name="filter_fee_due" string="Fee Due"
+                        domain="[('total_fee_due', '&gt;', 0)]"/>
+
+                <separator/>
+
+                <filter name="filter_portal_access" string="Has Portal Access"
+                        domain="[('user_id', '!=', False)]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_by_program" string="Program"
+                            context="{'group_by': 'program_id'}"/>
+                    <filter name="group_by_department" string="Department"
+                            context="{'group_by': 'department_id'}"/>
+                    <filter name="group_by_batch" string="Batch"
+                            context="{'group_by': 'batch_id'}"/>
+                    <filter name="group_by_semester" string="Current Semester"
+                            context="{'group_by': 'current_semester'}"/>
+                    <filter name="group_by_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_by_gender" string="Gender"
+                            context="{'group_by': 'gender'}"/>
+                    <filter name="group_by_admission_category" string="Category"
+                            context="{'group_by': 'admission_category'}"/>
+                    <filter name="group_by_admission_date" string="Admission Date"
+                            context="{'group_by': 'admission_date'}"/>
+                </group>
+
+                <searchpanel>
+                    <field name="program_id" string="Program"
+                           select="multi"
+                           icon="fa-graduation-cap"/>
+                    <field name="department_id" string="Department"
+                           select="multi"
+                           icon="fa-building"/>
+                    <field name="batch_id" string="Batch"
+                           select="multi"
+                           icon="fa-users"/>
+                    <field name="state" string="Status"
+                           select="multi"
+                           icon="fa-filter"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="student_view_kanban" model="ir.ui.view">
+        <field name="name">student.student.view.kanban</field>
+        <field name="model">student.student</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile"
+                    default_group_by="program_id"
+                    quick_create="false"
+                    sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="registration_number"/>
+                <field name="student_code"/>
+                <field name="student_photo"/>
+                <field name="email"/>
+                <field name="mobile"/>
+                <field name="program_id"/>
+                <field name="department_id"/>
+                <field name="batch_id"/>
+                <field name="current_semester"/>
+                <field name="cgpa"/>
+                <field name="attendance_percentage"/>
+                <field name="state"/>
+
+                <progressbar field="state"
+                             colors='{"draft": "muted", "admitted": "warning", "enrolled": "info", "active": "success", "graduated": "primary", "suspended": "danger"}'/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <img t-att-src="kanban_image('student.student', 'student_photo', record.id.raw_value)"
+                                     alt="Student Photo"
+                                     class="o_image_128_max"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                        <div class="text-muted">
+                                            <field name="registration_number"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_body">
+                                    <div class="row">
+                                        <div class="col-12 mb-2">
+                                            <i class="fa fa-graduation-cap text-primary"/>
+                                            <field name="program_id"/>
+                                        </div>
+                                        <div class="col-12 mb-2">
+                                            <i class="fa fa-building text-info"/>
+                                            <field name="department_id"/>
+                                        </div>
+                                        <div class="col-6">
+                                            <i class="fa fa-calendar text-success"/>
+                                            Sem <field name="current_semester"/>
+                                        </div>
+                                        <div class="col-6">
+                                            <i class="fa fa-trophy text-warning"/>
+                                            CGPA: <strong><field name="cgpa"/></strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-2">
+                                        <div class="col-12">
+                                            <progressbar t-att-value="record.attendance_percentage.raw_value"
+                                                         t-att-title="'Attendance: ' + record.attendance_percentage.raw_value + '%'"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-2">
+                                        <div class="col-6">
+                                            <i class="fa fa-envelope text-muted"/>
+                                            <field name="email"/>
+                                        </div>
+                                        <div class="col-6">
+                                            <i class="fa fa-phone text-muted"/>
+                                            <field name="mobile"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="state" widget="badge"
+                                               decoration-info="state == 'draft'"
+                                               decoration-warning="state in ['admitted', 'enrolled']"
+                                               decoration-success="state == 'active'"
+                                               decoration-primary="state == 'graduated'"
+                                               decoration-danger="state in ['suspended', 'expelled']"/>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Calendar View -->
+    <record id="student_view_calendar" model="ir.ui.view">
+        <field name="name">student.student.view.calendar</field>
+        <field name="model">student.student</field>
+        <field name="arch" type="xml">
+            <calendar string="Student Birthdays"
+                      date_start="date_of_birth"
+                      color="program_id"
+                      mode="month"
+                      event_open_popup="true"
+                      quick_create="false">
+                <field name="name"/>
+                <field name="registration_number"/>
+                <field name="program_id"/>
+                <field name="department_id"/>
+                <field name="mobile"/>
+                <field name="email"/>
+                <field name="age"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="student_view_pivot" model="ir.ui.view">
+        <field name="name">student.student.view.pivot</field>
+        <field name="model">student.student</field>
+        <field name="arch" type="xml">
+            <pivot string="Student Analysis">
+                <field name="program_id" type="row"/>
+                <field name="department_id" type="row"/>
+                <field name="state" type="col"/>
+                <field name="cgpa" type="measure"/>
+                <field name="attendance_percentage" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View -->
+    <record id="student_view_graph" model="ir.ui.view">
+        <field name="name">student.student.view.graph</field>
+        <field name="model">student.student</field>
+        <field name="arch" type="xml">
+            <graph string="Student Statistics" type="bar" stacked="1">
+                <field name="program_id"/>
+                <field name="state"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="student_view_graph_pie" model="ir.ui.view">
+        <field name="name">student.student.view.graph.pie</field>
+        <field name="model">student.student</field>
+        <field name="arch" type="xml">
+            <graph string="Student Statistics" type="pie">
+                <field name="program_id"/>
+                <field name="state"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_student" model="ir.actions.act_window">
+        <field name="name">Students</field>
+        <field name="res_model">student.student</field>
+        <field name="view_mode">kanban,list,form,calendar,pivot,graph</field>
+        <field name="context">{
+            'search_default_filter_active': 1,
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add your first Student
+            </p>
+            <p>
+                Manage student records with complete academic, personal, and administrative information.
+                Track attendance, fees, exam results, documents, and more.
+            </p>
+        </field>
+    </record>
+
+</odoo>
