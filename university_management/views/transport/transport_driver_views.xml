@@ -141,7 +141,7 @@
         <field name="name">transport.driver.view.search</field>
         <field name="model">transport.driver</field>
         <field name="arch" type="xml">
-            <search string="Search Drivers">
+            <search string="Search Driverss">
                 <field name="name"/>
                 <field name="driver_code"/>
                 <field name="mobile"/>
