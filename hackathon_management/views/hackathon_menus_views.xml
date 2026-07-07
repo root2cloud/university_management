@@ -1,0 +1,91 @@
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<odoo>-->
+<!--    <data>-->
+
+<!--        &lt;!&ndash; Main Menu &ndash;&gt;-->
+<!--        <menuitem id="menu_hackathon_root"-->
+<!--                  name="Hackathon"-->
+<!--                  sequence="10"-->
+<!--                  web_icon="hackathon_management,static/description/icon.png"/>-->
+
+<!--        &lt;!&ndash; Events &ndash;&gt;-->
+<!--        <menuitem id="menu_hackathon_events"-->
+<!--                  name="Events"-->
+<!--                  parent="menu_hackathon_root"-->
+<!--                  sequence="10"/>-->
+
+<!--        <menuitem id="menu_hackathon_event"-->
+<!--                  name="Hackathon Events"-->
+<!--                  parent="menu_hackathon_events"-->
+<!--                  action="action_hackathon_event"-->
+<!--                  sequence="10"/>-->
+
+<!--        <menuitem id="menu_hackathon_track"-->
+<!--                  name="Tracks/Problem Statements"-->
+<!--                  parent="menu_hackathon_events"-->
+<!--                  action="action_hackathon_track"-->
+<!--                  sequence="20"/>-->
+
+<!--        &lt;!&ndash; Teams & Participants &ndash;&gt;-->
+<!--        <menuitem id="menu_hackathon_teams"-->
+<!--                  name="Teams &amp; Participants"-->
+<!--                  parent="menu_hackathon_root"-->
+<!--                  sequence="20"/>-->
+
+<!--        <menuitem id="menu_hackathon_team"-->
+<!--                  name="Teams"-->
+<!--                  parent="menu_hackathon_teams"-->
+<!--                  action="action_hackathon_team"-->
+<!--                  sequence="10"/>-->
+
+<!--        <menuitem id="menu_hackathon_participant"-->
+<!--                  name="Participants"-->
+<!--                  parent="menu_hackathon_teams"-->
+<!--                  action="action_hackathon_participant"-->
+<!--                  sequence="20"/>-->
+
+<!--        &lt;!&ndash; Mentors & Judges &ndash;&gt;-->
+<!--        <menuitem id="menu_hackathon_panel"-->
+<!--                  name="Mentors &amp; Judges"-->
+<!--                  parent="menu_hackathon_root"-->
+<!--                  sequence="30"/>-->
+
+<!--        <menuitem id="menu_hackathon_mentor"-->
+<!--                  name="Mentors"-->
+<!--                  parent="menu_hackathon_panel"-->
+<!--                  action="action_hackathon_mentor"-->
+<!--                  sequence="10"/>-->
+
+<!--        <menuitem id="menu_hackathon_judge"-->
+<!--                  name="Judges"-->
+<!--                  parent="menu_hackathon_panel"-->
+<!--                  action="action_hackathon_judge"-->
+<!--                  sequence="20"/>-->
+
+<!--        &lt;!&ndash; Submissions & Evaluation &ndash;&gt;-->
+<!--        <menuitem id="menu_hackathon_evaluation"-->
+<!--                  name="Submissions &amp; Evaluation"-->
+<!--                  parent="menu_hackathon_root"-->
+<!--                  sequence="40"/>-->
+
+<!--        <menuitem id="menu_hackathon_submission"-->
+<!--                  name="Submissions"-->
+<!--                  parent="menu_hackathon_evaluation"-->
+<!--                  action="action_hackathon_submission"-->
+<!--                  sequence="10"/>-->
+
+<!--        <menuitem id="menu_hackathon_scoring"-->
+<!--                  name="Scoring"-->
+<!--                  parent="menu_hackathon_evaluation"-->
+<!--                  action="action_hackathon_scoring"-->
+<!--                  sequence="20"/>-->
+
+<!--        &lt;!&ndash; Configuration &ndash;&gt;-->
+<!--        <menuitem id="menu_hackathon_config"-->
+<!--                  name="Configuration"-->
+<!--                  parent="menu_hackathon_root"-->
+<!--                  sequence="100"-->
+<!--                  groups="hackathon_management.group_hackathon_manager"/>-->
+
+<!--    </data>-->
+<!--</odoo>-->

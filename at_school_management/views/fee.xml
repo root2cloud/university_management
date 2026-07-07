@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List View -->
+    <record id="view_school_fee_payment_list" model="ir.ui.view">
+        <field name="name">school.fee.payment.list</field>
+        <field name="model">school.fee.payment</field>
+        <field name="arch" type="xml">
+            <list string="Fee Payments">
+                <field name="admission_no"/>
+                <field name="academic_year"/>
+                <field name="fee_type"/>
+                <field name="amount_paid"/>
+                <field name="total_amount"/>
+                <field name="balance_amount"/>
+                <field name="payment_date"/>
+                <field name="payment_mode"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_school_fee_payment_form" model="ir.ui.view">
+        <field name="name">school.fee.payment.form</field>
+        <field name="model">school.fee.payment</field>
+        <field name="arch" type="xml">
+            <form string="Fee Payment">
+                <sheet>
+                    <group>
+                        <field name="admission_no"/>
+                        <field name="academic_year"/>
+                        <field name="fee_type"/>
+                        <field name="amount_paid"/>
+                        <field name="total_amount" readonly="1"/>
+                        <field name="balance_amount" readonly="1"/>
+                        <field name="payment_date"/>
+                        <field name="payment_mode"/>
+                        <field name="note"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_school_fee_payment" model="ir.actions.act_window">
+        <field name="name">Fee Payments</field>
+        <field name="res_model">school.fee.payment</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Register a fee payment record
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Items -->
+    <menuitem id="menu_school_fee_payment_root" name="Fee Management" parent="menu_school_root"/>
+    <menuitem id="menu_school_fee_payment" name="Fee Payments" parent="menu_school_fee_payment_root" sequence="10"
+              action="action_school_fee_payment"/>
+</odoo>

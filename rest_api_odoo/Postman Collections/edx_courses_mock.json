@@ -1,0 +1,9 @@
+{
+    "status": "success",
+    "courses": [
+        {"name": "Introduction to Computer Science", "source": "eDX", "course_url": "https://example.com/course1", "last_sync": "2025-06-03 17:30:00"},
+        {"name": "Data Science Basics", "source": "eDX", "course_url": "https://example.com/course2", "last_sync": "2025-06-03 17:30:00"},
+        {"name": "AI Foundations", "source": "eDX", "course_url": "https://example.com/course3", "last_sync": "2025-06-03 17:30:00"}
+    ],
+    "count": 3
+}

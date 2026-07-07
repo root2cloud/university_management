@@ -1,0 +1,20 @@
+.float-right {
+    float: right;
+    margin-left: 10px; /* Optional: add some space between buttons */
+}
+
+.custom{
+    margin: 30px 0px 0px 0px;
+}
+
+bg-warning-light {
+    background-color: #f8d7a3 !important; /* Light Yellow */
+}
+
+.bg-success-light {
+    background-color: #c3e6cb !important; /* Light Green */
+}
+
+.bg-danger-light {
+    background-color: #f8d7da !important; /* Light Red */
+}

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_teacher_tree" model="ir.ui.view">
+        <field name="name">hr.employee.teacher.tree</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="is_teacher" invisible="1"/>
+                <field name="qualification"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_teacher_form" model="ir.ui.view">
+        <field name="name">hr.employee.teacher.form</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/notebook" position="inside">
+                <page string="Teacher Info">
+                    <field name="is_teacher" invisible="1"/>
+                    <group>
+                        <field name="qualification"/>
+                        <field name="subject_ids"/>
+                        <field name="joining_date"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_hr_employee_teacher" model="ir.actions.act_window">
+        <field name="name">Teachers</field>
+        <field name="res_model">hr.employee</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_teacher', '=', True)]</field>
+    </record>
+
+    <!-- Menu Item -->
+    <menuitem id="menu_school_teachers"
+              name="Teachers"
+              parent="menu_school_root"
+              action="action_hr_employee_teacher"/>
+</odoo>
+
+

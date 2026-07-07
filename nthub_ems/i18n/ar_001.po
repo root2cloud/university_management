@@ -1,0 +1,1858 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* nthub_ems
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-04-23 14:57+0000\n"
+"PO-Revision-Date: 2024-04-23 14:57+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.sitting_templates_report
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_data_report_proof_registration
+msgid "...............:التوقيع"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_res_partner_view_form
+msgid ""
+"<span class=\"o_form_label o_td_label\" name=\"address_name\">\n"
+"                                            <b>Parent Address</b>\n"
+"                                        </span>"
+msgstr "عنوان الوالدين"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_res_partner_view_form
+msgid ""
+"<span class=\"o_form_label o_td_label\" name=\"address_name\">\n"
+"                                    <b>Address</b>\n"
+"                                </span>"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.ems_res_config_settings_view_form
+msgid "<span class=\"o_form_label\">Evaluation Type</span>"
+msgstr "نوع التقييم"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.classes_number_templates_report
+msgid ""
+"<span style=\"margin-right: 5px; font-size: 27px; border-bottom:2px solid "
+"black;\">رقم السكشن</span>"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.commit_templates_report
+msgid ""
+"<span style=\"margin-right: 5px; font-size: 27px; border-bottom:2px solid "
+"black;\">رقم اللجنه</span>"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_data_report
+msgid ""
+"<span style=\"position: relative; top:25px;\">\n"
+"                                    ................................................................ :التوقيع\n"
+"                                </span>"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.classes_number_templates_report
+#: model_terms:ir.ui.view,arch_db:nthub_ems.commit_templates_report
+msgid ""
+"<span style=\"position: relative; top:25px;\">\n"
+"                            ................................................................ :التوقيع\n"
+"                        </span>"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_data_report_proof_registration
+msgid ""
+"<span> </span>\n"
+"                                    <span style=\"margin-right: 40px;\">أن الطالب</span>"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.commit_templates_report
+msgid "<span> شعبه</span>"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_data_report_proof_registration
+msgid "<span>/ تحيه طيبه وبعد</span>"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.classes_number_templates_report
+#: model_terms:ir.ui.view,arch_db:nthub_ems.commit_templates_report
+#: model_terms:ir.ui.view,arch_db:nthub_ems.sitting_templates_report
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_data_report_proof_registration
+msgid "<span>/</span>"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_data_report_proof_registration
+msgid "<span>/تشهد انا</span>"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.sitting_templates_report
+msgid "<span>1</span>"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.sitting_templates_report
+msgid "<span>: شعبه</span>"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.classes_number_templates_report
+#: model_terms:ir.ui.view,arch_db:nthub_ems.commit_templates_report
+#: model_terms:ir.ui.view,arch_db:nthub_ems.sitting_templates_report
+msgid "<span>:عام</span>"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_data_report
+msgid "<span>:قد حصل على</span>"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_data_report_proof_registration
+msgid "<span>:مقيد بالفرقه</span>"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_data_report
+msgid "<span>أن الطالب</span>"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_data_report
+msgid "<span>تشهد</span>"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.classes_number_templates_report
+msgid "<span>شعبه</span>"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_data_report_proof_registration
+msgid "<span>عام</span>"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.sitting_templates_report
+msgid "<span>قائمه توزيع ارقام الجلوس لطﻻب فرقه</span>"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.classes_number_templates_report
+msgid "<span>قائمه توزيع ارقام السكاشن لطلاب فرقه</span>"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.commit_templates_report
+msgid "<span>قائمه توزيع ارقام اللجان لطلاب فرقه</span>"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.classes_number_templates_report
+#: model_terms:ir.ui.view,arch_db:nthub_ems.commit_templates_report
+#: model_terms:ir.ui.view,arch_db:nthub_ems.sitting_templates_report
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_data_report_proof_registration
+msgid "<span>قسم</span>"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_data_report_proof_registration
+msgid ""
+"<strong class=\"text-center\" style=\"font-size: 26px; position: relative; left:45%; top:5px; border-bottom:2px solid black;\">\n"
+"                                    اثبات القيد\n"
+"                                </strong>\n"
+"                                <br/>\n"
+"                                <br/>\n"
+"                                <br/>\n"
+"                                <br/>\n"
+"                                <br/>"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_data_report
+msgid ""
+"<strong class=\"text-center\" style=\"font-size: 26px; position: relative; left:45%; top:5px; border-bottom:2px solid black;\">\n"
+"                                    بيان حاله\n"
+"                                </strong>\n"
+"\n"
+"                                <br/>\n"
+"                                <br/>\n"
+"                                <br/>\n"
+"                                <br/>\n"
+"                                <br/>"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_s_report
+msgid "<strong>Alternative Name</strong>"
+msgstr "الاسم البديل"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_s_report
+msgid "<strong>Army State</strong>"
+msgstr "حاله الجيش"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_s_report
+msgid "<strong>Birth Date</strong>"
+msgstr "تاريخ الميلاد"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.commit_templates_report
+msgid "<strong>Chair Number</strong>"
+msgstr "رقم المقعد"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_s_report
+msgid "<strong>Email</strong>"
+msgstr "الايميل"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_s_report
+msgid "<strong>Gender</strong>"
+msgstr "النوع"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.classes_number_templates_report
+#: model_terms:ir.ui.view,arch_db:nthub_ems.commit_templates_report
+msgid "<strong>Names</strong>"
+msgstr "الاسماء"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_s_report
+msgid "<strong>Nationality</strong>"
+msgstr "الجنسيه"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.classes_number_templates_report
+#: model_terms:ir.ui.view,arch_db:nthub_ems.commit_templates_report
+msgid "<strong>Notes</strong>"
+msgstr "الملاحظات"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.classes_number_templates_report
+#: model_terms:ir.ui.view,arch_db:nthub_ems.commit_templates_report
+msgid "<strong>Number</strong>"
+msgstr "الرقم"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_s_report
+msgid "<strong>Parent Job</strong>"
+msgstr "وظيفة الوالدين"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_s_report
+msgid "<strong>Parent Name</strong>"
+msgstr "اسم الوالدين"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_s_report
+msgid "<strong>Phone</strong>"
+msgstr "الهاتف"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_s_report
+msgid "<strong>Place Of Birth</strong>"
+msgstr "مكان الميلاد"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_s_report
+msgid "<strong>Qualification</strong>"
+msgstr "المؤهلات"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_data_report
+msgid "<strong>الدرجة</strong>"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_data_report
+msgid "<strong>المادة</strong>"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_data_report
+msgid "<strong>المجموع</strong>"
+msgstr ""
+
+#. module: nthub_ems
+#: model:ir.actions.act_window,name:nthub_ems.education_record_action
+#: model:ir.ui.menu,name:nthub_ems.education_record_menu_action
+msgid "Academic Records"
+msgstr "السجلات الأكاديمية"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__message_needaction
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__message_needaction
+#: model:ir.model.fields,field_description:nthub_ems.field_level__message_needaction
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__message_needaction
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__message_needaction
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__message_needaction
+msgid "Action Needed"
+msgstr "الإجراءات اللازمة"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__activity_ids
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__activity_ids
+#: model:ir.model.fields,field_description:nthub_ems.field_level__activity_ids
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__activity_ids
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__activity_ids
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__activity_ids
+msgid "Activities"
+msgstr "أنشطة"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__activity_exception_decoration
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__activity_exception_decoration
+#: model:ir.model.fields,field_description:nthub_ems.field_level__activity_exception_decoration
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__activity_exception_decoration
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__activity_exception_decoration
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr "زخرفة استثناء النشاط"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__activity_state
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__activity_state
+#: model:ir.model.fields,field_description:nthub_ems.field_level__activity_state
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__activity_state
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__activity_state
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__activity_state
+msgid "Activity State"
+msgstr "حالة النشاط"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__activity_type_icon
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__activity_type_icon
+#: model:ir.model.fields,field_description:nthub_ems.field_level__activity_type_icon
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__activity_type_icon
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__activity_type_icon
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__activity_type_icon
+msgid "Activity Type Icon"
+msgstr "رمز نوع النشاط"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/student_student.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__age
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__age
+#, python-format
+msgid "Age"
+msgstr "العمر"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/department.py:0
+#: code:addons/nthub_ems/models/level.py:0
+#: code:addons/nthub_ems/models/qualification_student.py:0
+#: code:addons/nthub_ems/models/student_student.py:0
+#: code:addons/nthub_ems/models/sub_department.py:0
+#: code:addons/nthub_ems/models/subject.py:0
+#: code:addons/nthub_ems/models/teacher_teacher.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_department__alternative_name
+#: model:ir.model.fields,field_description:nthub_ems.field_level__alternative_name
+#: model:ir.model.fields,field_description:nthub_ems.field_qualification_student__alternative_name
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__alternative_name
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__alternative_name
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__alternative_name
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__alternative_name
+#, python-format
+msgid "Alternative Name"
+msgstr "الاسم البديل"
+
+#. module: nthub_ems
+#: model:ir.model.constraint,message:nthub_ems.constraint_department_alternative_name_unique
+#: model:ir.model.constraint,message:nthub_ems.constraint_qualification_student_alternative_name_unique
+#: model:ir.model.constraint,message:nthub_ems.constraint_res_partner_alternative_name_unique
+#: model:ir.model.constraint,message:nthub_ems.constraint_sub_department_alternative_name_unique
+msgid "Alternative Name must be unique!"
+msgstr "يجب أن يكون الاسم البديل فريدًا!"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__army_state
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__army_state
+msgid "Army State"
+msgstr "حاله الجيش"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__message_attachment_count
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__message_attachment_count
+#: model:ir.model.fields,field_description:nthub_ems.field_level__message_attachment_count
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__message_attachment_count
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__message_attachment_count
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__message_attachment_count
+msgid "Attachment Count"
+msgstr "عدد المرفقات"
+
+#. module: nthub_ems
+#. odoo-javascript
+#: code:addons/nthub_ems/static/src/xml/academic_records_tree_button.xml:0
+#, python-format
+msgid "Automation"
+msgstr "التشغيل الالى"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/student_student.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__birth_date
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__birth_date
+#, python-format
+msgid "Birth Date"
+msgstr "تاريخ الميلاد"
+
+#. module: nthub_ems
+#: model:ir.model.fields.selection,name:nthub_ems.selection__res_config_settings__evaluation_type__degree
+msgid "By Degree"
+msgstr "بالدرجة"
+
+#. module: nthub_ems
+#: model:ir.model.fields.selection,name:nthub_ems.selection__res_config_settings__evaluation_type__letters
+msgid "By Letters"
+msgstr "بواسطة الحروف"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/education_record.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__chair_number
+#, python-format
+msgid "Chair Number"
+msgstr "رقم الكرسي"
+
+#. module: nthub_ems
+#: model:ir.model.fields.selection,name:nthub_ems.selection__education_record__eds__chance
+msgid "Chance"
+msgstr "الفرصة"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__city
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__city
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_res_partner_view_form
+msgid "City"
+msgstr "المدينة"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__city_two
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__city_two
+msgid "City Two"
+msgstr "المدينة الثانية"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/education_record.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__class_number
+#, python-format
+msgid "Class"
+msgstr "السكشن"
+
+#. module: nthub_ems
+#: model:ir.model.fields.selection,name:nthub_ems.selection__multiple_academic_records__select_option__classes
+msgid "Classes"
+msgstr "السكاشن"
+
+#. module: nthub_ems
+#: model:ir.actions.report,name:nthub_ems.classes_wizard_reports
+msgid "Classes Detail"
+msgstr "تفاصيل السكشن"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/subject.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__code
+#, python-format
+msgid "Code"
+msgstr "الكود"
+
+#. module: nthub_ems
+#: model:ir.actions.report,name:nthub_ems.commit_wizard_reports
+msgid "Commit Detail"
+msgstr "تفاصيل اللجنه"
+
+#. module: nthub_ems
+#: model:ir.model.fields.selection,name:nthub_ems.selection__multiple_academic_records__select_option__committees
+msgid "Committees"
+msgstr "اللجان"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/education_record.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__committees_number
+#, python-format
+msgid "Committees Number"
+msgstr "عدد اللجان"
+
+#. module: nthub_ems
+#: model:ir.model,name:nthub_ems.model_res_config_settings
+msgid "Config Settings"
+msgstr "تهيئة الإعدادات "
+
+#. module: nthub_ems
+#: model:ir.ui.menu,name:nthub_ems.menu_qualification_student
+msgid "Configuration"
+msgstr "الاعدادات"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.mark_view_form
+msgid "Confirm"
+msgstr "تاكيد"
+
+#. module: nthub_ems
+#: model:ir.model.fields.selection,name:nthub_ems.selection__marks__state__confirm
+msgid "Confirmed"
+msgstr "مؤكد"
+
+#. module: nthub_ems
+#: model:ir.model,name:nthub_ems.model_res_partner
+msgid "Contact"
+msgstr "جهة الاتصال"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_res_partner_view_form
+msgid "Contact Details"
+msgstr "بيانات المتصل"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_s_report
+msgid "Contact Information"
+msgstr "معلومات الاتصال"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/student_student.py:0
+#: code:addons/nthub_ems/models/student_student.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__country_id
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__country_two_id
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__country_id
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__country_two_id
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_res_partner_view_form
+#, python-format
+msgid "Country"
+msgstr "الدولة"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.view_wizard_multiple_marks_form
+msgid "Create"
+msgstr "انشاء"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__create_uid
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__create_uid
+#: model:ir.model.fields,field_description:nthub_ems.field_level__create_uid
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__create_uid
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_academic_records__create_uid
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_marks__create_uid
+#: model:ir.model.fields,field_description:nthub_ems.field_qualification_student__create_uid
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__create_uid
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__create_uid
+msgid "Created by"
+msgstr "انشأ من قبل"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__create_date
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__create_date
+#: model:ir.model.fields,field_description:nthub_ems.field_level__create_date
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__create_date
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_academic_records__create_date
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_marks__create_date
+#: model:ir.model.fields,field_description:nthub_ems.field_qualification_student__create_date
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__create_date
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__create_date
+msgid "Created on"
+msgstr "تم إنشاؤها على"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.dashboard_form_view
+msgid "Current Projects"
+msgstr "المشاريع الحالية"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_res_partner_view_search
+msgid "Current Students"
+msgstr "الطلاب الحاليون"
+
+#. module: nthub_ems
+#: model:ir.actions.act_window,name:nthub_ems.open_board_my_dash_action
+#: model:ir.ui.menu,name:nthub_ems.dash_menu
+#: model_terms:ir.ui.view,arch_db:nthub_ems.dashboard_form_view
+msgid "Dashboard"
+msgstr "لوحة القيادة"
+
+#. module: nthub_ems
+#: model:ir.ui.menu,name:nthub_ems.data_menuitem
+msgid "Data"
+msgstr "البيانات"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__degree
+msgid "Degree"
+msgstr "الدرجة"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/education_record.py:0
+#: code:addons/nthub_ems/models/sub_department.py:0
+#: code:addons/nthub_ems/wizard/multiple_academic_records_wizard.py:0
+#: code:addons/nthub_ems/wizard/multiple_marks_wizard.py:0
+#: model:ir.actions.act_window,name:nthub_ems.department_action
+#: model:ir.model,name:nthub_ems.model_department
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__department_id
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_academic_records__department_id
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_marks__department_id
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__department_id
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__department_id
+#: model_terms:ir.ui.view,arch_db:nthub_ems.view_education_record_search
+#: model_terms:ir.ui.view,arch_db:nthub_ems.view_subject_search
+#, python-format
+msgid "Department"
+msgstr "القسم"
+
+#. module: nthub_ems
+#: model:ir.ui.menu,name:nthub_ems.department_menu_action
+msgid "Departments"
+msgstr "الاقسام"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.view_wizard_multiple_academic_records_form
+#: model_terms:ir.ui.view,arch_db:nthub_ems.view_wizard_multiple_marks_form
+msgid "Discard"
+msgstr "اهمال"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__display_name
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__display_name
+#: model:ir.model.fields,field_description:nthub_ems.field_level__display_name
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__display_name
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_academic_records__display_name
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_marks__display_name
+#: model:ir.model.fields,field_description:nthub_ems.field_qualification_student__display_name
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__display_name
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__display_name
+msgid "Display Name"
+msgstr "اسم العرض"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/wizard/multiple_academic_records_wizard.py:0
+#: code:addons/nthub_ems/wizard/multiple_academic_records_wizard.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_academic_records__type
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_academic_records__type_committees
+#, python-format
+msgid "Distribution Type"
+msgstr "نوع التوزيع"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/education_record.py:0
+#: code:addons/nthub_ems/wizard/multiple_academic_records_wizard.py:0
+#: code:addons/nthub_ems/wizard/multiple_marks_wizard.py:0
+#: model:ir.actions.act_window,name:nthub_ems.sub_department_action
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__sub_department_id
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_academic_records__sub_department_id
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_marks__sub_department_id
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__sub_department_id
+#: model_terms:ir.ui.view,arch_db:nthub_ems.view_education_record_search
+#: model_terms:ir.ui.view,arch_db:nthub_ems.view_subject_search
+#, python-format
+msgid "Division"
+msgstr "القسم"
+
+#. module: nthub_ems
+#: model:ir.ui.menu,name:nthub_ems.sub_department_menu_action
+msgid "Divisions"
+msgstr "الاقسام"
+
+#. module: nthub_ems
+#: model:ir.model.fields.selection,name:nthub_ems.selection__marks__state__draft
+msgid "Draft"
+msgstr "مسوده"
+
+#. module: nthub_ems
+#: model:ir.ui.menu,name:nthub_ems.menu_student_res_partner_root
+#: model_terms:ir.ui.view,arch_db:nthub_ems.ems_res_config_settings_view_form
+msgid "EMS"
+msgstr "نظام إدارة التعليم"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_res_partner_view_form
+msgid "Education Details"
+msgstr "تفاصيل التعليم"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.ems_res_config_settings_view_form
+msgid "Education Management System"
+msgstr "نظام إدارة التعليم"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/marks.py:0
+#: model:ir.model,name:nthub_ems.model_education_record
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__education_record_id
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__education_record_ids
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__education_record_ids
+#, python-format
+msgid "Education Record"
+msgstr "سجل التعليم"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/education_record.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__eds
+#, python-format
+msgid "Education State"
+msgstr "حاله التعليم"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.subject_view_form
+msgid "Educational Data"
+msgstr "البيانات التعليمية"
+
+#. module: nthub_ems
+#: model:ir.model.fields.selection,name:nthub_ems.selection__res_partner__nationality__egyptian
+msgid "Egyptian"
+msgstr "المصررين"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__email
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__email
+msgid "Email"
+msgstr "البريد الإلكتروني"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.level_form_view
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_res_partner_view_form
+#: model_terms:ir.ui.view,arch_db:nthub_ems.subject_view_form
+msgid "Enter Name"
+msgstr "ادخل الاسم"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.subject_view_form
+msgid "Evaluation Data"
+msgstr "بيانات التقييم"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/settings.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_res_config_settings__evaluation_type
+#, python-format
+msgid "Evaluation Type"
+msgstr "نوع التقييم"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/subject.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__final_exam_hours
+#, python-format
+msgid "Exam Hours"
+msgstr "ساعات الامتحان"
+
+#. module: nthub_ems
+#: model:ir.model.fields.selection,name:nthub_ems.selection__marks__degree__excellent
+msgid "Excellent"
+msgstr "ممتاز"
+
+#. module: nthub_ems
+#: model:ir.model.fields.selection,name:nthub_ems.selection__res_partner__army_state__exempt
+msgid "Exempt"
+msgstr "معفى"
+
+#. module: nthub_ems
+#: model:ir.model.fields.selection,name:nthub_ems.selection__marks__degree__fall
+msgid "Fall"
+msgstr "يسقط"
+
+#. module: nthub_ems
+#: model:ir.model.fields.selection,name:nthub_ems.selection__res_partner__gender__female
+msgid "Female"
+msgstr "انثى"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.view_education_record_search
+msgid "Filter by year greater than value"
+msgstr "تصفية حسب السنة أكبر من القيمة"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/subject.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__final_full_mark
+#, python-format
+msgid "Final Full Mark"
+msgstr "الدرجات الكاملة النهائية"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/marks.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__final_mark
+#, python-format
+msgid "Final Mark"
+msgstr "الدرجات النهائيه"
+
+#. module: nthub_ems
+#: model:ir.model.fields.selection,name:nthub_ems.selection__res_partner__army_state__finished
+msgid "Finished"
+msgstr "انتهى"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__message_follower_ids
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__message_follower_ids
+#: model:ir.model.fields,field_description:nthub_ems.field_level__message_follower_ids
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__message_follower_ids
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__message_follower_ids
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__message_follower_ids
+msgid "Followers"
+msgstr "المتابعون"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__message_partner_ids
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__message_partner_ids
+#: model:ir.model.fields,field_description:nthub_ems.field_level__message_partner_ids
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__message_partner_ids
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__message_partner_ids
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__message_partner_ids
+msgid "Followers (Partners)"
+msgstr ""
+
+#. module: nthub_ems
+#: model:ir.model.fields,help:nthub_ems.field_department__activity_type_icon
+#: model:ir.model.fields,help:nthub_ems.field_education_record__activity_type_icon
+#: model:ir.model.fields,help:nthub_ems.field_level__activity_type_icon
+#: model:ir.model.fields,help:nthub_ems.field_marks__activity_type_icon
+#: model:ir.model.fields,help:nthub_ems.field_sub_department__activity_type_icon
+#: model:ir.model.fields,help:nthub_ems.field_subject__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr ""
+
+#. module: nthub_ems
+#: model:ir.model.fields.selection,name:nthub_ems.selection__education_record__eds__fresh
+msgid "Fresh"
+msgstr "حديث"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__gender
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__gender
+msgid "Gender"
+msgstr "النوع"
+
+#. module: nthub_ems
+#. odoo-javascript
+#: code:addons/nthub_ems/static/src/xml/mark_tree_button.xml:0
+#, python-format
+msgid "Generate Subject"
+msgstr "توليد الموضوع"
+
+#. module: nthub_ems
+#: model:ir.model.fields.selection,name:nthub_ems.selection__marks__degree__good
+msgid "Good"
+msgstr "جيد"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.view_education_record_search
+#: model_terms:ir.ui.view,arch_db:nthub_ems.view_marks_search
+#: model_terms:ir.ui.view,arch_db:nthub_ems.view_subject_search
+msgid "Group By"
+msgstr "مجموعة من"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__has_message
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__has_message
+#: model:ir.model.fields,field_description:nthub_ems.field_level__has_message
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__has_message
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__has_message
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__has_message
+msgid "Has Message"
+msgstr "لديه رسالة"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__id
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__id
+#: model:ir.model.fields,field_description:nthub_ems.field_level__id
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__id
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_academic_records__id
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_marks__id
+#: model:ir.model.fields,field_description:nthub_ems.field_qualification_student__id
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__id
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__id
+msgid "ID"
+msgstr "بطاقة تعريف"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__activity_exception_icon
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__activity_exception_icon
+#: model:ir.model.fields,field_description:nthub_ems.field_level__activity_exception_icon
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__activity_exception_icon
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__activity_exception_icon
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__activity_exception_icon
+msgid "Icon"
+msgstr "الرمز"
+
+#. module: nthub_ems
+#: model:ir.model.fields,help:nthub_ems.field_department__activity_exception_icon
+#: model:ir.model.fields,help:nthub_ems.field_education_record__activity_exception_icon
+#: model:ir.model.fields,help:nthub_ems.field_level__activity_exception_icon
+#: model:ir.model.fields,help:nthub_ems.field_marks__activity_exception_icon
+#: model:ir.model.fields,help:nthub_ems.field_sub_department__activity_exception_icon
+#: model:ir.model.fields,help:nthub_ems.field_subject__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr "أيقونة للإشارة إلى نشاط الاستثناء"
+
+#. module: nthub_ems
+#: model:ir.model.fields,help:nthub_ems.field_department__message_needaction
+#: model:ir.model.fields,help:nthub_ems.field_education_record__message_needaction
+#: model:ir.model.fields,help:nthub_ems.field_level__message_needaction
+#: model:ir.model.fields,help:nthub_ems.field_marks__message_needaction
+#: model:ir.model.fields,help:nthub_ems.field_sub_department__message_needaction
+#: model:ir.model.fields,help:nthub_ems.field_subject__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "إذا تم تحديدها، فإن الرسائل الجديدة تتطلب انتباهك"
+
+#. module: nthub_ems
+#: model:ir.model.fields,help:nthub_ems.field_department__message_has_error
+#: model:ir.model.fields,help:nthub_ems.field_department__message_has_sms_error
+#: model:ir.model.fields,help:nthub_ems.field_education_record__message_has_error
+#: model:ir.model.fields,help:nthub_ems.field_education_record__message_has_sms_error
+#: model:ir.model.fields,help:nthub_ems.field_level__message_has_error
+#: model:ir.model.fields,help:nthub_ems.field_level__message_has_sms_error
+#: model:ir.model.fields,help:nthub_ems.field_marks__message_has_error
+#: model:ir.model.fields,help:nthub_ems.field_marks__message_has_sms_error
+#: model:ir.model.fields,help:nthub_ems.field_sub_department__message_has_error
+#: model:ir.model.fields,help:nthub_ems.field_sub_department__message_has_sms_error
+#: model:ir.model.fields,help:nthub_ems.field_subject__message_has_error
+#: model:ir.model.fields,help:nthub_ems.field_subject__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "إذا تم تحديده، فإن بعض الرسائل تحتوي على خطأ في التسليم"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__instructor_ids
+msgid "Instructor"
+msgstr "المعلم"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__message_is_follower
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__message_is_follower
+#: model:ir.model.fields,field_description:nthub_ems.field_level__message_is_follower
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__message_is_follower
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__message_is_follower
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__message_is_follower
+msgid "Is Follower"
+msgstr "هو تابع"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/student_student.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__is_graduated
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__is_graduated
+#, python-format
+msgid "Is Graduated"
+msgstr "متخرج"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_academic_records__is_print_report
+msgid "Is Print Report"
+msgstr " تقرير الطباعة"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__is_readonly
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__is_readonly
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__is_readonly
+msgid "Is Readonly"
+msgstr "للقراءة فقط"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/student_student.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__is_student
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__is_student
+#, python-format
+msgid "Is Student"
+msgstr " طالب"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/teacher_teacher.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__is_teacher
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__is_teacher
+#, python-format
+msgid "Is Teacher"
+msgstr "معلم"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/student_student.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__joining_date
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__joining_date
+#, python-format
+msgid "Joining Date"
+msgstr "تاريخ الانضمام"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department____last_update
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record____last_update
+#: model:ir.model.fields,field_description:nthub_ems.field_level____last_update
+#: model:ir.model.fields,field_description:nthub_ems.field_marks____last_update
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_academic_records____last_update
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_marks____last_update
+#: model:ir.model.fields,field_description:nthub_ems.field_qualification_student____last_update
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department____last_update
+#: model:ir.model.fields,field_description:nthub_ems.field_subject____last_update
+msgid "Last Modified on"
+msgstr "تاريخ آخر تعديل"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__write_uid
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__write_uid
+#: model:ir.model.fields,field_description:nthub_ems.field_level__write_uid
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__write_uid
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_academic_records__write_uid
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_marks__write_uid
+#: model:ir.model.fields,field_description:nthub_ems.field_qualification_student__write_uid
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__write_uid
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__write_uid
+msgid "Last Updated by"
+msgstr "آخر تحديث بواسطة"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__write_date
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__write_date
+#: model:ir.model.fields,field_description:nthub_ems.field_level__write_date
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__write_date
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_academic_records__write_date
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_marks__write_date
+#: model:ir.model.fields,field_description:nthub_ems.field_qualification_student__write_date
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__write_date
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__write_date
+msgid "Last Updated on"
+msgstr "آخر تحديث بتاريخ"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/subject.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__lecture_hours
+#, python-format
+msgid "Lecture Hours"
+msgstr "ساعات المحاضرات"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/education_record.py:0
+#: code:addons/nthub_ems/wizard/multiple_academic_records_wizard.py:0
+#: code:addons/nthub_ems/wizard/multiple_marks_wizard.py:0
+#: model:ir.model,name:nthub_ems.model_level
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__level_id
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_academic_records__level_id
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_marks__level_id
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__level_id
+#: model_terms:ir.ui.view,arch_db:nthub_ems.view_education_record_search
+#: model_terms:ir.ui.view,arch_db:nthub_ems.view_subject_search
+#, python-format
+msgid "Level"
+msgstr "المستوى"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_level__sum_mark_level
+msgid "Level Total Mark"
+msgstr "علامة المستوى الإجمالي"
+
+#. module: nthub_ems
+#: model:ir.ui.menu,name:nthub_ems.level_menu_action
+msgid "Levels"
+msgstr "المستويات"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.classes_number_templates_report
+#: model_terms:ir.ui.view,arch_db:nthub_ems.commit_templates_report
+#: model_terms:ir.ui.view,arch_db:nthub_ems.sitting_templates_report
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_data_report
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_data_report_proof_registration
+msgid "Logo"
+msgstr "الشعار"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__message_main_attachment_id
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__message_main_attachment_id
+#: model:ir.model.fields,field_description:nthub_ems.field_level__message_main_attachment_id
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__message_main_attachment_id
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__message_main_attachment_id
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__message_main_attachment_id
+msgid "Main Attachment"
+msgstr "المرفق الرئيسي"
+
+#. module: nthub_ems
+#: model:ir.model.fields.selection,name:nthub_ems.selection__res_partner__gender__male
+msgid "Male"
+msgstr "ذكر"
+
+#. module: nthub_ems
+#: model:ir.actions.act_window,name:nthub_ems.mark_action
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__marks_ids
+#: model:ir.ui.menu,name:nthub_ems.mark_menu_action
+msgid "Marks"
+msgstr "الدرجات"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.education_record_view_form
+msgid "Marks Details"
+msgstr "تفاصيل الدرجات"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__message_has_error
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__message_has_error
+#: model:ir.model.fields,field_description:nthub_ems.field_level__message_has_error
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__message_has_error
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__message_has_error
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__message_has_error
+msgid "Message Delivery error"
+msgstr "خطأ في تسليم الرسالة"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__message_ids
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__message_ids
+#: model:ir.model.fields,field_description:nthub_ems.field_level__message_ids
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__message_ids
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__message_ids
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__message_ids
+msgid "Messages"
+msgstr "رسائل"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/subject.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__mid_term_mark
+#, python-format
+msgid "Mid Term Full Mark"
+msgstr "درجات منتصف الفصل الدراسي "
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/marks.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__term_mark
+#, python-format
+msgid "Mid Term Mark"
+msgstr "درجات منتصف المدة"
+
+#. module: nthub_ems
+#: model:ir.model.fields.selection,name:nthub_ems.selection__res_partner__army_state__muggle
+msgid "Muggle"
+msgstr "مؤجل"
+
+#. module: nthub_ems
+#: model:ir.model.constraint,message:nthub_ems.constraint_marks_mrk_record_unique
+msgid "Must be \"Student and Office Year and Subject\" Unique"
+msgstr "يجب أن يكون \"السنة والموضوع الخاص بالطالب والمكتب\" فريدًا"
+
+#. module: nthub_ems
+#: model:ir.model.constraint,message:nthub_ems.constraint_education_record_edu_record_unique
+msgid "Must be \"Student and Office Year\" Unique"
+msgstr "يجب أن يكون \"سنة الطالب والمكتب\" فريدًا"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__my_activity_date_deadline
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__my_activity_date_deadline
+#: model:ir.model.fields,field_description:nthub_ems.field_level__my_activity_date_deadline
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__my_activity_date_deadline
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__my_activity_date_deadline
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr "الموعد النهائي لنشاطي"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/department.py:0
+#: code:addons/nthub_ems/models/education_record.py:0
+#: code:addons/nthub_ems/models/level.py:0
+#: code:addons/nthub_ems/models/qualification_student.py:0
+#: code:addons/nthub_ems/models/subject.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_department__name
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__name
+#: model:ir.model.fields,field_description:nthub_ems.field_level__name
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__name
+#: model:ir.model.fields,field_description:nthub_ems.field_qualification_student__name
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__name
+#, python-format
+msgid "Name"
+msgstr "الاسم"
+
+#. module: nthub_ems
+#: model:ir.model.constraint,message:nthub_ems.constraint_department_name_unique
+#: model:ir.model.constraint,message:nthub_ems.constraint_qualification_student_name_unique
+#: model:ir.model.constraint,message:nthub_ems.constraint_res_partner_name_unique
+#: model:ir.model.constraint,message:nthub_ems.constraint_sub_department_name_unique
+msgid "Name must be unique!"
+msgstr "يجب أن يكون الاسم فريدًا"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.sitting_templates_report
+msgid "Names"
+msgstr "الاسماء"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__nationality
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__nationality
+msgid "Nationality"
+msgstr "الجنسية"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__activity_date_deadline
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__activity_date_deadline
+#: model:ir.model.fields,field_description:nthub_ems.field_level__activity_date_deadline
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__activity_date_deadline
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__activity_date_deadline
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr "الموعد النهائي للنشاط التالي"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__activity_summary
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__activity_summary
+#: model:ir.model.fields,field_description:nthub_ems.field_level__activity_summary
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__activity_summary
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__activity_summary
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__activity_summary
+msgid "Next Activity Summary"
+msgstr "ملخص النشاط التالي"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__activity_type_id
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__activity_type_id
+#: model:ir.model.fields,field_description:nthub_ems.field_level__activity_type_id
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__activity_type_id
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__activity_type_id
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__activity_type_id
+msgid "Next Activity Type"
+msgstr "نوع النشاط التالي"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/education_record.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__nofs
+#, python-format
+msgid "No. of Failed Subjects"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.sitting_templates_report
+msgid "Notes"
+msgstr "الملاحظات"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/wizard/multiple_academic_records_wizard.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_academic_records__number
+#: model_terms:ir.ui.view,arch_db:nthub_ems.sitting_templates_report
+#, python-format
+msgid "Number"
+msgstr "الرقم"
+
+#. module: nthub_ems
+#: model:ir.model.fields.selection,name:nthub_ems.selection__multiple_academic_records__type__class
+msgid "Number Of Classes"
+msgstr "عدد السكاشن"
+
+#. module: nthub_ems
+#: model:ir.model.fields.selection,name:nthub_ems.selection__multiple_academic_records__type_committees__committee
+msgid "Number Of Committees"
+msgstr "عدد اللجان"
+
+#. module: nthub_ems
+#: model:ir.actions.act_window,name:nthub_ems.action_act_all_number_student_graph_in_every_level
+msgid "Number Student In Every Level"
+msgstr "عدد الطلاب في كل مستوى"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__message_needaction_counter
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__message_needaction_counter
+#: model:ir.model.fields,field_description:nthub_ems.field_level__message_needaction_counter
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__message_needaction_counter
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__message_needaction_counter
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__message_needaction_counter
+msgid "Number of Actions"
+msgstr "عدد الإجراءات"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__message_has_error_counter
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__message_has_error_counter
+#: model:ir.model.fields,field_description:nthub_ems.field_level__message_has_error_counter
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__message_has_error_counter
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__message_has_error_counter
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__message_has_error_counter
+msgid "Number of errors"
+msgstr "عدد الاخطاء"
+
+#. module: nthub_ems
+#: model:ir.model.fields,help:nthub_ems.field_department__message_needaction_counter
+#: model:ir.model.fields,help:nthub_ems.field_education_record__message_needaction_counter
+#: model:ir.model.fields,help:nthub_ems.field_level__message_needaction_counter
+#: model:ir.model.fields,help:nthub_ems.field_marks__message_needaction_counter
+#: model:ir.model.fields,help:nthub_ems.field_sub_department__message_needaction_counter
+#: model:ir.model.fields,help:nthub_ems.field_subject__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "عدد الرسائل التي تتطلب اتخاذ إجراء"
+
+#. module: nthub_ems
+#: model:ir.model.fields,help:nthub_ems.field_department__message_has_error_counter
+#: model:ir.model.fields,help:nthub_ems.field_education_record__message_has_error_counter
+#: model:ir.model.fields,help:nthub_ems.field_level__message_has_error_counter
+#: model:ir.model.fields,help:nthub_ems.field_marks__message_has_error_counter
+#: model:ir.model.fields,help:nthub_ems.field_sub_department__message_has_error_counter
+#: model:ir.model.fields,help:nthub_ems.field_subject__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "عدد الرسائل التي بها خطأ في التسليم"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/education_record.py:0
+#: code:addons/nthub_ems/models/marks.py:0
+#: code:addons/nthub_ems/wizard/multiple_academic_records_wizard.py:0
+#: code:addons/nthub_ems/wizard/multiple_marks_wizard.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__yro
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__office_year
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_academic_records__yro
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_marks__yro
+#: model_terms:ir.ui.view,arch_db:nthub_ems.view_marks_search
+#, python-format
+msgid "Office Year"
+msgstr "سنة المكتب"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/subject.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__oral_mark
+#, python-format
+msgid "Oral Full Mark"
+msgstr " درجه كاملة عن طريق الشفوى"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/marks.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__oral_mark
+#, python-format
+msgid "Oral Mark"
+msgstr "درجه الشفوى"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__other
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__other
+#: model:ir.model.fields.selection,name:nthub_ems.selection__res_partner__nationality__other
+msgid "Other"
+msgstr "اخرى"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_res_partner_view_form
+msgid "Other Details"
+msgstr "التفاصيل الاخرى"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_res_partner_view_form
+msgid "Parent Info"
+msgstr "معلومات الوالدين"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_s_report
+msgid "Parent Information"
+msgstr "معلومات الوالدين"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/student_student.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__parent_job
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__parent_job
+#, python-format
+msgid "Parent Job"
+msgstr "وظيفة الوالدين"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/student_student.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__parent_name_other
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__parent_name_other
+#, python-format
+msgid "Parent Name"
+msgstr "اسم الوالدين"
+
+#. module: nthub_ems
+#: model:ir.model.fields.selection,name:nthub_ems.selection__marks__degree__pass
+msgid "Pass"
+msgstr "اجتاز"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/marks.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__percentage
+#, python-format
+msgid "Percentage"
+msgstr "نسبة مئوية"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__phone
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__phone
+msgid "Phone"
+msgstr "رقم الهاتف"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.dashboard_form_view
+msgid "Pivot Academic Records"
+msgstr "السجلات الأكاديمية المحورية"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/student_student.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__place_of_birth
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__place_of_birth
+#, python-format
+msgid "Place Of Birth"
+msgstr "مكان الميلاد"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/student_student.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__Postponement_date
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__Postponement_date
+#, python-format
+msgid "Postponement Date"
+msgstr "تاريخ التأجيل"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/student_student.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__Postponement_decision_no
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__Postponement_decision_no
+#, python-format
+msgid "Postponement Decision Number"
+msgstr "رقم قرار التأجيل"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/subject.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__practical_hours
+#, python-format
+msgid "Practical Hours"
+msgstr "الساعات العملية"
+
+#. module: nthub_ems
+#. odoo-javascript
+#: code:addons/nthub_ems/static/src/xml/academic_records_tree_button.xml:0
+#, python-format
+msgid "Print Report"
+msgstr "طباعه التقري"
+
+#. module: nthub_ems
+#: model:ir.actions.report,name:nthub_ems.report_data_student_proof_registration
+msgid "Proof Data Report"
+msgstr "تقرير إثبات البيانات"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/student_student.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__qualification
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__qualification
+#, python-format
+msgid "Qualification"
+msgstr "المؤهل"
+
+#. module: nthub_ems
+#: model:ir.actions.act_window,name:nthub_ems.qualification_student_action
+#: model:ir.model,name:nthub_ems.model_qualification_student
+msgid "Qualification Student"
+msgstr "طلاب المؤهل"
+
+#. module: nthub_ems
+#: model:ir.ui.menu,name:nthub_ems.menu_qualification_student_submenu
+msgid "Qualification Students"
+msgstr "طلاب المؤهل"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__image_qualify
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__image_qualify
+msgid "Qualify Attach"
+msgstr "إرفاق التأهل"
+
+#. module: nthub_ems
+#: model:ir.model.fields.selection,name:nthub_ems.selection__education_record__eds__remaining
+msgid "Remaining"
+msgstr "متبقي"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__activity_user_id
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__activity_user_id
+#: model:ir.model.fields,field_description:nthub_ems.field_level__activity_user_id
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__activity_user_id
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__activity_user_id
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__activity_user_id
+msgid "Responsible User"
+msgstr "المستخدم المسؤول"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_department__message_has_sms_error
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__message_has_sms_error
+#: model:ir.model.fields,field_description:nthub_ems.field_level__message_has_sms_error
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__message_has_sms_error
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__message_has_sms_error
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr ""
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/subject.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__section_hours
+#, python-format
+msgid "Section Hours"
+msgstr "ساعات القسم"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/wizard/multiple_academic_records_wizard.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_academic_records__select_option
+#, python-format
+msgid "Select Option"
+msgstr "حدد الخيار"
+
+#. module: nthub_ems
+#: model:ir.actions.act_window,name:nthub_ems.ems_settings_action
+#: model:ir.ui.menu,name:nthub_ems.ems_settings_menu
+msgid "Settings"
+msgstr "الاعدات"
+
+#. module: nthub_ems
+#: model:ir.actions.report,name:nthub_ems.sitting_wizard_reports
+msgid "Sitting Detail"
+msgstr "تفاصيل الجلوس"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/education_record.py:0
+#: code:addons/nthub_ems/models/marks.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__sitting_number
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__sitting_number
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_academic_records__number_two
+#: model:ir.model.fields.selection,name:nthub_ems.selection__multiple_academic_records__select_option__sitting_number
+#: model_terms:ir.ui.view,arch_db:nthub_ems.sitting_templates_report
+#, python-format
+msgid "Sitting Number"
+msgstr "رقم الجلوس"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__state
+msgid "State"
+msgstr "الحاله"
+
+#. module: nthub_ems
+#: model:ir.model.fields,help:nthub_ems.field_department__activity_state
+#: model:ir.model.fields,help:nthub_ems.field_education_record__activity_state
+#: model:ir.model.fields,help:nthub_ems.field_level__activity_state
+#: model:ir.model.fields,help:nthub_ems.field_marks__activity_state
+#: model:ir.model.fields,help:nthub_ems.field_sub_department__activity_state
+#: model:ir.model.fields,help:nthub_ems.field_subject__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__street
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__street
+msgid "Street"
+msgstr "الشارع"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_res_partner_view_form
+msgid "Street 2..."
+msgstr ""
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__street_two
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__street_two
+msgid "Street Two"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_res_partner_view_form
+msgid "Street..."
+msgstr ""
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__street2
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__street2
+msgid "Street2"
+msgstr "الشارع 2"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__street2_two
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__street2_two
+msgid "Street2 Two"
+msgstr "شارع 2 "
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/education_record.py:0
+#: code:addons/nthub_ems/models/marks.py:0
+#: model:ir.actions.act_window,name:nthub_ems.student_res_partner_action
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__student_id
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__student_id
+#, python-format
+msgid "Student"
+msgstr "الطالب"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_s_report
+msgid "Student -"
+msgstr "الطالب -"
+
+#. module: nthub_ems
+#: model:ir.actions.report,name:nthub_ems.report_data_student
+msgid "Student Data Report"
+msgstr "تقرير بيانات الطالب"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_s_report
+msgid "Student Information"
+msgstr "بيانات الطالب"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.number_student_in_every_level_view_graph
+msgid "Student Pie Chart"
+msgstr "الرسم البياني الدائري للطالب"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__student_total_percentage
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__student_total_percentage
+msgid "Student Total Percentage"
+msgstr "النسبة المئوية الإجمالية للطالب"
+
+#. module: nthub_ems
+#: model:ir.actions.report,name:nthub_ems.report_student
+msgid "Student report"
+msgstr "تقرير الطالب"
+
+#. module: nthub_ems
+#: model:ir.model.fields.selection,name:nthub_ems.selection__multiple_academic_records__type__student
+msgid "Students In Classes"
+msgstr "الطلاب في السكاشن"
+
+#. module: nthub_ems
+#: model:ir.model.fields.selection,name:nthub_ems.selection__multiple_academic_records__type_committees__student_committee
+msgid "Students In Committees"
+msgstr "الطلاب في اللجان"
+
+#. module: nthub_ems
+#: model:ir.ui.menu,name:nthub_ems.menu_student_res_partner_submenu
+msgid "Students Profiles"
+msgstr "الملفات الشخصية للطلاب"
+
+#. module: nthub_ems
+#: model:ir.model,name:nthub_ems.model_sub_department
+msgid "Sub Department"
+msgstr ""
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/marks.py:0
+#: code:addons/nthub_ems/wizard/multiple_marks_wizard.py:0
+#: model:ir.actions.act_window,name:nthub_ems.subject_action
+#: model:ir.model,name:nthub_ems.model_subject
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__subject_id
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_marks__subject_id
+#: model_terms:ir.ui.view,arch_db:nthub_ems.view_marks_search
+#, python-format
+msgid "Subject"
+msgstr "الماده"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__subject_domain
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__subject_domain
+msgid "Subject Domain"
+msgstr "مجال المواد"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__subject_id_domain
+msgid "Subject Id Domain"
+msgstr "مجال معرف المواد"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_level__subject_line_ids
+msgid "Subject Line"
+msgstr "سجل المواد"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/teacher_teacher.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__subject_ids
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__subject_ids
+#: model:ir.ui.menu,name:nthub_ems.subject_menu_action
+#, python-format
+msgid "Subjects"
+msgstr "المواد"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.view_wizard_multiple_academic_records_form
+msgid "Submit"
+msgstr "يُقدِّم"
+
+#. module: nthub_ems
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__sum_year_total
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__sum_year_total
+msgid "Sum Year Total"
+msgstr "مجموع السنة المجموع"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/wizard/multiple_academic_records_wizard.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_multiple_academic_records__symbol
+#, python-format
+msgid "Symbol"
+msgstr "رمز"
+
+#. module: nthub_ems
+#: model:ir.actions.act_window,name:nthub_ems.teacher_res_partner_action
+msgid "Teacher"
+msgstr "المعلم"
+
+#. module: nthub_ems
+#: model:ir.ui.menu,name:nthub_ems.menu_teacher_res_partner_submenu
+msgid "Teachers Profiles"
+msgstr "الملفات الشخصية للمعلمين"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.dashboard_form_view
+msgid "The highest grade for a student in the year"
+msgstr "أعلى درجة يحصل عليها الطالب خلال العام"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.dashboard_form_view
+msgid "The number of students in each group"
+msgstr "عدد الطلاب في كل مجموعة"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/marks.py:0
+#, python-format
+msgid "This student has no Education Record in this year."
+msgstr "هذا الطالب ليس لديه سجل دراسي في هذا العام"
+
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/marks.py:0
+#: code:addons/nthub_ems/models/subject.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_marks__total_mark
+#: model:ir.model.fields,field_description:nthub_ems.field_subject__total_mark
+#, python-format
+msgid "Total Mark"
+msgstr "مجموع الدرجه"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/education_record.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__total_mark
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__student_total_mark
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__student_total_mark
+#, python-format
+msgid "Total Marks"
+msgstr "مجموع الدرجات"
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/student_student.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_res_partner__triple_number
+#: model:ir.model.fields,field_description:nthub_ems.field_res_users__triple_number
+#, python-format
+msgid "Triple Number"
+msgstr "الرقم الثلاثي"
+
+#. module: nthub_ems
+#: model:ir.model.fields,help:nthub_ems.field_department__activity_exception_decoration
+#: model:ir.model.fields,help:nthub_ems.field_education_record__activity_exception_decoration
+#: model:ir.model.fields,help:nthub_ems.field_level__activity_exception_decoration
+#: model:ir.model.fields,help:nthub_ems.field_marks__activity_exception_decoration
+#: model:ir.model.fields,help:nthub_ems.field_sub_department__activity_exception_decoration
+#: model:ir.model.fields,help:nthub_ems.field_subject__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr "نوع نشاط الاستثناء المسجل"
+
+#. module: nthub_ems
+#: model:ir.model.fields.selection,name:nthub_ems.selection__marks__degree__very_good
+msgid "Very Good"
+msgstr "جيد جدا"
+
+#. module: nthub_ems
+#: model:ir.model,name:nthub_ems.model_multiple_academic_records
+msgid "Wizard: 'Create Multiple Academic Records'"
+msgstr "السجلات الأكاديمية"
+
+#. module: nthub_ems
+#: model:ir.model,name:nthub_ems.model_multiple_marks
+msgid "Wizard: 'Create Multiple Records' "
+msgstr ""
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/education_record.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_education_record__year_percentage
+#, python-format
+msgid "Year Percentage"
+msgstr "النسبة المئوية للسنة"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.education_record_view_form
+msgid "education_record_form"
+msgstr ""
+
+#. module: nthub_ems
+#: model:ir.actions.act_window,name:nthub_ems.level_action
+#: model_terms:ir.ui.view,arch_db:nthub_ems.department_view_tree
+#: model_terms:ir.ui.view,arch_db:nthub_ems.education_record_view_tree
+#: model_terms:ir.ui.view,arch_db:nthub_ems.level_view_tree
+#: model_terms:ir.ui.view,arch_db:nthub_ems.mark_view_tree
+#: model_terms:ir.ui.view,arch_db:nthub_ems.sub_department_view_tree
+msgid "level"
+msgstr "المستوى"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.mark_view_form
+msgid "mark_form"
+msgstr ""
+
+#. module: nthub_ems
+#: model:ir.model,name:nthub_ems.model_marks
+msgid "marks"
+msgstr ""
+
+#. module: nthub_ems
+#. odoo-python
+#: code:addons/nthub_ems/models/sub_department.py:0
+#: model:ir.model.fields,field_description:nthub_ems.field_sub_department__name
+#, python-format
+msgid "name"
+msgstr "الاسم"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_s_report
+msgid "not found"
+msgstr "غير معثور عليه"
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.subject_view_form
+msgid "subject_form"
+msgstr ""
+
+#. module: nthub_ems
+#: model_terms:ir.ui.view,arch_db:nthub_ems.student_data_report
+msgid "الفرقة"
+msgstr ""

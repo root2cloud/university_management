@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_hackathon_scoring_list" model="ir.ui.view">
+            <field name="name">hackathon.scoring.list</field>
+            <field name="model">hackathon.scoring</field>
+            <field name="arch" type="xml">
+                <list string="Scoring" editable="bottom" sample="1">
+                    <field name="submission_id"/>
+                    <field name="judge_id"/>
+                    <field name="innovation_score"/>
+                    <field name="technical_score"/>
+                    <field name="impact_score"/>
+                    <field name="presentation_score"/>
+                    <field name="total_score"/>
+                    <field name="scoring_date"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_hackathon_scoring_form" model="ir.ui.view">
+            <field name="name">hackathon.scoring.form</field>
+            <field name="model">hackathon.scoring</field>
+            <field name="arch" type="xml">
+                <form string="Scoring">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="submission_id" string="Submission"/>
+                            <h1>
+                                <field name="submission_id"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="judge_id"/>
+                                <field name="scoring_date"/>
+                            </group>
+                            <group>
+                                <field name="total_score" readonly="1"/>
+                            </group>
+                        </group>
+                        <group string="Scoring Criteria (0-100 for each)">
+                            <group>
+                                <field name="innovation_score"/>
+                                <field name="innovation_weighted" readonly="1"/>
+                                <field name="technical_score"/>
+                                <field name="technical_weighted" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="impact_score"/>
+                                <field name="impact_weighted" readonly="1"/>
+                                <field name="presentation_score"/>
+                                <field name="presentation_weighted" readonly="1"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Comments">
+                                <group>
+                                    <field name="comments" widget="text"/>
+                                </group>
+                            </page>
+                            <page string="Detailed Feedback">
+                                <group>
+                                    <field name="strengths" widget="text"/>
+                                    <field name="improvements" widget="text"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_hackathon_scoring_search" model="ir.ui.view">
+            <field name="name">hackathon.scoring.search</field>
+            <field name="model">hackathon.scoring</field>
+            <field name="arch" type="xml">
+                <search string="Search Scores">
+                    <field name="submission_id"/>
+                    <field name="judge_id"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Submission" name="group_submission" context="{'group_by': 'submission_id'}"/>
+                        <filter string="Judge" name="group_judge" context="{'group_by': 'judge_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_hackathon_scoring" model="ir.actions.act_window">
+            <field name="name">Scoring</field>
+            <field name="res_model">hackathon.scoring</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+    </data>
+</odoo>

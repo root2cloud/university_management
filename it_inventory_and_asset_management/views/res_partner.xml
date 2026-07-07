@@ -1,0 +1,23 @@
+<odoo>
+    <record id="view_partner_form_inherit_is_vendor" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.is.vendor</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='function']" position="after">
+                <field name="is_vendor"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_res_partner_filter_inherit_vendor" model="ir.ui.view">
+        <field name="name">res.partner.search.inherit.vendor</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <filter name="vendor" string="Vendors" domain="[('is_vendor', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

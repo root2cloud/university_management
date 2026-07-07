@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_school_parent_tree" model="ir.ui.view">
+        <field name="name">school.parent.tree</field>
+        <field name="model">school.parent</field>
+        <field name="arch" type="xml">
+            <list string="Parents">
+                <field name="name"/>
+                <field name="contact_no"/>
+                <field name="email"/>
+                <field name="occupation"/>
+                <field name="relation"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_school_parent_form" model="ir.ui.view">
+        <field name="name">school.parent.form</field>
+        <field name="model">school.parent</field>
+        <field name="arch" type="xml">
+            <form string="Parent/Guardian">
+                <sheet>
+                          <div class="oe_title" style="margin-bottom: 20px;">
+                    <label for="name" string="Full Name" style="display: block; font-weight: bold; margin-bottom: 5px;"/>
+                    <h1>
+                        <field name="name" class="parent_full_name"/>
+                    </h1>
+                </div>
+                    <group>
+                        <group>
+                            <field name="contact_no"/>
+                            <field name="email"/>
+                            <field name="occupation"/>
+                            <field name="relation"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Children">
+                            <field name="students">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="admission_no"/>
+                                    <field name="class_id"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <style>
+                    .oe_title h1 {
+                        margin: 0;
+                        padding: 0;
+                    }
+                    .oe_title input {
+                        font-size: 24px !important;
+                        font-weight: bold !important;
+                    }
+                </style>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_school_parent" model="ir.actions.act_window">
+        <field name="name">Parents</field>
+        <field name="res_model">school.parent</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Register a Parent!
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_school_parents" name="Parents" parent="menu_school_root" action="action_school_parent"/>
+</odoo>
+
+

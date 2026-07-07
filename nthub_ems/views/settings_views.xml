@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="ems_res_config_settings_view_form" model="ir.ui.view">
+            <field name="name">.ems_res.config.settings.view.form.inherit</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+               <xpath expr="//form[hasclass('oe_form_configuration')]" position="inside">
+                   <app data-string="EMS" string="EMS" name="nthub_ems">
+                        <block title="Education Management System">
+                            <setting help="Define Evaluation Type">
+                                <field name="evaluation_type"/>
+                            </setting>
+                        </block>
+                    </app>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="ems_settings_action" model="ir.actions.act_window">
+            <field name="name">Settings</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module' : 'nthub_ems', 'bin_size': False}</field>
+        </record>
+
+    </data>
+</odoo>

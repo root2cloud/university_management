@@ -1,0 +1,45 @@
+<odoo>
+    <template id="portal_my_designs" name="My Designs" inherit_id="portal.portal_layout">
+        <xpath expr="//div[@id='wrap']" position="inside">
+            <div class="container mt-4">
+                <h1>My Designs</h1>
+                <t t-if="not designs">
+                    <p>No designs found.</p>
+                </t>
+                <t t-if="designs">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Project Name</th>
+                                <th>Room Name</th>
+                                <th>Square Footage</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="designs" t-as="design">
+                                <tr>
+                                    <td>
+                                        <t t-esc="design.name"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="design.room_name"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="design.square_feet"/>
+                                    </td>
+                                    <td>
+                                        <a t-att-href="'/my/designs/%s' % design.id">View Details</a>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                    <t t-if="pager">
+                        <t t-call="portal.pager"/>
+                    </t>
+                </t>
+            </div>
+        </xpath>
+    </template>
+</odoo>

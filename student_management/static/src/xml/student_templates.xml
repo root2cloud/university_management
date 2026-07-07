@@ -1,0 +1,7 @@
+<templates id="student_qweb" xml:space="preserve">
+    <t t-name="StudentBox">
+        <div class="student-box">
+            <t t-esc="name"/>
+        </div>
+    </t>
+</templates>

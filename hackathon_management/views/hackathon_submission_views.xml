@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_hackathon_submission_list" model="ir.ui.view">
+            <field name="name">hackathon.submission.list</field>
+            <field name="model">hackathon.submission</field>
+            <field name="arch" type="xml">
+                <list string="Submissions" sample="1">
+                    <field name="name"/>
+                    <field name="team_id"/>
+                    <field name="event_id"/>
+                    <field name="track_id"/>
+                    <field name="average_score"/>
+                    <field name="is_winner"/>
+                    <field name="prize_category"/>
+                    <field name="state" widget="badge" decoration-success="state == 'winner'" decoration-info="state == 'evaluated'"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_hackathon_submission_form" model="ir.ui.view">
+            <field name="name">hackathon.submission.form</field>
+            <field name="model">hackathon.submission</field>
+            <field name="arch" type="xml">
+                <form string="Submission">
+                    <header>
+                        <button name="action_submit" string="Submit Project" type="object" invisible="state != 'draft'" class="oe_highlight"/>
+                        <button name="action_start_review" string="Start Review" type="object" invisible="state != 'submitted'" class="oe_highlight"/>
+                        <button name="action_evaluate" string="Mark as Evaluated" type="object" invisible="state != 'under_review'" class="oe_highlight"/>
+                        <button name="action_mark_winner" string="Mark as Winner" type="object" invisible="state != 'evaluated'" class="oe_highlight"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,submitted,under_review,evaluated,winner"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" string="Project Title"/>
+                            <h1>
+                                <field name="name" placeholder="Enter project title"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="Basic Information">
+                                <field name="event_id"/>
+                                <field name="team_id"/>
+                                <field name="track_id"/>
+                                <field name="submission_date"/>
+                            </group>
+                            <group string="Scoring &amp; Winner Status">
+                                <field name="average_score"/>
+                                <field name="total_score"/>
+                                <field name="is_winner"/>
+                                <field name="prize_category" invisible="not is_winner"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Project Description">
+                                <group>
+                                    <field name="description" widget="html"/>
+                                    <field name="problem_solved" widget="html"/>
+                                    <field name="solution_approach" widget="html"/>
+                                </group>
+                            </page>
+                            <page string="Technical Details">
+                                <group>
+                                    <field name="technologies_used" widget="text"/>
+                                    <field name="features" widget="html"/>
+                                    <field name="architecture" widget="html"/>
+                                </group>
+                            </page>
+                            <page string="Links &amp; Resources">
+                                <group>
+                                    <group>
+                                        <field name="github_repo"/>
+                                        <field name="demo_url"/>
+                                        <field name="video_url"/>
+                                        <field name="presentation_url"/>
+                                    </group>
+                                    <group>
+                                        <field name="attachment_ids" widget="many2many_binary"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Future Scope">
+                                <group>
+                                    <field name="future_enhancements" widget="html"/>
+                                    <field name="commercial_viability" widget="html"/>
+                                </group>
+                            </page>
+                            <page string="Scores">
+                                <field name="scoring_ids">
+                                    <list>
+                                        <field name="judge_id"/>
+                                        <field name="innovation_score"/>
+                                        <field name="technical_score"/>
+                                        <field name="impact_score"/>
+                                        <field name="presentation_score"/>
+                                        <field name="total_score"/>
+                                        <field name="scoring_date"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_hackathon_submission_search" model="ir.ui.view">
+            <field name="name">hackathon.submission.search</field>
+            <field name="model">hackathon.submission</field>
+            <field name="arch" type="xml">
+                <search string="Search Submissions">
+                    <field name="name"/>
+                    <field name="team_id"/>
+                    <field name="event_id"/>
+                    <field name="track_id"/>
+                    <filter string="Winners" name="winners" domain="[('is_winner', '=', True)]"/>
+                    <filter string="Submitted" name="submitted" domain="[('state', '=', 'submitted')]"/>
+                    <filter string="Under Review" name="under_review" domain="[('state', '=', 'under_review')]"/>
+                    <filter string="Evaluated" name="evaluated" domain="[('state', '=', 'evaluated')]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Event" name="group_event" context="{'group_by': 'event_id'}"/>
+                        <filter string="Track" name="group_track" context="{'group_by': 'track_id'}"/>
+                        <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                        <filter string="Prize Category" name="group_prize" context="{'group_by': 'prize_category'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_hackathon_submission" model="ir.actions.act_window">
+            <field name="name">Submissions</field>
+            <field name="res_model">hackathon.submission</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+    </data>
+</odoo>

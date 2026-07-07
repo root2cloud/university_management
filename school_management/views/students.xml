@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_students_info_list" model="ir.ui.view">
+        <field name="name">students.info.list</field>
+        <field name="model">students.info</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="age"/>
+                <field name="date_of_birth"/>
+                <field name="cls"/>
+                <field name="rol_no"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_students_info_form" model="ir.ui.view">
+        <field name="name">students.info.form</field>
+        <field name="model">students.info</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="age"/>
+                        <field name="date_of_birth"/>
+                        <field name="cls"/>
+                        <field name="rol_no"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_students_info" model="ir.actions.act_window">
+        <field name="name">Students</field>
+        <field name="res_model">students.info</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_students_root" name="school" sequence="1"/>
+    <menuitem id="menu_students_info" name="Students Info" parent="menu_students_root" action="action_students_info" sequence="2"/>
+</odoo>

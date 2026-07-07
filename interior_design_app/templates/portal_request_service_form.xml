@@ -1,0 +1,28 @@
+<odoo>
+    <template id="portal_request_service_form" name="Request Service" inherit_id="portal.portal_layout">
+        <xpath expr="//div[@id='wrap']" position="inside">
+            <div class="container mt-4">
+                <t t-if="design">
+                    <h1>
+                        Request Service for
+                        <t t-esc="design.name"/>
+                    </h1>
+                    <form t-att-action="'/my/designs/%s/request_service/submit' % design.id" method="post">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <div class="form-group">
+                            <label for="description">Service Description</label>
+                            <textarea name="description" class="form-control" rows="5" required="1"/>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit Request</button>
+                        <a t-att-href="'/my/designs/%s' % design.id" class="btn btn-secondary">Cancel</a>
+                    </form>
+                </t>
+                <t t-else="">
+                    <h1>Request Service</h1>
+                    <p>No design found.</p>
+                    <a href="/my/designs" class="btn btn-primary">Back to My Designs</a>
+                </t>
+            </div>
+        </xpath>
+    </template>
+</odoo>

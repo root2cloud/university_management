@@ -1,0 +1,120 @@
+<odoo>
+
+    <record id="classes_number_report_paperformat" model="report.paperformat">
+        <field name="name">Classes Number Report</field>
+        <field name="default" eval="True"/>
+        <field name="format">A4</field>
+        <field name="page_width">0</field>
+        <field name="page_height">0</field>
+        <field name="margin_top">5</field>
+        <field name="margin_bottom">5</field>
+        <field name="margin_left">3</field>
+        <field name="margin_right">3</field>
+        <field name="header_spacing">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="header_line" eval="False"/>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="classes_wizard_reports" model="ir.actions.report">
+        <field name="name">Classes Detail</field>
+        <field name="model">multiple.academic.records</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">nthub_ems.classes_number_templates_report</field>
+        <field name="report_file">nthub_ems.classes_number_templates_report</field>
+        <field name="binding_model_id" ref="model_multiple_academic_records"/>
+        <field name="paperformat_id" ref="nthub_ems.classes_number_report_paperformat"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="nthub_ems.classes_number_templates_report">
+        <t t-call="web.html_container">
+            <t t-call="web.basic_layout">
+                <div class="row" style="border: 1px solid black; height: 100px; width:100%;">
+                    <div class="col-6" align="left" style="width:50%;">
+                        <img t-if="res_company.logo" t-att-src="image_data_uri(res_company.logo)"
+                             height="80px"
+                             width="140px"
+                             alt="Logo"/>
+                    </div>
+                    <div class="col-6" align="right" style="width:50%;">
+                        <strong t-esc="res_company.name"
+                                style="font-size: 26px; position: relative; top:20px; right:10px"/>
+                    </div>
+                </div>
+                <br/>
+<!--                <div class="page" style="border: 1px solid black;">-->
+                    <div class="text-center" style="text-align: center;">
+                        <strong>
+                            <h5 style="text-align:center;; margin-right: 5px;">
+                                <span t-esc="form['level_id']" style="font-size: 20px;"/>
+                                <span>قائمه توزيع ارقام السكاشن لطلاب فرقه</span>
+                            </h5>
+                            <h5 style="text-align:center;; margin-right: 5px;">
+                                <span t-esc="form['sub_department_id']" style="font-size: 20px;"/>
+                                <span>شعبه</span>
+                                <span t-esc="form['department_id']" style="font-size: 20px;"/>
+                                <span>قسم</span>
+
+                            </h5>
+                            <h5 style="text-align:center;; margin-right: 5px;">
+                                <span t-esc="form['yro']" style="font-size: 20px;"/>
+                                <span>/</span>
+                                <span t-esc="form['yro']+1" style="font-size: 20px;"/>
+                                <span>:عام</span>
+                            </h5>
+                            <h5 style="text-align:center;; margin-right: 5px;">
+                                  <span t-esc="form['number']" style="font-size: 20px;"/>
+                                <span>رقم السكشن</span>
+
+                            </h5>
+
+                        </strong>
+                    </div>
+                    <br/>
+                    <table class="table" style="font-size:15px; text-align:center; border:1px solid black !important;">
+                        <thead>
+                            <tr>
+                                <th style="border:1px solid black !important; background-color:#C0C0C0;">
+                                    <strong>Number</strong>
+                                </th>
+                                <th style="border:1px solid black !important; background-color:#C0C0C0;">
+                                    <strong>Names</strong>
+                                </th>
+                                <th style="border:1px solid black !important; background-color:#C0C0C0;">
+                                    <strong>Notes</strong>
+                                </th>
+                            </tr>
+                        </thead>
+                        <t t-set="serial_number" t-value="1"/>
+                        <t t-foreach="form['records_classes']" t-as="rec">
+                            <tbody>
+                                <tr>
+                                     <td style="border:1px solid black !important;">
+                                        <t t-esc="serial_number"/>
+                                    </td>
+                                     <td style="border:1px solid black !important;">
+                                        <t t-esc="rec['student_id'][1]"/>
+                                    </td>
+                                     <td style="border:1px solid black !important;">
+                                            <span/>
+                                        </td>
+                                </tr>
+                                <t t-set="serial_number" t-value="serial_number + 1"/>
+                            </tbody>
+                        </t>
+                    </table>
+<!--                </div>-->
+
+                 <br/>
+                 <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                <h2 style="text-align:right; margin-right: 5px;">...............:التوقيع</h2>
+            </t>
+        </t>
+    </template>
+</odoo>

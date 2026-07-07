@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Helpdesk Ticket Report Template -->
+    <template id="report_helpdesk_ticket">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+
+                    <div class="page">
+
+                        <!-- Title -->
+                        <h2 class="text-center" style="font-size: 22px; font-weight: bold;">
+                            <t t-esc="o.name"/> - <t t-esc="o.subject"/>
+                        </h2>
+                        <br/>
+
+                        <!-- Ticket Info Table -->
+                        <table class="table table-bordered" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Customer</th>
+                                    <th class="text-center">Description</th>
+                                    <th class="text-center">Priority</th>
+                                    <th class="text-center">Products</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr class="text-center">
+                                    <td>
+                                        <span t-field="o.customer_id"
+                                              t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
+                                    </td>
+                                    <td><span t-field="o.description"/></td>
+                                    <td><span t-field="o.priority"/></td>
+                                    <td>
+                                        <t t-if="o.product_ids">
+                                            <t t-foreach="o.product_ids" t-as="p">
+                                                <span t-esc="p.name"/><br/>
+                                            </t>
+                                        </t>
+                                        <t t-if="not o.product_ids">
+                                            -
+                                        </t>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Fetch tasks safely -->
+                        <t t-set="tasks" t-value="o.task_ids"/>
+
+                        <!-- Show only if tasks exist -->
+                        <t t-if="tasks and tasks.exists()">
+
+                            <h3 class="text-center" style="margin-top: 20px;">
+                                <strong>Tasks</strong>
+                            </h3>
+
+                            <table class="table table-bordered" style="width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Task Name</th>
+                                        <th class="text-center">Analytic Account</th>
+                                        <th class="text-center">Assigned To</th>
+                                        <th class="text-center">Total Hours Spent</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <t t-foreach="tasks" t-as="task">
+                                        <tr class="text-center">
+                                            <td><span t-field="task.name"/></td>
+                                            <td>
+                                                <t t-if="task.analytic_account_id">
+                                                    <span t-field="task.analytic_account_id"/>
+                                                </t>
+                                                <t t-if="not task.analytic_account_id">-</t>
+                                            </td>
+                                            <td>
+                                                <t t-if="task.user_ids">
+                                                    <t t-foreach="task.user_ids" t-as="u">
+                                                        <span t-esc="u.name"/><br/>
+                                                    </t>
+                                                </t>
+                                                <t t-if="not task.user_ids">-</t>
+                                            </td>
+                                            <td><span t-field="task.effective_hours"/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+
+                        </t>
+
+                    </div>
+
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Report Action -->
+    <record id="report_ticket" model="ir.actions.report">
+        <field name="name">Support Ticket</field>
+        <field name="model">ticket.helpdesk</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo_website_helpdesk.report_helpdesk_ticket</field>
+        <field name="report_file">odoo_website_helpdesk.report_helpdesk_ticket</field>
+        <field name="binding_model_id" ref="model_ticket_helpdesk"/>
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>
+
+<!--<?xml version="1.0" encoding="UTF-8" ?>-->
+<!--<odoo>-->
+<!--    &lt;!&ndash; Define a Qweb template for the support ticket report &ndash;&gt;-->
+<!--    <template id="report_helpdesk_ticket">-->
+<!--        <t t-call="web.html_container">-->
+<!--            <t t-foreach="docs" t-as="o">-->
+<!--                <t t-call="web.external_layout">-->
+<!--                    <div class="page">-->
+<!--                        <div style="margin-bottom: 10px;">-->
+<!--                            <div class="text-center"-->
+<!--                                 style="font-weight: 400 !important; font-size: 2rem !important;">-->
+<!--                                <t t-esc="o.name"/>-->
+<!--                                - -->
+<!--                                <t t-esc="o.subject"/>-->
+<!--                            </div>-->
+<!--                            <br/>-->
+<!--                            <table class="table table-bordered mt32">-->
+<!--                                <thead>-->
+<!--                                    <tr>-->
+<!--                                        <th class="text-center">-->
+<!--                                            <span>Customer</span>-->
+<!--                                        </th>-->
+<!--                                        <th class="text-center">-->
+<!--                                            <span>Description </span>-->
+<!--                                        </th>-->
+<!--                                        <th class="text-center">-->
+<!--                                            <span>Priority </span>-->
+<!--                                        </th>-->
+<!--                                        <th class="text-center">-->
+<!--                                            <span>Products</span>-->
+<!--                                        </th>-->
+<!--                                    </tr>-->
+<!--                                </thead>-->
+<!--                                <tbody>-->
+<!--                                    <tr class="text-center">-->
+<!--                                        <td>-->
+<!--                                            <span t-field="o.customer_id"-->
+<!--                                                  t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>-->
+<!--                                        </td>-->
+<!--                                        <td>-->
+<!--                                            <span t-field="o.description"/>-->
+<!--                                        </td>-->
+<!--                                        <td>-->
+<!--                                            <span t-field="o.priority"/>-->
+<!--                                        </td>-->
+<!--                                        <td>-->
+<!--                                            <span t-field="o.product_ids"/>-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
+<!--                                </tbody>-->
+<!--                            </table>-->
+<!--                        </div>-->
+<!--                        <t t-set="tasks"-->
+<!--                           t-value="request.env['project.task'].search([('ticket_id', '=', o.id)])"/>-->
+<!--                        <t t-if="tasks">-->
+<!--                            <div>-->
+<!--                                <h3 class="text-center">-->
+<!--                                    <strong>Tasks</strong>-->
+<!--                                </h3>-->
+<!--                            </div>-->
+<!--                            <table class="table table-bordered mt32">-->
+<!--                                <thead>-->
+<!--                                    <tr>-->
+<!--                                        <th class="text-center">-->
+<!--                                            <span>Task Name</span>-->
+<!--                                        </th>-->
+<!--                                        <th class="text-center">-->
+<!--                                            <span>Analytic Account</span>-->
+<!--                                        </th>-->
+<!--                                        <th class="text-center">-->
+<!--                                            <span>Assigned to</span>-->
+<!--                                        </th>-->
+<!--                                        <th class="text-center">-->
+<!--                                            <span>Total Hours Spend</span>-->
+<!--                                        </th>-->
+<!--                                    </tr>-->
+<!--                                </thead>-->
+<!--                                <t t-foreach="tasks" t-as="task">-->
+<!--                                    <tbody>-->
+<!--                                        <tr class="text-center">-->
+<!--                                            <td>-->
+<!--                                                <span t-field="task.name"/>-->
+<!--                                            </td>-->
+<!--                                            <td>-->
+<!--                                                <span t-field="task.analytic_account_id"/>-->
+<!--                                            </td>-->
+<!--                                            <td>-->
+<!--                                                <span t-esc="', '.join(map(lambda x: (x.name), task.user_ids))"/>-->
+<!--                                            </td>-->
+<!--                                            <td>-->
+<!--                                                <span t-field="task.effective_hours"/>-->
+<!--                                            </td>-->
+<!--                                        </tr>-->
+<!--                                    </tbody>-->
+<!--                                </t>-->
+<!--                            </table>-->
+<!--                        </t>-->
+<!--                    </div>-->
+<!--                </t>-->
+<!--            </t>-->
+<!--        </t>-->
+<!--    </template>-->
+<!--    &lt;!&ndash; Define an action for the Support Ticket report &ndash;&gt;-->
+<!--    <record id="report_ticket" model="ir.actions.report">-->
+<!--        <field name="name">Support Ticket</field>-->
+<!--        <field name="model">ticket.helpdesk</field>-->
+<!--        <field name="report_type">qweb-pdf</field>-->
+<!--        <field name="report_name">odoo_website_helpdesk.report_helpdesk_ticket</field>-->
+<!--        <field name="report_file">odoo_website_helpdesk.report_helpdesk_ticket</field>-->
+<!--        <field name="binding_model_id" ref="model_ticket_helpdesk"/>-->
+<!--        <field name="binding_view_types"/>-->
+<!--        <field name="binding_type">report</field>-->
+<!--    </record>-->
+<!--</odoo>-->

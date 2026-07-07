@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_top_borrowed_books">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <h2>Top 5 Borrowed Books</h2>
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Borrow Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="docs" t-as="borrowing">
+                                <tr>
+                                    <td>
+                                        <t t-esc="borrowing.book_id.title"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="request.env['library.borrowing'].search_count([('book_id', '=', borrowing.book_id.id)])"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+
+    <template id="report_most_active_members">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <h2>Most Active Members</h2>
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Borrow Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="docs" t-as="member">
+                                <tr>
+                                    <td>
+                                        <t t-esc="member.name"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="request.env['library.borrowing'].search_count([('borrower_id', '=', member.id)])"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+
+    <template id="report_zero_copies_books">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <h2>Books with Zero Available Copies</h2>
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>ISBN</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="docs.filtered(lambda b: b.available_copies == 0)" t-as="book">
+                                <tr>
+                                    <td>
+                                        <t t-esc="book.title"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="book.isbn"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>
+
+
+
+
+
+
+

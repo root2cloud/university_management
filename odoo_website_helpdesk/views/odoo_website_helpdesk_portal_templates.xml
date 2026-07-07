@@ -1,0 +1,1262 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <!-- ================================================================
+         1. BREADCRUMBS — xpath + logic 100% preserved
+         ================================================================ -->
+    <template id="portal_my_home_menu_tickets"
+              name="Portal layout : upcoming tickets"
+              inherit_id="portal.portal_breadcrumbs" priority="30">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'ticket'">
+                <a t-if="ticket" t-attf-href="/my/tickets">/ Helpdesk Tickets</a>
+                <t t-else="">/ Helpdesk Tickets</t>
+            </li>
+            <li t-if="ticket" class="breadcrumb-item active">
+                /
+                <t t-esc="details['display_name']"/>
+            </li>
+        </xpath>
+    </template>
+
+    <!-- ================================================================
+         2. PORTAL HOME ENTRY — xpath + all t-set values 100% preserved
+         ================================================================ -->
+    <template id="portal_my_home_helpdesk" name="Tickets"
+              inherit_id="portal.portal_my_home" priority="1"
+              customize_show="True">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Tickets</t>
+                <t t-set="url" t-value="'/my/tickets'"/>
+                <t t-set="placeholder_count" t-value="'ticket_count'"/>
+                <t t-set="icon" t-value="'./odoo_website_helpdesk/static/description/assets/icons/service-black.png'"/>
+                <t t-set="text">Follow, view or download your helpdesk tickets</t>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- ================================================================
+         3. MY TICKETS PAGE WRAPPER — all t-call / t-set preserved
+         ================================================================ -->
+    <template id="portal_my_tickets" name="My Tickets">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">My Tickets</t>
+            </t>
+            <t t-call="odoo_website_helpdesk.ticket_table"/>
+        </t>
+    </template>
+
+    <!-- ================================================================
+         4. TICKET TABLE
+         ================================================================ -->
+    <template id="ticket_table">
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&amp;family=DM+Mono:wght@400;500&amp;display=swap');
+
+            /* ── Scoped entirely under #hd-tbl-root ── */
+            #hd-tbl-root {
+            font-family: 'Sora', system-ui, sans-serif;
+            --c-navy: #0f1f3d;
+            --c-indigo: #3b5bdb;
+            --c-sky: #4dabf7;
+            --c-slate: #64748b;
+            --c-border: #e2e8f4;
+            --c-surface: #f8f9fe;
+            --c-white: #ffffff;
+            --c-green: #0ca678;
+            --c-amber: #f08c00;
+            --c-red: #e03131;
+            --c-mono: 'DM Mono', monospace;
+            }
+
+            /* Table wrap */
+            #hd-tbl-root .hd-table-shell {
+            background: var(--c-white);
+            border-radius: 18px;
+            border: 1px solid var(--c-border);
+            box-shadow: 0 1px 3px rgba(15,31,61,0.04), 0 8px 32px rgba(15,31,61,0.06);
+            overflow: hidden;
+            margin-top: 20px;
+            animation: hd-rise 0.4s ease both;
+            }
+            @keyframes hd-rise {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+            }
+
+            /* thead */
+            #hd-tbl-root .hd-table-shell table thead tr {
+            background: var(--c-navy) !important;
+            }
+            #hd-tbl-root .hd-table-shell table thead th {
+            font-family: 'Sora', sans-serif !important;
+            font-size: 0.65rem !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1.1px !important;
+            color: rgba(255,255,255,0.75) !important;
+            padding: 14px 20px !important;
+            border: none !important;
+            white-space: nowrap;
+            }
+            #hd-tbl-root .hd-table-shell table thead th:first-child { color: #fff !important; }
+
+            /* tbody rows */
+            #hd-tbl-root .hd-table-shell table tbody tr {
+            border-bottom: 1px solid var(--c-border) !important;
+            transition: background 0.12s ease;
+            }
+            #hd-tbl-root .hd-table-shell table tbody tr:last-child {
+            border-bottom: none !important;
+            }
+            #hd-tbl-root .hd-table-shell table tbody tr:hover {
+            background: var(--c-surface) !important;
+            }
+            #hd-tbl-root .hd-table-shell table tbody td {
+            font-family: 'Sora', sans-serif !important;
+            font-size: 0.86rem !important;
+            font-weight: 400 !important;
+            color: #334155 !important;
+            padding: 14px 20px !important;
+            vertical-align: middle !important;
+            border: none !important;
+            }
+
+            /* Ticket ID chip */
+            #hd-tbl-root .hd-ticket-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-family: var(--c-mono) !important;
+            font-size: 0.8rem !important;
+            font-weight: 500 !important;
+            color: var(--c-indigo) !important;
+            background: #eef2ff;
+            border: 1px solid #c5d0fa;
+            border-radius: 8px;
+            padding: 5px 11px;
+            text-decoration: none !important;
+            transition: all 0.15s ease;
+            }
+            #hd-tbl-root .hd-ticket-chip:hover {
+            background: var(--c-indigo) !important;
+            color: #fff !important;
+            border-color: var(--c-indigo) !important;
+            text-decoration: none !important;
+            }
+            #hd-tbl-root .hd-ticket-chip .hd-chip-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            flex-shrink: 0;
+            }
+
+            /* Subject text */
+            #hd-tbl-root .hd-subject {
+            font-size: 0.86rem !important;
+            font-weight: 500 !important;
+            color: #1e293b !important;
+            max-width: 260px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+            }
+
+            /* Date + time */
+            #hd-tbl-root .hd-date-val {
+            font-family: var(--c-mono) !important;
+            font-size: 0.8rem !important;
+            color: #475569 !important;
+            }
+            #hd-tbl-root .hd-time-val {
+            font-family: var(--c-mono) !important;
+            font-size: 0.73rem !important;
+            color: #94a3b8 !important;
+            display: block;
+            margin-top: 2px;
+            }
+
+            /* Stage badge */
+            #hd-tbl-root .hd-stage {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.72rem !important;
+            font-weight: 600 !important;
+            padding: 4px 10px;
+            border-radius: 99px;
+            white-space: nowrap;
+            background: #f0fdf4;
+            color: var(--c-green) !important;
+            border: 1px solid #a7f3d0;
+            text-transform: capitalize;
+            }
+            #hd-tbl-root .hd-stage::before {
+            content: '';
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: var(--c-green);
+            flex-shrink: 0;
+            }
+
+            /* Empty state */
+            #hd-tbl-root .hd-empty {
+            text-align: center;
+            padding: 72px 32px;
+            background: var(--c-white);
+            border-radius: 18px;
+            border: 1px solid var(--c-border);
+            box-shadow: 0 1px 3px rgba(15,31,61,0.04), 0 8px 32px rgba(15,31,61,0.06);
+            margin-top: 20px;
+            }
+            #hd-tbl-root .hd-empty-icon {
+            width: 68px; height: 68px;
+            background: #eef2ff;
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 1.6rem;
+            color: var(--c-indigo);
+            box-shadow: 0 4px 12px rgba(59,91,219,0.15);
+            }
+            #hd-tbl-root .hd-empty-title {
+            font-size: 1rem !important;
+            font-weight: 700 !important;
+            color: #1e293b !important;
+            margin: 0 0 6px !important;
+            }
+            #hd-tbl-root .hd-empty-sub {
+            font-size: 0.86rem !important;
+            color: var(--c-slate) !important;
+            margin: 0 !important;
+            }
+        </style>
+
+        <div class="search_ticket" id="hd-tbl-root">
+            <t t-if="tickets" t-call="portal.portal_table">
+                <thead>
+                    <tr class="active">
+                        <th>
+                            <span class="d-none d-md-inline">Ticket #</span>
+                        </th>
+                        <th class="text-right">Subject</th>
+                        <th style="display:none;" class="text-right">Priority</th>
+                        <th class="text-right">Date</th>
+                        <th class="text-right">Stage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- ▼ ALL t-foreach / t-esc / t-field UNTOUCHED ▼ -->
+                    <t t-foreach="tickets" t-as="ticket">
+                        <tr>
+                            <td id="my_selector">
+                                <a id="popover"
+                                   t-attf-href="/my/tickets/{{ticket.id}}"
+                                   class="hd-ticket-chip">
+                                    <span class="hd-chip-dot"></span>
+                                    <t t-esc="ticket.name" t-value="ticket.id"/>
+                                </a>
+                            </td>
+                            <td style="display:none;">
+                                <span t-field="ticket.name"/>
+                            </td>
+                            <td style="display:none;">
+                                <span t-field="ticket.subject"/>
+                            </td>
+                            <td style="display:none;">
+                                <span t-field="ticket.description"/>
+                            </td>
+                            <td style="display:none;">
+                                <span t-field="ticket.cost"/>
+                            </td>
+                            <td class="text-right">
+                                <span class="hd-subject" t-field="ticket.subject"/>
+                            </td>
+                            <td class="text-right" style="display:none;">
+                                <span t-field="ticket.priority"/>
+                            </td>
+                            <td class="text-right">
+                                <span class="hd-date-val"
+                                      t-field="ticket.create_date"
+                                      t-options="{'widget': 'date'}"/>
+                                &#160;
+                                <span class="hd-time-val d-none d-md-inline"
+                                      t-field="ticket.create_date"
+                                      t-options="{'time_only': True}"/>
+                            </td>
+                            <td class="text-right">
+                                <span class="hd-stage" t-field="ticket.stage_id.name"/>
+                            </td>
+                        </tr>
+                    </t>
+                </tbody>
+            </t>
+            <t t-if="not tickets">
+                <div class="hd-empty">
+                    <div class="hd-empty-icon">
+                        <i class="fa fa-inbox"></i>
+                    </div>
+                    <p class="hd-empty-title">No tickets yet</p>
+                    <p class="hd-empty-sub">There are currently no tickets issued for your account.</p>
+                </div>
+            </t>
+        </div>
+    </template>
+
+    <!-- ================================================================
+         5. TICKET DETAIL PAGE
+         ================================================================ -->
+    <template id="portal_ticket_details" name="My Tickets">
+        <t t-call="portal.portal_layout">
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&amp;family=DM+Mono:wght@400;500&amp;display=swap');
+
+                #hd-detail-root {
+                font-family: 'Sora', system-ui, sans-serif;
+                --c-navy: #0f1f3d;
+                --c-indigo: #3b5bdb;
+                --c-border: #e2e8f4;
+                --c-surf: #f8f9fe;
+                --c-green: #0ca678;
+                }
+                #hd-detail-root, #hd-detail-root * { box-sizing: border-box; }
+
+                /* Download button */
+                #hd-detail-root .hd-dl-btn {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 8px !important;
+                width: 100% !important;
+                padding: 11px 16px !important;
+                background: linear-gradient(135deg, #3b5bdb 0%, #1971c2 100%) !important;
+                color: #fff !important;
+                border: none !important;
+                border-radius: 10px !important;
+                font-family: 'Sora', sans-serif !important;
+                font-size: 0.84rem !important;
+                font-weight: 600 !important;
+                letter-spacing: 0.2px !important;
+                text-decoration: none !important;
+                box-shadow: 0 4px 14px rgba(59,91,219,0.30) !important;
+                transition: transform 0.15s, box-shadow 0.15s, background 0.15s !important;
+                cursor: pointer !important;
+                }
+                #hd-detail-root .hd-dl-btn:hover {
+                transform: translateY(-1px) !important;
+                box-shadow: 0 7px 20px rgba(59,91,219,0.40) !important;
+                color: #fff !important;
+                text-decoration: none !important;
+                }
+
+                /* Contact label */
+                #hd-detail-root .hd-contact-lbl {
+                font-family: 'Sora', sans-serif !important;
+                font-size: 0.62rem !important;
+                font-weight: 700 !important;
+                text-transform: uppercase !important;
+                letter-spacing: 1.1px !important;
+                color: #94a3b8 !important;
+                margin-bottom: 10px !important;
+                }
+
+                /* Portal doc card */
+                #hd-detail-root #portal_doc_content {
+                border-radius: 18px !important;
+                border: 1px solid var(--c-border) !important;
+                box-shadow: 0 1px 3px rgba(15,31,61,0.04), 0 8px 32px rgba(15,31,61,0.07) !important;
+                overflow: hidden !important;
+                }
+
+                /* History heading */
+                #hd-detail-root #helpdesk_ticket_communication {
+                margin-top: 32px !important;
+                }
+                #hd-detail-root #helpdesk_ticket_communication h2 {
+                font-family: 'Sora', sans-serif !important;
+                font-size: 1rem !important;
+                font-weight: 800 !important;
+                color: var(--c-navy) !important;
+                letter-spacing: -0.2px !important;
+                padding: 0 0 12px !important;
+                margin: 0 0 20px !important;
+                border-bottom: 2px solid var(--c-border) !important;
+                position: relative !important;
+                }
+                #hd-detail-root #helpdesk_ticket_communication h2::after {
+                content: '';
+                position: absolute; bottom: -2px; left: 0;
+                width: 36px; height: 2px;
+                background: var(--c-indigo); border-radius: 2px;
+                }
+            </style>
+
+            <div class="row mt16 o_portal_sale_sidebar" id="hd-detail-root">
+                <!-- ▼ SIDEBAR — all t-set / t-esc / t-attf / t-att / t-options PRESERVED ▼ -->
+                <t t-call="portal.portal_record_sidebar">
+                    <t t-set="classes" t-value="'col-lg-auto d-print-none'"/>
+                    <t t-set="title">
+                        <h4 class="mb-0">
+                            <t t-esc="details['display_name']"/>
+                        </h4>
+                    </t>
+                    <t t-set="entries">
+                        <ul class="list-group list-group-flush flex-wrap flex-row flex-lg-column">
+                            <li class="list-group-item d-grid align-content-start">
+                                <a class="hd-dl-btn btn btn-primary fa fa-download"
+                                   t-attf-href="/my/tickets/download/{{details.id}}"
+                                   target="_blank" style="margin-right: 10px;">
+                                    Download
+                                </a>
+                            </li>
+                            <li class="list-group-item d-grid align-content-start">
+                                <div class="hd-contact-lbl small mb-1">
+                                    <strong class="text-muted">Your Contact</strong>
+                                </div>
+                                <div class="row flex-nowrap">
+                                    <div class="col flex-grow-0 pe-2">
+                                        <img class="rounded-circle mr4 float-start o_portal_contact_img"
+                                             style="width:100px;"
+                                             t-att-src="image_data_uri(details['customer_id'].avatar_1024)"
+                                             alt="Contact"/>
+                                    </div>
+                                    <div class="col ps-0" style="min-width: 150px">
+                                        <span t-esc="details['customer_id']"
+                                              t-options='{"widget": "contact", "fields": ["name", "phone"], "no_marker": True}'/>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </t>
+                </t>
+
+                <!-- ▼ MAIN CONTENT — ids, t-attf-class, t-call all preserved ▼ -->
+                <div id="helpdesk_content" class="col-12 col-lg justify-content-end">
+                    <div t-attf-class="card #{'pb-5' if report_type == 'html' else ''}"
+                         id="portal_doc_content">
+                        <div t-call="odoo_website_helpdesk.helpdesk_content_preview"/>
+                    </div>
+                    <div id="helpdesk_ticket_communication" class="mt-4">
+                        <h2>History</h2>
+                        <t t-call="portal.message_thread">
+                            <t t-set="object" t-value="details"/>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ================================================================
+         6. TICKET CONTENT PREVIEW (card interior)
+         ================================================================ -->
+    <template id="helpdesk_content_preview" name="Sales Order Portal Content">
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&amp;family=DM+Mono:wght@400;500&amp;display=swap');
+
+            #hd-preview-root {
+            --c-navy: #0f1f3d;
+            --c-indigo: #3b5bdb;
+            --c-border: #e2e8f4;
+            --c-surf: #f8f9fe;
+            --c-muted: #94a3b8;
+            --c-text: #1e293b;
+            --c-green: #0ca678;
+            --c-amber: #f08c00;
+            --c-mono: 'DM Mono', monospace;
+            }
+            #hd-preview-root, #hd-preview-root * {
+            font-family: 'Sora', system-ui, sans-serif !important;
+            box-sizing: border-box;
+            }
+
+            /* ── Header band ── */
+            #hd-preview-root .hd-prev-header {
+            background: linear-gradient(135deg, #0f1f3d 0%, #1e3a5f 50%, #1971c2 100%);
+            padding: 32px 36px 44px;
+            position: relative;
+            overflow: hidden;
+            }
+            #hd-preview-root .hd-prev-header::before {
+            content: '';
+            position: absolute; inset: 0; pointer-events: none;
+            background:
+            radial-gradient(ellipse 80% 100% at 5% 60%, rgba(255,255,255,0.07), transparent),
+            radial-gradient(ellipse 40% 60% at 95% 0%, rgba(73,136,255,0.15), transparent);
+            }
+            #hd-preview-root .hd-prev-header::after {
+            content: '';
+            position: absolute; bottom: -1px; left: 0; right: 0;
+            height: 28px; background: #fff;
+            border-radius: 28px 28px 0 0;
+            }
+            #hd-preview-root .hd-prev-header .hd-prev-eyebrow {
+            position: relative; z-index: 1;
+            display: inline-flex; align-items: center; gap: 7px;
+            font-size: 0.62rem !important;
+            font-weight: 700 !important;
+            letter-spacing: 1.3px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.55) !important;
+            margin-bottom: 10px;
+            }
+            #hd-preview-root .hd-prev-header h4 {
+            position: relative; z-index: 1;
+            color: #fff !important;
+            font-size: 1.25rem !important;
+            font-weight: 800 !important;
+            letter-spacing: -0.4px !important;
+            margin: 0 !important;
+            line-height: 1.3 !important;
+            }
+
+            /* ── Body ── */
+            #hd-preview-root .hd-prev-body {
+            padding: 12px 32px 36px;
+            }
+
+            /* ── Section headers ── */
+            #hd-preview-root .hd-sec-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 28px 0 16px !important;
+            padding-bottom: 10px;
+            border-bottom: 1.5px solid var(--c-border);
+            position: relative;
+            }
+            #hd-preview-root .hd-sec-head::after {
+            content: '';
+            position: absolute; bottom: -1.5px; left: 0;
+            width: 32px; height: 1.5px;
+            background: var(--c-indigo); border-radius: 2px;
+            }
+            #hd-preview-root .hd-sec-ico {
+            width: 26px; height: 26px; flex-shrink: 0;
+            background: #eef2ff;
+            border-radius: 7px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.82rem;
+            }
+            #hd-preview-root .hd-sec-label {
+            font-size: 0.65rem !important;
+            font-weight: 800 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1.1px !important;
+            color: var(--c-indigo) !important;
+            }
+
+            /* ── Info grid ── */
+            #hd-preview-root .hd-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            }
+            @media (max-width: 576px) {
+            #hd-preview-root .hd-info-grid { grid-template-columns: 1fr; }
+            }
+
+            /* ── Info card ── */
+            #hd-preview-root .hd-info-card {
+            background: var(--c-surf);
+            border: 1px solid var(--c-border);
+            border-radius: 11px;
+            padding: 14px 16px;
+            transition: border-color 0.12s;
+            }
+            #hd-preview-root .hd-info-card:hover {
+            border-color: #c5d0fa;
+            }
+            #hd-preview-root .hd-info-lbl {
+            font-size: 0.6rem !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.9px !important;
+            color: var(--c-muted) !important;
+            margin: 0 0 6px !important;
+            }
+            #hd-preview-root .hd-info-val {
+            font-size: 0.88rem !important;
+            font-weight: 600 !important;
+            color: var(--c-text) !important;
+            margin: 0 !important;
+            line-height: 1.4;
+            }
+            #hd-preview-root .hd-info-val-mono {
+            font-family: var(--c-mono) !important;
+            font-size: 0.82rem !important;
+            font-weight: 500 !important;
+            color: #475569 !important;
+            }
+
+            /* ── Status badge ── */
+            #hd-preview-root .hd-badge-status {
+            display: inline-flex;
+            align-items: center; gap: 5px;
+            font-size: 0.72rem !important;
+            font-weight: 600 !important;
+            padding: 4px 11px;
+            border-radius: 99px;
+            background: #f0fdf4;
+            color: var(--c-green) !important;
+            border: 1px solid #a7f3d0;
+            }
+            #hd-preview-root .hd-badge-status::before {
+            content: '';
+            width: 5px; height: 5px;
+            border-radius: 50%; background: var(--c-green); flex-shrink: 0;
+            }
+
+            /* ── Priority badge ── */
+            #hd-preview-root .hd-badge-priority {
+            display: inline-flex;
+            align-items: center; gap: 5px;
+            font-size: 0.72rem !important;
+            font-weight: 600 !important;
+            padding: 4px 11px;
+            border-radius: 99px;
+            background: #fff9db;
+            color: var(--c-amber) !important;
+            border: 1px solid #ffe066;
+            }
+
+            /* ── Description block ── */
+            #hd-preview-root .hd-desc-block {
+            background: var(--c-surf);
+            border: 1px solid var(--c-border);
+            border-left: 3px solid var(--c-indigo);
+            border-radius: 11px;
+            padding: 18px 20px;
+            font-size: 0.88rem !important;
+            font-weight: 400 !important;
+            color: #475569 !important;
+            line-height: 1.75;
+            margin-top: 10px;
+            }
+        </style>
+
+        <div id="hd-preview-root">
+
+            <!-- ── Header ── -->
+            <div id="introduction"
+                 t-attf-class="hd-prev-header #{'card-header bg-white' if report_type == 'html' else ''}">
+                <div class="hd-prev-eyebrow">
+                    <i class="fa fa-ticket" style="font-size:0.7rem;"></i>
+                    Helpdesk Ticket
+                </div>
+                <h4>
+                    <b>
+                        <t t-esc="details['display_name']"/>
+                    </b>
+                </h4>
+            </div>
+
+            <!-- ── Body ── -->
+            <div class="hd-prev-body">
+
+                <!-- SECTION: Ticket Info -->
+                <div class="hd-sec-head">
+                    <div class="hd-sec-ico">🎫</div>
+                    <span class="hd-sec-label">Ticket Information</span>
+                </div>
+                <div class="hd-info-grid">
+                    <div class="hd-info-card">
+                        <div class="hd-info-lbl">Ticket Type</div>
+                        <!-- ▼ t-esc PRESERVED ▼ -->
+                        <div class="hd-info-val">
+                            <t t-esc="details['ticket_type_id'].name"/>
+                        </div>
+                    </div>
+                    <div class="hd-info-card">
+                        <div class="hd-info-lbl">Create Date</div>
+                        <div class="hd-info-val hd-info-val-mono">
+                            <t t-esc="details['create_date']"/>
+                        </div>
+                    </div>
+                    <div class="hd-info-card">
+                        <div class="hd-info-lbl">Last Update Date</div>
+                        <div class="hd-info-val hd-info-val-mono">
+                            <t t-esc="details['last_update_date']"/>
+                        </div>
+                    </div>
+                    <div class="hd-info-card">
+                        <div class="hd-info-lbl">Replied Date</div>
+                        <div class="hd-info-val hd-info-val-mono">
+                            <t t-esc="details['replied_date']"/>
+                        </div>
+                    </div>
+                    <div class="hd-info-card">
+                        <div class="hd-info-lbl">Ticket Subject</div>
+                        <div class="hd-info-val">
+                            <t t-esc="details['subject']"/>
+                        </div>
+                    </div>
+                    <div class="hd-info-card">
+                        <div class="hd-info-lbl">Category</div>
+                        <div class="hd-info-val">
+                            <t t-esc="details['category_id'].name"/>
+                        </div>
+                    </div>
+                    <div class="hd-info-card">
+                        <div class="hd-info-lbl">Priority</div>
+                        <div class="hd-info-val">
+                            <span class="hd-badge-priority">
+                                <t t-esc="details['priority']"/>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="hd-info-card">
+                        <div class="hd-info-lbl">Status</div>
+                        <div class="hd-info-val">
+                            <span class="hd-badge-status">
+                                <t t-esc="details['stage_id'].name"/>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION: Contact Info -->
+                <div class="hd-sec-head">
+                    <div class="hd-sec-ico">👤</div>
+                    <span class="hd-sec-label">Contact Information</span>
+                </div>
+                <div class="hd-info-grid">
+                    <div class="hd-info-card">
+                        <div class="hd-info-lbl">Person Name</div>
+                        <div class="hd-info-val">
+                            <t t-esc="details['customer_id'].name"/>
+                        </div>
+                    </div>
+                    <div class="hd-info-card">
+                        <div class="hd-info-lbl">Email</div>
+                        <div class="hd-info-val hd-info-val-mono">
+                            <t t-esc="details['customer_id'].email"/>
+                        </div>
+                    </div>
+                    <div class="hd-info-card">
+                        <div class="hd-info-lbl">Consultant</div>
+                        <div class="hd-info-val">
+                            <t t-esc="details['assigned_user_id'].name"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION: Description -->
+                <div class="hd-sec-head">
+                    <div class="hd-sec-ico">📝</div>
+                    <span class="hd-sec-label">Description</span>
+                </div>
+                <div class="hd-desc-block">
+                    <t t-esc="details['description']"/>
+                </div>
+
+            </div>
+        </div>
+    </template>
+
+    <!-- ================================================================
+         7. GROUP-BY TABLE — all t-foreach / t-if / t-esc / t-field PRESERVED
+         ================================================================ -->
+    <template id="ticket_group_by_table">
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&amp;family=DM+Mono:wght@400;500&amp;display=swap');
+
+            #hd-grp-root {
+            font-family: 'Sora', system-ui, sans-serif;
+            --c-navy: #0f1f3d;
+            --c-indigo: #3b5bdb;
+            --c-border: #e2e8f4;
+            --c-surf: #f8f9fe;
+            --c-green: #0ca678;
+            }
+            #hd-grp-root, #hd-grp-root * { box-sizing: border-box; }
+
+            /* thead */
+            #hd-grp-root table.table thead tr {
+            background: var(--c-navy) !important;
+            }
+            #hd-grp-root table.table thead th {
+            font-family: 'Sora', sans-serif !important;
+            font-size: 0.65rem !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1.1px !important;
+            color: rgba(255,255,255,0.72) !important;
+            padding: 14px 20px !important;
+            border: none !important;
+            }
+            #hd-grp-root table.table thead th:first-child { color: #fff !important; }
+
+            /* tbody */
+            #hd-grp-root table.table tbody tr {
+            border-bottom: 1px solid var(--c-border) !important;
+            transition: background 0.12s ease;
+            }
+            #hd-grp-root table.table tbody tr:hover {
+            background: var(--c-surf) !important;
+            }
+            #hd-grp-root table.table tbody td,
+            #hd-grp-root table.table tbody th {
+            font-family: 'Sora', sans-serif !important;
+            font-size: 0.86rem !important;
+            font-weight: 400 !important;
+            color: #334155 !important;
+            padding: 13px 20px !important;
+            vertical-align: middle !important;
+            border: none !important;
+            }
+
+            /* Group header row */
+            #hd-grp-root table.table tbody tr th.table-light {
+            background: #eef2ff !important;
+            color: var(--c-indigo) !important;
+            font-size: 0.7rem !important;
+            font-weight: 800 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+            padding: 10px 20px !important;
+            border-top: 2px solid #c5d0fa !important;
+            }
+
+            /* Ticket chip */
+            #hd-grp-root .hd-chip {
+            display: inline-flex; align-items: center; gap: 7px;
+            font-family: 'DM Mono', monospace !important;
+            font-size: 0.8rem !important; font-weight: 500 !important;
+            color: var(--c-indigo) !important;
+            background: #eef2ff; border: 1px solid #c5d0fa;
+            border-radius: 8px; padding: 5px 11px;
+            text-decoration: none !important;
+            transition: all 0.15s ease;
+            }
+            #hd-grp-root .hd-chip:hover {
+            background: var(--c-indigo) !important;
+            color: #fff !important;
+            border-color: var(--c-indigo) !important;
+            text-decoration: none !important;
+            }
+            #hd-grp-root .hd-chip-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor;
+            flex-shrink: 0; }
+
+            /* Date */
+            #hd-grp-root .hd-dt { font-family: 'DM Mono', monospace !important; font-size: 0.8rem !important; color:
+            #475569 !important; }
+            #hd-grp-root .hd-tm { font-family: 'DM Mono', monospace !important; font-size: 0.73rem !important; color:
+            #94a3b8 !important; display: block; margin-top: 2px; }
+
+            /* Stage */
+            #hd-grp-root .hd-stg { display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem !important;
+            font-weight: 600 !important; padding: 4px 10px; border-radius: 99px; background: #f0fdf4; color:
+            var(--c-green) !important; border: 1px solid #a7f3d0; }
+            #hd-grp-root .hd-stg::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background:
+            var(--c-green); flex-shrink: 0; }
+
+            /* Subject */
+            #hd-grp-root .hd-sbj { font-size: 0.86rem !important; font-weight: 500 !important; color: #1e293b
+            !important; }
+
+            /* Empty */
+            #hd-grp-root .hd-grp-empty { text-align: center; padding: 48px 24px; color: #64748b !important; font-size:
+            0.9rem !important; }
+        </style>
+
+        <div id="hd-grp-root">
+            <t t-if="tickets" t-call="portal.portal_table">
+                <thead>
+                    <tr class="active">
+                        <th>
+                            <span class="d-none d-md-inline">Ticket #</span>
+                        </th>
+                        <th class="text-right">Subject</th>
+                        <th style="display:none;" class="text-right">Priority</th>
+                        <th class="text-right">Date</th>
+                        <th class="text-right">Stage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- ▼ ALL t-foreach / t-if / t-esc / t-field PRESERVED ▼ -->
+                    <t t-foreach="tickets" t-as="ticket">
+                        <tr>
+                            <t t-if="ticket['name'] != '' ">
+                                <th class="table-light" colspan="4">
+                                    <t t-esc="ticket['name']"/>
+                                </th>
+                            </t>
+                        </tr>
+                        <t t-foreach="ticket['data']" t-as="ticket">
+                            <t t-foreach="ticket" t-as="data">
+                                <tr>
+                                    <td id="my_selector">
+                                        <a id="popover"
+                                           t-attf-href="/my/tickets/{{ticket.id}}"
+                                           class="hd-chip">
+                                            <span class="hd-chip-dot"></span>
+                                            <t t-esc="ticket.name" t-value="ticket.id"/>
+                                        </a>
+                                    </td>
+                                    <td style="display:none;">
+                                        <span t-field="data.name"/>
+                                    </td>
+                                    <td style="display:none;">
+                                        <span t-field="data.subject"/>
+                                    </td>
+                                    <td style="display:none;">
+                                        <span t-field="data.description"/>
+                                    </td>
+                                    <td style="display:none;">
+                                        <span t-field="data.cost"/>
+                                    </td>
+                                    <td class="text-right">
+                                        <span class="hd-sbj" t-field="data.subject"/>
+                                    </td>
+                                    <td class="text-right" style="display:none;">
+                                        <span t-field="data.priority"/>
+                                    </td>
+                                    <td class="text-right">
+                                        <span class="hd-dt" t-field="data.create_date" t-options="{'widget': 'date'}"/>
+                                        &#160;
+                                        <span class="hd-tm d-none d-md-inline" t-field="data.create_date"
+                                              t-options="{'time_only': True}"/>
+                                    </td>
+                                    <td class="text-right">
+                                        <span class="hd-stg" t-field="data.stage_id.name"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </t>
+                    </t>
+                </tbody>
+            </t>
+            <p t-else="" class="hd-grp-empty">
+                There are currently no tickets issued for your account.
+            </p>
+        </div>
+    </template>
+
+</odoo>
+        <!--<?xml version="1.0" encoding="UTF-8" ?>-->
+        <!--<odoo>-->
+        <!--    &lt;!&ndash; Template for portal breadcrumbs displaying upcoming tickets &ndash;&gt;-->
+        <!--    <template id="portal_my_home_menu_tickets"-->
+        <!--              name="Portal layout : upcoming tickets"-->
+        <!--              inherit_id="portal.portal_breadcrumbs" priority="30">-->
+        <!--        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">-->
+        <!--            <li t-if="page_name == 'ticket'">-->
+        <!--                <a t-if="ticket" t-attf-href="/my/tickets">/ Helpdesk Tickets-->
+        <!--                </a>-->
+        <!--                <t t-else="">/ Helpdesk Tickets</t>-->
+        <!--            </li>-->
+        <!--            <li t-if="ticket" class="breadcrumb-item active">-->
+        <!--                /-->
+        <!--                <t t-esc="details['display_name']"/>-->
+        <!--            </li>-->
+        <!--        </xpath>-->
+        <!--    </template>-->
+        <!--    &lt;!&ndash; Template for the "Tickets" section in the portal home &ndash;&gt;-->
+        <!--    <template id="portal_my_home_helpdesk" name="Tickets"-->
+        <!--              inherit_id="portal.portal_my_home" priority="1"-->
+        <!--              customize_show="True">-->
+        <!--        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">-->
+        <!--            <t t-call="portal.portal_docs_entry">-->
+        <!--                <t t-set="title">Tickets</t>-->
+        <!--                <t t-set="url" t-value="'/my/tickets'"/>-->
+        <!--                <t t-set="placeholder_count" t-value="'ticket_count'"/>-->
+        <!--                <t t-set="icon" t-value="'./odoo_website_helpdesk/static/description/assets/icons/service-black.png'"/>-->
+        <!--                <t t-set="text">Follow, view or download your helpdesk tickets</t>-->
+        <!--            </t>-->
+        <!--        </xpath>-->
+        <!--    </template>-->
+        <!--    &lt;!&ndash; Template for displaying My Tickets portal page &ndash;&gt;-->
+        <!--    <template id="portal_my_tickets" name="My Tickets">-->
+        <!--        <t t-call="portal.portal_layout">-->
+        <!--            <t t-set="breadcrumbs_searchbar" t-value="True"/>-->
+
+        <!--            <t t-call="portal.portal_searchbar">-->
+        <!--                <t t-set="title">My Tickets</t>-->
+        <!--            </t>-->
+        <!--            <t t-call="odoo_website_helpdesk.ticket_table"/>-->
+        <!--        </t>-->
+        <!--    </template>-->
+        <!--    &lt;!&ndash; Template for displaying ticket table &ndash;&gt;-->
+
+        <!--    <template id="ticket_table">-->
+        <!--        <div class="search_ticket">-->
+        <!--            <t t-if="tickets" t-call="portal.portal_table">-->
+        <!--                <thead>-->
+        <!--                    <tr class="active">-->
+        <!--                        <th>-->
+        <!--                            <span class='d-none d-md-inline'>Ticket #</span>-->
+        <!--                        </th>-->
+        <!--                        <th class="text-right">Subject</th>-->
+        <!--                        <th style="display:none;" class="text-right">Priority-->
+        <!--                        </th>-->
+        <!--                        <th class="text-right">Date</th>-->
+        <!--                        <th class="text-right">Stage</th>-->
+        <!--                    </tr>-->
+        <!--                </thead>-->
+        <!--                <tbody>-->
+        <!--                    <t t-foreach="tickets" t-as="ticket">-->
+        <!--                        <tr>-->
+        <!--                            <td id="my_selector">-->
+        <!--                                <a id="popover"-->
+        <!--                                   t-attf-href="/my/tickets/{{ticket.id}}">-->
+        <!--                                    <t t-esc="ticket.name" t-value="ticket.id"/>-->
+        <!--                                </a>-->
+        <!--                            </td>-->
+        <!--                            <td style="display:none;">-->
+        <!--                                <span t-field="ticket.name"/>-->
+        <!--                            </td>-->
+        <!--                            <td style="display:none;">-->
+        <!--                                <span t-field="ticket.subject"/>-->
+        <!--                            </td>-->
+        <!--                            <td style="display:none;">-->
+        <!--                                <span t-field="ticket.description"/>-->
+        <!--                            </td>-->
+        <!--                            <td style="display:none;">-->
+        <!--                                <span t-field="ticket.cost"/>-->
+        <!--                            </td>-->
+        <!--                            <td class="text-right">-->
+        <!--                                <span t-field="ticket.subject"/>-->
+        <!--                            </td>-->
+        <!--                            <td class="text-right" style="display:none;">-->
+        <!--                                <span t-field="ticket.priority"/>-->
+        <!--                            </td>-->
+        <!--                            <td class="text-right">-->
+        <!--                                <span t-field="ticket.create_date"-->
+        <!--                                      t-options="{'widget': 'date'}"/>-->
+        <!--                                &amp;nbsp;-->
+        <!--                                <span class='d-none d-md-inline'-->
+        <!--                                      t-field="ticket.create_date"-->
+        <!--                                      t-options="{'time_only': True}"/>-->
+        <!--                            </td>-->
+        <!--                            <td class="text-right">-->
+        <!--                                <span t-field="ticket.stage_id.name"/>-->
+        <!--                            </td>-->
+        <!--                        </tr>-->
+        <!--                    </t>-->
+        <!--                </tbody>-->
+        <!--            </t>-->
+        <!--            <p t-else="">-->
+        <!--                There are currently no tickets issued for your account.-->
+        <!--            </p>-->
+        <!--        </div>-->
+        <!--    </template>-->
+        <!--    &lt;!&ndash; Template for displaying ticket details &ndash;&gt;-->
+        <!--    <template id="portal_ticket_details" name="My Tickets">-->
+        <!--        <t t-call="portal.portal_layout">-->
+        <!--            <div class="row mt16 o_portal_sale_sidebar">-->
+        <!--                &lt;!&ndash; Sidebar &ndash;&gt;-->
+        <!--                <t t-call="portal.portal_record_sidebar">-->
+        <!--                    <t t-set="classes" t-value="'col-lg-auto d-print-none'"/>-->
+        <!--                    <t t-set="title">-->
+        <!--                        <h4 class="mb-0">-->
+        <!--                            <t t-esc="details['display_name']"/>-->
+        <!--                        </h4>-->
+        <!--                    </t>-->
+        <!--                    <t t-set="entries">-->
+        <!--                        <ul class="list-group list-group-flush flex-wrap flex-row flex-lg-column">-->
+        <!--                            <li class="list-group-item d-grid align-content-start">-->
+        <!--                                <a class="btn btn-primary fa fa-download"-->
+        <!--                                   t-attf-href="/my/tickets/download/{{details.id}}"-->
+        <!--                                   target="_blank" style="margin-right: 10px;">-->
+        <!--                                    Download-->
+        <!--                                </a>-->
+        <!--                            </li>-->
+        <!--                            <li class="list-group-item d-grid align-content-start" >-->
+        <!--                                <div class="small mb-1">-->
+        <!--                                    <strong class="text-muted">Your Contact-->
+        <!--                                    </strong>-->
+        <!--                                </div>-->
+        <!--                                <div class="row flex-nowrap">-->
+        <!--                                    <div class="col flex-grow-0 pe-2">-->
+        <!--                                        <img class="rounded-circle mr4 float-start o_portal_contact_img" style="width:100px;"-->
+        <!--                                             t-att-src="image_data_uri(details['customer_id'].avatar_1024)"-->
+        <!--                                             alt="Contact"/>-->
+        <!--                                    </div>-->
+        <!--                                    <div class="col ps-0"-->
+        <!--                                         style="min-width: 150px">-->
+        <!--                                        <span t-esc="details['customer_id']"-->
+        <!--                                              t-options='{"widget": "contact", "fields": ["name", "phone"], "no_marker": True}'/>-->
+        <!--                                    </div>-->
+        <!--                                </div>-->
+        <!--                            </li>-->
+        <!--                        </ul>-->
+        <!--                    </t>-->
+        <!--                </t>-->
+        <!--                &lt;!&ndash; Page content &ndash;&gt;-->
+        <!--                <div id="helpdesk_content"-->
+        <!--                     class="col-12 col-lg justify-content-end">-->
+        <!--                    <div t-attf-class="card #{'pb-5' if report_type == 'html' else ''}"-->
+        <!--                         id="portal_doc_content">-->
+        <!--                        <div t-call="odoo_website_helpdesk.helpdesk_content_preview"/>-->
+        <!--                    </div>-->
+        <!--                    &lt;!&ndash; chatter &ndash;&gt;-->
+        <!--                    <div id="helpdesk_ticket_communication" class="mt-4">-->
+        <!--                        <h2>History</h2>-->
+        <!--                        <t t-call="portal.message_thread">-->
+        <!--                            <t t-set="object" t-value="details"/>-->
+        <!--                        </t>-->
+        <!--                    </div>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--        </t>-->
+        <!--    </template>-->
+        <!--    &lt;!&ndash; Template for displaying ticket content preview &ndash;&gt;-->
+        <!--    <template id="helpdesk_content_preview" name="Sales Order Portal Content">-->
+        <!--        <div id="introduction"-->
+        <!--             t-attf-class="pb-2 pt-3 #{'card-header bg-white' if report_type == 'html' else ''}"-->
+        <!--             style="height:700px;">-->
+        <!--            <div class="container">-->
+        <!--                <h4 class="mb-0" style="margin-left:15px;">-->
+        <!--                    <b>-->
+        <!--                        <t t-esc="details['display_name']"/>-->
+        <!--                    </b>-->
+        <!--                </h4>-->
+        <!--                <hr style="width:100%"/>-->
+        <!--            </div>-->
+        <!--            <table class="table table-borderless">-->
+        <!--                <tr>-->
+        <!--                    <th>Ticket Type</th>-->
+        <!--                    <td>-->
+        <!--                        <t t-esc="details['ticket_type_id'].name"/>-->
+        <!--                    </td>-->
+        <!--                    <th>Create Date</th>-->
+        <!--                    <td>-->
+        <!--                        <t t-esc="details['create_date']"/>-->
+        <!--                    </td>-->
+        <!--                </tr>-->
+        <!--                <tr>-->
+        <!--                    <th>Last Update Date</th>-->
+        <!--                    <td>-->
+        <!--                        <t t-esc="details['last_update_date']"/>-->
+        <!--                    </td>-->
+        <!--                    <th>Person Name</th>-->
+        <!--                    <td>-->
+        <!--                        <t t-esc="details['customer_id'].name"/>-->
+        <!--                    </td>-->
+        <!--                </tr>-->
+        <!--                <tr>-->
+        <!--                    <th>Ticket Subject</th>-->
+        <!--                    <td>-->
+        <!--                        <t t-esc="details['subject']"/>-->
+        <!--                    </td>-->
+        <!--                    <th>Email</th>-->
+        <!--                    <td>-->
+        <!--                        <t t-esc="details['customer_id'].email"/>-->
+        <!--                    </td>-->
+        <!--                </tr>-->
+        <!--                <tr>-->
+        <!--                    <th>Category</th>-->
+        <!--                    <td>-->
+        <!--                        <t t-esc="details['category_id'].name"/>-->
+        <!--                    </td>-->
+        <!--                    <th>Replied Date</th>-->
+        <!--                    <td>-->
+        <!--                        <t t-esc="details['replied_date']"/>-->
+        <!--                    </td>-->
+        <!--                </tr>-->
+        <!--                <tr>-->
+        <!--                    <th>Priority</th>-->
+        <!--                    <td>-->
+        <!--                        <t t-esc="details['priority']"/>-->
+        <!--                    </td>-->
+        <!--                    <th>Consultant</th>-->
+        <!--                    <td>-->
+        <!--                        <t t-esc="details['assigned_user_id'].name"/>-->
+        <!--                    </td>-->
+        <!--                </tr>-->
+        <!--                <tr>-->
+        <!--                    <th>Status</th>-->
+        <!--                    <td>-->
+        <!--                        <t t-esc="details['stage_id'].name"/>-->
+        <!--                    </td>-->
+        <!--                </tr>-->
+        <!--                <tr>-->
+        <!--                    <th>Description</th>-->
+        <!--                </tr>-->
+        <!--                <tr>-->
+        <!--                    <td colspan="4">-->
+        <!--                        <t t-esc="details['description']"/>-->
+        <!--                    </td>-->
+        <!--                </tr>-->
+        <!--            </table>-->
+        <!--        </div>-->
+        <!--    </template>-->
+        <!--    &lt;!&ndash;        Template for displaying tickets grouped by certain criteria in a table format.&ndash;&gt;-->
+        <!--    <template id="ticket_group_by_table">-->
+        <!--        <t t-if="tickets" t-call="portal.portal_table">-->
+        <!--            <thead>-->
+        <!--                <tr class="active">-->
+        <!--                    <th>-->
+        <!--                        <span class="d-none d-md-inline">Ticket #</span>-->
+        <!--                    </th>-->
+        <!--                    <th class="text-right">Subject</th>-->
+        <!--                    <th style="display:none;" class="text-right">Priority-->
+        <!--                    </th>-->
+        <!--                    <th class="text-right">Date</th>-->
+        <!--                    <th class="text-right">Stage</th>-->
+        <!--                </tr>-->
+        <!--            </thead>-->
+        <!--            <tbody>-->
+        <!--                <t t-foreach="tickets" t-as="ticket">-->
+        <!--                    <tr>-->
+        <!--                        <t t-if="ticket['name'] != '' ">-->
+        <!--                            <th class="table-light" colspan="4">-->
+        <!--                                <t t-esc="ticket['name']"/>-->
+        <!--                            </th>-->
+        <!--                        </t>-->
+        <!--                    </tr>-->
+        <!--                    <t t-foreach="ticket['data']" t-as="ticket">-->
+        <!--                        <t t-foreach="ticket" t-as="data">-->
+
+        <!--                            <tr>-->
+        <!--                                <td id="my_selector">-->
+        <!--                                    <a id="popover"-->
+        <!--                                       t-attf-href="/my/tickets/{{ticket.id}}">-->
+        <!--                                        <t t-esc="ticket.name" t-value="ticket.id"/>-->
+        <!--                                    </a>-->
+        <!--                                </td>-->
+        <!--                                <td style="display:none;">-->
+        <!--                                    <span t-field="data.name"/>-->
+        <!--                                </td>-->
+        <!--                                <td style="display:none;">-->
+        <!--                                    <span t-field="data.subject"/>-->
+        <!--                                </td>-->
+        <!--                                <td style="display:none;">-->
+        <!--                                    <span t-field="data.description"/>-->
+        <!--                                </td>-->
+        <!--                                <td style="display:none;">-->
+        <!--                                    <span t-field="data.cost"/>-->
+        <!--                                </td>-->
+        <!--                                <td class="text-right">-->
+        <!--                                    <span t-field="data.subject"/>-->
+        <!--                                </td>-->
+        <!--                                <td class="text-right" style="display:none;">-->
+        <!--                                    <span t-field="data.priority"/>-->
+        <!--                                </td>-->
+        <!--                                <td class="text-right">-->
+        <!--                                    <span t-field="data.create_date"-->
+        <!--                                          t-options="{'widget': 'date'}"/>-->
+        <!--                                    &amp;nbsp;-->
+        <!--                                    <span class="d-none d-md-inline"-->
+        <!--                                          t-field="data.create_date"-->
+        <!--                                          t-options="{'time_only': True}"/>-->
+        <!--                                </td>-->
+        <!--                                <td class="text-right">-->
+        <!--                                    <span t-field="data.stage_id.name"/>-->
+        <!--                                </td>-->
+        <!--                            </tr>-->
+        <!--                        </t>-->
+        <!--                    </t>-->
+        <!--                </t>-->
+        <!--            </tbody>-->
+        <!--        </t>-->
+        <!--        <p t-else="">There are currently no tickets issued for your-->
+        <!--            account.-->
+        <!--        </p>-->
+        <!--    </template>-->
+        <!--</odoo>-->

@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_prediction_analysis_registration,access.prediction.analysis.registration,DashBoat.model_prediction_analysis_registration,base.group_user,1,1,1,1
+access_predictive_engine,access.predictive.engine,DashBoat.model_predictive_engine,base.group_user,1,1,1,1
+access_chatbot_history,access.chatbot.history,DashBoat.model_chatbot_history,base.group_user,1,1,1,1
+access_predictive_registration,access.predictive.registration,DashBoat.model_predictive_registration,base.group_user,1,1,1,1
+access_predictive_engine_user,access.predictive.engine.user,model_predictive_engine,base.group_user,1,1,1,1
+access_predictive_engine_admin,access.predictive.engine.admin,model_predictive_engine,base.group_system,1,1,1,1
+access_predictive_registration_user,access.predictive.registration.user,model_predictive_registration,base.group_user,1,1,1,1
+access_predictive_registration_admin,access.predictive.registration.admin,model_predictive_registration,base.group_system,1,1,1,1

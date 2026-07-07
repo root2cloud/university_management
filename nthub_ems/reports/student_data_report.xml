@@ -1,0 +1,140 @@
+<!--This XML file does not appear to have any style information associated with it. The document list is shown below.-->
+<odoo>
+    <data>
+        <record id="data_student_report_paperformat" model="report.paperformat">
+            <field name="name">Data Student Report</field>
+            <field name="default" eval="True"/>
+            <field name="format">A4</field>
+            <field name="page_width">0</field>
+            <field name="page_height">0</field>
+            <field name="margin_top">5</field>
+            <field name="margin_bottom">5</field>
+            <field name="margin_left">0</field>
+            <field name="margin_right">0</field>
+            <field name="header_spacing">0</field>
+            <field name="orientation">Portrait</field>
+            <field name="header_line" eval="False"/>
+            <field name="dpi">90</field>
+        </record>
+
+        <record id="report_data_student" model="ir.actions.report">
+            <field name="name">Student Data Report</field>
+            <field name="model">res.partner</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">nthub_ems.student_data_report</field>
+            <field name="report_file">nthub_ems.student_data_report</field>
+            <field name="binding_model_id" ref="model_res_partner"/>
+            <field name="paperformat_id" ref="nthub_ems.data_student_report_paperformat"/>
+            <field name="binding_type">report</field>
+        </record>
+
+        <template id="student_data_report">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.basic_layout">
+                        <div class="row" style="border: 1px solid black; height: 100px; width:100%;">
+                            <div class="col-6" align="left" style="width:50%;">
+                                <img t-if="res_company.logo" t-att-src="image_data_uri(res_company.logo)" height="80px"
+                                     width="140px" alt="Logo"/>
+                            </div>
+                            <div class="col-6" align="right" style="width:50%;">
+                                <strong t-esc="res_company.name"
+                                        style="font-size: 26px; position: relative; top:20px; right:10px"/>
+                            </div>
+                        </div>
+
+                        <br/>
+
+                        <div class="page" style="border: 1px solid black;">
+                            <br/>
+                            <div>
+                                <strong class="text-center"
+                                        style="font-size: 26px; position: relative; left:45%; top:5px; border-bottom:2px solid black;">
+                                    بيان حاله
+                                </strong>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <h5 style="text-align:right; margin-right: 5px;">
+                                    <span>:قد حصل على</span>
+                                    <span t-esc="doc.name" style="font-size: 20px;"/>
+                                    <span>أن الطالب</span>
+                                    <span t-esc="res_company.name" style="font-size: 20px;"/>
+                                    <span>تشهد</span>
+                                </h5>
+                            </div>
+
+                            <br/>
+                            <br/>
+
+                            <t t-foreach="doc.education_record_ids.sorted(lambda l: l.yro)" t-as="a">
+                                <span class="text-center" style="font-size: 26px; position: relative; left:35%; bottom:5px;">
+                                    (
+                                    <span t-esc="(a.yro + 1)" style="font-size: 20px;"/>
+                                    /
+                                    <span t-esc="a.yro" style="font-size: 20px;"/>
+                                    )
+                                    <span t-esc="a.level_id.name" style="font-size: 20px;"/>
+                                    الفرقة
+                                </span>
+
+                                <br/>
+
+                                <table class="table"
+                                       style="font-size:15px; width:95%; margin-left:2.5%; text-align:center; border:1px solid black !important;">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align:center; background-color:#C0C0C0;">
+                                                <strong>الدرجة</strong>
+                                            </th>
+                                            <th style="text-align:center; background-color:#C0C0C0;">
+                                                <strong>المادة</strong>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <t t-foreach="a.marks_ids" t-as="m">
+                                        <tbody>
+                                            <tr>
+                                                <td style="text-align:center;">
+                                                    <span t-esc="m.degree"/>
+                                                </td>
+                                                <td style="text-align:center;">
+                                                    <span t-esc="m.subject_id.name"/>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </t>
+                                    <tfoot>
+                                        <tr>
+                                            <td style="text-align:center;">
+                                                <span t-esc="doc.student_total_mark"/>
+                                            </td>
+                                            <td style="text-align:center;">
+                                                <strong>المجموع</strong>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                                <br/>
+                            </t>
+
+                        </div>
+
+                        <br/>
+                        <br/>
+
+                        <div style="border: 1px solid black; height: 100px; width:100%;">
+                            <h4 style="text-align:right; margin-right: 5px;">
+                                <span style="position: relative; top:25px;">
+                                    ................................................................ :التوقيع
+                                </span>
+                            </h4>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

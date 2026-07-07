@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_hackathon_team_list" model="ir.ui.view">
+            <field name="name">hackathon.team.list</field>
+            <field name="model">hackathon.team</field>
+            <field name="arch" type="xml">
+                <list string="Teams" sample="1">
+                    <field name="code"/>
+                    <field name="name"/>
+                    <field name="event_id"/>
+                    <field name="leader_id"/>
+                    <field name="track_id"/>
+                    <field name="member_count"/>
+                    <field name="has_submitted"/>
+                    <field name="state" widget="badge" decoration-success="state == 'submitted'" decoration-info="state == 'confirmed'"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_hackathon_team_form" model="ir.ui.view">
+            <field name="name">hackathon.team.form</field>
+            <field name="model">hackathon.team</field>
+            <field name="arch" type="xml">
+                <form string="Team">
+                    <header>
+                        <button name="action_confirm" string="Confirm Team" type="object" invisible="state != 'draft'" class="oe_highlight"/>
+                        <button name="action_start_working" string="Start Working" type="object" invisible="state != 'confirmed'" class="oe_highlight"/>
+                        <button name="action_disqualify" string="Disqualify" type="object" invisible="state == 'disqualified'" confirm="Are you sure you want to disqualify this team?"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,registered,confirmed,working,submitted"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" string="Team Name"/>
+                            <h1>
+                                <field name="name" placeholder="e.g., Tech Titans"/>
+                            </h1>
+                            <label for="code"/>
+                            <h3>
+                                <field name="code" readonly="1"/>
+                            </h3>
+                        </div>
+                        <group>
+                            <group string="Event Details">
+                                <field name="event_id"/>
+                                <field name="track_id"/>
+                                <field name="registration_date"/>
+                            </group>
+                            <group string="Contact Information">
+                                <field name="leader_id"/>
+                                <field name="contact_email"/>
+                                <field name="contact_phone"/>
+                                <field name="institution"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Mentor &amp; Submission">
+                                <field name="mentor_id"/>
+                                <field name="submission_id"/>
+                                <field name="has_submitted"/>
+                            </group>
+                            <group string="Statistics">
+                                <field name="member_count"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Team Members">
+                                <field name="member_ids">
+                                    <list editable="bottom">
+                                        <field name="name"/>
+                                        <field name="email"/>
+                                        <field name="phone"/>
+                                        <field name="institution"/>
+                                        <field name="year_of_study"/>
+                                        <field name="is_team_leader"/>
+                                        <field name="state" widget="badge"/>
+                                    </list>
+                                </field>
+                            </page>
+                            <page string="Project Details">
+                                <group>
+                                    <field name="project_name"/>
+                                    <field name="project_description" widget="html"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_hackathon_team_search" model="ir.ui.view">
+            <field name="name">hackathon.team.search</field>
+            <field name="model">hackathon.team</field>
+            <field name="arch" type="xml">
+                <search string="Search Teams">
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="leader_id"/>
+                    <field name="event_id"/>
+                    <field name="track_id"/>
+                    <filter string="Registered" name="registered" domain="[('state', '=', 'registered')]"/>
+                    <filter string="Confirmed" name="confirmed" domain="[('state', '=', 'confirmed')]"/>
+                    <filter string="Submitted" name="submitted" domain="[('state', '=', 'submitted')]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Event" name="group_event" context="{'group_by': 'event_id'}"/>
+                        <filter string="Track" name="group_track" context="{'group_by': 'track_id'}"/>
+                        <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_hackathon_team" model="ir.actions.act_window">
+            <field name="name">Teams</field>
+            <field name="res_model">hackathon.team</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+    </data>
+</odoo>

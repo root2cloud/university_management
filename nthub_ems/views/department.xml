@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+<!--        list to department-->
+    <record id="department_view_tree" model="ir.ui.view">
+        <field name="name">department_view_tree</field>
+        <field name="model">department</field>
+        <field name="arch" type="xml">
+            <list multi_edit="1" string="level" editable="bottom">
+                <field name="name" />
+                <field name="alternative_name" />
+            </list>
+        </field>
+    </record>
+
+
+<!--        action to department-->
+    <record id="department_action" model="ir.actions.act_window">
+        <field name="name">Department</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">department</field>
+        <field name="view_mode">list</field>
+    </record>
+    </data>
+</odoo>

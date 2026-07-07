@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+       <record id="view_wizard_multiple_academic_records_form" model="ir.ui.view">
+    <field name="name">multiple.academic.records.wizard.form</field>
+    <field name="model">multiple.academic.records</field>
+    <field name="arch" type="xml">
+        <form>
+            <!-- Grouping fields for better organization -->
+            <group>
+                <!-- Radio button to select an option -->
+                <field name="select_option" widget="radio"/>
+            </group>
+            <group>
+                <!-- Fields related to academic records -->
+                <group>
+                    <field name="yro" widget="char"/>
+                    <field name="level_id"/>
+                    <field name="department_id"/>
+                    <field name="sub_department_id"/>
+                </group>
+                <group>
+                    <!-- Invisible field controlling whether to print report -->
+                    <field name="is_print_report" invisible="1"/>
+                    <!-- Fields dependent on select_option -->
+                    <field name="type"  invisible="select_option != 'classes' or is_print_report == True"/>
+                    <field name="type_committees"
+                            invisible="select_option != 'committees' or is_print_report == True"/>
+                    <field name="symbol"
+                            invisible="select_option != 'sitting_number' or is_print_report == True"/>
+                    <!-- Field for number input -->
+                    <field name="number"
+                           invisible="select_option == 'sitting_number' or is_print_report == True and select_option == False"/>
+                    <!-- Invisible field for secondary number input -->
+                    <field name="number_two" invisible="1"/>
+                </group>
+            </group>
+            <!-- Footer buttons for actions -->
+            <footer>
+                <!-- Submit button to trigger action_multiple_academic_records method -->
+                <button name="action_multiple_academic_records" type="object" string="Submit" class="btn-primary" date-hotkey="q"/>
+                <!-- Cancel button -->
+                <button special="cancel" date-hotkey="z" string="Discard"/>
+            </footer>
+        </form>
+    </field>
+</record>
+
+
+    </data>
+</odoo>
+

@@ -1,0 +1,141 @@
+
+<odoo>
+    <data>
+        <record id="report_student" model="ir.actions.report">
+            <field name="name">Student report</field>
+            <field name="model">res.partner</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">nthub_ems.student_s_report</field>
+            <field name="report_file">nthub_ems.student_s_report</field>
+            <field name="binding_model_id" ref="model_res_partner"/>
+            <field name="binding_type">report</field>
+        </record>
+
+        <template id="student_s_report">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.internal_layout">
+                        <div class="page">
+                            <div class="text-center">
+                                <h2 style="text-align: center; color: #ffffff; background-color: silver; padding: 0px;">
+                                    <strong>
+                                        <p style="text-align: center; color: black;">
+                                            Student -
+                                            <span t-field="doc.name"/>
+                                        </p>
+                                    </strong>
+                                </h2>
+                            </div>
+                            <br/>
+                            <strong>
+                                <div class="image-container" style="position: absolute; right:0; top:50px;">
+                                    <t t-foreach="docs" t-as="o">
+                                        <img t-att-src="image_data_uri(o.image_1920)" t-if="o.image_1920"
+                                             alt="not found" class="student-image"
+                                             style="max-width: 200px; max-height: 200px;"/>
+                                    </t>
+                                </div>
+                            </strong>
+                            <br/>
+                            <br/>
+                            <h3>Student Information</h3>
+                            <hr/>
+                            <table class="table table-responsive">
+                                <tr>
+                                    <td>
+                                        <strong>Alternative Name</strong>
+                                    </td>
+                                    <td>
+                                        <span t-field="doc.alternative_name"/>
+                                    </td>
+                                    <td>
+                                        <strong>Qualification</strong>
+                                    </td>
+                                    <td>
+                                        <span t-field="doc.qualification"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Gender</strong>
+                                    </td>
+                                    <td>
+                                        <span t-field="doc.gender"/>
+                                    </td>
+                                    <td>
+                                        <strong>Birth Date</strong>
+                                    </td>
+                                    <td>
+                                        <span t-field="doc.birth_date"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Place Of Birth</strong>
+                                    </td>
+                                    <td>
+                                        <span t-field="doc.place_of_birth"/>
+                                    </td>
+                                    <td>
+                                        <strong>Nationality</strong>
+                                    </td>
+                                    <td>
+                                        <span t-field="doc.nationality"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Army State</strong>
+                                    </td>
+                                    <td>
+                                        <span t-field="doc.army_state"/>
+                                    </td>
+                                </tr>
+                            </table>
+                            <br/>
+                            <h3>Parent Information</h3>
+                            <hr/>
+                            <br/>
+                            <table class="table table-responsive">
+                                <tr>
+                                    <td>
+                                        <strong>Parent Name</strong>
+                                    </td>
+                                    <td>
+                                        <span t-field="doc.parent_name_other"/>
+                                    </td>
+                                    <td>
+                                        <strong>Parent Job</strong>
+                                    </td>
+                                    <td>
+                                        <span t-field="doc.parent_job"/>
+                                    </td>
+                                </tr>
+                            </table>
+                            <br/>
+                            <h3>Contact Information</h3>
+                            <hr/>
+                            <br/>
+                            <table class="table table-responsive">
+                                <tr>
+                                    <td>
+                                        <strong>Phone</strong>
+                                    </td>
+                                    <td>
+                                        <span t-field="doc.phone"/>
+                                    </td>
+                                    <td>
+                                        <strong>Email</strong>
+                                    </td>
+                                    <td>
+                                        <span t-field="doc.email"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

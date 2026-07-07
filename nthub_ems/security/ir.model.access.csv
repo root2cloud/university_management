@@ -1,0 +1,12 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_level_level,Ems.level,model_level,,1,1,1,1
+access_education_record,Ems.education.record,model_education_record,,1,1,1,1
+access_department,Ems.department,model_department,,1,1,1,1
+access_sub_department,Ems.sub.department,model_sub_department,,1,1,1,1
+access_subject,Ems.subject,model_subject,,1,1,1,1
+access_marks,Ems.marks,model_marks,,1,1,1,1
+access_qualification_student,access.qualification.student,model_qualification_student,,1,1,1,1
+access_multiple_marks,access.multiple.marks,model_multiple_marks,,1,1,1,1
+access_multiple_academic_records,access.multiple.academic.records,model_multiple_academic_records,,1,1,1,1
+
+

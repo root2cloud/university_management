@@ -1,0 +1,101 @@
+<!--<odoo>-->
+<!--    <record id="design_project_form_view" model="ir.ui.view">-->
+<!--        <field name="name">design.project.form</field>-->
+<!--        <field name="model">design.project</field>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <form string="Design Project">-->
+<!--                <header>-->
+<!--                    <button name="generate_design_options" string="Generate Design Options" type="object"-->
+<!--                            class="oe_highlight"/>-->
+<!--                    <button name="edit_selected_design" string="Edit Selected Design" type="object"-->
+<!--                            class="oe_highlight"/>-->
+<!--                    <button name="extract_components" string="Extract Components" type="object" class="oe_highlight"/>-->
+<!--                    <button name="generate_design" string="Generate Design (Single)" type="object"-->
+<!--                            class="oe_highlight"/>-->
+<!--                    <button name="download_design_document" string="Download Design PDF" type="object" class="oe_link"/>-->
+<!--                    <button name="download_3d_model" string="Download 3D Model" type="object" class="oe_link"/>-->
+<!--                    <button name="request_service" string="Request Service" type="object" class="oe_link"-->
+<!--                            invisible="state != 'expired'"/>-->
+<!--                </header>-->
+<!--                <sheet>-->
+<!--                    <group>-->
+<!--                        <group>-->
+<!--                            <field name="name"/>-->
+<!--                            <field name="partner_id" options="{'no_create': True, 'no_open': True}"/>-->
+<!--                            <field name="room_name"/>-->
+<!--                            <field name="square_feet"/>-->
+<!--                            <field name="length"/>-->
+<!--                            <field name="breadth"/>-->
+<!--                            <field name="style_preference"/>-->
+<!--                        </group>-->
+<!--                        <group>-->
+<!--                            <field name="selected_design_id" widget="selection"/>-->
+<!--                            <field name="warranty_period"/>-->
+<!--                            <field name="start_date"/>-->
+<!--                            <field name="expiry_date" readonly="1"/>-->
+<!--                            <field name="state" readonly="1"/>-->
+<!--                            <field name="design_document" filename="document_name"/>-->
+<!--                            <field name="document_name" readonly="False"/>-->
+<!--                            <field name="model_3d" filename="model_3d_name"/>-->
+<!--                            <field name="model_3d_name" readonly="False"/>-->
+<!--                        </group>-->
+<!--                    </group>-->
+<!--                    <notebook>-->
+<!--                        <page string="Design Options">-->
+<!--                            <field name="design_options_ids">-->
+<!--                                <list>-->
+<!--                                    <field name="name"/>-->
+<!--                                    <field name="description"/>-->
+<!--                                    <field name="design_image" widget="image"/>-->
+<!--                                </list>-->
+<!--                            </field>-->
+<!--                        </page>-->
+<!--                        <page string="Components">-->
+<!--                            <field name="component_ids">-->
+<!--                                <list>-->
+<!--                                    <field name="name"/>-->
+<!--                                    <field name="component_type"/>-->
+<!--                                    <field name="quantity"/>-->
+<!--                                    <field name="dimensions"/>-->
+<!--                                </list>-->
+<!--                            </field>-->
+<!--                        </page>-->
+<!--                        <page string="Service Requests">-->
+<!--                            <field name="service_request_ids">-->
+<!--                                <list>-->
+<!--                                    <field name="request_date"/>-->
+<!--                                    <field name="description"/>-->
+<!--                                    <field name="state"/>-->
+<!--                                </list>-->
+<!--                            </field>-->
+<!--                        </page>-->
+<!--                    </notebook>-->
+<!--                </sheet>-->
+<!--                <chatter/>-->
+<!--            </form>-->
+<!--        </field>-->
+<!--    </record>-->
+<!--    <record id="design_project_list_view" model="ir.ui.view">-->
+<!--        <field name="name">design.project.list</field>-->
+<!--        <field name="model">design.project</field>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <list string="Design Projects">-->
+<!--                <field name="name"/>-->
+<!--                <field name="room_name"/>-->
+<!--                <field name="square_feet"/>-->
+<!--            </list>-->
+<!--        </field>-->
+<!--    </record>-->
+<!--    <record id="action_design_project" model="ir.actions.act_window">-->
+<!--        <field name="name">Design Projects</field>-->
+<!--        <field name="res_model">design.project</field>-->
+<!--        <field name="view_mode">list,form</field>-->
+<!--    </record>-->
+<!--    <record id="action_portal_my_designs" model="ir.actions.act_url">-->
+<!--        <field name="name">My Designs</field>-->
+<!--        <field name="url">/my/designs</field>-->
+<!--        <field name="target">self</field>-->
+<!--    </record>-->
+<!--    <menuitem id="main_menu_root" name="Interior Design App"/>-->
+<!--    <menuitem id="menu_design_project" name="Design Projects" parent="main_menu_root" action="action_design_project"/>-->
+<!--</odoo>-->

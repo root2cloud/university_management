@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+<!--        list to teacher-->
+        <record id="teacher_res_partner_view_tree" model="ir.ui.view">
+            <field name="name">teacher_res_partner_view_tree</field>
+            <field name="model">res.partner</field>
+            <field name="arch" type="xml">
+                <list multi_edit="1" editable="bottom">
+                    <field name="name" />
+                    <field name="alternative_name" />
+                    <field name="subject_ids" widget="many2many_tags" readonly="1" domain="[('id', 'in', subject_domain)]" />
+                    <field name="subject_domain" invisible="1" />
+                </list>
+            </field>
+        </record>
+
+<!--        action the model teacher-->
+        <record id="teacher_res_partner_action" model="ir.actions.act_window">
+            <field name="name">Teacher</field>
+            <field name="res_model">res.partner</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">list,form</field>
+            <field name="context">{"default_is_teacher": True}</field>
+            <field name="domain">[('is_teacher', '=', True)]</field>
+            <field name="view_ids" eval="[(5, 0, 0), (0, 0, {'view_mode': 'list', 'view_id': ref('teacher_res_partner_view_tree')}),]" />
+        </record>
+
+    </data>
+</odoo>

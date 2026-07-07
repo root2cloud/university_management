@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_helpdesk_dashboard" model="ir.actions.act_window">
+        <field name="name">Helpdesk Support Dashboard</field>
+        <field name="res_model">helpdesk.dashboard</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field> </record>
+
+    <menuitem id="menu_helpdesk_dashboard" name="Helpdesk Dashboard" parent="menu_helpdesk" action="action_helpdesk_dashboard" sequence="0"/>
+
+    <record id="view_helpdesk_dashboard_form" model="ir.ui.view">
+        <field name="name">helpdesk.dashboard.form.premium</field>
+        <field name="model">helpdesk.dashboard</field>
+        <field name="arch" type="xml">
+            <form string="Helpdesk Dashboard" create="false" edit="false">
+
+                <style>
+                    :root {
+                        --bg-color: #f8fafc;
+                        --card-bg: #ffffff;
+                        --text-main: #0f172a;
+                        --text-muted: #64748b;
+                        --primary: #4f46e5;
+                        --secondary: #8b5cf6;
+                        --success: #10b981;
+                        --warning: #f59e0b;
+                        --border: #e2e8f0;
+                    }
+                    .hd-wrapper { background-color: var(--bg-color); padding: 30px; min-height: 100vh; font-family: 'Inter', -apple-system, sans-serif; }
+
+                    /* GLASS HEADER DRILL-DOWN (FIXED Z-INDEX) */
+                    .hd-header {
+                        background: linear-gradient(135deg, #312e81 0%, #4f46e5 100%);
+                        border-radius: 20px;
+                        padding: 25px 35px;
+                        margin-bottom: 25px;
+                        box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.3);
+                        position: relative; /* FIX */
+                        z-index: 999;       /* FIX: Forces dropdowns to appear ABOVE the cards below */
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+
+                    .drill-down-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; min-width: 400px; }
+                    .selector-box { background: rgba(255,255,255,0.15); padding: 12px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(5px); }
+                    .selector-box label { color: #c7d2fe; font-size: 0.75rem; text-transform: uppercase; font-weight: 800; margin-bottom: 4px; display: block; letter-spacing: 0.5px; }
+                    .selector-box .o_field_widget { font-weight: 700 !important; font-size: 1.1rem !important; color: white !important; }
+                    .selector-box .o_input { background: transparent !important; color: white !important; border: none !important; }
+
+                    /* KPI CARDS (FIXED Z-INDEX) */
+                    .kpi-row {
+                        display: grid;
+                        grid-template-columns: repeat(4, 1fr);
+                        gap: 20px;
+                        margin-bottom: 25px;
+                        position: relative; /* FIX */
+                        z-index: 10;        /* FIX: Keeps cards below the header */
+                    }
+                    .kpi-card {
+                        background: var(--card-bg);
+                        border-radius: 16px;
+                        padding: 24px;
+                        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+                        border: 1px solid var(--border);
+                        transition: transform 0.2s;
+                        position: relative;
+                        z-index: 1; /* Keep individual cards low */
+                    }
+                    .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 15px 20px -5px rgba(0,0,0,0.05); z-index: 2; }
+                    .kpi-val { font-size: 2.5rem; font-weight: 900; color: var(--text-main); line-height: 1.1; margin-top: 15px; }
+                    .kpi-label { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+                    .kpi-icon { position: absolute; top: 24px; right: 24px; font-size: 2.5rem; opacity: 0.1; }
+                </style>
+
+                <div class="hd-wrapper">
+
+                    <div class="hd-header">
+                        <div style="color: white;">
+                            <h1 style="font-weight: 900; margin: 0; font-size: 2.2rem; color: white !important;"><i class="fa fa-life-ring mr-3"></i> Support Command</h1>
+                            <p style="margin: 5px 0 0 0; color: #a5b4fc !important; font-size: 1.05rem;">Analyze team performance and resolve tickets.</p>
+                        </div>
+
+                        <div class="drill-down-grid">
+                            <div class="selector-box">
+                                <label for="team_id">1. Select Team</label>
+                                <field name="team_id" options="{'no_create': True}" placeholder="All Teams..."/>
+                            </div>
+                            <div class="selector-box" invisible="not team_id">
+                                <label for="ticket_id">2. Select Ticket</label>
+                                <field name="ticket_id" options="{'no_create': True}" placeholder="Drill down..."/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="kpi-row">
+                            <div class="kpi-card" style="border-bottom: 4px solid var(--primary);">
+                                <i class="fa fa-ticket kpi-icon text-primary"/>
+                                <div class="kpi-label">Total Volume</div>
+                                <div class="kpi-val"><field name="kpi_total_tickets"/></div>
+                            </div>
+                            <div class="kpi-card" style="border-bottom: 4px solid var(--warning);">
+                                <i class="fa fa-clock-o kpi-icon text-warning"/>
+                                <div class="kpi-label">Open / Pending</div>
+                                <div class="kpi-val"><field name="kpi_open_tickets"/></div>
+                            </div>
+                            <div class="kpi-card" style="border-bottom: 4px solid var(--success);">
+                                <i class="fa fa-check-circle kpi-icon text-success"/>
+                                <div class="kpi-label">Successfully Resolved</div>
+                                <div class="kpi-val"><field name="kpi_solved_tickets"/></div>
+                            </div>
+                            <div class="kpi-card" style="border-bottom: 4px solid var(--secondary);">
+                                <i class="fa fa-star kpi-icon" style="color:var(--secondary);"/>
+                                <div class="kpi-label">Avg Customer Rating</div>
+                                <div class="kpi-val"><field name="kpi_avg_rating" widget="float" digits="[16,1]"/> <small style="font-size: 1rem; color:#94a3b8;">/ 5</small></div>
+                            </div>
+                        </div>
+
+                        <field name="explorer_html" widget="html" nolabel="1"/>
+
+                    </div>
+                </div>
+            </form>
+        </field>
+    </record>
+</odoo>
+
+
+<!--&lt;!&ndash; filename: views/helpdesk_dashboard_views.xml &ndash;&gt;-->
+<!--<odoo>-->
+<!--    &lt;!&ndash; Action &ndash;&gt;-->
+<!--    <record id="action_helpdesk_dashboard" model="ir.actions.act_window">-->
+<!--        <field name="name">Helpdesk Dashboard</field>-->
+<!--        <field name="res_model">helpdesk.dashboard</field>-->
+<!--        <field name="view_mode">form</field>-->
+<!--        <field name="target">current</field>-->
+<!--    </record>-->
+
+<!--    &lt;!&ndash; Menu (adjust parent to your module's main menu, e.g., under Helpdesk) &ndash;&gt;-->
+<!--&lt;!&ndash;    <menuitem id="menu_helpdesk_dashboard_root" name="Dashboard" sequence="1" parent="menu_helpdesk"/>&ndash;&gt;-->
+<!--    <menuitem id="menu_helpdesk_dashboard" name="Helpdesk Dashboard" parent="menu_helpdesk" action="action_helpdesk_dashboard" sequence="0"/>-->
+
+<!--    &lt;!&ndash; Form View &ndash;&gt;-->
+<!--    <record id="view_helpdesk_dashboard_form" model="ir.ui.view">-->
+<!--        <field name="name">helpdesk.dashboard.form</field>-->
+<!--        <field name="model">helpdesk.dashboard</field>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <form string="Helpdesk Dashboard">-->
+<!--                <header>-->
+<!--                    <button name="action_refresh_dashboard" type="object" string="Refresh" class="btn-primary"/>-->
+<!--                </header>-->
+<!--                <sheet>-->
+<!--                    <group>-->
+<!--                        <group>-->
+<!--                            <field name="team_id" options="{'no_create': True, 'no_edit': True}"/>-->
+<!--                        </group>-->
+<!--                        <group>-->
+<!--                            <field name="ticket_id" options="{'no_create': True, 'no_edit': True}"/>-->
+<!--                        </group>-->
+<!--                    </group>-->
+<!--                    <field name="dashboard_html" nolabel="1" widget="html" options="{'height': '800px'}"/>-->
+<!--                </sheet>-->
+<!--            </form>-->
+<!--        </field>-->
+<!--    </record>-->
+<!--</odoo>-->

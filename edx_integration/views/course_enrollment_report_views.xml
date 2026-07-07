@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="course_enrollment_report_wizard_view" model="ir.ui.view">
+        <field name="name">Course Enrollment Report Wizard</field>
+        <field name="model">course.enrollment.report</field>
+        <field name="arch" type="xml">
+            <form string="Course Enrollment Report">
+                <group>
+                    <field name="department_id"/>
+                    <field name="employee_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                </group>
+                <group string="Enrollment Details">
+                    <field name="enrolled_courses" widget="text" readonly="1"/>
+                </group>
+                <group string="Training Status">
+                    <field name="training_status" widget="text" readonly="1"/>
+                </group>
+                <footer>
+                    <button string="Generate Report" type="object" name="action_generate_report" class="oe_highlight"/>
+                    <button string="Cancel" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_course_enrollment_report" model="ir.actions.act_window">
+        <field name="name">Course Enrollment Report</field>
+        <field name="res_model">course.enrollment.report</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+    <menuitem id="menu_course_enrollment_report" name="Course Enrollment Report" parent="menu_elearning_root" action="action_course_enrollment_report" sequence="20"/>
+</odoo>

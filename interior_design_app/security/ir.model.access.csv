@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_design_project_user,access.design.project.user,model_design_project,base.group_user,1,1,1,1
+access_design_project_portal,access.design.project.portal,model_design_project,base.group_portal,1,0,0,0
+access_design_option_user,access.design.option.user,model_design_option,base.group_user,1,1,1,1
+access_design_option_portal,access.design.option.portal,model_design_option,base.group_portal,1,0,0,0
+access_design_component_user,access.design.component.user,model_design_component,base.group_user,1,1,1,1
+access_design_component_portal,access.design.component.portal,model_design_component,base.group_portal,1,0,0,0
+access_design_service_request_user,access.design.service.request.user,model_design_service_request,base.group_user,1,1,1,1
+access_design_service_request_portal,access.design.service.request.portal,model_design_service_request,base.group_portal,1,1,1,0

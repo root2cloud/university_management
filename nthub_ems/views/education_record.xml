@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!--define a view action server -->
+        <record id="action_server_active" model="ir.actions.server">
+            <field name="name">Active State</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="model_education_record" />
+            <field name="binding_model_id" ref="model_education_record" />
+            <field name="binding_view_types">list,form</field>
+            <field name="state">code</field>
+            <field name="code">
+                for rec in records:
+                rec.action_active()
+            </field>
+        </record>
+
+        <record id="action_server_finished" model="ir.actions.server">
+            <field name="name">Finished State</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="model_education_record" />
+            <field name="binding_model_id" ref="model_education_record" />
+            <field name="binding_view_types">list,form</field>
+            <field name="state">code</field>
+            <field name="code">
+                for rec in records:
+                    rec.action_finished()
+            </field>
+        </record>
+
+        <record id="action_server_compute_total_marks" model="ir.actions.server">
+            <field name="name">Compute Total Marks</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="model_education_record" />
+            <field name="binding_model_id" ref="model_education_record" />
+            <field name="binding_view_types">list,form</field>
+            <field name="state">code</field>
+            <field name="code">
+                for rec in records:
+                    rec.calc_total_mark()
+            </field>
+        </record>
+
+        <!--define a view search -->
+        <record model="ir.ui.view" id="view_education_record_search">
+            <field name="name">education.record.search</field>
+            <field name="model">education.record</field>
+            <field name="arch" type="xml">
+                <search>
+                    <!--                    <field name="max_year"/>-->
+                    <field name="yro" />
+                    <filter string="Filter by current year" name="max_year"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Level" name="group_by_level_id" context="{'group_by': 'level_id'}" />
+                        <filter string="Department" name="group_by_department_id" context="{'group_by': 'department_id'}" />
+                        <filter string="Division" name="group_by_sub_department_id" context="{'group_by': 'sub_department_id'}" />
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="education_record_view_tree" model="ir.ui.view">
+            <field name="name">education_record_view_tree</field>
+            <field name="model">education.record</field>
+            <field name="arch" type="xml">
+                <list multi_edit="1" string="level" js_class="button_academic_in_tree">
+                    <field name="student_id" options="{'no_open': True, 'no_create': True}" />
+                    <field name="yro" widget="text" />
+                    <field name="level_id" />
+                    <field name="department_id" />
+                    <field name="sub_department_id" />
+                    <field name="class_number" />
+                    <field name="sitting_number" />
+                    <field name="committees_number" />
+                    <field name="chair_number" />
+                    <field name="total_mark" />
+                    <field name="eds" widget="badge" decoration-success="eds == 'fresh'" decoration-warning="eds == 'remaining'" decoration-danger="eds == 'chance'" />
+                    <field name="state" decoration-success="state == 'active'" decoration-info="state == 'finished'" widget="badge" />
+                </list>
+            </field>
+        </record>
+
+        <record id="number_student_in_every_level_view_graph" model="ir.ui.view">
+            <field name="name">Student Pie Chart</field>
+            <field name="model">education.record</field>
+            <field name="arch" type="xml">
+                <graph string="Student Pie Chart" type="pie">
+                    <field name="level_id" type="row" />
+                    <field name="student_id" type="measure" />
+                    <field name="state" />
+                </graph>
+            </field>
+        </record>
+
+        <record id="student_records_view_pivot" model="ir.ui.view">
+            <field name="name">Students Records Pivot</field>
+            <field name="model">education.record</field>
+            <field name="arch" type="xml">
+                <pivot string="Students Records" sample="1">
+                    <field name="level_id" />
+                    <field name="student_id" />
+                    <field name="yro" widget="text" />
+                    <field name="level_id" />
+                    <field name="department_id" />
+                    <field name="sub_department_id" />
+                    <field name="class_number" />
+                    <field name="sitting_number" />
+                    <field name="committees_number" />
+                    <field name="chair_number" />
+                    <field name="total_mark" />
+                    <field name="eds" />
+                    <field name="state" />
+                </pivot>
+            </field>
+        </record>
+
+        <record id="education_record_view_form" model="ir.ui.view">
+            <field name="name">education_record_view_form</field>
+            <field name="model">education.record</field>
+            <field name="arch" type="xml">
+                <form string="education_record_form" readonly="state == 'finished'">
+                    <header>
+                        <button name="calc_total_mark" string="Compute Total Marks" type="object" class="oe_highlight" invisible="state != 'finished'" />
+                        <field name="state" widget="statusbar" nolabel="1" statusbar_visible="active,finished" />
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="yro" widget="char" readonly="state == 'finished'" />
+                                <field name="is_readonly" invisible="1" />
+                                <field name="student_id" options="{'no_open': True, 'no_create': True}" readonly="is_readonly == True" />
+                                <field name="level_id" options="{'no_open': True, 'no_create': True}" readonly="is_readonly == True" />
+                                <field name="department_id" options="{'no_open': True, 'no_create': True}" readonly="is_readonly == True" />
+                                <field name="sub_department_id" options="{'no_open': True, 'no_create': True}" readonly="is_readonly == True" />
+                                <field name="eds" readonly="state == 'finished'" />
+                            </group>
+                            <group>
+                                <field name="total_mark" readonly="state == 'finished'" />
+                                <field name="year_percentage" widget="percentage" readonly="state == 'finished'" />
+                                <field name="class_number" readonly="state == 'finished'" />
+                                <field name="sitting_number" readonly="state == 'finished'" />
+                                <field name="committees_number" readonly="state == 'finished'" />
+                                <field name="chair_number" readonly="state == 'finished'" />
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Marks Details">
+                                <field name="marks_ids" readonly="state == 'finished'">
+                                    <list editable="bottom">
+<!--                                        <field name="subject_id" domain="subject_id_domain" required="1" readonly="parent.is_readonly == True" />-->
+                                        <field name="subjects_domain_ids" invisible="1"/>
+                                        <field name="subject_id" domain="[('id', 'in', subjects_domain_ids)]" required="1" readonly="parent.is_readonly == True" />
+                                        <field name="oral_mark" />
+                                        <field name="term_mark" />
+                                        <field name="final_mark" />
+                                        <field name="total_mark" />
+                                        <field name="percentage" widget="percentage" />
+                                        <field name="degree"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <chatter reload_on_follower="True"/>
+                        <!-- <field name="message_follower_ids" />
+                        <field name="activity_ids" />
+                        <field name="message_ids" /> -->
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="education_record_action" model="ir.actions.act_window">
+            <field name="name">Academic Records</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">education.record</field>
+            <field name="view_mode">list,form</field>
+           <field name="context" eval="{'search_default_max_year': 1, 'search_default_group_by_level_id': 1, 'search_default_group_by_department_id': 1, 'search_default_group_by_sub_department_id': 1,}"/>
+        </record>
+    </data>
+</odoo>

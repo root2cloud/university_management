@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="edx_courses_template" name="eDX Courses">
+        <t t-call="website.layout">
+            <div class="container">
+                <h1>eDX Courses (Demo)</h1>
+                <p class="alert alert-info">Mock eDX courses and videos synced to Odoo eLearning.</p>
+                <t t-if="not courses">
+                    <p>No courses available yet. Please wait for the sync to complete.</p>
+                </t>
+                <t t-foreach="courses" t-as="course">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title"><t t-esc="course.name"/></h5>
+                            <p class="card-text"><t t-esc="course.description"/></p>
+                            <iframe t-attf-src="{{course.video_url}}" width="100%" height="315" frameborder="0" allowfullscreen="1"/>
+                            <a t-att-href="course.course_url" target="_blank" class="btn btn-primary mt-2">Go to Course</a>
+                        </div>
+                    </div>
+                </t>
+            </div>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,20 @@
+<odoo>
+    <!-- Tree View -->
+    <record id="view_asset_brand_tree" model="ir.ui.view">
+        <field name="name">asset.brand.tree</field>
+        <field name="model">asset.brand</field>
+        <field name="arch" type="xml">
+            <list string="Asset Brands" editable="bottom">
+                <field name="name" required="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_asset_brand" model="ir.actions.act_window">
+        <field name="name">Asset Brands</field>
+        <field name="res_model">asset.brand</field>
+        <field name="view_mode">list</field>
+    </record>
+
+</odoo>

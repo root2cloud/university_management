@@ -1,0 +1,13 @@
+id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
+access_it_components,it.components,it_inventory_and_asset_management.model_it_components,base.group_user,1,1,1,1
+access_used_user_logs,used.user.logs,it_inventory_and_asset_management.model_used_user_logs,base.group_user,1,1,1,1
+access_it_assets,it.assets,it_inventory_and_asset_management.model_it_assets,base.group_user,1,1,1,1
+access_asset_type,asset.type,it_inventory_and_asset_management.model_asset_type,base.group_user,1,1,1,1
+access_asset_model,asset.model,it_inventory_and_asset_management.model_asset_model,base.group_user,1,1,1,1
+access_asset_brand,asset.brand,it_inventory_and_asset_management.model_asset_brand,base.group_user,1,1,1,1
+access_dashboard_block,access.dashboard.block,model_dashboard_block,base.group_user,1,1,1,1
+access_system_system,access.system.system,model_system_system,base.group_user,1,1,1,1
+
+
+
+

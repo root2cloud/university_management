@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="predictive_registration_form_view" model="ir.ui.view">
+        <field name="name">predictive.registration.form</field>
+        <field name="model">predictive.registration</field>
+        <field name="arch" type="xml">
+            <form string="Registration Form">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="email"/>
+                        <field name="phone_number"/>
+                        <field name="address"/>
+                        <field name="registration_date"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="predictive_registration_list_view" model="ir.ui.view">
+        <field name="name">predictive.registration.list</field>
+        <field name="model">predictive.registration</field>
+        <field name="arch" type="xml">
+            <list string="Registration List">
+                <field name="name"/>
+                <field name="email"/>
+                <field name="phone_number"/>
+                <field name="registration_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="predictive_registration_action" model="ir.actions.act_window">
+        <field name="name">Registration</field>
+        <field name="res_model">predictive.registration</field>
+        <field name="view_mode">form</field>
+    </record>
+</odoo>

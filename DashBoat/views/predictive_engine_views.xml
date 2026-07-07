@@ -1,0 +1,2498 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Dashboard Form View with Chatbot -->
+    <record id="view_predictive_engine_dashboard_form" model="ir.ui.view">
+        <field name="name">predictive.engine.dashboard.form</field>
+        <field name="model">predictive.engine</field>
+        <field name="arch" type="xml">
+            <form string="Sales" create="false" edit="true">
+                <div style="padding: 0; margin: 0; position: relative;">
+                    <!-- Dashboard Iframe -->
+                    <iframe
+                        src="/predictive_engine/dashboard"
+                        style="width: 100vw; height: 100vh; border: none; margin: 0; padding: 0; overflow: visible;"
+                        frameborder="0"
+                        scrolling="yes"
+                        allowfullscreen="true"
+                    ></iframe>
+                    <!-- Floating Toggle Chat Button -->
+                    <a href="javascript:void(0);"
+                        class="btn btn-primary"
+                        style="position: fixed; bottom: 30px; right: 30px; z-index: 1050;"
+                        onclick="var panel=document.getElementById('odoo_chatbot_panel');if(panel)panel.classList.toggle('d-none');">
+                        <span class="fa fa-comments"></span> Chat </a>
+                    <!-- Chatbot Panel (Single Q&A, chat style, form view safe) -->
+                    <div id="odoo_chatbot_panel"
+                        class="card shadow-lg d-none"
+                        style="position: fixed; bottom: 80px; right: 30px; width: 700px; max-width: 90vw; max-height: 85vh; z-index: 1051; overflow: hidden; display: flex; flex-direction: column; resize: both; min-width: 500px; min-height: 400px;">
+                        <!-- Enhanced Resize Handles - All Directions -->
+                        <!-- Top Edge -->
+                        <div class="resize-handle resize-top"
+                            style="position: absolute; top: -2px; left: 0; width: 100%; height: 8px; cursor: ns-resize; background: transparent; z-index: 1052;"></div>
+                        <!-- Bottom Edge -->
+                        <div class="resize-handle resize-bottom"
+                            style="position: absolute; bottom: -2px; left: 0; width: 100%; height: 8px; cursor: ns-resize; background: transparent; z-index: 1052;"></div>
+                        <!-- Left Edge -->
+                        <div class="resize-handle resize-left"
+                            style="position: absolute; top: 0; left: -2px; width: 8px; height: 100%; cursor: ew-resize; background: transparent; z-index: 1052;"></div>
+                        <!-- Right Edge -->
+                        <div class="resize-handle resize-right"
+                            style="position: absolute; top: 0; right: -2px; width: 8px; height: 100%; cursor: ew-resize; background: transparent; z-index: 1052;"></div>
+                        <!-- Top-Left Corner -->
+                        <div class="resize-handle resize-tl"
+                            style="position: absolute; top: -4px; left: -4px; width: 12px; height: 12px; cursor: nw-resize; background: transparent; z-index: 1052;"></div>
+                        <!-- Top-Right Corner -->
+                        <div class="resize-handle resize-tr"
+                            style="position: absolute; top: -4px; right: -4px; width: 12px; height: 12px; cursor: ne-resize; background: transparent; z-index: 1052;"></div>
+                        <!-- Bottom-Left Corner -->
+                        <div class="resize-handle resize-bl"
+                            style="position: absolute; bottom: -4px; left: -4px; width: 12px; height: 12px; cursor: sw-resize; background: transparent; z-index: 1052;"></div>
+                        <!-- Bottom-Right Corner -->
+                        <div class="resize-handle resize-br"
+                            style="position: absolute; bottom: -4px; right: -4px; width: 12px; height: 12px; cursor: se-resize; background: transparent; z-index: 1052;"></div>
+
+                        <div class="card-header d-flex justify-content-between align-items-center"
+                            style="background: #3e4955; color: #fff;">
+                            <span>
+                                <strong>Odoo Sales and CRM Chatbot</strong>
+                            </span>
+                            <span>
+                                <!-- <a href="javascript:void(0);" class="btn btn-sm btn-light"
+                                title="Minimize"
+                                onclick="var body=document.getElementById('odoo_chatbot_body');var
+                                history=document.querySelector('.chatbot-user-questions');if(body)body.classList.toggle('d-none');if(history)history.classList.add('d-none');">
+                                    <span class="fa fa-window-minimize"></span>
+                                </a> -->
+                                <a href="javascript:void(0);" class="btn btn-sm btn-light"
+                                    title="Maximize"
+                                    onclick="
+                                    var panel=document.getElementById('odoo_chatbot_panel');
+                                    var history=document.querySelector('.chatbot-user-questions');
+                                    if(panel){
+                                        panel.style.width='100vw';
+                                        panel.style.height='100vh';
+                                        panel.style.top='0';
+                                        panel.style.left='0';
+                                        panel.style.right='0';
+                                        panel.style.bottom='0';
+                                        panel.style.maxWidth='100vw';
+                                        panel.style.maxHeight='100vh';
+                                        panel.style.position='fixed';
+                                        panel.style.margin='0';
+                                        panel.style.borderRadius='0';
+                                        if(history)history.classList.remove('d-none');
+                                    }
+                                ">
+                                    <span class="fa fa-window-maximize"></span>
+                                </a>
+                                <a href="javascript:void(0);" class="btn btn-sm btn-light"
+                                    title="Restore"
+                                    onclick="
+                                    var panel=document.getElementById('odoo_chatbot_panel');
+                                    var history=document.querySelector('.chatbot-user-questions');
+                                    if(panel){
+                                        panel.style.width='700px';
+                                        panel.style.height='';
+                                        panel.style.top='';
+                                        panel.style.left='';
+                                        panel.style.right='30px';
+                                        panel.style.bottom='80px';
+                                        panel.style.maxWidth='90vw';
+                                        panel.style.maxHeight='85vh';
+                                        panel.style.position='fixed';
+                                        panel.style.margin='';
+                                        panel.style.borderRadius='';
+                                        if(history)history.classList.add('d-none');
+                                    }
+                                ">
+                                    <span class="fa fa-compress"></span>
+                                </a>
+                                <a href="javascript:void(0);" class="btn btn-sm btn-danger"
+                                    title="Close"
+                                    onclick="var panel=document.getElementById('odoo_chatbot_panel');var history=document.querySelector('.chatbot-user-questions');if(panel)panel.classList.add('d-none');if(history)history.classList.add('d-none');">
+                                    <span class="fa fa-times"></span>
+                                </a>
+                            </span>
+                        </div>
+                        <!-- NEW: 2-column layout for large screens -->
+                        <div id="odoo_chatbot_split_body"
+                            style="display: flex; flex: 1 1 auto; min-height: 0; height: 70vh;">
+                            <!-- Left: User Questions List -->
+                            <div class="chatbot-user-questions d-none"
+                                style="width: 40%; min-width: 180px; max-width: 350px; background: #f1f3f6; border-right: 1px solid #e0e0e0; overflow-y: auto; padding: 18px 10px; display: flex; flex-direction: column;">
+                                <div
+                                    style="font-weight: 600; color: #3e4955; margin-bottom: 12px; font-size: 1.1em;">Your
+                                    Questions</div>
+                                <field name="user_questions" nolabel="1"
+                                    context="{'form_view_ref': 'DashBoat.chatbot_history_insight_form'}"
+                                    mode="list,form">
+                                    <list string="User Questions" create="false" edit="false"
+                                        delete="false" colors="is_user==True:blue">
+                                        <field name="message" string="Question" />
+                                    </list>
+                                </field>
+                            </div>
+                            <!-- Right: Chat Area -->
+                            <div class="chatbot-chat-area"
+                                style="width: 60%; min-width: 260px; background: #f8f9fa; display: flex; flex-direction: column; flex: 1 1 auto;">
+                                <div
+                                    style="flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 24px;">
+                                    <field name="chat_html" widget="html" nolabel="1" />
+                                </div>
+                                <!-- <div style="padding: 16px 24px; background: #fff; border-top:
+                                1px solid #dee2e6; display: flex; align-items: center;">
+                                    <field name="new_message" placeholder="Typing..." style="flex: 1 1 auto; margin-right: 10px;"/>
+                                    <button name="send_message" string="Send" type="object" class="btn btn-primary" style="min-width:
+                                80px;"/>
+                                </div> -->
+
+
+                                <!-- new -->
+                                <div
+                                    style="padding: 16px 24px; background: #fff; border-top: 1px solid #dee2e6; display: flex; align-items: center;">
+                                    <field name="new_message" class="new-message-input"
+                                        placeholder="Typing..."
+                                        style="flex: 1 1 auto; margin-right: 10px;" />
+                                    <button name="send_message" string="Send" type="object"
+                                        class="btn btn-primary" style="min-width: 80px;" />
+                                </div>
+                                <!-- end -->
+                            </div>
+                        </div>
+
+                        <!-- Responsive fallback for small screens -->
+                        <style>
+                            @media (max-width: 1199px) {
+                            #odoo_chatbot_split_body { flex-direction: column !important; }
+                            .chatbot-user-questions { width: 100% !important; max-width: none
+                            !important; min-width: 0 !important; border-right: none !important;
+                            border-bottom: 1px solid #e0e0e0 !important; }
+                            .chatbot-chat-area { width: 100% !important; min-width: 0 !important; }
+                            }
+                            @media (min-width: 1200px) {
+                            #odoo_chatbot_split_body { flex-direction: row !important; }
+                            .chatbot-user-questions.d-none { display: none !important; }
+                            .chatbot-user-questions:not(.d-none) { display: flex !important; }
+                            .chatbot-chat-area { display: flex !important; }
+                            }
+                        </style>
+                        <style>
+                            .chat-bubble {
+                            max-width: 80%;
+                            padding: 12px 18px;
+                            border-radius: 18px;
+                            margin-bottom: 4px;
+                            word-break: break-word;
+                            font-size: 1.05em;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+                            }
+
+                            .chat-bubble-user {
+                            background: #007bff !important;
+                            color: #fff !important;
+                            border-radius: 18px !important;
+                            overflow: hidden !important;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+                            position: relative !important;
+                            display: inline-block !important;
+                            max-width: 80%;
+                            min-width: 40px;
+                            margin-left: auto !important;
+                            margin-right: 0 !important;
+                            padding: 12px 18px;
+                            word-break: break-word;
+                            float: right !important;
+                            clear: both !important;
+                            }
+
+                            .chat-bubble-user:before,
+                            .chat-bubble-user:after {
+                            display: none !important;
+                            content: none !important;
+                            }
+
+                            .chat-bubble-bot {
+                            background: #e9ecef;
+                            color: #343a40;
+                            border-bottom-left-radius: 4px;
+                            border-top-right-radius: 18px;
+                            border-top-left-radius: 18px;
+                            border-bottom-right-radius: 18px;
+                            margin-right: 20%;
+                            margin-top: 16px;
+                            float: none !important;
+                            clear: both !important;
+                            display: block !important;
+                            }
+
+                            /* ✅ Add this to hide empty user bubbles */
+                            .chat-bubble-user:empty {
+                            display: none !important;
+                            }
+
+                            /* Enhanced Resize functionality */
+                            .resize-handle {
+                            transition: background 0.2s ease;
+                            }
+
+                            .resize-handle:hover {
+                            background: rgba(0, 123, 255, 0.15) !important;
+                            }
+
+                            .resize-handle:active {
+                            background: rgba(0, 123, 255, 0.3) !important;
+                            }
+
+                            /* Corner handles with visual indicators */
+                            .resize-tl:hover, .resize-tr:hover, .resize-bl:hover, .resize-br:hover {
+                            background: rgba(0, 123, 255, 0.2) !important;
+                            border-radius: 50% !important;
+                            }
+
+                            /* Edge handles with visual indicators */
+                            .resize-top:hover, .resize-bottom:hover {
+                            background: linear-gradient(to right, transparent, rgba(0, 123, 255,
+                            0.15), transparent) !important;
+                            }
+
+                            .resize-left:hover, .resize-right:hover {
+                            background: linear-gradient(to bottom, transparent, rgba(0, 123, 255,
+                            0.15), transparent) !important;
+                            }
+
+                            /* Resize feedback */
+                            .resizing {
+                            user-select: none !important;
+                            -webkit-user-select: none !important;
+                            -moz-user-select: none !important;
+                            -ms-user-select: none !important;
+                            }
+                        </style>
+
+                        <script type="text/javascript">
+                        <![CDATA[
+                            // Simple Resize functionality
+                            document.addEventListener('DOMContentLoaded', function() {
+                                var panel = document.getElementById('odoo_chatbot_panel');
+                                var handles = panel.querySelectorAll('.resize-handle');
+                               
+                                var isResizing = false;
+                                var currentHandle = null;
+                                var startX, startY, startWidth, startHeight, startLeft, startTop;
+                               
+                                function addResizeFeedback() {
+                                    panel.classList.add('resizing');
+                                    document.body.style.cursor = currentHandle.style.cursor;
+                                }
+                               
+                                function removeResizeFeedback() {
+                                    panel.classList.remove('resizing');
+                                    document.body.style.cursor = '';
+                                }
+                               
+                                for (var i = 0; i < handles.length; i++) {
+                                    var handle = handles[i];
+                                    handle.addEventListener('mousedown', function(e) {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        isResizing = true;
+                                        currentHandle = this;
+                                       
+                                        var rect = panel.getBoundingClientRect();
+                                        startX = e.clientX;
+                                        startY = e.clientY;
+                                        startWidth = rect.width;
+                                        startHeight = rect.height;
+                                        startLeft = rect.left;
+                                        startTop = rect.top;
+                                       
+                                        addResizeFeedback();
+                                        document.addEventListener('mousemove', handleMouseMove);
+                                        document.addEventListener('mouseup', handleMouseUp);
+                                    });
+                                }
+                               
+                                function handleMouseMove(e) {
+                                    if (!isResizing) return;
+                                   
+                                    var deltaX = e.clientX - startX;
+                                    var deltaY = e.clientY - startY;
+                                   
+                                    var handleClass = currentHandle.className;
+                                    var minWidth = 300;
+                                    var minHeight = 200;
+                                    var maxWidth = window.innerWidth * 0.9;
+                                    var maxHeight = window.innerHeight * 0.8;
+                                   
+                                    var history = document.querySelector('.chatbot-user-questions');
+                                    if (history) {
+                                        if (panel.style.width === '100vw' &amp;&amp; panel.style.height === '100vh') {
+                                            history.classList.remove('d-none');
+                                        } else {
+                                            history.classList.add('d-none');
+                                        }
+                                    }
+                                   
+                                    if (handleClass.indexOf('resize-left') !== -1) {
+                                        var newWidth = startWidth - deltaX;
+                                        if (newWidth >= minWidth &amp;&amp; newWidth <= maxWidth) {
+                                            panel.style.width = newWidth + 'px';
+                                            panel.style.left = (startLeft + deltaX) + 'px';
+                                        }
+                                    } else if (handleClass.indexOf('resize-right') !== -1) {
+                                        var newWidth = startWidth + deltaX;
+                                        if (newWidth >= minWidth &amp;&amp; newWidth <= maxWidth) {
+                                            panel.style.width = newWidth + 'px';
+                                        }
+                                    } else if (handleClass.indexOf('resize-top') !== -1) {
+                                        var newHeight = startHeight - deltaY;
+                                        if (newHeight >= minHeight &amp;&amp; newHeight <= maxHeight) {
+                                            panel.style.height = newHeight + 'px';
+                                            panel.style.top = (startTop + deltaY) + 'px';
+                                        }
+                                    } else if (handleClass.indexOf('resize-bottom') !== -1) {
+                                        var newHeight = startHeight + deltaY;
+                                        if (newHeight >= minHeight &amp;&amp; newHeight <= maxHeight) {
+                                            panel.style.height = newHeight + 'px';
+                                        }
+                                    } else if (handleClass.indexOf('resize-tl') !== -1) {
+                                        var newWidth = startWidth - deltaX;
+                                        var newHeight = startHeight - deltaY;
+                                        if (newWidth >= minWidth &amp;&amp; newWidth <= maxWidth &amp;&amp; newHeight >= minHeight &amp;&amp; newHeight <= maxHeight) {
+                                            panel.style.width = newWidth + 'px';
+                                            panel.style.height = newHeight + 'px';
+                                            panel.style.left = (startLeft + deltaX) + 'px';
+                                            panel.style.top = (startTop + deltaY) + 'px';
+                                        }
+                                    } else if (handleClass.indexOf('resize-tr') !== -1) {
+                                        var newWidth = startWidth + deltaX;
+                                        var newHeight = startHeight - deltaY;
+                                        if (newWidth >= minWidth &amp;&amp; newWidth <= maxWidth &amp;&amp; newHeight >= minHeight &amp;&amp; newHeight <= maxHeight) {
+                                            panel.style.width = newWidth + 'px';
+                                            panel.style.height = newHeight + 'px';
+                                            panel.style.top = (startTop + deltaY) + 'px';
+                                        }
+                                    } else if (handleClass.indexOf('resize-bl') !== -1) {
+                                        var newWidth = startWidth - deltaX;
+                                        var newHeight = startHeight + deltaY;
+                                        if (newWidth >= minWidth &amp;&amp; newWidth <= maxWidth &amp;&amp; newHeight >= minHeight &amp;&amp; newHeight <= maxHeight) {
+                                            panel.style.width = newWidth + 'px';
+                                            panel.style.height = newHeight + 'px';
+                                            panel.style.left = (startLeft + deltaX) + 'px';
+                                        }
+                                    } else if (handleClass.indexOf('resize-br') !== -1) {
+                                        var newWidth = startWidth + deltaX;
+                                        var newHeight = startHeight + deltaY;
+                                        if (newWidth >= minWidth &amp;&amp; newWidth <= maxWidth &amp;&amp; newHeight >= minHeight &amp;&amp; newHeight <= maxHeight) {
+                                            panel.style.width = newWidth + 'px';
+                                            panel.style.height = newHeight + 'px';
+                                        }
+                                    }
+                                }
+                               
+                                function handleMouseUp() {
+                                    isResizing = false;
+                                    currentHandle = null;
+                                    removeResizeFeedback();
+                                    document.removeEventListener('mousemove', handleMouseMove);
+                                    document.removeEventListener('mouseup', handleMouseUp);
+                                }
+                               
+                                panel.addEventListener('selectstart', function(e) {
+                                    if (isResizing) {
+                                        e.preventDefault();
+                                    }
+                                });
+                            });
+                        ]]>
+                        </script>
+                    </div>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Chatbot History Insight Form View -->
+    <record id="chatbot_history_insight_form" model="ir.ui.view">
+        <field name="name">chatbot.history.insight.form</field>
+        <field name="model">chatbot.history</field>
+        <field name="arch" type="xml">
+            <form string="Chatbot Insights" create="false" edit="false" delete="false">
+                <group>
+                    <field name="message" readonly="1" string="User Question" />
+                </group>
+                <group>
+                    <field name="bot_insights" readonly="1" string="Insights" widget="html"
+                        class="chatbot-insights" />
+                </group>
+                <style>
+                    .chatbot-insights ul {
+                    list-style-type: disc;
+                    margin-left: 20px;
+                    padding: 0;
+                    color: #343a40;
+                    font-size: 1.05em;
+                    }
+                    .chatbot-insights li {
+                    margin-bottom: 10px;
+                    line-height: 1.4;
+                    }
+                    @media (max-width: 767px) {
+                    .chatbot-insights ul {
+                    margin-left: 15px;
+                    font-size: 0.95em;
+                    }
+                    }
+                </style>
+            </form>
+        </field>
+    </record>
+
+    <!-- Dashboard QWeb Template -->
+    <template id="predictive_engine_dashboard_page" name="Interactive Sales">
+        <t t-call="web.html_container">
+            <t t-call="web.layout">
+                <script t-att-src="'https://cdn.plot.ly/plotly-2.27.0.min.js'"
+                    type="text/javascript"></script>
+                <div
+                    style="padding: 20px; background-color: #f8f9fa; min-height: calc(100vh - 60px); font-family: 'Arial', sans-serif;">
+                    <div id="ai_defaults_sales" t-att-data-current_filter="current_filter or ''" t-att-data-selected_year="selected_year or ''" t-att-data-date_from="date_from or ''" t-att-data-date_to="date_to or ''"></div>
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h1
+                            style="font-size: 2.5em; color: #343a40; font-weight: 700; margin-bottom: 10px;">SALES
+                            DASHBOARD</h1>
+                        <div style="font-size: 1.2em; color: #6c757d; font-weight: 500;">
+                            <span t-esc="dashboard_data.get('date_range', '')" />
+                        </div>
+                    </div>
+                    <div
+                        style="background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 20px; margin-bottom: 30px;">
+                        <t t-if="error_message">
+                            <div class="alert alert-warning" role="alert"
+                                style="margin-bottom: 15px;">
+                                <span t-esc="error_message" />
+                            </div>
+                        </t>
+                        <form method="get" action="/predictive_engine/dashboard" class="row">
+                            <div class="col-md-3 mb-3">
+                                <label
+                                    style="display: block; margin-bottom: 8px; font-weight: 600; color: #495057;">Time
+                                    Period</label>
+                                <select name="date_filter" id="date_filter_select"
+                                    class="form-control"
+                                    style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                    <option value="today"
+                                        t-att-selected="'selected' if current_filter == 'today' else None">
+                                        Today</option>
+                                    <option value="yesterday"
+                                        t-att-selected="'selected' if current_filter == 'yesterday' else None">
+                                        Yesterday</option>
+                                    <option value="7days"
+                                        t-att-selected="'selected' if current_filter == '7days' else None">Last
+                                        7 Days</option>
+                                    <option value="30days"
+                                        t-att-selected="'selected' if current_filter == '30days' else None">Last
+                                        30 Days</option>
+                                    <option value="90days"
+                                        t-att-selected="'selected' if current_filter == '90days' else None">Last
+                                        90 Days</option>
+                                    <option value="6months"
+                                        t-att-selected="'selected' if current_filter == '6months' else None">Last
+                                        6 Months</option>
+                                    <option value="year"
+                                        t-att-selected="'selected' if current_filter == 'year' else None">Select
+                                        Year...</option>
+                                    <option value="custom"
+                                        t-att-selected="'selected' if current_filter == 'custom' else None">Custom
+                                        Range</option>
+                                </select>
+                            </div>
+
+                            <div id="year_filter_container" class="col-md-2 mb-3"
+                                t-att-style="'display: %s;' % ('block' if current_filter == 'year' else 'none')">
+                                <label
+                                    style="display: block; margin-bottom: 8px; font-weight: 600; color: #495057;">
+                                    Year</label>
+                                <select name="year_filter" class="form-control" size="4"
+                                    style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                    <option value="2025"
+                                        t-att-selected="'selected' if selected_year == '2025' else None">
+                                        2025</option>
+                                    <option value="2024"
+                                        t-att-selected="'selected' if selected_year == '2024' else None">
+                                        2024</option>
+                                    <option value="2023"
+                                        t-att-selected="'selected' if selected_year == '2023' else None">
+                                        2023</option>
+                                    <option value="2022"
+                                        t-att-selected="'selected' if selected_year == '2022' else None">
+                                        2022</option>
+                                </select>
+                            </div>
+
+                            <div id="custom_date_container" class="col-md-6"
+                                style="padding-right: 0px; padding-left: 0px;"
+                                t-att-style="'display: %s;' % ('flex' if current_filter == 'custom' else 'none')">
+                                <div class="row w-100" style="margin-left: 0px;">
+                                    <div class="col-md-6 mb-3">
+                                        <label
+                                            style="display: block; margin-bottom: 8px; font-weight: 600; color: #495057;">From
+                                            Date</label>
+                                        <input type="date" name="date_from" class="form-control"
+                                            style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #dee2e6;"
+                                            t-att-value="date_from" t-att-max="today" />
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label
+                                            style="display: block; margin-bottom: 8px; font-weight: 600; color: #495057;">To
+                                            Date</label>
+                                        <input type="date" name="date_to" class="form-control"
+                                            style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #dee2e6;"
+                                            t-att-value="date_to" t-att-min="date_from"
+                                            t-att-max="today" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-1 mb-3" style="align-self: flex-end;">
+                                <button type="submit" class="btn btn-primary"
+                                    style="width: 100%; padding: 10px; background-color: #007bff; border: none; border-radius: 6px; font-weight: 600;">
+                                    Apply
+                                </button>
+                            </div>
+                            <div class="col-md-2 mb-3" style="align-self: flex-end;">
+                                <button id="download_sales_report_btn" 
+                                        type="button"
+                                        class="btn btn-outline-secondary"
+                                        style="width: 100%; padding: 10px; border-radius: 6px; font-weight: 600; position: relative;"
+                                        onclick="downloadReport('sales'); return false;">
+                                    <span id="download_sales_text">Download Report</span>
+                                    <span id="download_sales_loader" style="display: none;">
+                                        <i class="fa fa-spinner fa-spin" style="margin-right: 8px;"></i>
+                                        Generating...
+                                    </span>
+                                </button>
+                                <div id="download_sales_message" style="display: none; color: #dc3545; font-size: 12px; margin-top: 5px; text-align: center; font-weight: 500;">
+                                    Report will download in a few seconds.
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- Report Progress Modal (Sales/Shared) -->
+                    <div id="report_progress_modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:6000;">
+                        <div style="position:absolute; left:50%; top:40%; transform:translate(-50%,-50%); background:#fff; width:420px; max-width:90vw; border-radius:8px; box-shadow:0 8px 30px rgba(0,0,0,0.2); overflow:hidden;">
+                            <div style="padding:12px 16px; border-bottom:1px solid #eee; font-weight:700; color:#343a40;">Generating PDF...</div>
+                            <div style="padding:16px;">
+                                <div style="height: 10px; background:#f1f3f5; border-radius:6px; overflow:hidden;">
+                                    <div id="report_progress_bar" style="width:1%; height:100%; background:#007bff; transition: width 0.2s ease;"></div>
+                                </div>
+                                <div id="report_progress_label" style="margin-top:8px; text-align:right; color:#6c757d; font-weight:600;">1%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Indeterminate Spinner (Fallback/Alternative Loader) -->
+                    <div id="report_spinner_modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.35); z-index:6001; align-items:center; justify-content:center;">
+                        <div style="background:#fff; padding:14px 18px; border-radius:8px; display:flex; align-items:center; gap:12px; box-shadow:0 8px 30px rgba(0,0,0,0.2);">
+                            <div style="width:18px; height:18px; border:3px solid #e9ecef; border-top-color:#007bff; border-radius:50%; animation: rep_spin 0.9s linear infinite;"></div>
+                            <div style="font-weight:600; color:#495057;">Preparing report...</div>
+                        </div>
+                    </div>
+                    <style>
+                        @keyframes rep_spin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+                        
+                        /* Download button styles */
+                        #download_sales_report_btn:disabled,
+                        #download_crm_report_btn:disabled {
+                            opacity: 0.7;
+                            cursor: not-allowed;
+                            background-color: #f8f9fa;
+                            border-color: #dee2e6;
+                        }
+                        
+                        #download_sales_loader,
+                        #download_crm_loader {
+                            display: none;
+                            align-items: center;
+                            justify-content: center;
+                        }
+                        
+                        .fa-spinner {
+                            animation: fa-spin 1s infinite linear;
+                        }
+                        
+                        @keyframes fa-spin {
+                            0% { transform: rotate(0deg); }
+                            100% { transform: rotate(360deg); }
+                        }
+                    </style>
+                    <script type="text/javascript">
+                        // Global download function - outside CDATA
+                        function downloadReport(dashboard) {
+                            console.log('downloadReport function called for:', dashboard);
+                            
+                            var buttonId = 'download_' + dashboard + '_report_btn';
+                            var textId = 'download_' + dashboard + '_text';
+                            var loaderId = 'download_' + dashboard + '_loader';
+                            var messageId = 'download_' + dashboard + '_message';
+                            
+                            var button = document.getElementById(buttonId);
+                            var textSpan = document.getElementById(textId);
+                            var loaderSpan = document.getElementById(loaderId);
+                            var messageDiv = document.getElementById(messageId);
+                            
+                            if (button &amp;&amp; textSpan &amp;&amp; loaderSpan) {
+                                // Show loader
+                                button.disabled = true;
+                                textSpan.style.display = 'none';
+                                loaderSpan.style.display = 'inline';
+                            }
+                            
+                            // Show red message
+                            if (messageDiv) {
+                                messageDiv.style.display = 'block';
+                            }
+                            
+                            // Get URL parameters
+                            var urlParams = new URLSearchParams(window.location.search);
+                            var url = '/predictive_engine/dashboard_report?dashboard=' + dashboard;
+                            
+                            if (urlParams.get('date_filter')) url += '&amp;date_filter=' + urlParams.get('date_filter');
+                            if (urlParams.get('year_filter')) url += '&amp;year_filter=' + urlParams.get('year_filter');
+                            if (urlParams.get('date_from')) url += '&amp;date_from=' + urlParams.get('date_from');
+                            if (urlParams.get('date_to')) url += '&amp;date_to=' + urlParams.get('date_to');
+                            
+                            // Use XMLHttpRequest to track actual download completion
+                            var xhr = new XMLHttpRequest();
+                            xhr.open('GET', url, true);
+                            xhr.responseType = 'blob';
+                            
+                            xhr.onprogress = function(e) {
+                                // Show progress if available
+                                if (e.lengthComputable) {
+                                    var percentComplete = (e.loaded / e.total) * 100;
+                                    console.log('Download progress: ' + percentComplete + '%');
+                                }
+                            };
+                            
+                            xhr.onload = function() {
+                                if (xhr.status === 200) {
+                                    // Download successful
+                                    var blob = xhr.response;
+                                    var cd = xhr.getResponseHeader('Content-Disposition');
+                                    var filename = (dashboard === 'crm' ? 'CRM' : 'Sales') + '_dashboard_report.pdf';
+                                    
+                                    // Extract filename from Content-Disposition header if available
+                                    if (cd) {
+                                        var matches = /filename="(.+)"/.exec(cd);
+                                        if (matches) filename = matches[1];
+                                    }
+                                    
+                                    // Create download link
+                                    var link = document.createElement('a');
+                                    var urlObj = window.URL.createObjectURL(blob);
+                                    link.href = urlObj;
+                                    link.download = filename;
+                                    link.style.display = 'none';
+                                    document.body.appendChild(link);
+                                    
+                                    // Hide message immediately when download starts
+                                    if (messageDiv) {
+                                        messageDiv.style.display = 'none';
+                                    }
+                                    
+                                    // Trigger download
+                                    link.click();
+                                    
+                                    // Clean up and hide loader after download is triggered
+                                    setTimeout(function() {
+                                        try {
+                                            window.URL.revokeObjectURL(urlObj);
+                                            document.body.removeChild(link);
+                                        } catch(e) {
+                                            console.log('Error cleaning up:', e);
+                                        }
+                                        
+                                        // Hide loader
+                                        if (button &amp;&amp; textSpan &amp;&amp; loaderSpan) {
+                                            button.disabled = false;
+                                            textSpan.style.display = 'inline';
+                                            loaderSpan.style.display = 'none';
+                                        }
+                                    }, 1000);
+                                } else {
+                                    // Error occurred
+                                    console.error('Download failed:', xhr.status, xhr.statusText);
+                                    alert('Failed to generate report: ' + (xhr.statusText || ('HTTP ' + xhr.status)));
+                                    
+                                    // Hide loader and message on error
+                                    if (button &amp;&amp; textSpan &amp;&amp; loaderSpan) {
+                                        button.disabled = false;
+                                        textSpan.style.display = 'inline';
+                                        loaderSpan.style.display = 'none';
+                                    }
+                                    if (messageDiv) {
+                                        messageDiv.style.display = 'none';
+                                    }
+                                }
+                            };
+                            
+                            xhr.onerror = function() {
+                                console.error('Network error while downloading report');
+                                alert('Network error while downloading report');
+                                
+                                // Hide loader and message on error
+                                if (button &amp;&amp; textSpan &amp;&amp; loaderSpan) {
+                                    button.disabled = false;
+                                    textSpan.style.display = 'inline';
+                                    loaderSpan.style.display = 'none';
+                                }
+                                if (messageDiv) {
+                                    messageDiv.style.display = 'none';
+                                }
+                            };
+                            
+                            // Start the download
+                            xhr.send();
+                        }
+                        
+                        // Make function globally accessible
+                        window.downloadReport = downloadReport;
+                        
+                        // Test function availability
+                        console.log('downloadReport function available:', typeof downloadReport);
+                        console.log('window.downloadReport available:', typeof window.downloadReport);
+                    </script>
+                    <script type="text/javascript">
+                    <![CDATA[
+                        
+                        // Report downloader with progress (Sales/Shared)
+                        (function(){
+                            // Simple global spin controller
+                            window.ReportSpin = window.ReportSpin || {
+                                show: function(){ try{ var m=document.getElementById('report_spinner_modal'); if(m) m.style.display='flex'; }catch(e){} },
+                                hide: function(){ try{ var m=document.getElementById('report_spinner_modal'); if(m) m.style.display='none'; }catch(e){} }
+                            };
+                            function buildReportUrl(dashboard, filters){
+                                return '/predictive_engine/dashboard_report?dashboard=' + encodeURIComponent(dashboard)
+                                    + '&date_filter=' + encodeURIComponent(filters.date_filter || '')
+                                    + '&year_filter=' + encodeURIComponent(filters.year_filter || '')
+                                    + '&date_from=' + encodeURIComponent(filters.date_from || '')
+                                    + '&date_to=' + encodeURIComponent(filters.date_to || '');
+                            }
+                            function getFilters(defaultNodeId){
+                                var params = new URLSearchParams(window.location.search);
+                                var defNode = document.getElementById(defaultNodeId);
+                                return {
+                                    date_filter: params.get('date_filter') || (defNode ? defNode.getAttribute('data-current_filter') : '') || '6months',
+                                    year_filter: params.get('year_filter') || (defNode ? defNode.getAttribute('data-selected_year') : '') || '',
+                                    date_from: params.get('date_from') || (defNode ? defNode.getAttribute('data-date_from') : '') || '',
+                                    date_to: params.get('date_to') || (defNode ? defNode.getAttribute('data-date_to') : '') || ''
+                                };
+                            }
+                            function filenameFromDisposition(hdr, fallback){
+                                try{
+                                    if(!hdr) return fallback;
+                                    var m = /filename\*=UTF-8''([^;]+)|filename=\"?([^\";]+)\"?/i.exec(hdr);
+                                    var fn = (m &amp;&amp; (m[1] || m[2])) || fallback;
+                                    return decodeURIComponent(fn);
+                                }catch(e){ return fallback; }
+                            }
+                            function showModal(){ var m=document.getElementById('report_progress_modal'); if(m){ m.style.display='block'; setProgress(1);} }
+                            function hideModal(){ var m=document.getElementById('report_progress_modal'); if(m){ m.style.display='none'; } }
+                            function setProgress(p){
+                                try{
+                                    var bar=document.getElementById('report_progress_bar');
+                                    var lbl=document.getElementById('report_progress_label');
+                                    p = Math.max(1, Math.min(100, Math.floor(p)));
+                                    if(bar) bar.style.width = p + '%';
+                                    if(lbl) lbl.textContent = p + '%';
+                                }catch(e){}
+                            }
+                            window.DashReport = {
+                                download: function(dashboard){
+                                    try{
+                                        var filters = getFilters(dashboard === 'crm' ? 'ai_defaults_crm' : 'ai_defaults_sales');
+                                        var url = buildReportUrl(dashboard, filters);
+                                        
+                                        // Get button elements to reset loader after download
+                                        var buttonId = 'download_' + dashboard + '_report_btn';
+                                        var textId = 'download_' + dashboard + '_text';
+                                        var loaderId = 'download_' + dashboard + '_loader';
+                                        var messageId = 'download_' + dashboard + '_message';
+                                        var btn = document.getElementById(buttonId);
+                                        var txt = document.getElementById(textId);
+                                        var lod = document.getElementById(loaderId);
+                                        var msg = document.getElementById(messageId);
+                                        
+                                        // Show red message
+                                        if (msg) {
+                                            msg.style.display = 'block';
+                                        }
+                                        
+                                        // Show both: indeterminate spinner immediately + progress modal when data flows
+                                        try{ if (window.ReportSpin &amp;&amp; ReportSpin.show) ReportSpin.show(); }catch(e){}
+                                        showModal();
+                                        var xhr = new XMLHttpRequest();
+                                        xhr.open('GET', url, true);
+                                        xhr.responseType = 'blob';
+                                        var last = 1, anim;
+                                        xhr.onprogress = function(e){
+                                            if (e.lengthComputable) {
+                                                var pct = (e.loaded / e.total) * 100;
+                                                last = pct; setProgress(pct);
+                                            } else {
+                                                // Indeterminate: animate slowly up to 90%
+                                                if (!anim) {
+                                                    anim = setInterval(function(){ last = Math.min(90, last + 2); setProgress(last); }, 200);
+                                                }
+                                            }
+                                        };
+                                        xhr.onload = function(){
+                                            try{ if (anim) clearInterval(anim); }catch(e){}
+                                            if (xhr.status === 200) {
+                                                setProgress(100);
+                                                var blob = xhr.response;
+                                                var cd = xhr.getResponseHeader('Content-Disposition');
+                                                var fn = filenameFromDisposition(cd, (dashboard==='crm'?'CRM':'Sales') + '_dashboard_report.pdf');
+                                                    var link = document.createElement('a');
+                                                    var urlObj = window.URL.createObjectURL(blob);
+                                                    link.href = urlObj; link.download = fn;
+                                                    document.body.appendChild(link);
+                                                    
+                                                    // Hide message immediately when download starts
+                                                    if (msg) {
+                                                        msg.style.display = 'none';
+                                                    }
+                                                    
+                                                    link.click();
+                                                    setTimeout(function(){ 
+                                                        try{ 
+                                                            window.URL.revokeObjectURL(urlObj); 
+                                                            document.body.removeChild(link);
+                                                        }catch(e){} 
+                                                        hideModal(); 
+                                                        try{ if (window.ReportSpin &amp;&amp; ReportSpin.hide) ReportSpin.hide(); }catch(e){} 
+                                                        
+                                                        // Reset button loader state
+                                                        if (btn &amp;&amp; txt &amp;&amp; lod) {
+                                                            btn.disabled = false;
+                                                            txt.style.display = 'inline';
+                                                            lod.style.display = 'none';
+                                                        }
+                                                    }, 1000);
+                                            } else {
+                                                setProgress(100);
+                                                setTimeout(function(){ 
+                                                    try{ hideModal(); }catch(e){} 
+                                                    try{ if (window.ReportSpin &amp;&amp; ReportSpin.hide) ReportSpin.hide(); }catch(e){} 
+                                                    
+                                                    // Reset button loader state on error and hide message
+                                                    if (btn &amp;&amp; txt &amp;&amp; lod) {
+                                                        btn.disabled = false;
+                                                        txt.style.display = 'inline';
+                                                        lod.style.display = 'none';
+                                                    }
+                                                    if (msg) {
+                                                        msg.style.display = 'none';
+                                                    }
+                                                }, 600);
+                                                try{ alert('Failed to generate report: ' + (xhr.statusText || ('HTTP ' + xhr.status))); }catch(e){}
+                                            }
+                                        };
+                                        xhr.onerror = function(){
+                                            try{ if (anim) clearInterval(anim); }catch(e){}
+                                            setProgress(100);
+                                            setTimeout(function(){ 
+                                                try{ hideModal(); }catch(e){} 
+                                                try{ if (window.ReportSpin &amp;&amp; ReportSpin.hide) ReportSpin.hide(); }catch(e){} 
+                                                
+                                                // Reset button loader state on error and hide message
+                                                if (btn &amp;&amp; txt &amp;&amp; lod) {
+                                                    btn.disabled = false;
+                                                    txt.style.display = 'inline';
+                                                    lod.style.display = 'none';
+                                                }
+                                                if (msg) {
+                                                    msg.style.display = 'none';
+                                                }
+                                            }, 600);
+                                            try{ alert('Network error while downloading report'); }catch(e){}
+                                        };
+                                        xhr.send();
+                                    }catch(err){ 
+                                        try{ alert('Error: ' + err.message); }catch(e){} 
+                                        
+                                        // Reset button loader on exception and hide message
+                                        var buttonId = 'download_' + dashboard + '_report_btn';
+                                        var textId = 'download_' + dashboard + '_text';
+                                        var loaderId = 'download_' + dashboard + '_loader';
+                                        var messageId = 'download_' + dashboard + '_message';
+                                        var btn = document.getElementById(buttonId);
+                                        var txt = document.getElementById(textId);
+                                        var lod = document.getElementById(loaderId);
+                                        var msg = document.getElementById(messageId);
+                                        if (btn &amp;&amp; txt &amp;&amp; lod) {
+                                            btn.disabled = false;
+                                            txt.style.display = 'inline';
+                                            lod.style.display = 'none';
+                                        }
+                                        if (msg) {
+                                            msg.style.display = 'none';
+                                        }
+                                    }
+                                }
+                            };
+                            // Minimal inline downloader as a backup if DashReport isn't available when clicking
+                            window.__salesInlineDownload = function(){
+                                try{
+                                    if (window.DashReport &amp;&amp; typeof window.DashReport.download==='function'){
+                                        return window.DashReport.download('sales');
+                                    }
+                                    // Show message when download starts
+                                    var msg = document.getElementById('download_sales_message');
+                                    if (msg) {
+                                        msg.style.display = 'block';
+                                    }
+                                    var filters = getFilters('ai_defaults_sales');
+                                    var url = buildReportUrl('sales', filters);
+                                    try{ if (window.ReportSpin &amp;&amp; ReportSpin.show) ReportSpin.show(); }catch(e){}
+                                    showModal();
+                                    var xhr = new XMLHttpRequest();
+                                    xhr.open('GET', url, true);
+                                    xhr.responseType = 'blob';
+                                    var last = 1, anim;
+                                    xhr.onprogress = function(e){
+                                        if (e.lengthComputable) { var pct = (e.loaded / e.total) * 100; last = pct; setProgress(pct); }
+                                        else { if (!anim) { anim = setInterval(function(){ last = Math.min(90, last + 2); setProgress(last); }, 200); } }
+                                    };
+                                    xhr.onload = function(){
+                                        try{ if (anim) clearInterval(anim); }catch(e){}
+                                        if (xhr.status === 200) {
+                                            setProgress(100);
+                                            var blob = xhr.response;
+                                            var cd = xhr.getResponseHeader('Content-Disposition');
+                                            var fn = filenameFromDisposition(cd, 'Sales_dashboard_report.pdf');
+                                            var link = document.createElement('a');
+                                            var urlObj = window.URL.createObjectURL(blob);
+                                            link.href = urlObj; link.download = fn; 
+                                            document.body.appendChild(link);
+                                            
+                                            // Hide message immediately when download starts
+                                            var msg = document.getElementById('download_sales_message');
+                                            if (msg) {
+                                                msg.style.display = 'none';
+                                            }
+                                            
+                                            link.click();
+                                            setTimeout(function(){ try{ window.URL.revokeObjectURL(urlObj); document.body.removeChild(link);}catch(e){} hideModal(); try{ if (window.ReportSpin &amp;&amp; ReportSpin.hide) ReportSpin.hide(); }catch(e){} }, 600);
+                                        } else { 
+                                            setProgress(100); 
+                                            // Hide message on error
+                                            var msg = document.getElementById('download_sales_message');
+                                            if (msg) {
+                                                msg.style.display = 'none';
+                                            }
+                                            setTimeout(function(){ try{ hideModal(); }catch(e){} try{ if (window.ReportSpin &amp;&amp; ReportSpin.hide) ReportSpin.hide(); }catch(e){} }, 600); 
+                                            try{ alert('Failed to generate report'); }catch(e){} 
+                                        }
+                                    };
+                                    xhr.onerror = function(){ 
+                                        try{ if (anim) clearInterval(anim); }catch(e){} 
+                                        setProgress(100); 
+                                        // Hide message on error
+                                        var msg = document.getElementById('download_sales_message');
+                                        if (msg) {
+                                            msg.style.display = 'none';
+                                        }
+                                        setTimeout(function(){ try{ hideModal(); }catch(e){} try{ if (window.ReportSpin &amp;&amp; ReportSpin.hide) ReportSpin.hide(); }catch(e){} }, 600); 
+                                    };
+                                    xhr.send();
+                                }catch(e){ try{ var a=document.getElementById('download_sales_report_btn'); if(a &amp;&amp; a.href) window.open(a.href,'_blank'); }catch(_){} }
+                            };
+                            // Bind Sales button with fallback navigation
+                            try {
+                                document.addEventListener('DOMContentLoaded', function(){
+                                    var btn = document.getElementById('download_sales_report_btn');
+                                    if (!btn) return;
+                                    btn.addEventListener('click', function(){
+                                        try{ window.__salesInlineDownload(); }catch(e){ try { var base = btn.getAttribute('data-fallback-url') || '/predictive_engine/dashboard_report?dashboard=sales'; window.open(base,'_blank'); } catch(_) {} }
+                                    });
+                                });
+                            } catch(e) {}
+                        })();
+                        document.addEventListener('DOMContentLoaded', function() {
+                            var dateSelect = document.getElementById('crm_date_filter_select');
+                            var yearBox = document.getElementById('crm_year_filter_container');
+                            var customBox = document.getElementById('crm_custom_date_container');
+                            function updateCRMFilters() {
+                                if (!dateSelect) return;
+                                if (dateSelect.value === 'year') {
+                                    if (yearBox) yearBox.style.display = 'block';
+                                    if (customBox) customBox.style.display = 'none';
+                                    // Auto-open year dropdown
+                                    try {
+                                        var yearSelect = yearBox &amp;&amp; yearBox.querySelector('select[name="year_filter"]');
+                                        // If the year select is not present (e.g., hidden by server-side condition), create it dynamically.
+                                        if (!yearSelect &amp;&amp; yearBox) {
+                                            yearSelect = document.createElement('select');
+                                            yearSelect.name = 'year_filter';
+                                            yearSelect.className = 'form-control';
+                                            yearSelect.size = 4;
+                                            yearSelect.style.cssText = 'width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #dee2e6;';
+                                            var years = ['2025','2024','2023','2022'];
+                                            years.forEach(function(y){
+                                                var opt = document.createElement('option');
+                                                opt.value = y; opt.textContent = y;
+                                                yearSelect.appendChild(opt);
+                                            });
+                                            yearBox.appendChild(yearSelect);
+                                        }
+                                        if (yearSelect) {
+                                            yearSelect.focus();
+                                            var evt = new MouseEvent('mousedown', { bubbles: true, cancelable: true, view: window });
+                                            yearSelect.dispatchEvent(evt);
+                                        }
+                                    } catch(e) { /* no-op */ }
+                                } else if (dateSelect.value === 'custom') {
+                                    if (yearBox) yearBox.style.display = 'none';
+                                    if (customBox) customBox.style.display = 'flex';
+                                } else {
+                                    if (yearBox) yearBox.style.display = 'none';
+                                    if (customBox) customBox.style.display = 'none';
+                                }
+                            }
+                            if (dateSelect) {
+                                dateSelect.addEventListener('change', updateCRMFilters);
+                                // initialize on load so selecting Year instantly shows 2022..2025
+                                updateCRMFilters();
+                            }
+                        });
+                    ]]>
+                    </script>
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                        <div
+                            style="background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 20px; text-align: center;">
+                            <div style="font-size: 1.1em; color: #6c757d; margin-bottom: 8px;">TOTAL
+                                SALES</div>
+                            <div style="font-size: 2.2em; color: #007bff; font-weight: 700;"
+                                t-esc="dashboard_data.get('total_sales', '₹0.00')"></div>
+                        </div>
+                        <div
+                            style="background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 20px; text-align: center;">
+                            <div style="font-size: 1.1em; color: #6c757d; margin-bottom: 8px;">AVG.
+                                DEAL SIZE</div>
+                            <div style="font-size: 2.2em; color: #17a2b8; font-weight: 700;"
+                                t-esc="dashboard_data.get('avg_deal_size', '₹0.00')"></div>
+                        </div>
+                    </div>
+                    <div
+                        style="background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 20px; margin-bottom: 25px;">
+                        <div
+                            style="font-size: 1.3em; color: #343a40; font-weight: 700; margin-bottom: 15px; text-align: center;">SALES
+                            PERFORMANCE</div>
+                        <div style="text-align:right; margin-bottom:8px;">
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="DashAI.open('sales_performance_chart')">
+                                <span class="fa fa-magic"></span> AI Analysis
+                            </button>
+                        </div>
+                        <t>
+                            <div data-chart-key="sales_performance_chart">
+                                <t t-raw="dashboard_data.get('sales_performance_chart', '&lt;div style=&quot;text-align:center;padding:40px;&quot;&gt;No data available&lt;/div&gt;')" />
+                            </div>
+                        </t>
+                    </div>
+
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 25px;">
+
+                        <div
+                            style="background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 20px;">
+                            <div
+                                style="font-size: 1.3em; color: #343a40; font-weight: 700; margin-bottom: 15px; text-align: center;">TOP
+                                PRODUCTS</div>
+                            <div style="text-align:right; margin-bottom:8px;">
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="DashAI.open('sales_by_product_chart')">
+                                    <span class="fa fa-magic"></span> AI Analysis
+                                </button>
+                            </div>
+                            <t>
+                                <div data-chart-key="sales_by_product_chart">
+                                    <t t-raw="dashboard_data.get('sales_by_product_chart', '&lt;div style=&quot;text-align:center;padding:40px;&quot;&gt;No data available&lt;/div&gt;')" />
+                                </div>
+                            </t>
+                        </div>
+
+                        <div
+                            style="background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 20px;">
+                            <div
+                                style="font-size: 1.3em; color: #343a40; font-weight: 700; margin-bottom: 15px; text-align: center;">SALES
+                                BY REGION</div>
+                            <div style="text-align:right; margin-bottom:8px;">
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="DashAI.open('sales_by_region_chart')">
+                                    <span class="fa fa-magic"></span> AI Analysis
+                                </button>
+                            </div>
+                            <t>
+                                <div data-chart-key="sales_by_region_chart">
+                                    <t t-raw="dashboard_data.get('sales_by_region_chart', '&lt;div style=&quot;text-align:center;padding:40px;&quot;&gt;No data available&lt;/div&gt;')" />
+                                </div>
+                            </t>
+                        </div>
+
+                        <div
+                            style="background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 20px;">
+                            <div
+                                style="font-size: 1.3em; color: #343a40; font-weight: 700; margin-bottom: 15px; text-align: center;">TOP
+                                CUSTOMERS</div>
+                            <div style="text-align:right; margin-bottom:8px;">
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="DashAI.open('top_customers_chart')">
+                                    <span class="fa fa-magic"></span> AI Analysis
+                                </button>
+                            </div>
+                            <t>
+                                <div data-chart-key="top_customers_chart">
+                                    <t t-raw="dashboard_data.get('top_customers_chart', '&lt;div style=&quot;text-align:center;padding:40px;&quot;&gt;No data available&lt;/div&gt;')" />
+                                </div>
+                            </t>
+                        </div>
+
+                        <div
+                            style="background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 20px;">
+                            <div
+                                style="font-size: 1.3em; color: #343a40; font-weight: 700; margin-bottom: 15px; text-align: center;">TOP
+                                SALESPEOPLE</div>
+                            <div style="text-align:right; margin-bottom:8px;">
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="DashAI.open('top_salespersons_chart')">
+                                    <span class="fa fa-magic"></span> AI Analysis
+                                </button>
+                            </div>
+                            <t>
+                                <div data-chart-key="top_salespersons_chart">
+                                    <t t-raw="dashboard_data.get('top_salespersons_chart', '&lt;div style=&quot;text-align:center;padding:40px;&quot;&gt;No data available&lt;/div&gt;')" />
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+                <style>
+                    .plotly-graph-div {
+                    width: 100% !important;
+                    height: 400px !important;
+                    }
+                    .js-plotly-plot .plotly .modebar {
+                    padding: 5px 10px !important;
+                    }
+                    .hovertext text {
+                    font-size: 12px !important;
+                    font-weight: bold !important;
+                    }
+                </style>
+                <script type="text/javascript">
+                    document.addEventListener('DOMContentLoaded', function() {
+                    var dateFilterSelect = document.getElementById('date_filter_select');
+                    var yearFilterContainer = document.getElementById('year_filter_container');
+                    var customDateContainer = document.getElementById('custom_date_container');
+                    dateFilterSelect.addEventListener('change', function() {
+                    if (this.value === 'year') {
+                    yearFilterContainer.style.display = 'block';
+                    customDateContainer.style.display = 'none';
+                    } else if (this.value === 'custom') {
+                    yearFilterContainer.style.display = 'none';
+                    customDateContainer.style.display = 'flex';
+                    // Auto-open date picker for From Date if supported
+                    try {
+                    var fromInput = customDateContainer.querySelector('input[name="date_from"]');
+                    if (fromInput) {
+                    fromInput.focus();
+                    if (typeof fromInput.showPicker === 'function') {
+                    fromInput.showPicker();
+                    }
+                    }
+                    } catch(e) { /* no-op */ }
+                    } else {
+                    yearFilterContainer.style.display = 'none';
+                    customDateContainer.style.display = 'none';
+                    }
+                    });
+                    });
+                </script>
+                <!-- AI Insight Modal and Helper (Sales) -->
+                <div id="ai_insight_modal" style="display:none; position:fixed; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:5000;">
+                    <div id="ai_insight_dialog" style="background:#fff; max-width:95vw; width:95vw; position:absolute; top:5%; left:50%; transform:translateX(-50%); border-radius:8px; box-shadow:0 8px 30px rgba(0,0,0,0.2); overflow:hidden; height:90vh;">
+                        <div id="ai_insight_header" style="padding:12px 16px; border-bottom:1px solid #eee; display:flex; align-items:center; justify-content:space-between; cursor:move; user-select:none; position:sticky; top:0; background:#fff; z-index:1;">
+                            <div style="font-weight:700; color:#343a40;">📊 AI Chart Analysis</div>
+                            <button type="button" class="btn btn-sm btn-light" onclick="(function(m){ m.style.display='none'; try{ document.body.style.overflow=''; document.body.removeAttribute('data-ai-scroll'); }catch(e){} })(document.getElementById('ai_insight_modal'))">Close</button>
+                        </div>
+                        <div id="ai_insight_body" style="padding:16px; max-height:82vh; overflow:auto; background:#fff;">
+                            Loading...
+                        </div>
+                        <div id="ai_insight_resize" style="position:absolute; right:0; bottom:0; width:16px; height:16px; cursor:se-resize; background:transparent;"></div>
+                    </div>
+                </div>
+                <script type="text/javascript">
+                (function(){
+                    window.DashAI = {
+                        open: function(chartKey){
+                            var modal = document.getElementById('ai_insight_modal');
+                            var body = document.getElementById('ai_insight_body');
+                            var dialog = document.getElementById('ai_insight_dialog');
+                            if (!modal || !body) return;
+                            modal.style.display = 'block';
+                            body.innerHTML = 'Loading...';
+                            try { body.style.overflowX = 'hidden'; } catch(e) {}
+                            try { body.style.overflowX = 'hidden'; } catch(e) {}
+                            try { document.body.setAttribute('data-ai-scroll','1'); document.body.style.overflow='hidden'; } catch(e) {}
+                            try { modal.addEventListener('click', function(ev){ if (ev.target === modal){ modal.style.display='none'; try{ document.body.style.overflow=''; document.body.removeAttribute('data-ai-scroll'); }catch(e){} } }); } catch(e) {}
+                            try {
+                                if (dialog){
+                                    dialog.style.width = dialog.getAttribute('data-width') || '95vw';
+                                    dialog.style.height = dialog.getAttribute('data-height') || '90vh';
+                                    if (!dialog.getAttribute('data-left')){
+                                        dialog.style.left = '50%';
+                                        dialog.style.top = '5%';
+                                        dialog.style.transform = 'translateX(-50%)';
+                                    } else {
+                                        dialog.style.left = dialog.getAttribute('data-left');
+                                        dialog.style.top = dialog.getAttribute('data-top');
+                                        dialog.style.transform = 'none';
+                                    }
+                                }
+                            } catch(e) {}
+                            var params = new URLSearchParams(window.location.search);
+                            var defNode = document.getElementById('ai_defaults_sales') || document.getElementById('ai_defaults_crm');
+                            var payload = {
+                                chart_key: chartKey,
+                                date_filter: params.get('date_filter') || (defNode ? defNode.getAttribute('data-current_filter') : '') || '6months',
+                                year_filter: params.get('year_filter') || (defNode ? defNode.getAttribute('data-selected_year') : '') || '',
+                                date_from: params.get('date_from') || (defNode ? defNode.getAttribute('data-date_from') : '') || '',
+                                date_to: params.get('date_to') || (defNode ? defNode.getAttribute('data-date_to') : '') || '',
+                            };
+                            fetch('/predictive_engine/chart_insight', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(payload)
+                            }).then(function(r){ return r.json(); }).then(function(resp){
+                                console.log('AI Response:', resp);
+                                // Get HTML from response (handle both response structures)
+                                var insightHtml = (resp &amp;&amp; resp.result &amp;&amp; resp.result.html) || (resp &amp;&amp; resp.html) || '';
+                                if (insightHtml){
+                                    // Display only insights, pros, and cons - no chart
+                                    body.innerHTML = '';
+                                    var container = document.createElement('div');
+                                    container.style.width = '100%';
+                                    container.style.height = '100%';
+                                    container.style.overflow = 'auto';
+                                    container.style.overflowX = 'hidden';
+                                    container.style.overflowY = 'auto';
+                                    container.style.padding = '16px';
+                                    container.style.paddingRight = '8px';
+                                    container.style.wordBreak = 'break-word';
+                                    container.style.whiteSpace = 'normal';
+                                    container.innerHTML = insightHtml;
+                                    body.appendChild(container);
+                                } else {
+                                    console.log('AI Error - resp:', resp);
+                                    body.innerHTML = '<div style="color:#c00;">' + (resp &amp;&amp; resp.result &amp;&amp; resp.result.error ? resp.result.error : 'Failed to generate insights') + '</div>';
+                                }
+                            }).catch(function(e){
+                                console.log('AI Network Error:', e);
+                                body.innerHTML = '<div style="color:#c00;">' + (e &amp;&amp; e.message ? e.message : 'Network error') + '</div>';
+                            });
+                        }
+                    };
+                    try {
+                        var dialog = document.getElementById('ai_insight_dialog');
+                        var header = document.getElementById('ai_insight_header');
+                        var resize = document.getElementById('ai_insight_resize');
+                        if (dialog &amp;&amp; header &amp;&amp; resize){
+                            var drag = {active:false, x:0, y:0, left:0, top:0};
+                            header.addEventListener('mousedown', function(e){
+                                e.preventDefault();
+                                try { if (e.target &amp;&amp; (e.target.tagName === 'BUTTON' || (e.target.closest &amp;&amp; e.target.closest('button')))) { return; } } catch(err) {}
+                                drag.active = true;
+                                drag.x = e.clientX; drag.y = e.clientY;
+                                var rect = dialog.getBoundingClientRect();
+                                drag.left = rect.left; drag.top = rect.top;
+                                dialog.style.transform = 'none';
+                                function move(ev){
+                                    if (!drag.active) return;
+                                    var nl = drag.left + (ev.clientX - drag.x);
+                                    var nt = drag.top + (ev.clientY - drag.y);
+                                    nl = Math.max(8, Math.min(window.innerWidth - dialog.offsetWidth - 8, nl));
+                                    nt = Math.max(8, Math.min(window.innerHeight - dialog.offsetHeight - 8, nt));
+                                    dialog.style.left = nl + 'px';
+                                    dialog.style.top = nt + 'px';
+                                    dialog.setAttribute('data-left', dialog.style.left);
+                                    dialog.setAttribute('data-top', dialog.style.top);
+                                }
+                                function up(){ drag.active = false; document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', up); }
+                                document.addEventListener('mousemove', move);
+                                document.addEventListener('mouseup', up);
+                            });
+                            var sizing = {active:false, w:0, h:0, x:0, y:0};
+                            resize.addEventListener('mousedown', function(e){
+                                e.preventDefault();
+                                sizing.active = true; sizing.x = e.clientX; sizing.y = e.clientY;
+                                var rect = dialog.getBoundingClientRect(); sizing.w = rect.width; sizing.h = rect.height;
+                                function grow(ev){
+                                    if (!sizing.active) return;
+                                    var nw = Math.max(360, Math.min(window.innerWidth - 32, sizing.w + (ev.clientX - sizing.x)));
+                                    var nh = Math.max(220, Math.min(window.innerHeight - 32, sizing.h + (ev.clientY - sizing.y)));
+                                    dialog.style.width = nw + 'px';
+                                    dialog.style.height = nh + 'px';
+                                    dialog.setAttribute('data-width', dialog.style.width);
+                                    dialog.setAttribute('data-height', dialog.style.height);
+                                }
+                                function stop(){ sizing.active = false; document.removeEventListener('mousemove', grow); document.removeEventListener('mouseup', stop); }
+                                document.addEventListener('mousemove', grow);
+                                document.addEventListener('mouseup', stop);
+                            });
+                        }
+                    } catch(e) {}
+                })();
+                </script>
+            </t>
+        </t>
+    </template>
+
+    <!-- CRM Form View (separate to point iframe to CRM route) -->
+    <record id="view_predictive_engine_crm_dashboard_form" model="ir.ui.view">
+        <field name="name">predictive.engine.crm.dashboard.form</field>
+        <field name="model">predictive.engine</field>
+        <field name="arch" type="xml">
+            <form string="CRM" create="false" edit="true">
+                <div style="padding: 0; margin: 0; position: relative;">
+                    <iframe
+                        src="/predictive_engine/crm_dashboard"
+                        style="width: 100vw; height: 100vh; border: none; margin: 0; padding: 0; overflow: visible;"
+                        frameborder="0"
+                        scrolling="yes"
+                        allowfullscreen="true"
+                    ></iframe>
+                    <!-- Floating Toggle Chat Button (CRM) -->
+                    <a href="javascript:void(0);"
+                        class="btn btn-primary"
+                        style="position: fixed; bottom: 30px; right: 30px; z-index: 1050;"
+                        onclick="var panel=document.getElementById('odoo_chatbot_panel');if(panel)panel.classList.toggle('d-none');">
+                        <span class="fa fa-comments"></span> Chat </a>
+                    <!-- Chatbot Panel (CRM, same as Sales) -->
+                    <div id="odoo_chatbot_panel"
+                        class="card shadow-lg d-none"
+                        style="position: fixed; bottom: 80px; right: 30px; width: 700px; max-width: 90vw; max-height: 85vh; z-index: 1051; overflow: hidden; display: flex; flex-direction: column; resize: both; min-width: 500px; min-height: 400px;">
+                        <!-- Enhanced Resize Handles - All Directions -->
+                        <!-- Top Edge -->
+                        <div class="resize-handle resize-top"
+                            style="position: absolute; top: -2px; left: 0; width: 100%; height: 8px; cursor: ns-resize; background: transparent; z-index: 1052;"></div>
+                        <!-- Bottom Edge -->
+                        <div class="resize-handle resize-bottom"
+                            style="position: absolute; bottom: -2px; left: 0; width: 100%; height: 8px; cursor: ns-resize; background: transparent; z-index: 1052;"></div>
+                        <!-- Left Edge -->
+                        <div class="resize-handle resize-left"
+                            style="position: absolute; top: 0; left: -2px; width: 8px; height: 100%; cursor: ew-resize; background: transparent; z-index: 1052;"></div>
+                        <!-- Right Edge -->
+                        <div class="resize-handle resize-right"
+                            style="position: absolute; top: 0; right: -2px; width: 8px; height: 100%; cursor: ew-resize; background: transparent; z-index: 1052;"></div>
+                        <!-- Top-Left Corner -->
+                        <div class="resize-handle resize-tl"
+                            style="position: absolute; top: -4px; left: -4px; width: 12px; height: 12px; cursor: nw-resize; background: transparent; z-index: 1052;"></div>
+                        <!-- Top-Right Corner -->
+                        <div class="resize-handle resize-tr"
+                            style="position: absolute; top: -4px; right: -4px; width: 12px; height: 12px; cursor: ne-resize; background: transparent; z-index: 1052;"></div>
+                        <!-- Bottom-Left Corner -->
+                        <div class="resize-handle resize-bl"
+                            style="position: absolute; bottom: -4px; left: -4px; width: 12px; height: 12px; cursor: sw-resize; background: transparent; z-index: 1052;"></div>
+                        <!-- Bottom-Right Corner -->
+                        <div class="resize-handle resize-br"
+                            style="position: absolute; bottom: -4px; right: -4px; width: 12px; height: 12px; cursor: se-resize; background: transparent; z-index: 1052;"></div>
+
+                        <div class="card-header d-flex justify-content-between align-items-center"
+                            style="background: #3e4955; color: #fff;">
+                            <span>
+                                <strong>Odoo Sales and CRM Chatbot</strong>
+                            </span>
+                            <span>
+                                <a href="javascript:void(0);" class="btn btn-sm btn-light"
+                                    title="Maximize"
+                                    onclick="
+                                    var panel=document.getElementById('odoo_chatbot_panel');
+                                    var history=document.querySelector('.chatbot-user-questions');
+                                    if(panel){
+                                        panel.style.width='100vw';
+                                        panel.style.height='100vh';
+                                        panel.style.top='0';
+                                        panel.style.left='0';
+                                        panel.style.right='0';
+                                        panel.style.bottom='0';
+                                        panel.style.maxWidth='100vw';
+                                        panel.style.maxHeight='100vh';
+                                        panel.style.position='fixed';
+                                        panel.style.margin='0';
+                                        panel.style.borderRadius='0';
+                                        if(history)history.classList.remove('d-none');
+                                    }
+                                ">
+                                    <span class="fa fa-window-maximize"></span>
+                                </a>
+                                <a href="javascript:void(0);" class="btn btn-sm btn-light"
+                                    title="Restore"
+                                    onclick="
+                                    var panel=document.getElementById('odoo_chatbot_panel');
+                                    var history=document.querySelector('.chatbot-user-questions');
+                                    if(panel){
+                                        panel.style.width='700px';
+                                        panel.style.height='';
+                                        panel.style.top='';
+                                        panel.style.left='';
+                                        panel.style.right='30px';
+                                        panel.style.bottom='80px';
+                                        panel.style.maxWidth='90vw';
+                                        panel.style.maxHeight='85vh';
+                                        panel.style.position='fixed';
+                                        panel.style.margin='';
+                                        panel.style.borderRadius='';
+                                        if(history)history.classList.add('d-none');
+                                    }
+                                ">
+                                    <span class="fa fa-compress"></span>
+                                </a>
+                                <a href="javascript:void(0);" class="btn btn-sm btn-danger"
+                                    title="Close"
+                                    onclick="var panel=document.getElementById('odoo_chatbot_panel');var history=document.querySelector('.chatbot-user-questions');if(panel)panel.classList.add('d-none');if(history)history.classList.add('d-none');">
+                                    <span class="fa fa-times"></span>
+                                </a>
+                            </span>
+                        </div>
+                        <!-- NEW: 2-column layout for large screens -->
+                        <div id="odoo_chatbot_split_body"
+                            style="display: flex; flex: 1 1 auto; min-height: 0; height: 70vh;">
+                            <!-- Left: User Questions List -->
+                            <div class="chatbot-user-questions d-none"
+                                style="width: 40%; min-width: 180px; max-width: 350px; background: #f1f3f6; border-right: 1px solid #e0e0e0; overflow-y: auto; padding: 18px 10px; display: flex; flex-direction: column;">
+                                <div
+                                    style="font-weight: 600; color: #3e4955; margin-bottom: 12px; font-size: 1.1em;">Your
+                                    Questions</div>
+                                <field name="user_questions" nolabel="1"
+                                    context="{'form_view_ref': 'DashBoat.chatbot_history_insight_form'}"
+                                    mode="list,form">
+                                    <list string="User Questions" create="false" edit="false"
+                                        delete="false" colors="is_user==True:blue">
+                                        <field name="message" string="Question" />
+                                    </list>
+                                </field>
+                            </div>
+                            <!-- Right: Chat Area -->
+                            <div class="chatbot-chat-area"
+                                style="width: 60%; min-width: 260px; background: #f8f9fa; display: flex; flex-direction: column; flex: 1 1 auto;">
+                                <div
+                                    style="flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 24px;">
+                                    <field name="chat_html" widget="html" nolabel="1" />
+                                </div>
+                                <div
+                                    style="padding: 16px 24px; background: #fff; border-top: 1px solid #dee2e6; display: flex; align-items: center;">
+                                    <field name="new_message" class="new-message-input"
+                                        placeholder="Typing..."
+                                        style="flex: 1 1 auto; margin-right: 10px;" />
+                                    <button name="send_message" string="Send" type="object"
+                                        class="btn btn-primary" style="min-width: 80px;" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Responsive fallback for small screens (CRM) -->
+                        <style>
+                            @media (max-width: 1199px) {
+                            #odoo_chatbot_split_body { flex-direction: column !important; }
+                            .chatbot-user-questions { width: 100% !important; max-width: none
+                            !important; min-width: 0 !important; border-right: none !important;
+                            border-bottom: 1px solid #e0e0e0 !important; }
+                            .chatbot-chat-area { width: 100% !important; min-width: 0 !important; }
+                            }
+                            @media (min-width: 1200px) {
+                            #odoo_chatbot_split_body { flex-direction: row !important; }
+                            .chatbot-user-questions.d-none { display: none !important; }
+                            .chatbot-user-questions:not(.d-none) { display: flex !important; }
+                            .chatbot-chat-area { display: flex !important; }
+                            }
+                        </style>
+                        <style>
+                            .chat-bubble {
+                            max-width: 80%;
+                            padding: 12px 18px;
+                            border-radius: 18px;
+                            margin-bottom: 4px;
+                            word-break: break-word;
+                            font-size: 1.05em;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+                            }
+                            .chat-bubble-user {
+                            background: #007bff !important;
+                            color: #fff !important;
+                            border-radius: 18px !important;
+                            overflow: hidden !important;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+                            position: relative !important;
+                            display: inline-block !important;
+                            max-width: 80%;
+                            min-width: 40px;
+                            margin-left: auto !important;
+                            margin-right: 0 !important;
+                            padding: 12px 18px;
+                            word-break: break-word;
+                            float: right !important;
+                            clear: both !important;
+                            }
+                            .chat-bubble-user:before,
+                            .chat-bubble-user:after { display: none !important; content: none !important; }
+                            .chat-bubble-bot { background: #e9ecef; color: #343a40; border-bottom-left-radius: 4px; border-top-right-radius: 18px; border-top-left-radius: 18px; border-bottom-right-radius: 18px; margin-right: 20%; margin-top: 16px; float: none !important; clear: both !important; display: block !important; }
+                            .chat-bubble-user:empty { display: none !important; }
+                            .resize-handle { transition: background 0.2s ease; }
+                            .resize-handle:hover { background: rgba(0, 123, 255, 0.15) !important; }
+                            .resize-handle:active { background: rgba(0, 123, 255, 0.3) !important; }
+                            .resize-tl:hover, .resize-tr:hover, .resize-bl:hover, .resize-br:hover { background: rgba(0, 123, 255, 0.2) !important; border-radius: 50% !important; }
+                            .resize-top:hover, .resize-bottom:hover { background: linear-gradient(to right, transparent, rgba(0, 123, 255, 0.15), transparent) !important; }
+                            .resize-left:hover, .resize-right:hover { background: linear-gradient(to bottom, transparent, rgba(0, 123, 255, 0.15), transparent) !important; }
+                            .resizing { user-select: none !important; -webkit-user-select: none !important; -moz-user-select: none !important; -ms-user-select: none !important; }
+                        </style>
+
+                        <script type="text/javascript">
+                        <![CDATA[
+                            // Simple Resize functionality (CRM)
+                            document.addEventListener('DOMContentLoaded', function() {
+                                var panel = document.getElementById('odoo_chatbot_panel');
+                                var handles = panel.querySelectorAll('.resize-handle');
+                                var isResizing = false;
+                                var currentHandle = null;
+                                var startX, startY, startWidth, startHeight, startLeft, startTop;
+                                function addResizeFeedback() { panel.classList.add('resizing'); document.body.style.cursor = currentHandle.style.cursor; }
+                                function removeResizeFeedback() { panel.classList.remove('resizing'); document.body.style.cursor = ''; }
+                                for (var i = 0; i < handles.length; i++) {
+                                    var handle = handles[i];
+                                    handle.addEventListener('mousedown', function(e) {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        isResizing = true;
+                                        currentHandle = this;
+                                        var rect = panel.getBoundingClientRect();
+                                        startX = e.clientX; startY = e.clientY; startWidth = rect.width; startHeight = rect.height; startLeft = rect.left; startTop = rect.top;
+                                        addResizeFeedback();
+                                        document.addEventListener('mousemove', handleMouseMove);
+                                        document.addEventListener('mouseup', handleMouseUp);
+                                    });
+                                }
+                                function handleMouseMove(e) {
+                                    if (!isResizing) return;
+                                    var deltaX = e.clientX - startX; var deltaY = e.clientY - startY;
+                                    var handleClass = currentHandle.className; var minWidth = 300; var minHeight = 200; var maxWidth = window.innerWidth * 0.9; var maxHeight = window.innerHeight * 0.8;
+                                    var history = document.querySelector('.chatbot-user-questions');
+                                    if (history) {
+                                        if (panel.style.width === '100vw' && panel.style.height === '100vh') { history.classList.remove('d-none'); } else { history.classList.add('d-none'); }
+                                    }
+                                    if (handleClass.indexOf('resize-left') !== -1) { var newWidth = startWidth - deltaX; if (newWidth >= minWidth && newWidth <= maxWidth) { panel.style.width = newWidth + 'px'; panel.style.left = (startLeft + deltaX) + 'px'; } }
+                                    else if (handleClass.indexOf('resize-right') !== -1) { var newWidth2 = startWidth + deltaX; if (newWidth2 >= minWidth && newWidth2 <= maxWidth) { panel.style.width = newWidth2 + 'px'; } }
+                                    else if (handleClass.indexOf('resize-top') !== -1) { var newHeight = startHeight - deltaY; if (newHeight >= minHeight && newHeight <= maxHeight) { panel.style.height = newHeight + 'px'; panel.style.top = (startTop + deltaY) + 'px'; } }
+                                    else if (handleClass.indexOf('resize-bottom') !== -1) { var newHeight2 = startHeight + deltaY; if (newHeight2 >= minHeight && newHeight2 <= maxHeight) { panel.style.height = newHeight2 + 'px'; } }
+                                    else if (handleClass.indexOf('resize-tl') !== -1) { var nw = startWidth - deltaX; var nh = startHeight - deltaY; if (nw >= minWidth && nw <= maxWidth && nh >= minHeight && nh <= maxHeight) { panel.style.width = nw + 'px'; panel.style.height = nh + 'px'; panel.style.left = (startLeft + deltaX) + 'px'; panel.style.top = (startTop + deltaY) + 'px'; } }
+                                    else if (handleClass.indexOf('resize-tr') !== -1) { var nw2 = startWidth + deltaX; var nh2 = startHeight - deltaY; if (nw2 >= minWidth && nw2 <= maxWidth && nh2 >= minHeight && nh2 <= maxHeight) { panel.style.width = nw2 + 'px'; panel.style.height = nh2 + 'px'; panel.style.top = (startTop + deltaY) + 'px'; } }
+                                    else if (handleClass.indexOf('resize-bl') !== -1) { var nw3 = startWidth - deltaX; var nh3 = startHeight + deltaY; if (nw3 >= minWidth && nw3 <= maxWidth && nh3 >= minHeight && nh3 <= maxHeight) { panel.style.width = nw3 + 'px'; panel.style.height = nh3 + 'px'; panel.style.left = (startLeft + deltaX) + 'px'; } }
+                                    else if (handleClass.indexOf('resize-br') !== -1) { var nw4 = startWidth + deltaX; var nh4 = startHeight + deltaY; if (nw4 >= minWidth && nw4 <= maxWidth && nh4 >= minHeight && nh4 <= maxHeight) { panel.style.width = nw4 + 'px'; panel.style.height = nh4 + 'px'; } }
+                                }
+                                function handleMouseUp() { isResizing = false; currentHandle = null; removeResizeFeedback(); document.removeEventListener('mousemove', handleMouseMove); document.removeEventListener('mouseup', handleMouseUp); }
+                                panel.addEventListener('selectstart', function(e) { if (isResizing) { e.preventDefault(); } });
+                            });
+                        ]]>
+                        </script>
+                    </div>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- CRM QWeb Template -->
+    <template id="predictive_engine_crm_dashboard_page" name="Interactive CRM">
+        <t t-call="web.html_container">
+            <t t-call="web.layout">
+                <script t-att-src="'https://cdn.plot.ly/plotly-2.27.0.min.js'"
+                    type="text/javascript"></script>
+                <div
+                    style="padding: 20px; background-color: #f8f9fa; min-height: calc(100vh - 60px); font-family: 'Arial', sans-serif;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h1
+                            style="font-size: 2.5em; color: #343a40; font-weight: 700; margin-bottom: 10px;">CRM
+                            DASHBOARD</h1>
+                        <div id="ai_defaults_crm" t-att-data-current_filter="current_filter or ''" t-att-data-selected_year="selected_year or ''" t-att-data-date_from="date_from or ''" t-att-data-date_to="date_to or ''"></div>
+                        <div style="font-size: 1.2em; color: #6c757d; font-weight: 500;">
+                            <span t-esc="dashboard_data.get('date_range', '')" />
+                        </div>
+                    </div>
+                    <div
+                        style="background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 20px; margin-bottom: 30px;">
+                        <t t-if="error_message">
+                            <div class="alert alert-warning" role="alert"
+                                style="margin-bottom: 15px;">
+                                <span t-esc="error_message" />
+                            </div>
+                        </t>
+                        <form id="crm_filter_form" method="get"
+                            action="/predictive_engine/crm_dashboard" class="row">
+                            <div class="col-md-3 mb-3">
+                                <label
+                                    style="display: block; margin-bottom: 8px; font-weight: 600; color: #495057;">Time
+                                    Period</label>
+                                <select name="date_filter" id="crm_date_filter_select"
+                                    class="form-control"
+                                    style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                    <option value="today"
+                                        t-att-selected="'selected' if current_filter == 'today' else None">
+                                        Today</option>
+                                    <option value="yesterday"
+                                        t-att-selected="'selected' if current_filter == 'yesterday' else None">
+                                        Yesterday</option>
+                                    <option value="7days"
+                                        t-att-selected="'selected' if current_filter == '7days' else None">Last
+                                        7 Days</option>
+                                    <option value="30days"
+                                        t-att-selected="'selected' if current_filter == '30days' else None">Last
+                                        30 Days</option>
+                                    <option value="90days"
+                                        t-att-selected="'selected' if current_filter == '90days' else None">Last
+                                        90 Days</option>
+                                    <option value="6months"
+                                        t-att-selected="'selected' if current_filter == '6months' else None">Last
+                                        6 Months</option>
+                                    <option value="year"
+                                        t-att-selected="'selected' if current_filter == 'year' else None">Select
+                                        Year...</option>
+                                    <option value="custom"
+                                        t-att-selected="'selected' if current_filter == 'custom' else None">Custom
+                                        Range</option>
+                                </select>
+                            </div>
+
+                            <div id="crm_year_filter_container" class="col-md-2 mb-3"
+                                t-att-style="'display: %s;' % ('block' if current_filter == 'year' else 'none')">
+                                <label
+                                    style="display: block; margin-bottom: 8px; font-weight: 600; color: #495057;">
+                                    Year</label>
+                                <select name="year_filter" class="form-control" size="4"
+                                    style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                    <option value="2025"
+                                        t-att-selected="'selected' if selected_year == '2025' else None">
+                                        2025</option>
+                                    <option value="2024"
+                                        t-att-selected="'selected' if selected_year == '2024' else None">
+                                        2024</option>
+                                    <option value="2023"
+                                        t-att-selected="'selected' if selected_year == '2023' else None">
+                                        2023</option>
+                                    <option value="2022"
+                                        t-att-selected="'selected' if selected_year == '2022' else None">
+                                        2022</option>
+                                </select>
+                            </div>
+
+                            <div id="crm_custom_date_container" class="col-md-6"
+                                style="padding-right: 0px; padding-left: 0px;"
+                                t-att-style="'display: %s;' % ('flex' if current_filter == 'custom' else 'none')">
+                                <div class="row w-100" style="margin-left: 0px;">
+                                    <div class="col-md-6 mb-3">
+                                        <label
+                                            style="display: block; margin-bottom: 8px; font-weight: 600; color: #495057;">From
+                                            Date</label>
+                                        <input type="date" name="date_from" class="form-control"
+                                            style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #dee2e6;"
+                                            t-att-value="date_from" t-att-max="today" />
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label
+                                            style="display: block; margin-bottom: 8px; font-weight: 600; color: #495057;">To
+                                            Date</label>
+                                        <input type="date" name="date_to" class="form-control"
+                                            style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #dee2e6;"
+                                            t-att-value="date_to" t-att-min="date_from"
+                                            t-att-max="today" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-1 mb-3" style="align-self: flex-end;">
+                                <button type="submit" class="btn btn-primary"
+                                    style="width: 100%; padding: 10px; background-color: #007bff; border: none; border-radius: 6px; font-weight: 600;">
+                                    Apply</button>
+                            </div>
+                            <div class="col-md-2 mb-3" style="align-self: flex-end;">
+                                <button id="download_crm_report_btn" 
+                                        type="button" 
+                                        class="btn btn-outline-secondary" 
+                                        style="width: 100%; padding: 10px; border-radius: 6px; font-weight: 600; position: relative;"
+                                        onclick="downloadReport('crm'); return false;">
+                                    <span id="download_crm_text">Download Report</span>
+                                    <span id="download_crm_loader" style="display: none;">
+                                        <i class="fa fa-spinner fa-spin" style="margin-right: 8px;"></i>
+                                        Generating...
+                                    </span>
+                                </button>
+                                <div id="download_crm_message" style="display: none; color: #dc3545; font-size: 12px; margin-top: 5px; text-align: center; font-weight: 500;">
+                                    Report will download in a few seconds.
+                                </div>
+                            </div>
+                        </form>
+                        <!-- Report Progress Modal (CRM/Shared) -->
+                        <div id="report_progress_modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:6000;">
+                            <div style="position:absolute; left:50%; top:40%; transform:translate(-50%,-50%); background:#fff; width:420px; max-width:90vw; border-radius:8px; box-shadow:0 8px 30px rgba(0,0,0,0.2); overflow:hidden;">
+                                <div style="padding:12px 16px; border-bottom:1px solid #eee; font-weight:700; color:#343a40;">Generating PDF...</div>
+                                <div style="padding:16px;">
+                                    <div style="height: 10px; background:#f1f3f5; border-radius:6px; overflow:hidden;">
+                                        <div id="report_progress_bar" style="width:1%; height:100%; background:#007bff; transition: width 0.2s ease;"></div>
+                                    </div>
+                                    <div id="report_progress_label" style="margin-top:8px; text-align:right; color:#6c757d; font-weight:600;">1%</div>
+                                </div>
+                            </div>
+                        </div>
+                        <script type="text/javascript">
+                        <![CDATA[
+                            // CRM page: ensure global downloadReport exists (fallback)
+                            if (typeof window.downloadReport !== 'function') {
+                                window.downloadReport = function(dashboard) {
+                                    try {
+                                        var buttonId = 'download_' + dashboard + '_report_btn';
+                                        var textId = 'download_' + dashboard + '_text';
+                                        var loaderId = 'download_' + dashboard + '_loader';
+                                        var btn = document.getElementById(buttonId);
+                                        var txt = document.getElementById(textId);
+                                        var lod = document.getElementById(loaderId);
+                                        
+                                        if (btn && txt && lod) { 
+                                            btn.disabled = true; 
+                                            txt.style.display = 'none'; 
+                                            lod.style.display = 'inline'; 
+                                        }
+                                        
+                                        // Show red message
+                                        var msg = document.getElementById('download_' + dashboard + '_message');
+                                        if (msg) {
+                                            msg.style.display = 'block';
+                                        }
+                                        
+                                        if (window.DashReport && typeof window.DashReport.download === 'function') {
+                                            return window.DashReport.download(dashboard);
+                                        }
+                                        
+                                        var params = new URLSearchParams(window.location.search);
+                                        var url = '/predictive_engine/dashboard_report?dashboard=' + dashboard;
+                                        if (params.get('date_filter')) url += '&date_filter=' + params.get('date_filter');
+                                        if (params.get('year_filter')) url += '&year_filter=' + params.get('year_filter');
+                                        if (params.get('date_from')) url += '&date_from=' + params.get('date_from');
+                                        if (params.get('date_to')) url += '&date_to=' + params.get('date_to');
+                                        
+                                        // Use XMLHttpRequest to track actual download completion
+                                        var xhr = new XMLHttpRequest();
+                                        xhr.open('GET', url, true);
+                                        xhr.responseType = 'blob';
+                                        
+                                        xhr.onprogress = function(e) {
+                                            // Show progress if available
+                                            if (e.lengthComputable) {
+                                                var percentComplete = (e.loaded / e.total) * 100;
+                                                console.log('Download progress: ' + percentComplete + '%');
+                                            }
+                                        };
+                                        
+                                        xhr.onload = function() {
+                                            if (xhr.status === 200) {
+                                                // Download successful
+                                                var blob = xhr.response;
+                                                var cd = xhr.getResponseHeader('Content-Disposition');
+                                                var filename = (dashboard === 'crm' ? 'CRM' : 'Sales') + '_dashboard_report.pdf';
+                                                
+                                                // Extract filename from Content-Disposition header if available
+                                                if (cd) {
+                                                    var matches = /filename="(.+)"/.exec(cd);
+                                                    if (matches) filename = matches[1];
+                                                }
+                                                
+                                                // Create download link
+                                                var link = document.createElement('a');
+                                                var urlObj = window.URL.createObjectURL(blob);
+                                                link.href = urlObj;
+                                                link.download = filename;
+                                                link.style.display = 'none';
+                                                document.body.appendChild(link);
+                                                
+                                                // Hide message immediately when download starts
+                                                var msg = document.getElementById('download_' + dashboard + '_message');
+                                                if (msg) {
+                                                    msg.style.display = 'none';
+                                                }
+                                                
+                                                // Trigger download
+                                                link.click();
+                                                
+                                                // Clean up and hide loader after download is triggered
+                                                setTimeout(function() {
+                                                    try {
+                                                        window.URL.revokeObjectURL(urlObj);
+                                                        document.body.removeChild(link);
+                                                    } catch(e) {
+                                                        console.log('Error cleaning up:', e);
+                                                    }
+                                                    
+                                                    // Hide loader
+                                                    if (btn && txt && lod) {
+                                                        btn.disabled = false;
+                                                        txt.style.display = 'inline';
+                                                        lod.style.display = 'none';
+                                                    }
+                                                }, 1000);
+                                            } else {
+                                                // Error occurred
+                                                console.error('Download failed:', xhr.status, xhr.statusText);
+                                                alert('Failed to generate report: ' + (xhr.statusText || ('HTTP ' + xhr.status)));
+                                                
+                                                // Hide loader and message on error
+                                                if (btn && txt && lod) {
+                                                    btn.disabled = false;
+                                                    txt.style.display = 'inline';
+                                                    lod.style.display = 'none';
+                                                }
+                                                var msg = document.getElementById('download_' + dashboard + '_message');
+                                                if (msg) {
+                                                    msg.style.display = 'none';
+                                                }
+                                            }
+                                        };
+                                        
+                                        xhr.onerror = function() {
+                                            console.error('Network error while downloading report');
+                                            alert('Network error while downloading report');
+                                            
+                                            // Hide loader and message on error
+                                            if (btn && txt && lod) {
+                                                btn.disabled = false;
+                                                txt.style.display = 'inline';
+                                                lod.style.display = 'none';
+                                            }
+                                            var msg = document.getElementById('download_' + dashboard + '_message');
+                                            if (msg) {
+                                                msg.style.display = 'none';
+                                            }
+                                        };
+                                        
+                                        // Start the download
+                                        xhr.send();
+                                    } catch(err) {
+                                        try { alert('Download error: ' + err.message); } catch(_e) {}
+                                    }
+                                };
+                            }
+
+                            // Report downloader with progress (CRM/Shared)
+                            (function(){
+                                if (window.DashReport) return; // reuse if already defined
+                                function getFilters(defaultNodeId){
+                                    var params = new URLSearchParams(window.location.search);
+                                    var defNode = document.getElementById(defaultNodeId);
+                                    return {
+                                        date_filter: params.get('date_filter') || (defNode ? defNode.getAttribute('data-current_filter') : '') || '6months',
+                                        year_filter: params.get('year_filter') || (defNode ? defNode.getAttribute('data-selected_year') : '') || '',
+                                        date_from: params.get('date_from') || (defNode ? defNode.getAttribute('data-date_from') : '') || '',
+                                        date_to: params.get('date_to') || (defNode ? defNode.getAttribute('data-date_to') : '') || ''
+                                    };
+                                }
+                                function filenameFromDisposition(hdr, fallback){
+                                    try{
+                                        if(!hdr) return fallback;
+                                        var m = /filename\*=UTF-8''([^;]+)|filename=\"?([^\";]+)\"?/i.exec(hdr);
+                                        var fn = (m && (m[1] || m[2])) || fallback;
+                                        return decodeURIComponent(fn);
+                                    }catch(e){ return fallback; }
+                                }
+                                // Disable CRM progress modal and percentage (no-op functions)
+                                function showModal(){ /* progress modal disabled intentionally */ }
+                                function hideModal(){ /* progress modal disabled intentionally */ }
+                                function setProgress(p){ /* progress updates disabled */ }
+                                window.DashReport = {
+                                    download: function(dashboard){
+                                        try{
+                                            var filters = getFilters(dashboard === 'crm' ? 'ai_defaults_crm' : 'ai_defaults_sales');
+                                            var url = '/predictive_engine/dashboard_report?dashboard=' + encodeURIComponent(dashboard)
+                                                + '&date_filter=' + encodeURIComponent(filters.date_filter || '')
+                                                + '&year_filter=' + encodeURIComponent(filters.year_filter || '')
+                                                + '&date_from=' + encodeURIComponent(filters.date_from || '')
+                                                + '&date_to=' + encodeURIComponent(filters.date_to || '');
+                                            
+                                            // Get button elements to reset loader after download
+                                            var buttonId = 'download_' + dashboard + '_report_btn';
+                                            var textId = 'download_' + dashboard + '_text';
+                                            var loaderId = 'download_' + dashboard + '_loader';
+                                            var messageId = 'download_' + dashboard + '_message';
+                                            var btn = document.getElementById(buttonId);
+                                            var txt = document.getElementById(textId);
+                                            var lod = document.getElementById(loaderId);
+                                            var msg = document.getElementById(messageId);
+                                            
+                                            // Show message when download starts
+                                            if (msg) {
+                                                msg.style.display = 'block';
+                                            }
+                                            
+                                            showModal();
+                                            var xhr = new XMLHttpRequest();
+                                            xhr.open('GET', url, true);
+                                            xhr.responseType = 'blob';
+                                            var last = 1, anim;
+                                            xhr.onprogress = function(e){ /* progress disabled */ };
+                                            xhr.onload = function(){
+                                                try{ if (anim) clearInterval(anim); }catch(e){}
+                                                if (xhr.status === 200) {
+                                                    var blob = xhr.response;
+                                                    var cd = xhr.getResponseHeader('Content-Disposition');
+                                                    var fn = filenameFromDisposition(cd, (dashboard==='crm'?'CRM':'Sales') + '_dashboard_report.pdf');
+                                                    var link = document.createElement('a');
+                                                    var urlObj = window.URL.createObjectURL(blob);
+                                                    link.href = urlObj; link.download = fn;
+                                                    document.body.appendChild(link);
+                                                    
+                                                    // Hide message immediately when download starts
+                                                    if (msg) {
+                                                        msg.style.display = 'none';
+                                                    }
+                                                    
+                                                    link.click();
+                                                    setTimeout(function(){ 
+                                                        try{ 
+                                                            window.URL.revokeObjectURL(urlObj); 
+                                                            document.body.removeChild(link);
+                                                        }catch(e){} 
+                                                        hideModal();
+                                                        
+                                                        // Reset button loader state
+                                                        if (btn && txt && lod) {
+                                                            btn.disabled = false;
+                                                            txt.style.display = 'inline';
+                                                            lod.style.display = 'none';
+                                                        }
+                                                    }, 1000);
+                                                } else {
+                                                    setProgress(100);
+                                                    setTimeout(function(){
+                                                        hideModal();
+                                                        // Reset button loader state on error and hide message
+                                                        if (btn && txt && lod) {
+                                                            btn.disabled = false;
+                                                            txt.style.display = 'inline';
+                                                            lod.style.display = 'none';
+                                                        }
+                                                        if (msg) {
+                                                            msg.style.display = 'none';
+                                                        }
+                                                    }, 600);
+                                                    try{ alert('Failed to generate report: ' + (xhr.statusText || ('HTTP ' + xhr.status))); }catch(e){}
+                                                }
+                                            };
+                                            xhr.onerror = function(){
+                                                try{ if (anim) clearInterval(anim); }catch(e){}
+                                                setProgress(100);
+                                                setTimeout(function(){
+                                                    hideModal();
+                                                    // Reset button loader state on error and hide message
+                                                    if (btn && txt && lod) {
+                                                        btn.disabled = false;
+                                                        txt.style.display = 'inline';
+                                                        lod.style.display = 'none';
+                                                    }
+                                                    if (msg) {
+                                                        msg.style.display = 'none';
+                                                    }
+                                                }, 600);
+                                                try{ alert('Network error while downloading report'); }catch(e){}
+                                            };
+                                            xhr.send();
+                                        }catch(err){ 
+                                            try{ alert('Error: ' + err.message); }catch(e){} 
+                                            // Reset button loader on exception and hide message
+                                            var buttonId = 'download_' + dashboard + '_report_btn';
+                                            var textId = 'download_' + dashboard + '_text';
+                                            var loaderId = 'download_' + dashboard + '_loader';
+                                            var messageId = 'download_' + dashboard + '_message';
+                                            var btn = document.getElementById(buttonId);
+                                            var txt = document.getElementById(textId);
+                                            var lod = document.getElementById(loaderId);
+                                            var msg = document.getElementById(messageId);
+                                            if (btn && txt && lod) {
+                                                btn.disabled = false;
+                                                txt.style.display = 'inline';
+                                                lod.style.display = 'none';
+                                            }
+                                            if (msg) {
+                                                msg.style.display = 'none';
+                                            }
+                                        }
+                                    }
+                                };
+                            })();
+                        ]]>
+                        </script>
+                        <script type="text/javascript">
+                        <![CDATA[
+                            (function(){
+                              var dateSelect = document.getElementById('crm_date_filter_select');
+                              var yearBox = document.getElementById('crm_year_filter_container');
+                              var customBox = document.getElementById('crm_custom_date_container');
+                              function openYearList() {
+                                if (!yearBox) return;
+                                var yearSelect = yearBox.querySelector('select[name="year_filter"]');
+                                if (yearSelect) {
+                                  yearSelect.focus();
+                                  try { yearSelect.size = 4; } catch(e) {}
+                                  try {
+                                    var evt = new MouseEvent('mousedown', { bubbles: true, cancelable: true, view: window });
+                                    yearSelect.dispatchEvent(evt);
+                                  } catch(e) {}
+                                }
+                              }
+                              function openFromDate() {
+                                if (!customBox) return;
+                                var fromInput = customBox.querySelector('input[name="date_from"]');
+                                if (fromInput) {
+                                  fromInput.focus();
+                                  if (typeof fromInput.showPicker === 'function') { try { fromInput.showPicker(); } catch(e) {} }
+                                }
+                              }
+                              function updateCRMFilters(){
+                                if (!dateSelect) return;
+                                if (dateSelect.value === 'year'){
+                                  if (yearBox) yearBox.style.display = 'block';
+                                  if (customBox) customBox.style.display = 'none';
+                                  openYearList();
+                                } else if (dateSelect.value === 'custom'){
+                                  if (yearBox) yearBox.style.display = 'none';
+                                  if (customBox) customBox.style.display = 'flex';
+                                  openFromDate();
+                                } else {
+                                  if (yearBox) yearBox.style.display = 'none';
+                                  if (customBox) customBox.style.display = 'none';
+                                }
+                              }
+                              if (dateSelect){
+                                dateSelect.addEventListener('change', updateCRMFilters);
+                                // Initialize on load
+                                updateCRMFilters();
+                              }
+                              var crmForm = document.getElementById('crm_filter_form');
+                              if (crmForm){
+                                crmForm.addEventListener('submit', function(){
+                                  // Hide filter blocks immediately after Apply is clicked
+                                  if (yearBox) yearBox.style.display = 'none';
+                                  if (customBox) customBox.style.display = 'none';
+                                });
+                              }
+                            })();
+                        ]]>
+                        </script>
+                    </div>
+
+                    <!-- KPI Row -->
+                    <div
+                        style="display: grid; grid-template-columns: repeat(4, 300px); gap: 12px; margin-bottom: 20px; align-items: stretch;">
+                        <div
+                            style="background-color: white; border-radius: 8px; box-shadow: 0 1px 6px rgba(0,0,0,0.05); padding: 12px; min-height: 90px; display: flex; flex-direction: column; justify-content: center;">
+                            <div style="font-size: 0.95em; color: #6c757d; text-align:center;">TOTAL
+                                LEADS</div>
+                            <div
+                                style="display:flex; align-items:center; justify-content:center; gap:10px; margin-top: 6px;">
+                                <!-- Sparkline-like icon (decorative) -->
+                                <svg width="32" height="18" viewBox="0 0 28 18" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path d="M1 14 L7 8 L11 12 L16 5 L21 9 L27 3" stroke="#007bff"
+                                        stroke-width="2" fill="none" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                </svg>
+                                <div
+                                    style="font-size: 1.6em; color: #007bff; font-weight: 700; line-height: 1;"
+                                    t-esc="dashboard_data.get('kpi_total_leads', '0')"></div>
+                            </div>
+                        </div>
+                        <div
+                            style="background-color: white; border-radius: 8px; box-shadow: 0 1px 6px rgba(0,0,0,0.05); padding: 12px; min-height: 90px; display: flex; flex-direction: column; justify-content: center;">
+                            <div style="font-size: 0.95em; color: #6c757d; text-align:center;">TOTAL
+                                OPPORTUNITIES</div>
+                            <div
+                                style="display:flex; align-items:center; justify-content:center; gap:10px; margin-top: 6px;">
+                                <!-- Sparkline-like icon (decorative) -->
+                                <svg width="28" height="18" viewBox="0 0 28 18" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path d="M1 10 L6 6 L10 13 L14 8 L19 12 L27 5" stroke="#17a2b8"
+                                        stroke-width="2" fill="none" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                </svg>
+                                <div
+                                    style="font-size: 1.6em; color: #17a2b8; font-weight: 700; line-height: 1;"
+                                    t-esc="dashboard_data.get('kpi_total_opps', '0')"></div>
+                            </div>
+                        </div>
+                        <div
+                            style="background-color: white; border-radius: 8px; box-shadow: 0 1px 6px rgba(0,0,0,0.05); padding: 12px; min-height: 90px; display: flex; flex-direction: column; justify-content: center;">
+                            <div style="font-size: 0.95em; color: #6c757d; text-align:center;">CONVERSION
+                                RATE</div>
+                            <div
+                                style="display:flex; align-items:center; justify-content:center; gap:10px; margin-top: 6px;">
+                                <!-- Sparkline-like icon (decorative) -->
+                                <svg width="28" height="18" viewBox="0 0 28 18" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path d="M1 12 L5 14 L9 9 L13 11 L18 6 L23 8 L27 4"
+                                        stroke="#28a745" stroke-width="2" fill="none"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <div
+                                    style="font-size: 1.6em; color: #28a745; font-weight: 700; line-height: 1;"
+                                    t-esc="dashboard_data.get('conversion_rate_kpi', '0%')"></div>
+                            </div>
+                        </div>
+                        <div
+                            style="background-color: white; border-radius: 8px; box-shadow: 0 1px 6px rgba(0,0,0,0.05); padding: 12px; min-height: 90px; display: flex; flex-direction: column; justify-content: center;">
+                            <div style="font-size: 0.95em; color: #6c757d; text-align:center;">
+                                WON REVENUE</div>
+                            <div
+                                style="display:flex; align-items:center; justify-content:center; gap:10px; margin-top: 6px; white-space: nowrap;">
+                                <span class="fa fa-bullseye" style="font-size:18px; color:#6f42c1;"></span>
+                                <div
+                                    style="font-size: 1.05em; color: #6f42c1; font-weight: 600; line-height: 1;"
+                                    t-esc="dashboard_data.get('revenue_target_label', '₹0 / ₹0')"></div>
+                            </div>
+                            <div
+                                style="height: 8px; background: #f1f3f5; border-radius: 6px; overflow: hidden; margin-top: 8px;">
+                                <div
+                                    t-att-style="'width: ' + str(dashboard_data.get('revenue_target_pct', 0)) + '%; height:100%; background:#6f42c1;'"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 25px;">
+                        <div
+                            style="background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 20px; grid-column: 1 / -1;">
+                            <div
+                                style="font-size: 1.3em; color: #343a40; font-weight: 700; margin-bottom: 15px; text-align: center;">PIPELINE
+                                FUNNEL (COUNT)</div>
+                            <div style="text-align:right; margin-bottom:8px;">
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="DashAI.open('pipeline_funnel_chart')">
+                                    <span class="fa fa-magic"></span> AI Analysis
+                                </button>
+                            </div>
+                            <div data-chart-key="pipeline_funnel_chart">
+                                <t t-raw="dashboard_data.get('pipeline_funnel_chart', '&lt;div style=&quot;text-align:center;padding:40px;&quot;&gt;No data available&lt;/div&gt;')" />
+                            </div>
+                        </div>
+
+                        <div
+                            style="background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 20px;">
+                            <div
+                                style="font-size: 1.3em; color: #343a40; font-weight: 700; margin-bottom: 15px; text-align: center;">AVG
+                                DEAL SIZE TREND</div>
+                            <div style="text-align:right; margin-bottom:8px;">
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="DashAI.open('avg_deal_size_trend_chart')">
+                                    <span class="fa fa-magic"></span> AI Analysis
+                                </button>
+                            </div>
+                            <div data-chart-key="avg_deal_size_trend_chart">
+                                <t t-raw="dashboard_data.get('avg_deal_size_trend_chart', '&lt;div style=&quot;text-align:center;padding:40px;&quot;&gt;No data available&lt;/div&gt;')" />
+                            </div>
+                        </div>
+                        <div
+                            style="background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 20px;">
+                            <div
+                                style="font-size: 1.3em; color: #343a40; font-weight: 700; margin-bottom: 15px; text-align: center;">WON
+                                REVENUE TREND</div>
+                            <div style="text-align:right; margin-bottom:8px;">
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="DashAI.open('won_revenue_trend_chart')">
+                                    <span class="fa fa-magic"></span> AI Analysis
+                                </button>
+                            </div>
+                            <div data-chart-key="won_revenue_trend_chart">
+                                <t t-raw="dashboard_data.get('won_revenue_trend_chart', '&lt;div style=&quot;text-align:center;padding:40px;&quot;&gt;No data available&lt;/div&gt;')" />
+                            </div>
+                        </div>
+                        <div
+                            style="background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 20px;">
+                            <div
+                                style="font-size: 1.3em; color: #343a40; font-weight: 700; margin-bottom: 15px; text-align: center;">STAGE
+                                DISTRIBUTION</div>
+                            <div style="text-align:right; margin-bottom:8px;">
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="DashAI.open('stage_distribution_chart')">
+                                    <span class="fa fa-magic"></span> AI Analysis
+                                </button>
+                            </div>
+                            <div data-chart-key="stage_distribution_chart">
+                                <t t-raw="dashboard_data.get('stage_distribution_chart', '&lt;div style=&quot;text-align:center;padding:40px;&quot;&gt;No data available&lt;/div&gt;')" />
+                            </div>
+                        </div>
+                        <div
+                            style="background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 20px;">
+                            <div
+                                style="font-size: 1.3em; color: #343a40; font-weight: 700; margin-bottom: 15px; text-align: center;">LEAD
+                                SOURCE EFFECTIVENESS</div>
+                            <div style="text-align:right; margin-bottom:8px;">
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="DashAI.open('lead_source_chart')">
+                                    <span class="fa fa-magic"></span> AI Analysis
+                                </button>
+                            </div>
+                            <div data-chart-key="lead_source_chart">
+                                <t t-raw="dashboard_data.get('lead_source_chart', '&lt;div style=&quot;text-align:center;padding:40px;&quot;&gt;No data available&lt;/div&gt;')" />
+                            </div>
+                        </div>
+                        <div
+                            style="background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 20px; grid-column: 1 / -1;">
+                            <div
+                                style="font-size: 1.3em; color: #343a40; font-weight: 700; margin-bottom: 15px; text-align: center;">REVENUE
+                                FORECAST</div>
+                            <div style="text-align:right; margin-bottom:8px;">
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="DashAI.open('revenue_forecast_chart')">
+                                    <span class="fa fa-magic"></span> AI Analysis
+                                </button>
+                            </div>
+                            <div data-chart-key="revenue_forecast_chart">
+                                <t t-raw="dashboard_data.get('revenue_forecast_chart', '&lt;div style=&quot;text-align:center;padding:40px;&quot;&gt;No revenue forecast data available&lt;/div&gt;')" />
+                            </div>
+                        </div>
+                        <div
+                            style="background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 20px;">
+                            <div
+                                style="font-size: 1.3em; color: #343a40; font-weight: 700; margin-bottom: 15px; text-align: center;">GEOGRAPHICAL
+                                INSIGHTS</div>
+                            <div style="text-align:right; margin-bottom:8px;">
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="DashAI.open('geo_insights_chart')">
+                                    <span class="fa fa-magic"></span> AI Analysis
+                                </button>
+                            </div>
+                            <div data-chart-key="geo_insights_chart">
+                                <t t-raw="dashboard_data.get('geo_insights_chart', '&lt;div style=&quot;text-align:center;padding:40px;&quot;&gt;No data available&lt;/div&gt;')" />
+                            </div>
+                        </div>
+                        <div
+                            style="background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 20px;">
+                            <div
+                                style="font-size: 1.3em; color: #343a40; font-weight: 700; margin-bottom: 15px; text-align: center;">ACTIVITIES
+                                DUE/OVERDUE HEATMAP</div>
+                            <div style="text-align:right; margin-bottom:8px;">
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="DashAI.open('activities_heatmap')">
+                                    <span class="fa fa-magic"></span> AI Analysis
+                                </button>
+                            </div>
+                            <div data-chart-key="activities_heatmap">
+                                <t t-raw="dashboard_data.get('activities_heatmap', '&lt;div style=&quot;text-align:center;padding:40px;&quot;&gt;No data available&lt;/div&gt;')" />
+                            </div>
+                        </div>
+                        <!-- Sales Performance and Lost Reason Analysis in a 2-column layout -->
+                        <div
+                            style="background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 20px;">
+                            <div
+                                style="font-size: 1.3em; color: #343a40; font-weight: 700; margin-bottom: 15px; text-align: center;">SALES
+                                PERFORMANCE (BY SALESPERSON)</div>
+                            <div style="text-align:right; margin-bottom:8px;">
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="DashAI.open('sales_perf_chart')">
+                                    <span class="fa fa-magic"></span> AI Analysis
+                                </button>
+                            </div>
+                            <div data-chart-key="sales_perf_chart">
+                                <t t-raw="dashboard_data.get('sales_perf_chart', '&lt;div style=&quot;text-align:center;padding:40px;&quot;&gt;No data available&lt;/div&gt;')" />
+                            </div>
+                        </div>
+
+                        <div
+                            style="background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 20px;">
+                            <div
+                                style="font-size: 1.3em; color: #343a40; font-weight: 700; margin-bottom: 15px; text-align: center;">LOST
+                                REASON ANALYSIS</div>
+                            <div style="text-align:right; margin-bottom:8px;">
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="DashAI.open('lost_reason_chart')">
+                                    <span class="fa fa-magic"></span> AI Analysis
+                                </button>
+                            </div>
+                            <div data-chart-key="lost_reason_chart">
+                                <t t-raw="dashboard_data.get('lost_reason_chart', '&lt;div style=&quot;text-align:center;padding:40px;&quot;&gt;No lost reason data available&lt;/div&gt;')" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- AI Insight Modal and Helper (CRM) -->
+                <div id="ai_insight_modal" style="display:none; position:fixed; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:5000;">
+                    <div id="ai_insight_dialog" style="background:#fff; max-width:1200px; width:1000px; position:absolute; top:5%; left:50%; transform:translateX(-50%); border-radius:8px; box-shadow:0 8px 30px rgba(0,0,0,0.2); overflow:hidden; height:80vh;">
+                        <div id="ai_insight_header" style="padding:12px 16px; border-bottom:1px solid #eee; display:flex; align-items:center; justify-content:space-between; cursor:move; user-select:none; position:sticky; top:0; background:#fff; z-index:1;">
+                            <div style="font-weight:700; color:#343a40;">📊 AI Chart Analysis</div>
+                            <button type="button" class="btn btn-sm btn-light" onclick="(function(m){ m.style.display='none'; try{ document.body.style.overflow=''; document.body.removeAttribute('data-ai-scroll'); }catch(e){} })(document.getElementById('ai_insight_modal'))">Close</button>
+                        </div>
+                        <div id="ai_insight_body" style="padding:16px; max-height:70vh; overflow:auto; background:#fff;">
+                            Loading...
+                        </div>
+                        <div id="ai_insight_resize" style="position:absolute; right:0; bottom:0; width:16px; height:16px; cursor:se-resize; background:transparent;"></div>
+                    </div>
+                </div>
+                <script type="text/javascript">
+                (function(){
+                    window.DashAI = {
+                        open: function(chartKey){
+                            var modal = document.getElementById('ai_insight_modal');
+                            var body = document.getElementById('ai_insight_body');
+                            var dialog = document.getElementById('ai_insight_dialog');
+                            if (!modal || !body) return;
+                            modal.style.display = 'block';
+                            body.innerHTML = 'Loading...';
+                            try { document.body.setAttribute('data-ai-scroll','1'); document.body.style.overflow='hidden'; } catch(e) {}
+                            try { modal.addEventListener('click', function(ev){ if (ev.target === modal){ modal.style.display='none'; try{ document.body.style.overflow=''; document.body.removeAttribute('data-ai-scroll'); }catch(e){} } }); } catch(e) {}
+                            try {
+                                if (dialog){
+                                    dialog.style.width = dialog.getAttribute('data-width') || '1000px';
+                                    dialog.style.height = dialog.getAttribute('data-height') || '80vh';
+                                    if (!dialog.getAttribute('data-left')){
+                                        dialog.style.left = '50%';
+                                        dialog.style.top = '5%';
+                                        dialog.style.transform = 'translateX(-50%)';
+                                    } else {
+                                        dialog.style.left = dialog.getAttribute('data-left');
+                                        dialog.style.top = dialog.getAttribute('data-top');
+                                        dialog.style.transform = 'none';
+                                    }
+                                }
+                            } catch(e) {}
+                            var params = new URLSearchParams(window.location.search);
+                            var defNode = document.getElementById('ai_defaults_sales') || document.getElementById('ai_defaults_crm');
+                            var payload = {
+                                chart_key: chartKey,
+                                date_filter: params.get('date_filter') || (defNode ? defNode.getAttribute('data-current_filter') : '') || '6months',
+                                year_filter: params.get('year_filter') || (defNode ? defNode.getAttribute('data-selected_year') : '') || '',
+                                date_from: params.get('date_from') || (defNode ? defNode.getAttribute('data-date_from') : '') || '',
+                                date_to: params.get('date_to') || (defNode ? defNode.getAttribute('data-date_to') : '') || '',
+                            };
+                            fetch('/predictive_engine/chart_insight', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(payload)
+                            }).then(function(r){ return r.json(); }).then(function(resp){
+                                console.log('AI Response:', resp);
+                                // Get HTML from response (handle both response structures)
+                                var insightHtml = (resp &amp;&amp; resp.result &amp;&amp; resp.result.html) || (resp &amp;&amp; resp.html) || '';
+                                if (insightHtml){
+                                    // Display only insights, pros, and cons - no chart
+                                    body.innerHTML = '';
+                                    var container = document.createElement('div');
+                                    container.style.width = '100%';
+                                    container.style.height = '100%';
+                                    container.style.overflow = 'auto';
+                                    container.style.overflowX = 'hidden';
+                                    container.style.overflowY = 'auto';
+                                    container.style.padding = '16px';
+                                    container.style.paddingRight = '8px';
+                                    container.style.wordBreak = 'break-word';
+                                    container.style.whiteSpace = 'normal';
+                                    container.innerHTML = insightHtml;
+                                    body.appendChild(container);
+                                } else {
+                                    console.log('AI Error - resp:', resp);
+                                    body.innerHTML = '<div style="color:#c00;">' + (resp &amp;&amp; resp.result &amp;&amp; resp.result.error ? resp.result.error : 'Failed to generate insights') + '</div>';
+                                }
+                            }).catch(function(e){
+                                console.log('AI Network Error:', e);
+                                body.innerHTML = '<div style="color:#c00;">' + (e &amp;&amp; e.message ? e.message : 'Network error') + '</div>';
+                            });
+                        }
+                    };
+                    try {
+                        var dialog = document.getElementById('ai_insight_dialog');
+                        var header = document.getElementById('ai_insight_header');
+                        var resize = document.getElementById('ai_insight_resize');
+                        if (dialog &amp;&amp; header &amp;&amp; resize){
+                            var drag = {active:false, x:0, y:0, left:0, top:0};
+                            header.addEventListener('mousedown', function(e){
+                                e.preventDefault();
+                                try { if (e.target &amp;&amp; (e.target.tagName === 'BUTTON' || (e.target.closest &amp;&amp; e.target.closest('button')))) { return; } } catch(err) {}
+                                drag.active = true;
+                                drag.x = e.clientX; drag.y = e.clientY;
+                                var rect = dialog.getBoundingClientRect();
+                                drag.left = rect.left; drag.top = rect.top;
+                                dialog.style.transform = 'none';
+                                function move(ev){
+                                    if (!drag.active) return;
+                                    var nl = drag.left + (ev.clientX - drag.x);
+                                    var nt = drag.top + (ev.clientY - drag.y);
+                                    nl = Math.max(8, Math.min(window.innerWidth - dialog.offsetWidth - 8, nl));
+                                    nt = Math.max(8, Math.min(window.innerHeight - dialog.offsetHeight - 8, nt));
+                                    dialog.style.left = nl + 'px';
+                                    dialog.style.top = nt + 'px';
+                                    dialog.setAttribute('data-left', dialog.style.left);
+                                    dialog.setAttribute('data-top', dialog.style.top);
+                                }
+                                function up(){ drag.active = false; document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', up); }
+                                document.addEventListener('mousemove', move);
+                                document.addEventListener('mouseup', up);
+                            });
+                            var sizing = {active:false, w:0, h:0, x:0, y:0};
+                            resize.addEventListener('mousedown', function(e){
+                                e.preventDefault();
+                                sizing.active = true; sizing.x = e.clientX; sizing.y = e.clientY;
+                                var rect = dialog.getBoundingClientRect(); sizing.w = rect.width; sizing.h = rect.height;
+                                function grow(ev){
+                                    if (!sizing.active) return;
+                                    var nw = Math.max(360, Math.min(window.innerWidth - 32, sizing.w + (ev.clientX - sizing.x)));
+                                    var nh = Math.max(220, Math.min(window.innerHeight - 32, sizing.h + (ev.clientY - sizing.y)));
+                                    dialog.style.width = nw + 'px';
+                                    dialog.style.height = nh + 'px';
+                                    dialog.setAttribute('data-width', dialog.style.width);
+                                    dialog.setAttribute('data-height', dialog.style.height);
+                                }
+                                function stop(){ sizing.active = false; document.removeEventListener('mousemove', grow); document.removeEventListener('mouseup', stop); }
+                                document.addEventListener('mousemove', grow);
+                                document.addEventListener('mouseup', stop);
+                            });
+                        }
+                    } catch(e) {}
+                })();
+                </script>
+            </t>
+        </t>
+    </template>
+
+    <!-- CRM Action -->
+    <record id="predictive_engine_crm_dashboard_action" model="ir.actions.act_window">
+        <field name="name">CRM</field>
+        <field name="res_model">predictive.engine</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+        <field name="context">{"default_dashboard_name": "CRM"}</field>
+        <field name="view_id" ref="view_predictive_engine_crm_dashboard_form" />
+    </record>
+
+    <!-- Registration Action -->
+    <record id="predictive_registration_action" model="ir.actions.act_window">
+        <field name="name">Registration</field>
+        <field name="res_model">predictive.registration</field>
+        <field name="view_mode">form</field>
+        <field name="help" type="html">
+            <p>Register your DashBoat access here.</p>
+        </field>
+    </record>
+
+    <!-- Dashboard Action -->
+    <record id="predictive_engine_dashboard_action" model="ir.actions.act_window">
+        <field name="name">Sales</field>
+        <field name="res_model">predictive.engine</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_predictive_engine_dashboard_form" />
+        <field name="target">current</field>
+    </record>
+
+    <!-- Root Menu for DashBoat -->
+    <menuitem id="menu_predictive_engine_root" name="DashBoat" sequence="1" />
+    <!-- Dashboard Submenu -->
+    <menuitem id="menu_predictive_engine_dashboard"
+        name="Sales"
+        parent="menu_predictive_engine_root"
+        action="predictive_engine_dashboard_action"
+        sequence="5" />
+    <!-- CRM Submenu -->
+    <menuitem id="menu_predictive_engine_crm_dashboard"
+        name="CRM"
+        parent="menu_predictive_engine_root"
+        action="predictive_engine_crm_dashboard_action"
+        sequence="6" />
+</odoo>

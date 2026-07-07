@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="email_template_reservation_expiry" model="mail.template">
+        <field name="name">Reservation Expiry Reminder</field>
+        <field name="model_id" ref="model_library_borrowing"/>
+        <field name="email_from">${object.company_id.email}</field>
+        <field name="email_to">${object.borrower_id.email}</field>
+        <field name="subject">Reservation Expiry Reminder for ${object.book_id.title}</field>
+        <field name="body_html">
+            <![CDATA[
+            <p>Dear ${object.borrower_id.name},</p>
+            <p>Your reservation for the book <strong>${object.book_id.title}</strong> is about to expire on ${object.expiry_date}.</p>
+            <p>Please borrow the book before the reservation expires.</p>
+            <p>Thank you!</p>
+            ]]>
+        </field>
+    </record>
+</odoo>

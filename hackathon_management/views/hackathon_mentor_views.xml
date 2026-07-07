@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_hackathon_mentor_list" model="ir.ui.view">
+            <field name="name">hackathon.mentor.list</field>
+            <field name="model">hackathon.mentor</field>
+            <field name="arch" type="xml">
+                <list string="Mentors" sample="1">
+                    <field name="name"/>
+                    <field name="designation"/>
+                    <field name="organization"/>
+                    <field name="expertise"/>
+                    <field name="team_count"/>
+                    <field name="max_teams"/>
+                    <field name="active"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_hackathon_mentor_form" model="ir.ui.view">
+            <field name="name">hackathon.mentor.form</field>
+            <field name="model">hackathon.mentor</field>
+            <field name="arch" type="xml">
+                <form string="Mentor">
+                    <sheet>
+                        <field name="image" widget="image" class="oe_avatar"/>
+                        <div class="oe_title">
+                            <label for="name" string="Mentor Name"/>
+                            <h1>
+                                <field name="name" placeholder="Enter mentor name"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="Contact Information">
+                                <field name="email"/>
+                                <field name="phone"/>
+                                <field name="linkedin_profile"/>
+                                <field name="website"/>
+                            </group>
+                            <group string="Professional Details">
+                                <field name="designation"/>
+                                <field name="organization"/>
+                                <field name="experience_years"/>
+                                <field name="active"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Availability">
+                                <field name="max_teams"/>
+                                <field name="team_count"/>
+                                <field name="availability" widget="text"/>
+                            </group>
+                            <group string="Expertise">
+                                <field name="expertise" widget="text"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Biography">
+                                <field name="bio" widget="html"/>
+                            </page>
+                            <page string="Assigned Teams">
+                                <field name="team_ids">
+                                    <list>
+                                        <field name="code"/>
+                                        <field name="name"/>
+                                        <field name="leader_id"/>
+                                        <field name="track_id"/>
+                                        <field name="state" widget="badge"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_hackathon_mentor" model="ir.actions.act_window">
+            <field name="name">Mentors</field>
+            <field name="res_model">hackathon.mentor</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+    </data>
+</odoo>

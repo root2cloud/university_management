@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_it_assets_tree" model="ir.ui.view">
+        <field name="name">it.assets.tree</field>
+        <field name="model">it.assets</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="item_code"/>
+                <field name="name"/>
+                <field name="item_user"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="view_it_assets_kanban" model="ir.ui.view">
+        <field name="name">it.assets.kanban</field>
+        <field name="model">it.assets</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="item_code"/>
+                <field name="name"/>
+                <field name="item_user"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card">
+                            <strong><field name="name"/></strong><br/>
+                            <span>Code: <field name="item_code"/></span><br/>
+                            <span>User: <field name="item_user"/></span>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_it_assets_form" model="ir.ui.view">
+        <field name="name">it.assets.form</field>
+        <field name="model">it.assets</field>
+        <field name="arch" type="xml">
+            <form string="IT Asset" readonly="asset_repaired in ['True']">
+                <sheet>
+                    <group>
+                        <field name="item_code" required="1"/>
+                        <field name="name" required="1"/>
+                        <field name="asset_type"/>
+                        <field name="item_user"/>
+                        <field name="system_id"/>
+                        <field name="asset_repaired"/>
+                    </group>
+                    <notebook>
+                        <page string="Components">
+                            <field name="all_components">
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+               <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_it_assets" model="ir.actions.act_window">
+        <field name="name">Assets</field>
+        <field name="res_model">it.assets</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first asset
+            </p>
+        </field>
+    </record>
+
+</odoo>

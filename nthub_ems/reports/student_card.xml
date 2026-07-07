@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+           <record id="ems_report_paperformat" model="report.paperformat">
+            <field name="name">EMS Report</field>
+            <field name="default" eval="True"/>
+            <field name="format">custom</field>
+            <field name="page_width">64</field>
+            <field name="page_height">100</field>
+            <field name="margin_top">0</field>
+            <field name="margin_bottom">0</field>
+            <field name="margin_left">0</field>
+            <field name="margin_right">0</field>
+            <field name="header_spacing">3</field>
+            <field name="orientation">Landscape</field>
+            <field name="header_line" eval="False"/>
+            <field name="dpi">90</field>
+        </record>
+
+                <record id="report_student_card" model="ir.actions.report">
+                    <field name="name">Student Card</field>
+                    <field name="model">education.record</field>
+                    <field name="report_type">qweb-pdf</field>
+                    <field name="report_name">nthub_ems.student_card_report</field>
+                    <field name="report_file">nthub_ems.student_card_report</field>
+                    <field name="binding_model_id" ref="model_education_record"/>
+                    <field name="binding_type">report</field>
+                    <field name="paperformat_id" ref="nthub_ems.ems_report_paperformat"/>
+                </record>
+
+        <template id="student_card_report">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.basic_layout">
+                        <div class="page">
+                            <div class="oe_structure">
+                                <div class="row">
+<!--                                                                        <div class="row">-->
+<!--                                                                            <div class="col-12 text-center">-->
+<!--                                                                                <span t-esc="res_company.name" style="display: block;"/>-->
+<!--                                                                                <img t-if="res_company.logo" t-att-src="image_data_uri(res_company.logo)"-->
+<!--                                                                                     height="100px"-->
+<!--                                                                                     width="150px"-->
+<!--                                                                                     alt="Logo"/>-->
+<!--                                                                            </div>-->
+<!--                                                                        </div>-->
+
+                                    <div class="col-4" width="50%" style="text-align: center; padding-top:0px;" >
+                                        <span t-esc="res_company.name" style="text-align: center;  font-size: 26px;"/>
+                                    </div>
+                                     <div class="col-4"  width="50%" style="margin:auto; padding-top:0px;" >
+                                        <img t-if="res_company.logo" t-att-src="image_data_uri(res_company.logo)"
+                                             height="80px"
+                                             width="140px"
+                                             alt="Logo" style="float: right; font-size: 26px; "/>
+                                    </div>
+                                    <hr style="border: 1px solid black;"/>
+                                    <center >
+                                        <div class="col-xs-12"  style="margin:auto;">
+                                            <table class="table table-condensed">
+                                                <tr>
+                                                    <td width="30%" >
+                                                        <p style="text-align: center;">
+                                                            <div class="image-container" style="float: left;">
+                                                                <t t-foreach="docs" t-as="o">
+                                                                    <img t-att-src="image_data_uri(o.student_id.image_1920)"
+                                                                         t-if="o.student_id.image_1920"
+                                                                         alt="not found"
+                                                                         class="student-image"
+                                                                         style="max-width: 120px; max-height: 120px;"/>
+                                                                </t>
+                                                            </div>
+                                                            <br/>
+                                                            <br/>
+                                                        </p>
+                                                    </td>
+                                                    <td width="70%" >
+                                                        <table width="140%" height="80px" >
+                                                            <tr>
+                                                                <td style="font-family: 'Helvetica';padding-left:20px;">
+                                                                    <strong>Name :</strong>
+                                                                    <span t-field="doc.student_id.name"/>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="font-family: 'Helvetica';padding-left:20px;">
+                                                                    <strong>Level :</strong>
+                                                                    <span t-field="doc.level_id"/>
+                                                                </td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td style="font-family: 'Helvetica';padding-left:20px;">
+                                                                    <strong>Division :</strong>
+                                                                    <span t-field="doc.sub_department_id"/>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="font-family: 'Helvetica';padding-left:20px;">
+                                                                    <strong>Department :</strong>
+                                                                    <span t-field="doc.department_id"/>
+                                                                </td>
+                                                            </tr>
+                                                             <tr>
+                                                                <td style="font-family: 'Helvetica';padding-left:20px;">
+                                                                    <strong>Education State :</strong>
+                                                                    <span t-field="doc.eds"/>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="font-family: 'Helvetica'; padding-left: 60px; font-size: 27px; color: darkred;">
+                                                                    <strong style=" padding-left: 60px;" >
+                                                                        <span t-esc="doc.yro"/>
+                                                                        /
+                                                                        <span t-esc="doc.yro + 1"/>
+                                                                    </strong>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                        <div>
+                                                            <img t-att-src="'/report/barcode/Code128/'+doc.student_id.name"
+                                                                 style="width:210px;height:60px" alt="Barcode"/>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </center>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

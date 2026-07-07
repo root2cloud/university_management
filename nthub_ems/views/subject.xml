@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--define a view list -->
+        <record id="subject_view_tree" model="ir.ui.view">
+            <field name="name">subject_view_tree</field>
+            <field name="model">subject</field>
+            <field name="arch" type="xml">
+                <list multi_edit="1">
+                    <field name="name" />
+                    <field name="alternative_name" />
+                    <field name="instructor_ids" widget="many2many_tags" />
+                    <field name="level_id" />
+                    <field name="department_id" />
+                    <field name="sub_department_id" />
+                    <field name="code" />
+                    <field name="total_mark" />
+                </list>
+            </field>
+        </record>
+        <!--define a view form -->
+        <record id="subject_view_form" model="ir.ui.view">
+            <field name="name">subject_view_form</field>
+            <field name="model">subject</field>
+            <field name="arch" type="xml">
+                <form string="subject_form">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" default_focus="1" placeholder="Enter Name" />
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="Educational Data">
+                                <field name="alternative_name" />
+                                <field name="code" />
+                                <field name="level_id" />
+                                <field name="department_id" options="{'no_open': True, 'no_create': True}" />
+                                <field name="sub_department_id" options="{'no_open': True, 'no_create': True}" />
+                                <field name="instructor_ids" options="{'no_open': True, 'no_create': True}" widget="many2many_tags" />
+                            </group>
+                            <group string="Evaluation Data">
+                                <field name="oral_mark" />
+                                <field name="mid_term_mark" />
+                                <field name="final_full_mark" />
+                                <field name="total_mark" />
+                                <field name="lecture_hours" />
+                                <field name="section_hours" />
+                                <field name="practical_hours" />
+                                <field name="final_exam_hours" />
+                            </group>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <chatter reload_on_follower="True"/>
+                        <!-- <field name="message_follower_ids" />
+                        <field name="activity_ids" />
+                        <field name="message_ids" /> -->
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!--define a view search -->
+        <record model="ir.ui.view" id="view_subject_search">
+            <field name="name">subject.search</field>
+            <field name="model">subject</field>
+            <field name="arch" type="xml">
+                <search>
+                    <group expand="0" string="Group By">
+                        <filter string="Level" name="group_by_level_id" context="{'group_by': 'level_id'}" />
+                        <filter string="Department" name="group_by_department_id" context="{'group_by': 'department_id'}" />
+                        <filter string="Division" name="group_by_sub_department_id" context="{'group_by': 'sub_department_id'}" />
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!--  define action-->
+        <record id="subject_action" model="ir.actions.act_window">
+            <field name="name">Subject</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">subject</field>
+            <field name="view_mode">list,form</field>
+            <field name="context" eval="{'search_default_group_by_level_id': 1, 'search_default_group_by_department_id': 1, 'search_default_group_by_sub_department_id': 1,}" />
+        </record>
+    </data>
+</odoo>

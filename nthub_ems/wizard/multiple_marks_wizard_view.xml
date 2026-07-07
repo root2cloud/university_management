@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Define a view for the wizard to create multiple marks -->
+        <record id="view_wizard_multiple_marks_form" model="ir.ui.view">
+            <field name="name">multiple.marks.wizard.form</field>
+            <field name="model">multiple.marks</field>
+            <field name="arch" type="xml">
+                <!-- Define a form view -->
+                <form>
+                    <!-- Grouping fields for better organization -->
+                    <group>
+                        <group>
+                            <!-- Fields related to academic records -->
+                            <field name="yro" widget="char"/>
+                            <field name="level_id"/>
+                            <field name="department_id"/>
+                            <field name="sub_department_id"/>
+                            <field name="subject_id"/>
+                        </group>
+                    </group>
+                    <!-- Footer buttons for actions -->
+                    <footer>
+                        <!-- Button to create multiple records -->
+                        <button name="action_create_multiple_records" type="object" string="Create" class="btn-primary" date-hotkey="q"/>
+                        <!-- Cancel button -->
+                        <button special="cancel" date-hotkey="z" string="Discard"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

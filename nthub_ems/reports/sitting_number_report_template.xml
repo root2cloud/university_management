@@ -1,0 +1,186 @@
+<odoo>
+    <record id="data_sittring_number_report_paperformat" model="report.paperformat">
+        <field name="name">Siting Number</field>
+        <field name="default" eval="True"/>
+        <field name="format">A4</field>
+        <field name="page_width">0</field>
+        <field name="page_height">0</field>
+        <field name="margin_top">10</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">3</field>
+        <field name="margin_right">3</field>
+        <field name="header_spacing">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="header_line" eval="False"/>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="sitting_wizard_reports" model="ir.actions.report">
+        <field name="name">Sitting Detail</field>
+        <field name="model">multiple.academic.records</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">nthub_ems.sitting_templates_report</field>
+        <field name="report_file">nthub_ems.sitting_templates_report</field>
+        <field name="binding_model_id" ref="model_multiple_academic_records"/>
+        <field name="paperformat_id" ref="nthub_ems.data_sittring_number_report_paperformat"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="nthub_ems.sitting_templates_report">
+        <t t-call="web.html_container">
+            <t t-call="web.basic_layout">
+
+                <div class="row" style="border: 1px solid black; height: 100px; width:100%;">
+                    <div class="col-6" align="left" style="width:50%;">
+                        <img t-if="res_company.logo" t-att-src="image_data_uri(res_company.logo)"
+                             height="80px"
+                             width="140px"
+                             alt="Logo"/>
+                    </div>
+
+                    <div class="col-6" align="right" style="width:50%;">
+                        <strong t-esc="res_company.name"
+                                style="font-size: 26px; position: relative; top:20px; right:10px"/>
+                    </div>
+                </div>
+                <br/>
+                <div class="text-center" style="text-align: center;">
+
+<!--                    <strong class="text-center"-->
+<!--                            style="font-size: 26px; position: relative; left:45%; top:5px; border-bottom:2px solid black;">-->
+<!--                        <span t-esc="form['level_id']" style="font-size: 20px;"/>-->
+<!--                        <span>قائمه توزيع ارقام الجلوس لطﻻب فرقه</span>-->
+<!--                    </strong>-->
+                    <strong>
+                    <h5 style="text-align:center;; margin-right: 5px;">
+
+<!--                        <span t-esc="form['yro']" style="font-size: 20px;"/>-->
+<!--                        <span>:عام</span>-->
+<!--                        <span t-esc="form['sub_department_id']" style="font-size: 20px;"/>-->
+<!--                        <span>: شعبه</span>-->
+<!--                        <span t-esc="form['department_id']" style="font-size: 20px;"/>-->
+<!--                        <span>قسم</span>-->
+                        <span t-esc="form['level_id']" style="font-size: 20px;"/>
+                        <span>قائمه توزيع ارقام الجلوس لطﻻب فرقه</span>
+                    </h5>
+                         <h5 style="text-align:center;; margin-right: 5px;">
+                              <span t-esc="form['sub_department_id']" style="font-size: 20px;"/>
+                        <span>: شعبه</span>
+                           <span t-esc="form['department_id']" style="font-size: 20px;"/>
+                        <span>قسم</span>
+
+
+                    </h5>
+
+                        <h5 style="text-align:center;; margin-right: 5px;">
+                            <span t-esc="form['yro']" style="font-size: 20px;"/>
+                             <span>/</span>
+                              <span t-esc="form['yro']+1" style="font-size: 20px;"/>
+                        <span>:عام</span>
+
+
+
+                    </h5>
+                    </strong>
+                </div>
+
+                <br/>
+                <br/>
+                <br/>
+
+                <div class="page">
+
+
+                     <style>
+                        /* Define custom CSS styles */
+                        .table-bordered td:nth-child(1),
+                        .table-bordered th:nth-child(1) {
+                        /* Adjust width of the first column */
+                        width: 5%;
+                        }
+
+                        .table-bordered td:nth-child(2),
+                        .table-bordered th:nth-child(2) {
+                        /* Adjust width of the second column */
+                        width: 15%;
+                        }
+
+                        .table-bordered td:nth-child(3),
+                        .table-bordered th:nth-child(3) {
+                        /* Adjust width of the third column */
+                        width: 10%;
+                        }
+
+                        .table-bordered td:nth-child(4),
+                        .table-bordered th:nth-child(4) {
+                        /* Adjust width of the fourth column */
+                        width: 70%;
+                        }
+                    </style>
+
+                    <table class="table" style="font-size:15px; text-align:center; border:1px solid black !important;">
+                        <thead>
+                            <tr>
+                                <th style="border:1px solid black !important; background-color:#C0C0C0;" >Number</th>
+                                <th style="border:1px solid black !important; background-color:#C0C0C0;">Names</th>
+                                <th style="border:1px solid black !important; background-color:#C0C0C0;">Sitting Number</th>
+                                <th style="border:1px solid black !important; background-color:#C0C0C0;">Notes</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <t t-if="form['number_two']">
+                                <tr>
+                                    <td style="border:1px solid black !important;">
+                                        <span>1</span>
+                                    </td>
+                                    <td style="border:1px solid black !important;">
+                                        <t t-esc="form['record']['student_id'][1]"/>
+                                    </td>
+                                    <td style="border:1px solid black !important;">
+                                        <t t-esc="form['record']['sitting_number']"/>
+                                    </td>
+                                    <td style="border:1px solid black !important;">
+                                        <span/>
+                                    </td>
+                                </tr>
+                            </t>
+
+                            <t t-else="">
+                                <t t-set="serial_number" t-value="1"/>
+                                <t t-foreach="form['records']" t-as="rec">
+                                    <tr>
+                                        <td style="border:1px solid black !important;">
+                                            <t t-esc="serial_number"/>
+                                        </td>
+                                        <td style="border:1px solid black !important;">
+                                            <t t-esc="rec['student_id'][1]"/>
+                                        </td>
+                                        <td style="border:1px solid black !important;">
+                                            <t t-esc="rec['sitting_number']"/>
+                                        </td>
+                                        <td style="border:1px solid black !important;">
+                                            <span/>
+                                        </td>
+                                    </tr>
+                                    <t t-set="serial_number" t-value="serial_number + 1"/>
+                                </t>
+                            </t>
+                        </tbody>
+                    </table>
+
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <h2 style="text-align:right; margin-right: 5px;">...............:التوقيع</h2>
+
+                </div>
+
+            </t>
+        </t>
+    </template>
+</odoo>
+

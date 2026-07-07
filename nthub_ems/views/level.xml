@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+<!--define a view form -->
+        <record id="level_form_view" model="ir.ui.view">
+            <field name="name">level_form</field>
+            <field name="model">level</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" default_focus="1" placeholder="Enter Name" />
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="alternative_name" />
+                                <field name="sum_mark_level" />
+                                <field name="final_year" />
+                            </group>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <chatter reload_on_follower="True"/>
+                        <!-- <field name="message_follower_ids" />
+                        <field name="activity_ids" />
+                        <field name="message_ids" /> -->
+                    </div>
+                </form>
+            </field>
+        </record>
+
+<!--define a view list -->
+        <record id="level_view_tree" model="ir.ui.view">
+            <field name="name">level_view_tree</field>
+            <field name="model">level</field>
+            <field name="arch" type="xml">
+                <list multi_edit="1" string="level">
+                    <field name="name" />
+                    <field name="alternative_name" />
+                    <field name="sum_mark_level" />
+                </list>
+            </field>
+        </record>
+<!--define a view action -->
+        <record id="level_action" model="ir.actions.act_window">
+            <field name="name">level</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">level</field>
+            <field name="view_mode">list,form</field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template2" xml:space="preserve">
+     <t t-name="HelloComponent" owl="1">
+        <div class="hello-component p-3 border rounded bg-light">
+            <h4 class="text-center mb-3">Hello, Odoo!</h4>
+            <p class="text-center">This is a simple Owl component template.</p>
+        </div>
+    </t>
+</templates>

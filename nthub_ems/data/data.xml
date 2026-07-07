@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+<!--    data to max_yro-->
+    <data noupdate="1">
+        <record id="nthub_ems.maxyro" model="ir.config_parameter">
+            <field name="key">nthub_ems.maxyro</field>
+            <field name="value">1</field>
+        </record>
+
+         <record id="nthub_ems_evaluation_type" model="ir.config_parameter">
+            <field name="key">nthub_ems.evaluation_type</field>
+            <field name="value">degree</field>
+        </record>
+    </data>
+</odoo>
+
+

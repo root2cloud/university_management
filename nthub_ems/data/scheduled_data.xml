@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="ir_cron_auto_change_state_eduction_record" model="ir.cron">
+            <field name="name">Auto Change State Academic Records</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">weeks</field>
+            <!-- <field name="numbercall">-1</field> -->
+            <field name="model_id" ref="model_education_record"/>
+            <field name="code">model.auto_change_state_eduction_record()</field>
+            <field name="state">code</field>
+        </record>
+    </data>
+
+    <!-- <record id="ir_cron_auto_post_draft_entry" model="ir.cron">
+        <field name="name">Account: Post draft entries with auto_post enabled and accounting date up to today</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="nextcall" eval="(DateTime.now().replace(hour=2, minute=0) + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <field name="model_id" ref="model_account_move"/>
+        <field name="code">model._autopost_draft_entries()</field>
+        <field name="state">code</field>
+    </record> -->
+</odoo>
+
+<!-- <?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+         <record id="ir_cron_auto_change_state_eduction_record" model="ir.cron">
+            <field name="name">Auto Change State Academic Records</field>
+            <field name="model_id" ref="model_education_record"/>
+            <field name="type">ir.actions.server</field>
+            <field name="state">code</field>
+            <field name="code">model.auto_change_state_eduction_record()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">weeks</field>
+            <field name="numbercall">-1</field>
+        </record>
+    </data>
+</odoo>
+
+ -->

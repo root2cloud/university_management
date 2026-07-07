@@ -1,0 +1,17 @@
+<odoo>
+    <!-- Action for Prediction Analysis Registration -->
+    <record id="action_prediction_analysis_registration" model="ir.actions.act_window">
+        <field name="name">Prediction Analysis Registration</field>
+        <field name="res_model">prediction.analysis.registration</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_prediction_analysis_registration_list" />
+        <field name="target">current</field>
+    </record>
+
+    <!-- Prediction Analysis Registration Menu after Chatbot -->
+    <menuitem id="menu_prediction_analysis_registration"
+        name="Settings"
+        parent="menu_predictive_engine_root"
+        action="action_prediction_analysis_registration"
+        sequence="7" />
+</odoo>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_school_library_issue_tree" model="ir.ui.view">
+        <field name="name">school.library.issue.tree</field>
+        <field name="model">school.library.issue</field>
+        <field name="arch" type="xml">
+            <list string="Issued Books">
+                <field name="student_id"/>
+                <field name="book_id"/>
+                <field name="issue_date"/>
+                <field name="return_date"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_school_library_issue_form" model="ir.ui.view">
+        <field name="name">school.library.issue.form</field>
+        <field name="model">school.library.issue</field>
+        <field name="arch" type="xml">
+            <form string="Issue Book">
+                <header>
+                <button name="return_book"
+                        type="object"
+                        string="Return Book"
+                        class="btn-primary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="student_id"/>
+                        <field name="book_id"/>
+                        <field name="issue_date"/>
+                        <field name="return_date"/>
+                        <field name="state"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action Window -->
+    <record id="action_school_library_issue" model="ir.actions.act_window">
+        <field name="name">Issued Books</field>
+        <field name="res_model">school.library.issue</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Issue a book to a student.</p>
+        </field>
+    </record>
+
+    <!-- Menu Items -->
+    <menuitem id="menu_school_library_issue" name="Issue Books"
+              parent="menu_school_library_root" action="action_school_library_issue"/>
+</odoo>

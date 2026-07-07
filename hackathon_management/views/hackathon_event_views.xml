@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Tree View -->
+        <record id="view_hackathon_event_list" model="ir.ui.view">
+            <field name="name">hackathon.event.list</field>
+            <field name="model">hackathon.event</field>
+            <field name="arch" type="xml">
+                <list string="Hackathon Events" sample="1">
+                    <field name="code"/>
+                    <field name="name"/>
+                    <field name="start_date"/>
+                    <field name="end_date"/>
+                    <field name="venue"/>
+                    <field name="total_teams"/>
+                    <field name="total_participants"/>
+                    <field name="state" widget="badge" decoration-success="state == 'completed'" decoration-info="state == 'ongoing'" decoration-warning="state == 'registration'"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Form View -->
+        <record id="view_hackathon_event_form" model="ir.ui.view">
+            <field name="name">hackathon.event.form</field>
+            <field name="model">hackathon.event</field>
+            <field name="arch" type="xml">
+                <form string="Hackathon Event">
+                    <header>
+                        <button name="action_publish" string="Publish" type="object" invisible="state != 'draft'" class="oe_highlight"/>
+                        <button name="action_open_registration" string="Open Registration" type="object" invisible="state != 'published'" class="oe_highlight"/>
+                        <button name="action_start_hackathon" string="Start Hackathon" type="object" invisible="state != 'registration'" class="oe_highlight"/>
+                        <button name="action_start_judging" string="Start Judging" type="object" invisible="state != 'ongoing'" class="oe_highlight"/>
+                        <button name="action_complete" string="Complete" type="object" invisible="state != 'judging'" class="oe_highlight"/>
+                        <button name="action_cancel" string="Cancel" type="object" invisible="state in ['completed', 'cancelled']" confirm="Are you sure you want to cancel this event?"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,published,registration,ongoing,judging,completed"/>
+                    </header>
+                    <sheet>
+                        <field name="image" widget="image" class="oe_avatar"/>
+                        <div class="oe_title">
+                            <label for="name" string="Hackathon Name"/>
+                            <h1>
+                                <field name="name" placeholder="e.g., CodeFest 2025"/>
+                            </h1>
+                            <label for="code"/>
+                            <h3>
+                                <field name="code" readonly="1"/>
+                            </h3>
+                        </div>
+                        <group>
+                            <group string="Event Details">
+                                <field name="theme"/>
+                                <field name="organizer_id"/>
+                                <field name="organizer_contact"/>
+                                <field name="organizer_phone"/>
+                            </group>
+                            <group string="Venue Information">
+                                <field name="venue"/>
+                                <field name="venue_address"/>
+                                <field name="venue_capacity"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Registration Period">
+                                <field name="registration_start_date"/>
+                                <field name="registration_end_date"/>
+                            </group>
+                            <group string="Event Period">
+                                <field name="start_date"/>
+                                <field name="end_date"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Team Configuration">
+                                <field name="allow_solo"/>
+                                <field name="min_team_size"/>
+                                <field name="max_team_size"/>
+                            </group>
+                            <group string="Statistics">
+                                <field name="total_teams"/>
+                                <field name="total_participants"/>
+                                <field name="total_submissions"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Description &amp; Rules">
+                                <group>
+                                    <field name="description" nolabel="1" widget="html"/>
+                                    <field name="rules" string="Rules &amp; Guidelines" widget="html"/>
+                                    <field name="eligibility" string="Eligibility Criteria" widget="html"/>
+                                </group>
+                            </page>
+                            <page string="Prizes">
+                                <group>
+                                    <group>
+                                        <field name="currency_id" invisible="1"/>
+                                        <field name="first_prize"/>
+                                        <field name="second_prize"/>
+                                        <field name="third_prize"/>
+                                    </group>
+                                    <group>
+                                        <field name="special_prizes" widget="text"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Tracks/Problem Statements">
+                                <field name="track_ids">
+                                    <list editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="name"/>
+                                        <field name="difficulty_level"/>
+                                        <field name="sponsor_id"/>
+                                        <field name="team_count"/>
+                                    </list>
+                                </field>
+                            </page>
+                            <page string="Teams">
+                                <field name="team_ids">
+                                    <list>
+                                        <field name="code"/>
+                                        <field name="name"/>
+                                        <field name="leader_id"/>
+                                        <field name="track_id"/>
+                                        <field name="member_count"/>
+                                        <field name="state" widget="badge"/>
+                                    </list>
+                                </field>
+                            </page>
+                            <page string="Participants">
+                                <field name="participant_ids">
+                                    <list>
+                                        <field name="name"/>
+                                        <field name="email"/>
+                                        <field name="institution"/>
+                                        <field name="team_id"/>
+                                        <field name="is_team_leader"/>
+                                        <field name="state" widget="badge"/>
+                                    </list>
+                                </field>
+                            </page>
+                            <page string="Mentors &amp; Judges">
+                                <group>
+                                    <group string="Mentors">
+                                        <field name="mentor_ids" nolabel="1">
+                                            <list>
+                                                <field name="name"/>
+                                                <field name="organization"/>
+                                                <field name="team_count"/>
+                                            </list>
+                                        </field>
+                                    </group>
+                                    <group string="Judges">
+                                        <field name="judge_ids" nolabel="1">
+                                            <list>
+                                                <field name="name"/>
+                                                <field name="organization"/>
+                                                <field name="expertise"/>
+                                            </list>
+                                        </field>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Submissions">
+                                <field name="submission_ids">
+                                    <list>
+                                        <field name="name"/>
+                                        <field name="team_id"/>
+                                        <field name="track_id"/>
+                                        <field name="average_score"/>
+                                        <field name="state" widget="badge"/>
+                                        <field name="is_winner"/>
+                                    </list>
+                                </field>
+                            </page>
+                            <page string="Resources">
+                                <group>
+                                    <field name="resources_provided" string="Resources Provided" widget="html"/>
+                                    <field name="api_keys" string="API Keys &amp; Access" widget="text"/>
+                                    <field name="datasets" string="Available Datasets" widget="text"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <!-- Kanban View -->
+        <record id="view_hackathon_event_kanban" model="ir.ui.view">
+            <field name="name">hackathon.event.kanban</field>
+            <field name="model">hackathon.event</field>
+            <field name="arch" type="xml">
+                <kanban class="o_kanban_mobile" sample="1">
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="start_date"/>
+                    <field name="venue"/>
+                    <field name="total_teams"/>
+                    <field name="state"/>
+                    <templates>
+                        <t t-name="card">
+                            <div class="o_kanban_card_header">
+                                <div class="o_kanban_card_header_title">
+                                    <div class="o_primary"><field name="name"/></div>
+                                    <div class="o_secondary"><field name="code"/></div>
+                                </div>
+                            </div>
+                            <div class="container o_kanban_card_content mt-3">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <span><i class="fa fa-calendar"/> <field name="start_date"/></span>
+                                    </div>
+                                    <div class="col-6">
+                                        <span><i class="fa fa-map-marker"/> <field name="venue"/></span>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-6">
+                                        <span><i class="fa fa-users"/> <field name="total_teams"/> Teams</span>
+                                    </div>
+                                    <div class="col-6">
+                                        <field name="state" widget="badge"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- Search View -->
+        <record id="view_hackathon_event_search" model="ir.ui.view">
+            <field name="name">hackathon.event.search</field>
+            <field name="model">hackathon.event</field>
+            <field name="arch" type="xml">
+                <search string="Search Hackathon Events">
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="venue"/>
+                    <field name="theme"/>
+                    <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                    <filter string="Registration Open" name="registration" domain="[('state', '=', 'registration')]"/>
+                    <filter string="Ongoing" name="ongoing" domain="[('state', '=', 'ongoing')]"/>
+                    <filter string="Completed" name="completed" domain="[('state', '=', 'completed')]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                        <filter string="Organizer" name="group_organizer" context="{'group_by': 'organizer_id'}"/>
+                        <filter string="Start Date" name="group_start_date" context="{'group_by': 'start_date'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="action_hackathon_event" model="ir.actions.act_window">
+            <field name="name">Hackathon Events</field>
+            <field name="res_model">hackathon.event</field>
+            <field name="view_mode">kanban,list,form</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create your first Hackathon Event
+                </p>
+                <p>
+                    Start organizing an amazing hackathon by creating an event with all the details, tracks, and prizes.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

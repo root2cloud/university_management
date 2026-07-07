@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_hackathon_track_list" model="ir.ui.view">
+            <field name="name">hackathon.track.list</field>
+            <field name="model">hackathon.track</field>
+            <field name="arch" type="xml">
+                <list string="Tracks" editable="bottom" sample="1">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="event_id"/>
+                    <field name="difficulty_level"/>
+                    <field name="sponsor_id"/>
+                    <field name="team_count"/>
+                    <field name="active"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_hackathon_track_form" model="ir.ui.view">
+            <field name="name">hackathon.track.form</field>
+            <field name="model">hackathon.track</field>
+            <field name="arch" type="xml">
+                <form string="Track">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" string="Track Name"/>
+                            <h1>
+                                <field name="name" placeholder="e.g., Healthcare Innovation"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="event_id"/>
+                                <field name="difficulty_level"/>
+                                <field name="technologies"/>
+                            </group>
+                            <group>
+                                <field name="sponsor_id"/>
+                                <field name="sponsor_prize"/>
+                                <field name="currency_id" invisible="1"/>
+                                <field name="team_count"/>
+                                <field name="active"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Problem Statement">
+                                <group>
+                                    <field name="description" widget="html"/>
+                                    <field name="problem_statement" widget="html"/>
+                                </group>
+                            </page>
+                            <page string="Resources">
+                                <group>
+                                    <field name="reference_links" widget="text"/>
+                                    <field name="sample_data" widget="text"/>
+                                </group>
+                            </page>
+                            <page string="Teams">
+                                <field name="team_ids">
+                                    <list>
+                                        <field name="code"/>
+                                        <field name="name"/>
+                                        <field name="leader_id"/>
+                                        <field name="member_count"/>
+                                        <field name="state" widget="badge"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_hackathon_track" model="ir.actions.act_window">
+            <field name="name">Tracks</field>
+            <field name="res_model">hackathon.track</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+    </data>
+</odoo>

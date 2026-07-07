@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Kanban View -->
+    <record id="view_it_component_kanban" model="ir.ui.view">
+    <field name="name">it.components.kanban</field>
+    <field name="model">it.components</field>
+    <field name="arch" type="xml">
+        <kanban records_draggable="0" class="o_kanban_example">
+            <field name="id" invisible="1"/>
+            <templates>
+                <t t-name="kanban-box">
+                    <div class="oe_kanban_global_click">
+                        <div class="d-flex" style="height: 150px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+                            <!-- Left side: Image (50%) -->
+                            <div style="flex: 1; min-width: 50%; max-width: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #f8f9fa;">
+                                <img t-att-src="kanban_image('it.components', 'image_1920', record.id.raw_value)"
+                                    alt="Component Image"
+                                    style="max-height: 140px; max-width: 100%; object-fit: contain;"/>
+                            </div>
+                            <!-- Right side: Details (50%) -->
+                            <div style="flex: 1; padding: 12px; display: flex; flex-direction: column; justify-content: center;">
+                                <h4 class="o_kanban_record_title" style="margin-bottom: 8px; font-weight: 600; font-size: 1.2em;">
+                                    <field name="name"/>
+                                </h4>
+                                <div><strong>Component No:</strong> <field name="comp_number"/></div>
+                                <div><strong>Assignee:</strong> <field name="user"/></div>
+                                <div><strong>Serial No:</strong> <field name="serial_number"/></div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </templates>
+        </kanban>
+    </field>
+    </record>
+
+    <!-- Tree View (for fallback navigation) -->
+    <record id="view_it_component_tree" model="ir.ui.view">
+        <field name="name">it.components.tree</field>
+        <field name="model">it.components</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="comp_number"/>
+                <field name="user"/>
+                <field name="asset_kind"/>
+                <field name="serial_number"/>
+                <field name="total_quantity"/>
+                <field name="available_quantity"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_it_component_form" model="ir.ui.view">
+    <field name="name">it.components.form</field>
+    <field name="model">it.components</field>
+    <field name="arch" type="xml">
+        <form>
+            <header>
+                 <field name="state" widget="statusbar"/>
+            </header>
+            <sheet>
+                <div class="oe_title">
+                    <h1><field name="name" required="1"/></h1>
+                </div>
+
+                <div>
+                    <group>
+                        <group>
+                            <field name="comp_number"/>
+                            <field name="asset_kind" widget="radio"/>
+                            <field name="serial_number"/>
+                            <field name="brand"/>
+                            <field name="model"/>
+                            <field name="is_repair"/>
+                        </group>
+
+                        <group>
+                            <field name="user" widget="many2many_tags" readonly="1"/>
+                            <field name="vendor_id" domain="[('is_vendor', '=', True)]"/>
+                            <field name="total_quantity"/>
+                            <field name="available_quantity"/>
+                        </group>
+                    </group>
+                </div>
+
+                <div>
+                    <field name="image_1920" widget="image" class="oe_avatar" options="{'preview_image': 'image_1920'}" nolabel="1" style="margin-top: -360px"/>
+                </div>
+
+                <notebook>
+                    <page string="Technical Info" invisible="asset_kind in ['physical']">
+                        <group>
+                            <field name="os_type"/>
+                            <field name="ip_address"/>
+                            <field name="license"/>
+                        </group>
+                    </page>
+
+                    <page string="Warranty Info">
+                        <group>
+                            <field name="buy_date"/>
+                            <field name="warranty"/>
+                            <field name="warranty_end_date"/>
+                        </group>
+                    </page>
+
+                    <page string="Used Users">
+                        <field name="used_users">
+                            <list editable="bottom">
+                                <field name="user_id"/>
+                                <field name="last_used_date"/>
+                            </list>
+                        </field>
+                    </page>
+
+                    <page string="IT Assets">
+                        <field name="it_assets">
+                            <list editable="bottom">
+                                <field name="name"/>
+                                <field name="item_code"/>
+                            </list>
+                        </field>
+                    </page>
+                </notebook>
+            </sheet>
+            
+            <chatter/>
+
+        </form>
+    </field>
+    </record>
+
+    <!-- Action Window -->
+    <record id="action_it_components" model="ir.actions.act_window">
+        <field name="name">Components</field>
+        <field name="res_model">it.components</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No components found. Create one now!
+            </p>
+        </field>
+    </record>
+
+</odoo>

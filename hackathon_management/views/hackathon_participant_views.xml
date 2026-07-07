@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_hackathon_participant_list" model="ir.ui.view">
+            <field name="name">hackathon.participant.list</field>
+            <field name="model">hackathon.participant</field>
+            <field name="arch" type="xml">
+                <list string="Participants" sample="1">
+                    <field name="name"/>
+                    <field name="email"/>
+                    <field name="phone"/>
+                    <field name="institution"/>
+                    <field name="event_id"/>
+                    <field name="team_id"/>
+                    <field name="is_team_leader"/>
+                    <field name="state" widget="badge" decoration-success="state == 'checked_in'" decoration-info="state == 'verified'"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_hackathon_participant_form" model="ir.ui.view">
+            <field name="name">hackathon.participant.form</field>
+            <field name="model">hackathon.participant</field>
+            <field name="arch" type="xml">
+                <form string="Participant">
+                    <header>
+                        <button name="action_verify" string="Verify" type="object" invisible="state != 'registered'" class="oe_highlight"/>
+                        <button name="action_check_in" string="Check In" type="object" invisible="state != 'verified'" class="oe_highlight"/>
+                        <button name="action_withdraw" string="Withdraw" type="object" invisible="state == 'withdrawn'" confirm="Are you sure?"/>
+                        <field name="state" widget="statusbar" statusbar_visible="registered,verified,checked_in"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" string="Full Name"/>
+                            <h1>
+                                <field name="name" placeholder="Enter full name"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="Contact Information">
+                                <field name="email"/>
+                                <field name="phone"/>
+                                <field name="event_id"/>
+                                <field name="team_id"/>
+                                <field name="is_team_leader"/>
+                            </group>
+                            <group string="Personal Details">
+                                <field name="date_of_birth"/>
+                                <field name="gender"/>
+                                <field name="tshirt_size"/>
+                                <field name="dietary_preferences"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Academic Details">
+                                <field name="institution"/>
+                                <field name="department"/>
+                                <field name="year_of_study"/>
+                                <field name="student_id"/>
+                            </group>
+                            <group string="Technical Profile">
+                                <field name="experience_level"/>
+                                <field name="programming_languages"/>
+                                <field name="github_profile"/>
+                                <field name="linkedin_profile"/>
+                                <field name="portfolio"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Skills &amp; Experience">
+                                <group>
+                                    <field name="skills" widget="text"/>
+                                </group>
+                            </page>
+                            <page string="Emergency Contact">
+                                <group>
+                                    <group>
+                                        <field name="emergency_contact_name"/>
+                                        <field name="emergency_contact_phone"/>
+                                    </group>
+                                    <group>
+                                        <field name="medical_conditions" widget="text"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Registration Details">
+                                <group>
+                                    <group>
+                                        <field name="registration_date"/>
+                                        <field name="check_in_date"/>
+                                    </group>
+                                    <group>
+                                        <field name="certificate_issued"/>
+                                        <field name="active"/>
+                                    </group>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_hackathon_participant_search" model="ir.ui.view">
+            <field name="name">hackathon.participant.search</field>
+            <field name="model">hackathon.participant</field>
+            <field name="arch" type="xml">
+                <search string="Search Participants">
+                    <field name="name"/>
+                    <field name="email"/>
+                    <field name="institution"/>
+                    <field name="team_id"/>
+                    <field name="event_id"/>
+                    <filter string="Team Leaders" name="team_leaders" domain="[('is_team_leader', '=', True)]"/>
+                    <filter string="Checked In" name="checked_in" domain="[('state', '=', 'checked_in')]"/>
+                    <filter string="Verified" name="verified" domain="[('state', '=', 'verified')]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Event" name="group_event" context="{'group_by': 'event_id'}"/>
+                        <filter string="Team" name="group_team" context="{'group_by': 'team_id'}"/>
+                        <filter string="Institution" name="group_institution" context="{'group_by': 'institution'}"/>
+                        <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_hackathon_participant" model="ir.actions.act_window">
+            <field name="name">Participants</field>
+            <field name="res_model">hackathon.participant</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+    </data>
+</odoo>

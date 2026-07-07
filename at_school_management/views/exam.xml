@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Exam Tree/List View -->
+    <record id="view_school_exam_tree" model="ir.ui.view">
+        <field name="name">school.exam.tree</field>
+        <field name="model">school.exam</field>
+        <field name="arch" type="xml">
+            <list string="Exams">
+                <field name="name"/>
+                <field name="class_id"/>
+                <field name="subject_id"/>
+                <field name="exam_datetime"/>
+                <field name="max_marks"/>
+                <field name="passing_marks"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Exam Form View -->
+    <record id="view_school_exam_form" model="ir.ui.view">
+        <field name="name">school.exam.form</field>
+        <field name="model">school.exam</field>
+        <field name="arch" type="xml">
+            <form string="Exam">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="class_id"/>
+                        <field name="subject_id"/>
+                        <field name="exam_datetime"/>
+                        <field name="max_marks"/>
+                        <field name="passing_marks"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Exam Kanban View -->
+    <record id="view_school_exam_kanban" model="ir.ui.view">
+        <field name="name">school.exam.kanban</field>
+        <field name="model">school.exam</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="class_id"/>
+                <field name="subject_id"/>
+
+                <field name="exam_datetime"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click o_kanban_record">
+                            <strong><field name="name"/></strong>
+                            <div><span>Class: </span><field name="class_id"/></div>
+                            <div><span>Subject: </span><field name="subject_id"/></div>
+                            <div><span>Time: </span><field name="exam_datetime"/></div>
+                            <div><span>Max: </span><field name="max_marks"/>, <span>Pass: </span><field name="passing_marks"/></div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Action to Open Exams -->
+    <record id="action_school_exam" model="ir.actions.act_window">
+        <field name="name">Exams</field>
+        <field name="res_model">school.exam</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first exam!
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Items -->
+    <menuitem id="menu_school_exam_root" name="Exams" parent="menu_school_root" />
+    <menuitem id="menu_school_exam" name="Exams"
+              parent="menu_school_exam_root"
+              action="action_school_exam"/>
+</odoo>

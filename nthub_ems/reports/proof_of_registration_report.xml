@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <record id="data_student_academic_report_paperformat" model="report.paperformat">
+            <field name="name">Proof Student Report</field>
+            <field name="default" eval="True"/>
+            <field name="format">A4</field>
+            <field name="page_width">0</field>
+            <field name="page_height">0</field>
+            <field name="margin_top">10</field>
+            <field name="margin_bottom">10</field>
+            <field name="margin_left">3</field>
+            <field name="margin_right">3</field>
+            <field name="header_spacing">0</field>
+            <field name="orientation">Portrait</field>
+            <field name="header_line" eval="False"/>
+            <field name="dpi">90</field>
+        </record>
+
+        <record id="report_data_student_proof_registration" model="ir.actions.report">
+            <field name="name">Proof Data Report</field>
+            <field name="model">education.record</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">nthub_ems.student_data_report_proof_registration</field>
+            <field name="report_file">nthub_ems.student_data_report_proof_registration</field>
+            <field name="binding_model_id" ref="model_education_record"/>
+            <field name="paperformat_id" ref="nthub_ems.data_student_academic_report_paperformat"/>
+            <field name="binding_type">report</field>
+        </record>
+
+        <template id="student_data_report_proof_registration">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.basic_layout">
+                        <div class="row" style="border: 1px solid black; height: 100px; width:100%;">
+                            <div class="col-6" align="left" style="width:50%;">
+                                <img t-if="res_company.logo" t-att-src="image_data_uri(res_company.logo)"
+                                     height="80px"
+                                     width="140px"
+                                     alt="Logo"/>
+                            </div>
+
+                            <div class="col-6" align="right" style="width:50%;">
+                                <strong t-esc="res_company.name"
+                                        style="font-size: 26px; position: relative; top:20px; right:10px"/>
+                            </div>
+                        </div>
+
+                        <br/>
+
+                        <div class="page" style="border: 1px solid black;">
+
+                            <br/>
+
+                            <div>
+                                <strong class="text-center"
+                                        style="font-size: 26px; position: relative; left:45%; top:5px; border-bottom:2px solid black;">
+                                    اثبات القيد
+                                </strong>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <h5 style="text-align:right; margin-right: 40px;">
+
+                                    <span>/ تحيه طيبه وبعد</span>
+                                </h5>
+                                <h5 style="text-align:right; margin-right: 40px;">
+
+                                    <span t-esc="res_company.name" style="font-size: 20px;"/>
+                                    <span>/تشهد انا</span>
+                                </h5>
+                                <h5 style="text-align:right; margin-right: 40px;">
+                                    <span t-esc="doc.yro +1" style="font-size: 20px;"/>
+                                    <span>/</span>
+                                    <span t-esc="doc.yro" style="font-size: 20px;"/>
+                                    <span>عام</span>
+                                    <span t-esc="doc.sub_department_id.name" style="font-size: 20px;"/>
+                                    <span>قسم</span>
+                                    <span t-esc="doc.level_id.name" style="font-size: 20px;"/>
+                                    <span>:مقيد بالفرقه</span>
+                                    <span t-esc="doc.name" style="font-size: 20px;"/>
+                                    <span> </span>
+                                    <span style="margin-right: 40px;" >أن الطالب</span>
+
+                                </h5>
+
+                            </div>
+
+
+                            <br/>
+                            <br/>
+                            <br/>
+                            <h2 style="text-align:right; margin-right: 5px;">...............:التوقيع</h2>
+
+                            <br/>
+                            <!--                            </t>-->
+
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>
+
+
+

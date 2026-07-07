@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <record id="action_report_top_borrowed_books" model="ir.actions.report">
+            <field name="name">Top 5 Borrowed Books</field>
+            <field name="model">library.borrowing</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">library_managements_system.report_top_borrowed_books</field>
+            <field name="report_file">library_managements_system.report_top_borrowed_books</field>
+        </record>
+    </data>
+
+    <data>
+        <record id="action_report_most_active_members" model="ir.actions.report">
+            <field name="name">Most Active Members</field>
+            <field name="model">library.member</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">library_managements_system.report_most_active_members</field>
+            <field name="report_file">library_managements_system.report_most_active_members</field>
+        </record>
+    </data>
+
+    <data>
+        <record id="action_report_zero_copies_books" model="ir.actions.report">
+            <field name="name">Books with Zero Copies</field>
+            <field name="model">library.book</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">library_managements_system.report_zero_copies_books</field>
+            <field name="report_file">library_managements_system.report_zero_copies_books</field>
+        </record>
+    </data>
+</odoo>

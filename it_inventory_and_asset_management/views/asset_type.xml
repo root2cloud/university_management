@@ -1,0 +1,21 @@
+<odoo>
+    <!-- Tree View -->
+    <record id="view_asset_type_tree" model="ir.ui.view">
+        <field name="name">asset.type.tree</field>
+        <field name="model">asset.type</field>
+        <field name="arch" type="xml">
+            <list string="Asset Types" editable="bottom">
+                <field name="name" required="1"/>
+                <field name="status"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_asset_type" model="ir.actions.act_window">
+        <field name="name">Asset Types</field>
+        <field name="res_model">asset.type</field>
+        <field name="view_mode">list</field>
+    </record>
+
+</odoo>

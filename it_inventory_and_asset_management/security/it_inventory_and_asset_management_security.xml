@@ -1,0 +1,5 @@
+<odoo>
+    <record id="group_it_asset_user" model="res.groups">
+        <field name="name">IT Asset User</field>
+    </record>
+</odoo>

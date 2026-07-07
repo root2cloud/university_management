@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Tree/List View -->
+    <record id="view_school_exam_result_tree" model="ir.ui.view">
+        <field name="name">school.exam.result.tree</field>
+        <field name="model">school.exam.result</field>
+        <field name="arch" type="xml">
+            <list string="Exam Results">
+                <field name="student_id"/>
+                <field name="exam_id"/>
+                <field name="marks_obtained"/>
+                <field name="grade"/>
+                <field name="status"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_school_exam_result_form" model="ir.ui.view">
+        <field name="name">school.exam.result.form</field>
+        <field name="model">school.exam.result</field>
+        <field name="arch" type="xml">
+            <form string="Exam Result">
+                <sheet>
+                    <group>
+                        <field name="student_id"/>
+                        <field name="admission_no"/>
+                        <field name="exam_id"/>
+                        <field name="marks_obtained"/>
+                        <field name="grade"/>
+                        <field name="status"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_school_exam_result" model="ir.actions.act_window">
+        <field name="name">Exam Results</field>
+        <field name="res_model">school.exam.result</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Record exam results here!
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_school_exam_result" name="Exam Results"
+              parent="menu_school_exam_root"
+              action="action_school_exam_result"/>
+</odoo>

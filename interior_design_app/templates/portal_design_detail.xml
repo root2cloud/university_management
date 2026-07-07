@@ -1,0 +1,27 @@
+<odoo>
+    <template id="portal_my_design_detail" name="Design Details" inherit_id="portal.portal_layout">
+        <xpath expr="//div[@id='wrap']" position="inside">
+            <div class="container mt-4">
+                <t t-if="design">
+                    <h1>
+                        Design Details:
+                        <t t-esc="design.name"/>
+                    </h1>
+                    <p>
+                        Room:
+                        <t t-esc="design.room_name"/>
+                    </p>
+                    <p>
+                        Square Feet:
+                        <t t-esc="design.square_feet"/>
+                    </p>
+                </t>
+                <t t-else="">
+                    <h1>Design Details</h1>
+                    <p>No design found.</p>
+                </t>
+                <a href="/my/designs" class="btn btn-primary">Back to My Designs</a>
+            </div>
+        </xpath>
+    </template>
+</odoo>

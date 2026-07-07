@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="elearning_course_list_view" model="ir.ui.view">
+        <field name="name">elearning.course.list</field>
+        <field name="model">elearning.course</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="source"/>
+                <field name="course_url"/>
+                <field name="video_url"/>
+                <field name="last_sync"/>
+            </list>
+        </field>
+    </record>
+    <record id="elearning_course_form_view" model="ir.ui.view">
+        <field name="name">elearning.course.form</field>
+        <field name="model">elearning.course</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="description" widget="text"/>
+                        <field name="source"/>
+                        <field name="external_id"/>
+                        <field name="course_url"/>
+                        <field name="video_url"/>
+                        <field name="last_sync"/>
+                        <field name="slide_channel_id" widget="many2one"/>
+                    </group>
+                    <group string="Video Preview">
+                        <field name="video_url" widget="website_iframe" options="{'width': '100%', 'height': '315px', 'frameborder': '0', 'allowfullscreen': '1'}"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="elearning_course_action" model="ir.actions.act_window">
+        <field name="name">eDX Courses</field>
+        <field name="res_model">elearning.course</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('source', '=', 'eDX')]</field>
+    </record>
+    <menuitem id="menu_elearning_root" name="eLearning" sequence="5"/>
+    <menuitem id="menu_edx_courses" name="eDX Courses" parent="menu_elearning_root" action="elearning_course_action" sequence="10"/>
+</odoo>

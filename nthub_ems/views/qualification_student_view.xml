@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--define a view list -->
+        <record id="qualification_student_view_tree" model="ir.ui.view">
+            <field name="name">view_qualification_student_tree</field>
+            <field name="model">qualification.student</field>
+            <field name="arch" type="xml">
+                <list multi_edit="1" editable="bottom">
+                    <field name="name" />
+                    <field name="alternative_name" />
+                </list>
+            </field>
+        </record>
+
+        <!--define a view action -->
+        <record id="qualification_student_action" model="ir.actions.act_window">
+            <field name="name">Qualification Student</field>
+            <field name="res_model">qualification.student</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">list</field>
+        </record>
+    </data>
+</odoo>
+
+
+

@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="website_helpdesk" model="website.menu">
+        <field name="name">Helpdesk</field>
+        <field name="url" eval="'/helpdesk_ticket'"/>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence" type="int">55</field>
+    </record>
+
+    <record id="odoo_website_helpdesk.helpdesk_thanks" model="website.page">
+        <field name="name">Thanks (Helpdesk)</field>
+        <field name="type">qweb</field>
+        <field name="url">/helpdesk-thank-you</field>
+        <field name="website_indexed" eval="False"/>
+        <field name="is_published">True</field>
+        <field name="key">odoo_website_helpdesk.helpdesk_thanks</field>
+        <field name="arch" type="xml">
+            <t name="Thanks (Helpdesk)" t-name="odoo_website_helpdesk.helpdesk_thanks">
+                <t t-call="website.layout">
+                    <style>
+                        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap');
+
+                        .ty-wrapper {
+                            background-color: #f8fafc;
+                            min-height: 80vh;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-family: 'Inter', sans-serif;
+                            padding: 60px 20px;
+                        }
+                        .ty-card {
+                            background: #ffffff;
+                            max-width: 600px;
+                            width: 100%;
+                            border-radius: 24px;
+                            padding: 50px;
+                            text-align: center;
+                            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.08);
+                            border: 1px solid #f1f5f9;
+                            position: relative;
+                            overflow: hidden;
+                        }
+                        .ty-card::before {
+                            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px;
+                            background: linear-gradient(90deg, #10b981, #3b82f6);
+                        }
+                        .ty-icon-pulse {
+                            width: 100px; height: 100px; margin: 0 auto 30px;
+                            background: rgba(16, 185, 129, 0.1); border-radius: 50%;
+                            display: flex; align-items: center; justify-content: center;
+                            animation: pulseGlow 2s infinite;
+                        }
+                        .ty-icon-pulse i { font-size: 3rem; color: #10b981; }
+                        @keyframes pulseGlow {
+                            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+                            70% { box-shadow: 0 0 0 20px rgba(16, 185, 129, 0); }
+                            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+                        }
+                        .ty-title { font-size: 2.5rem; font-weight: 900; color: #0f172a; margin-bottom: 10px; letter-spacing: -0.5px; }
+                        .ty-subtitle { font-size: 1.1rem; color: #64748b; margin-bottom: 30px; line-height: 1.6; }
+
+                        .ty-ticket-box {
+                            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+                            border-radius: 16px; padding: 25px; margin-bottom: 35px;
+                            border: 1px solid #e2e8f0;
+                        }
+                        .ty-ticket-box p { margin: 0; color: #475569; font-weight: 600; font-size: 1rem; }
+                        .ty-ticket-link {
+                            display: inline-block; font-size: 1.8rem; font-weight: 900; color: #3b82f6;
+                            margin-top: 10px; text-decoration: none; transition: color 0.2s;
+                        }
+                        .ty-ticket-link:hover { color: #2563eb; text-decoration: underline; }
+
+                        .ty-company-info {
+                            display: flex; justify-content: center; gap: 25px; flex-wrap: wrap;
+                            margin-top: 30px; padding-top: 30px; border-top: 1px dashed #e2e8f0;
+                            color: #64748b; font-size: 0.9rem; font-weight: 500;
+                        }
+                        .ty-company-info div { display: flex; align-items: center; gap: 8px; }
+                        .ty-company-info i { color: #3b82f6; }
+                    </style>
+
+                    <div id="wrap">
+                        <div class="ty-wrapper">
+                            <div class="ty-card">
+                                <div class="ty-icon-pulse"><i class="fa fa-check-circle"></i></div>
+                                <h1 class="ty-title">Request Received!</h1>
+                                <p class="ty-subtitle">Thank you for reaching out. Our support team is already reviewing your details and will assist you shortly.</p>
+
+                                <div class="ty-ticket-box">
+                                    <p>Track your request status using your Ticket ID:</p>
+                                    <a t-attf-href="/my/tickets/#{request.session.ticket_id}" class="ty-ticket-link">
+                                        <t t-esc="request.session.ticket_number"/>
+                                    </a>
+                                </div>
+
+                                <div class="ty-company-info">
+                                    <div title="Location"><i class="fa fa-map-marker"></i> 3575 Demo Buena Vista Ave</div>
+                                    <div title="Phone"><i class="fa fa-phone"></i> +1 (650) 555-0111</div>
+                                    <div title="Email"><i class="fa fa-envelope"></i> info@yourcompany.example.com</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </field>
+    </record>
+
+    <template id="ticket_form" name="Helpdesk Ticket">
+        <t t-call="website.layout">
+            <t t-set="logged_partner" t-value="request.env['website.visitor']._get_visitor_from_request().partner_id"/>
+            <t t-set="contactus_form_values"
+               t-value="{ 'email_to': res_company.email, 'name': request.params.get('name', ''), 'phone': request.params.get('phone', ''), 'email_from': request.params.get('email_from', ''), 'company': request.params.get('company', ''), 'subject': request.params.get('subject', ''), }"/>
+            <span class="hidden" data-for="contactus_form" t-att-data-values="contactus_form_values"/>
+
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap');
+
+                :root {
+                    --form-bg: #f4f7f6;
+                    --primary-color: #4f46e5;
+                    --primary-hover: #4338ca;
+                    --text-dark: #0f172a;
+                    --text-gray: #64748b;
+                    --border-color: #e2e8f0;
+                }
+
+                .hd-page { background-color: var(--form-bg); font-family: 'Inter', sans-serif; padding-bottom: 80px; }
+
+                /* Premium Hero Header */
+                .hd-hero {
+                    background: linear-gradient(135deg, #1e1b4b 0%, #4f46e5 100%);
+                    padding: 100px 20px 140px 20px;
+                    text-align: center;
+                    position: relative;
+                }
+                .hd-hero h1 { color: #ffffff; font-size: 3.5rem; font-weight: 900; margin-bottom: 15px; letter-spacing: -1px; }
+                .hd-hero p { color: #c7d2fe; font-size: 1.2rem; max-width: 600px; margin: 0 auto; font-weight: 500; }
+
+                /* SVG Curve */
+                .hd-curve { position: absolute; bottom: -1px; left: 0; width: 100%; overflow: hidden; line-height: 0; }
+                .hd-curve svg { display: block; width: calc(130% + 1.3px); height: 60px; }
+                .hd-curve .shape-fill { fill: var(--form-bg); }
+
+                /* Layout Shift */
+                .hd-container { margin-top: -60px; position: relative; z-index: 10; max-width: 1200px; }
+
+                /* Master Form Card */
+                .hd-form-wrapper {
+                    background: #ffffff;
+                    border-radius: 24px;
+                    padding: 50px;
+                    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.03);
+                    border: 1px solid #ffffff;
+                }
+                .hd-form-header { margin-bottom: 40px; border-bottom: 2px solid var(--form-bg); padding-bottom: 20px; }
+                .hd-form-header h2 { font-weight: 800; color: var(--text-dark); margin: 0; font-size: 1.8rem; display: flex; align-items: center; gap: 12px; }
+
+                /* Form Inputs */
+                .s_website_form_label { font-weight: 700; color: var(--text-dark); font-size: 0.9rem; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+                .s_website_form_mark { color: #ef4444 !important; font-weight: 900; margin-left: 3px; }
+
+                .premium-input {
+                    width: 100%; background-color: #f8fafc !important; border: 2px solid transparent !important;
+                    border-radius: 14px !important; padding: 16px 20px !important; font-size: 1rem !important;
+                    color: var(--text-dark) !important; font-weight: 500 !important; transition: all 0.3s ease !important;
+                    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02) !important;
+                }
+                .premium-input:focus {
+                    background-color: #ffffff !important; border-color: var(--primary-color) !important;
+                    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15) !important; outline: none !important;
+                }
+                textarea.premium-input { min-height: 150px; resize: vertical; }
+                select.premium-input { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; padding-right: 2.5rem !important; }
+
+                /* File Upload Zone */
+                .premium-file-wrap {
+                    background-color: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 14px;
+                    padding: 10px; transition: all 0.3s ease; position: relative;
+                }
+                .premium-file-wrap:hover { border-color: var(--primary-color); background-color: #f5f3ff; }
+                .premium-file-wrap input[type="file"] { background: transparent !important; border: none !important; box-shadow: none !important; padding: 10px !important; }
+
+                /* Submit Button */
+                .btn-submit-premium {
+                    background: linear-gradient(135deg, var(--primary-color) 0%, #6366f1 100%); color: white !important;
+                    font-weight: 800; font-size: 1.1rem; padding: 18px 40px; border-radius: 14px; border: none;
+                    cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); width: 100%;
+                    box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4); text-transform: uppercase; letter-spacing: 1px;
+                }
+                .btn-submit-premium:hover { transform: translateY(-3px); box-shadow: 0 15px 25px -5px rgba(79, 70, 229, 0.5); }
+
+                /* Sidebar Info Cards */
+                .info-card {
+                    background: #ffffff; border-radius: 20px; padding: 35px;
+                    box-shadow: 0 15px 30px -10px rgba(0,0,0,0.05); border: 1px solid var(--border-color); margin-bottom: 25px;
+                }
+                .info-card h3 { font-size: 1.3rem; font-weight: 800; color: var(--text-dark); margin-bottom: 25px; }
+                .info-item { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px; }
+                .info-item:last-child { margin-bottom: 0; }
+                .info-icon {
+                    width: 48px; height: 48px; min-width: 48px; background: #f1f5f9; color: var(--primary-color);
+                    border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+                }
+                .info-text h4 { font-size: 0.9rem; font-weight: 800; color: var(--text-dark); margin: 0 0 4px 0; text-transform: uppercase; }
+                .info-text p { margin: 0; color: var(--text-gray); font-size: 1rem; font-weight: 500; line-height: 1.4; }
+
+                /* Grid spacing overrides */
+                .form-spacing { margin-bottom: 25px; }
+                @media (max-width: 991px) { .hd-form-wrapper { padding: 30px 20px; } .hd-hero { padding: 80px 20px 100px 20px; } }
+            </style>
+
+            <div id="wrap" class="hd-page">
+
+                <section class="hd-hero">
+                    <div class="container">
+                        <h1>How can we help you?</h1>
+                        <p>Our expert support team is ready to resolve your queries. Fill out the details below to open a new ticket.</p>
+                    </div>
+                    <div class="hd-curve">
+                        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+                            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C59.71,118.06,150.71,101.24,227.4,83.51Z" class="shape-fill"></path>
+                        </svg>
+                    </div>
+                </section>
+
+                <section class="container hd-container">
+                    <div class="row align-items-start">
+
+                        <div class="col-lg-8 mb-5 mb-lg-0">
+                            <div class="hd-form-wrapper">
+                                <div class="hd-form-header">
+                                    <h2><i class="fa fa-ticket text-primary"></i> Open New Ticket</h2>
+                                </div>
+
+                                <section class="s_website_form">
+                                    <form id="Ticket_form" action="/website/form/" method="post" enctype="multipart/form-data"
+                                          class="o_mark_required" data-mark="*" data-model_name="ticket.helpdesk"
+                                          data-success-mode="redirect" data-success-page="/helpdesk-thank-you" data-pre-fill="true">
+
+                                        <div class="s_website_form_rows row">
+
+                                            <div class="col-md-6 form-spacing s_website_form_field s_website_form_custom s_website_form_required" data-type="char" data-name="Field">
+                                                <label class="s_website_form_label" for="contact1">Full Name <span class="s_website_form_mark">*</span></label>
+                                                <input id="contact1" type="text" class="form-control s_website_form_input premium-input" name="customer_name" required="1" data-fill-with="name" placeholder="John Doe"/>
+                                            </div>
+                                            <div class="col-md-6 form-spacing s_website_form_field s_website_form_required" data-type="email" data-name="Field">
+                                                <label class="s_website_form_label" for="contact3">Email Address <span class="s_website_form_mark">*</span></label>
+                                                <input id="contact3" type="email" class="form-control s_website_form_input premium-input" name="email_from" required="1" data-fill-with="email" placeholder="john@example.com"/>
+                                            </div>
+
+                                            <div class="col-md-6 form-spacing s_website_form_field s_website_form_custom" data-type="char" data-name="Field">
+                                                <label class="s_website_form_label" for="contact2">Phone Number</label>
+                                                <input id="contact2" type="tel" class="form-control s_website_form_input premium-input" name="phone" data-fill-with="phone" placeholder="+1 (555) 000-0000"/>
+                                            </div>
+                                            <div class="col-md-6 form-spacing s_website_form_field s_website_form_custom" data-type="char" data-name="Field">
+                                                <label class="s_website_form_label" for="contact4">Company Name</label>
+                                                <input id="contact4" type="text" class="form-control s_website_form_input premium-input" name="company" data-fill-with="commercial_company_name" placeholder="Your Organization"/>
+                                            </div>
+
+                                            <div class="col-md-6 form-spacing s_website_form_field s_website_form_custom s_website_form_required" data-type="char" data-name="Field">
+                                                <label class="s_website_form_label" for="contact53">Ticket Type <span class="s_website_form_mark">*</span></label>
+                                                <select name="ticket_type_id" id="contact53" class="form-control s_website_form_input premium-input" required="1">
+                                                    <t t-foreach="types or []" t-as="p">
+                                                        <option t-att-value="p.id"><t t-esc="p.name"/></option>
+                                                    </t>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6 form-spacing s_website_form_field s_website_form_required" data-type="char" data-name="Field">
+                                                <label class="s_website_form_label" for="contact51">Category <span class="s_website_form_mark">*</span></label>
+                                                <select name="category" id="contact51" class="form-control s_website_form_input premium-input" required="1">
+                                                    <t t-foreach="categories or []" t-as="c">
+                                                        <option t-att-value="c.id"><t t-esc="c.name"/></option>
+                                                    </t>
+                                                </select>
+                                            </div>
+
+                                            <t t-set="product" t-value="request.env['ir.config_parameter'].sudo().get_param('odoo_website_helpdesk.product_website')"/>
+                                            <t t-if="product">
+                                                <div class="col-12 form-spacing s_website_form_field s_website_form_custom s_website_form_required" data-type="text" data-name="Field">
+                                                    <label class="s_website_form_label" for="contact52">Related Products</label>
+                                                    <select id="product" name="product" multiple="multiple" class="form-control s_website_form_input premium-input">
+                                                        <option value="0" selected="true">Choose Products</option>
+                                                    </select>
+                                                </div>
+                                            </t>
+
+                                            <div class="col-12 form-spacing s_website_form_field s_website_form_required" data-type="char" data-name="Field">
+                                                <label class="s_website_form_label" for="contact5">Subject <span class="s_website_form_mark">*</span></label>
+                                                <input id="contact5" type="text" class="form-control s_website_form_input premium-input" name="subject" required="1" placeholder="Briefly describe your issue"/>
+                                            </div>
+
+                                            <div id="ticket_disc" class="col-12 form-spacing s_website_form_field s_website_form_custom s_website_form_required" data-type="text" data-name="Field">
+                                                <label class="s_website_form_label" for="contact6">Detailed Description <span class="s_website_form_mark">*</span></label>
+                                                <textarea id="contact6" class="form-control s_website_form_input premium-input" name="description" required="1" placeholder="Please provide as much detail as possible to help us resolve your issue quickly..."/>
+                                            </div>
+
+                                            <div class="col-12 form-spacing s_website_form_field s_website_form_custom s_website_form_required" data-type="binary" data-name="Field">
+                                                <label class="s_website_form_label" for="attachment">Attachments (Optional)</label>
+                                                <div class="premium-file-wrap">
+                                                    <input type="file" name="ticket_attachment" multiple="true" class="form-control s_website_form_input premium-input"/>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group col-12 s_website_form_field s_website_form_dnone">
+                                                <input id="contact7" type="hidden" class="form-control s_website_form_input" name="email_to"/>
+                                            </div>
+
+                                            <div class="col-12 mt-3 s_website_form_submit" data-name="Submit Button">
+                                                <button type="submit" class="btn-submit-premium s_website_form_send">
+                                                    Submit Request <i class="fa fa-arrow-right ml-2"></i>
+                                                </button>
+                                                <span id="s_website_form_result"/>
+                                            </div>
+
+                                        </div>
+                                    </form>
+                                </section>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 pl-lg-4">
+
+                            <div class="info-card">
+                                <h3>Get in Touch</h3>
+                                <div class="info-item">
+                                    <div class="info-icon"><i class="fa fa-map-marker"></i></div>
+                                    <div class="info-text">
+                                        <h4>Headquarters</h4>
+                                        <p>3575 Demo Buena Vista Avenue<br/>Tech District, CA 94043</p>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-icon"><i class="fa fa-phone"></i></div>
+                                    <div class="info-text">
+                                        <h4>Call Us</h4>
+                                        <p>+1 (650) 555-0111</p>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-icon"><i class="fa fa-envelope"></i></div>
+                                    <div class="info-text">
+                                        <h4>Email Support</h4>
+                                        <p>info@yourcompany.example.com</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="info-card" style="background: linear-gradient(135deg, #f0fdf4 0%, #d1fae5 100%); border-color: #a7f3d0;">
+                                <h3 style="color: #065f46;"><i class="fa fa-shield mr-2"></i> Our Promise</h3>
+                                <div class="info-item mb-3">
+                                    <i class="fa fa-clock-o text-success mt-1" style="font-size: 1.2rem;"></i>
+                                    <p style="color: #064e3b; margin: 0; font-weight: 600;">Response within <strong>24 hours</strong></p>
+                                </div>
+                                <div class="info-item mb-3">
+                                    <i class="fa fa-check-circle text-success mt-1" style="font-size: 1.2rem;"></i>
+                                    <p style="color: #064e3b; margin: 0; font-weight: 600;">Instant ticket confirmation</p>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fa fa-lock text-success mt-1" style="font-size: 1.2rem;"></i>
+                                    <p style="color: #064e3b; margin: 0; font-weight: 600;">Your data is secure &amp; encrypted</p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
+</odoo>

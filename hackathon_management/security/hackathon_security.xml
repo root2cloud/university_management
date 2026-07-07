@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Categories -->
+        <record id="module_category_hackathon" model="ir.module.category">
+            <field name="name">Hackathon Management</field>
+            <field name="description">Manage hackathons, teams, and participants</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <!-- Groups -->
+        <record id="group_hackathon_user" model="res.groups">
+            <field name="name">Hackathon User</field>
+            <field name="category_id" ref="module_category_hackathon"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="group_hackathon_coordinator" model="res.groups">
+            <field name="name">Hackathon Coordinator</field>
+            <field name="category_id" ref="module_category_hackathon"/>
+            <field name="implied_ids" eval="[(4, ref('group_hackathon_user'))]"/>
+        </record>
+
+        <record id="group_hackathon_manager" model="res.groups">
+            <field name="name">Hackathon Manager</field>
+            <field name="category_id" ref="module_category_hackathon"/>
+            <field name="implied_ids" eval="[(4, ref('group_hackathon_coordinator'))]"/>
+        </record>
+
+    </data>
+</odoo>
