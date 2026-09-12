@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="paperformat_question_paper" model="report.paperformat">
+        <field name="name">Question Paper</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">15</field>
+        <field name="margin_bottom">18</field>
+        <field name="margin_left">12</field>
+        <field name="margin_right">12</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- Report Action -->
+    <record id="action_report_question_paper" model="ir.actions.report">
+        <field name="name">Question Paper</field>
+        <field name="model">exam.question.paper</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">university_management.report_question_paper</field>
+        <field name="report_file">university_management.report_question_paper</field>
+        <field name="binding_model_id" ref="model_exam_question_paper"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Question Paper - %s' % (object.code or object.name)</field>
+        <field name="paperformat_id" ref="paperformat_question_paper"/>
+    </record>
+
+    <!-- Report Template.
+         NOTE: floated divs were tried here and wkhtmltopdf mis-paginated them
+         (duplicated/garbled content across the page break). Back to <table>
+         layout, but every layout table carries class="qp-table" and a single
+         <style> block at the top kills borders on that class with !important
+         — so there is exactly one place border-removal can fail, not eleven
+         scattered inline overrides. -->
+    <template id="report_question_paper">
+        <t t-call="web.basic_layout">
+            <style>
+                table.qp-table, table.qp-table > tr > td, table.qp-table > tbody > tr > td {
+                    border: none !important;
+                    border-collapse: collapse;
+                    padding: 1px 2px;
+                }
+            </style>
+            <t t-foreach="docs" t-as="o">
+                <div class="page" style="font-family: 'Times New Roman', Times, serif; font-size: 11.5pt; color: #000; padding: 10px 20px;">
+
+                    <!-- Code No. / Regulation -->
+                    <table class="qp-table" style="width:100%; margin-bottom:2px;">
+                        <tr>
+                            <td style="font-weight:bold; text-align:left; width:33%;"><t t-esc="o.subject_code"/></td>
+                            <td style="width:34%;"/>
+                            <td style="font-weight:bold; text-align:right; width:33%;"><t t-esc="o.regulation"/></td>
+                        </tr>
+                    </table>
+
+                    <!-- Header block: logo overlaid via position:absolute so it NEVER
+                         stretches the row height. Previously the logo sat in its own
+                         <td>; a table row is always as tall as its tallest cell, so a
+                         fixed 78px logo cell forced the row to 78px even when the text
+                         cell was shorter — leaving a visible blank gap between the
+                         header text and the Date/Time/Marks line below it. Overlaying
+                         the logo removes it from height calculation entirely.
+                         NOTE: do NOT add a min-height here — that reintroduces the exact
+                         same bug one level up. A fixed min-height on this div is itself
+                         a "tallest cell" forcing extra blank space whenever the actual
+                         header text (college name + affiliation + location + session +
+                         subject + branch) renders shorter than that number, which is
+                         what produced the bigger gap on some papers vs. others. The
+                         div's height should come purely from its own text content; the
+                         absolutely-positioned logo never contributes to that height
+                         either way, so no fallback min-height is needed. -->
+                    <div style="position:relative; text-align:center; margin-bottom:0; padding-bottom:0; padding-left:120px; padding-right:120px;">
+                        <img t-if="o.company_id.logo"
+                             t-att-src="image_data_uri(o.company_id.logo)"
+                             style="position:absolute; left:0; top:0; width:110px; height:110px; object-fit:contain;"/>
+                        <!-- College name + "(Autonomous)" kept on one line: font-size steps
+                             down as the name gets longer so long names (e.g. "SIR M
+                             VISVESVARAYA INSTITUTE OF TECHNOLOGY (AUTONOMOUS)") still fit
+                             on a single row instead of wrapping to a second line. -->
+                        <t t-set="college_name" t-value="o.company_id.name or 'Lendi Institute of Engineering &amp; Technology'"/>
+                        <t t-set="college_full" t-value="college_name + ('' if 'AUTONOMOUS' in college_name.upper() else ' (Autonomous)')"/>
+                        <t t-set="college_font_size" t-value="'13pt' if len(college_full) &lt;= 45 else ('11.5pt' if len(college_full) &lt;= 60 else '10pt')"/>
+                        <div t-attf-style="font-weight:bold; font-size:#{college_font_size}; text-transform:uppercase; white-space:nowrap;">
+                            <t t-esc="college_full"/>
+                        </div>
+                        <div t-if="o.affiliation_line"><t t-esc="o.affiliation_line"/></div>
+                        <div t-if="o.location_line"><t t-esc="o.location_line"/></div>
+                        <div t-if="o.exam_session" style="font-weight:bold;">
+                            <t t-esc="o.exam_session"/>
+                        </div>
+                        <div style="font-weight:bold; font-size:13pt;">
+                            <t t-esc="o.subject_id.name"/>
+                        </div>
+                        <div t-if="o.branch_short"><i>(<t t-esc="o.branch_short"/>)</i></div>
+                    </div>
+
+                    <!-- Date / Time / Max Marks — deliberately its OWN table with its own
+                         inline border-bottom, not the qp-table class, so the qp-table
+                         border reset above can never touch it. Only the bottom rule is
+                         wanted (no line above this row). -->
+                    <table style="width:100%; border:none; border-collapse:collapse; border-bottom:2px solid #000; margin:-2px 0 10px 0;">
+                        <tr>
+                            <td style="border:none; padding:2px 0; text-align:left; width:33%;">
+                                Date: <t t-esc="o.exam_date and o.exam_date.strftime('%d-%m-%Y') or ''"/>
+                            </td>
+                            <td style="border:none; padding:2px 0; text-align:center; width:34%;">
+                                Time: <t t-esc="'%.0f' % (o.duration_minutes / 60.0)"/> Hours.
+                            </td>
+                            <td style="border:none; padding:2px 0; text-align:right; width:33%;">
+                                Max. Marks: <t t-esc="o.total_marks"/>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- PART A: one "1." spanning all ten lettered rows, exactly like the
+                         Lendi sample — sub-part letter + question text + marks per row. -->
+                    <t t-set="part_a_lines" t-value="o.paper_question_ids.filtered(lambda l: l.part == 'part_a').sorted(key=lambda l: l.sequence)"/>
+                    <t t-if="part_a_lines">
+                        <div style="text-align:center; font-weight:bold;">
+                            PART-A [<t t-esc="sum(part_a_lines.mapped('marks'))"/> MARKS]
+                        </div>
+                        <div style="text-align:center; font-weight:bold; margin-bottom:6px;">
+                            Answer All Questions, Each Question Carries Equal Marks
+                        </div>
+                        <table class="qp-table" style="width:100%;">
+                            <t t-foreach="part_a_lines" t-as="line">
+                                <tr>
+                                    <td t-if="line_first" t-att-rowspan="len(part_a_lines)"
+                                        style="width:20px; vertical-align:top; font-weight:bold;">1.</td>
+                                    <td style="vertical-align:top; text-align:left;">
+                                        <b><t t-esc="line.sub_part"/>.</b> <t t-esc="line.question_text"/>
+                                        <div t-if="line.question_image" style="text-align:center; margin:4px 0;">
+                                            <img t-att-src="image_data_uri(line.question_image)" style="max-height:120px;"/>
+                                        </div>
+                                    </td>
+                                    <td style="vertical-align:top; text-align:right; white-space:nowrap; width:150px;">
+                                        [<t t-esc="line.marks"/> Marks;<t t-esc="line.co_level"/>;<t t-esc="line.rbt_display"/>]
+                                    </td>
+                                </tr>
+                            </t>
+                        </table>
+                    </t>
+
+                    <!-- PART B -->
+                    <t t-set="part_b_lines" t-value="o.paper_question_ids.filtered(lambda l: l.part == 'part_b')"/>
+                    <t t-if="part_b_lines">
+                        <t t-set="units" t-value="sorted(set(part_b_lines.mapped('unit')))"/>
+                        <div style="text-align:center; font-weight:bold; margin-top:8px;">
+                            <!-- Student answers ONE full question (worth part_b_marks_each) per unit,
+                                 not the sum of every alternative printed on the page. -->
+                            PART-B [<t t-esc="len(units) * o.part_b_marks_each"/> MARKS]
+                        </div>
+                        <div style="text-align:center; font-weight:bold; margin-bottom:6px;">
+                            Answer ONE Question From Each UNIT and Each Question Carries Equal Marks
+                        </div>
+
+                        <t t-foreach="units" t-as="unit_name">
+                            <div style="text-align:center; font-weight:bold; margin-top:6px;">
+                                <t t-esc="unit_name"/>
+                            </div>
+                            <t t-set="unit_lines" t-value="part_b_lines.filtered(lambda l: l.unit == unit_name)"/>
+                            <t t-set="qnos" t-value="sorted(set(unit_lines.mapped('question_number')), key=lambda x: int(x) if x and x.isdigit() else 0)"/>
+                            <t t-foreach="qnos" t-as="qno">
+                                <t t-set="sub_lines" t-value="unit_lines.filtered(lambda l: l.question_number == qno).sorted(key=lambda l: l.sequence)"/>
+                                <table class="qp-table" style="width:100%; margin-bottom:2px; page-break-inside:avoid;">
+                                    <t t-foreach="sub_lines" t-as="sub">
+                                        <tr>
+                                            <td t-if="sub_first" t-att-rowspan="len(sub_lines)"
+                                                style="width:24px; vertical-align:top; font-weight:bold;"><t t-esc="qno"/>.</td>
+                                            <td style="vertical-align:top; text-align:left;">
+                                                <b><t t-esc="sub.sub_part"/>)</b> <t t-esc="sub.question_text"/>
+                                                <div t-if="sub.question_image" style="text-align:center; margin:4px 0;">
+                                                    <img t-att-src="image_data_uri(sub.question_image)" style="max-height:120px;"/>
+                                                </div>
+                                            </td>
+                                            <td style="vertical-align:top; text-align:right; white-space:nowrap; width:150px;">
+                                                [<t t-esc="sub.marks"/> Marks;<t t-esc="sub.co_level"/>; <t t-esc="sub.rbt_display"/>]
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </table>
+                            </t>
+                        </t>
+                    </t>
+
+                    <div style="text-align:center; font-weight:bold; margin-top:14px; page-break-before:avoid;">----THE END----</div>
+
+                </div>
+            </t>
+            <!-- Page number footer: placed OUTSIDE the .page div so wkhtmltopdf
+                 picks it up as a repeating footer on every physical page.
+                 <span class="page"/> and <span class="topage"/> are wkhtmltopdf
+                 magic variables that only get substituted in header/footer divs. -->
+            <div class="footer" style="text-align:center; font-size:10pt; font-family: 'Times New Roman', Times, serif; padding-top:4px;">
+                <span>Page </span><span class="page"/><span> of </span><span class="topage"/>
+            </div>
+        </t>
+    </template>
+
+</odoo>

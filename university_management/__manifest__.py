@@ -85,6 +85,8 @@
         # Data
         'data/sequence.xml',
         'data/online_exam_sequences.xml',
+        'data/omr_sequences.xml',
+        'data/omr_scanner_export_template.xml',
         'data/email_templates.xml',
         'data/sms_templates.xml',
         'data/automated_actions.xml',
@@ -134,6 +136,11 @@
         'views/examination/mcq_question_bank_views.xml',
         'views/examination/online_exam_views.xml',
         'views/examination/online_exam_attempt_views.xml',
+        'views/examination/question_bank_theory_views.xml',
+        'views/examination/question_paper_views.xml',
+        'views/examination/omr_sheet_template_views.xml',
+        'views/examination/omr_sheet_views.xml',
+        'views/examination/omr_scanner_views.xml',
 
         # Views - Student
         'views/student/student_attendance_views.xml',
@@ -289,6 +296,8 @@
         'wizard/result/publish_result_wizard_views.xml',
         'wizard/examination/auto_evaluate_wizard_views.xml',
         'wizard/examination/generate_seating_wizard_views.xml',
+        'wizard/examination/generate_omr_sheets_wizard_views.xml',
+        'wizard/examination/bulk_omr_scan_wizard_views.xml',
         'wizard/attendance/attendance_report_wizard_views.xml',
         'wizard/attendance/bulk_attendance_wizard_views.xml',
         'wizard/placements/placement_report_wizard_views.xml',
@@ -306,6 +315,7 @@
         'report/hall_ticket_report.xml',
         'report/fee_receipt.xml',
         'report/marksheet_report.xml',
+        'report/question_paper_report.xml',
         'report/salary_slip_report.xml',
         'report/faculty_form16_report.xml',
         'report/student_report.xml',
@@ -369,6 +379,12 @@
             'university_management/static/src/css/ai_assistant.css',
             'university_management/static/src/xml/ai_assistant_templates.xml',
             'university_management/static/src/js/ai_assistant.js',
+            'university_management/static/src/css/omr_scanner.css',
+            'university_management/static/src/js/omr_scanner_widget.js',
+            'university_management/static/src/css/bulk_omr_multi_upload.css',
+            'university_management/static/src/js/bulk_omr_multi_upload_widget.js',
+            'university_management/static/src/xml/bulk_omr_multi_upload_templates.xml',
+            'university_management/static/src/js/omr_export_template_autoselect.js',
         ],
     },
 
@@ -376,6 +392,10 @@
         'static/description/banner.png',
         'static/description/icon.png',
     ],
+
+    'external_dependencies': {
+            'python': ['reportlab', 'pypdf', 'Pillow', 'pyzbar', 'pytesseract', 'qrcode', 'easyocr', 'python-docx'],
+        },
 
     'installable': True,
     'application': True,

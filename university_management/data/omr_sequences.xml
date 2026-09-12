@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Theory Question Bank Sequence -->
+        <record id="seq_theory_question_bank" model="ir.sequence">
+            <field name="name">Theory Question Bank</field>
+            <field name="code">exam.theory.question.bank</field>
+            <field name="prefix">TQB/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Question Paper Sequence -->
+        <record id="seq_question_paper" model="ir.sequence">
+            <field name="name">Question Paper</field>
+            <field name="code">exam.question.paper</field>
+            <field name="prefix">QP/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- OMR Sheet Sequence -->
+        <record id="seq_omr_sheet" model="ir.sequence">
+            <field name="name">OMR Sheet</field>
+            <field name="code">exam.omr.sheet</field>
+            <field name="prefix">OMR/</field>
+            <field name="number_next">200001</field>
+            <field name="padding">6</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- OMR Scanner Sequence -->
+        <record id="seq_omr_scanner" model="ir.sequence">
+            <field name="name">OMR Scanner</field>
+            <field name="code">exam.omr.scanner</field>
+            <field name="prefix">SCAN/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- OMR Scanner — Form -->
+    <!-- ============================================================ -->
+    <record id="view_omr_scanner_form" model="ir.ui.view">
+        <field name="name">exam.omr.scanner.form</field>
+        <field name="model">exam.omr.scanner</field>
+        <field name="arch" type="xml">
+            <form string="OMR Scanner">
+                <header>
+                    <button name="action_process_all" type="object"
+                            string="Scan"
+                            class="btn-primary"
+                            invisible="state not in ('draft',)"/>
+                    <button name="action_decode_barcode" type="object"
+                            string="Decode Barcode"
+                            class="btn-secondary"
+                            invisible="state not in ('draft',)"/>
+                    <button name="action_detect_marks" type="object"
+                            string="Detect Marks (OCR)"
+                            class="btn-secondary"
+                            invisible="state not in ('decoded',)"/>
+                    <button name="action_confirm_marks" type="object"
+                            string="Confirm &amp; Update Result"
+                            class="btn-success"
+                            invisible="state not in ('ocr_done',)"
+                            confirm="This will update the student's result record with the marks. Continue?"/>
+                    <button name="action_reset_draft" type="object"
+                            string="Reset"
+                            class="btn-danger"
+                            invisible="state == 'draft'"
+                            confirm="Reset this scan record?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,decoded,ocr_done,confirmed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_sheet" type="object"
+                                class="oe_stat_button text-primary"
+                                icon="fa-file-text-o"
+                                invisible="not omr_sheet_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">OMR Sheet</span>
+                            </div>
+                        </button>
+                        <button name="action_view_result" type="object"
+                                class="oe_stat_button text-success"
+                                icon="fa-check-square-o"
+                                invisible="not result_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Result</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <widget name="web_ribbon" title="Barcode Decoded" bg_color="text-bg-info"
+                            invisible="state != 'decoded'"/>
+                    <widget name="web_ribbon" title="Marks Detected" bg_color="text-bg-warning"
+                            invisible="state != 'ocr_done'"/>
+                    <widget name="web_ribbon" title="Confirmed &amp; Updated" bg_color="text-bg-success"
+                            invisible="state != 'confirmed'"/>
+                    <widget name="web_ribbon" title="Failed" bg_color="text-bg-danger"
+                            invisible="state != 'failed'"/>
+
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <!-- Error banner -->
+                    <div class="alert alert-warning" role="alert"
+                         invisible="not error_message">
+                        <field name="error_message" readonly="1"/>
+                    </div>
+
+                    <group>
+                        <group string="Upload Scanned Sheet">
+                            <field name="scanned_file" filename="scanned_filename"
+                                   widget="binary"/>
+                            <field name="scanned_filename" invisible="1"/>
+                            <field name="scan_date"/>
+                            <field name="valuation_part"/>
+                        </group>
+                        <group string="Barcode Decoded Info">
+                            <field name="barcode_raw"/>
+                            <field name="decoded_registration"/>
+                            <field name="decoded_student_name"/>
+                            <field name="decoded_subject_code"/>
+                            <field name="decoded_serial"/>
+                            <field name="decoded_hall_ticket"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Linked Records">
+                            <field name="student_id"/>
+                            <field name="examination_id"/>
+                            <field name="subject_id"/>
+                            <field name="omr_sheet_id"/>
+                            <field name="result_id"/>
+                        </group>
+                        <group string="Detected Marks">
+                            <field name="detected_grand_total"/>
+                            <field name="grand_total"
+                                   invisible="state not in ('ocr_done',)"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Question-wise Marks" name="marks_detail">
+                            <p class="text-muted">
+                                Edit a value below if OCR detected it incorrectly. Every question below
+                                is its own stored field, so it also appears as its own column in list
+                                views and in the Export Data wizard — just like Grand Total Marks.
+                            </p>
+                            <group string="Part A — Q1 (A - J)">
+                                <group>
+                                    <field name="pa_q1_a"/>
+                                    <field name="pa_q1_b"/>
+                                    <field name="pa_q1_c"/>
+                                    <field name="pa_q1_d"/>
+                                    <field name="pa_q1_e"/>
+                                    <field name="pa_q1_f"/>
+                                </group>
+                                <group>
+                                    <field name="pa_q1_g"/>
+                                    <field name="pa_q1_h"/>
+                                    <field name="pa_q1_i"/>
+                                    <field name="pa_q1_j"/>
+                                    <field name="pa_q1_extra"/>
+                                    <field name="pa_q1_total"/>
+                                </group>
+                            </group>
+                            <group string="Part B — Q1">
+                                <group col="5">
+                                    <field name="pb_q1_a"/>
+                                    <field name="pb_q1_b"/>
+                                    <field name="pb_q1_c"/>
+                                    <field name="pb_q1_d"/>
+                                    <field name="pb_q1_total"/>
+                                </group>
+                            </group>
+                            <group string="Part B — Q2">
+                                <group col="5">
+                                    <field name="pb_q2_a"/>
+                                    <field name="pb_q2_b"/>
+                                    <field name="pb_q2_c"/>
+                                    <field name="pb_q2_d"/>
+                                    <field name="pb_q2_total"/>
+                                </group>
+                            </group>
+                            <group string="Part B — Q3">
+                                <group col="5">
+                                    <field name="pb_q3_a"/>
+                                    <field name="pb_q3_b"/>
+                                    <field name="pb_q3_c"/>
+                                    <field name="pb_q3_d"/>
+                                    <field name="pb_q3_total"/>
+                                </group>
+                            </group>
+                            <group string="Part B — Q4">
+                                <group col="5">
+                                    <field name="pb_q4_a"/>
+                                    <field name="pb_q4_b"/>
+                                    <field name="pb_q4_c"/>
+                                    <field name="pb_q4_d"/>
+                                    <field name="pb_q4_total"/>
+                                </group>
+                            </group>
+                            <group string="Part B — Q5">
+                                <group col="5">
+                                    <field name="pb_q5_a"/>
+                                    <field name="pb_q5_b"/>
+                                    <field name="pb_q5_c"/>
+                                    <field name="pb_q5_d"/>
+                                    <field name="pb_q5_total"/>
+                                </group>
+                            </group>
+                            <group string="Part B — Q6">
+                                <group col="5">
+                                    <field name="pb_q6_a"/>
+                                    <field name="pb_q6_b"/>
+                                    <field name="pb_q6_c"/>
+                                    <field name="pb_q6_d"/>
+                                    <field name="pb_q6_total"/>
+                                </group>
+                            </group>
+                            <group string="Part B — Q7">
+                                <group col="5">
+                                    <field name="pb_q7_a"/>
+                                    <field name="pb_q7_b"/>
+                                    <field name="pb_q7_c"/>
+                                    <field name="pb_q7_d"/>
+                                    <field name="pb_q7_total"/>
+                                </group>
+                            </group>
+                            <group string="Part B — Q8">
+                                <group col="5">
+                                    <field name="pb_q8_a"/>
+                                    <field name="pb_q8_b"/>
+                                    <field name="pb_q8_c"/>
+                                    <field name="pb_q8_d"/>
+                                    <field name="pb_q8_total"/>
+                                </group>
+                            </group>
+                            <group string="Part B — Q9">
+                                <group col="5">
+                                    <field name="pb_q9_a"/>
+                                    <field name="pb_q9_b"/>
+                                    <field name="pb_q9_c"/>
+                                    <field name="pb_q9_d"/>
+                                    <field name="pb_q9_total"/>
+                                </group>
+                            </group>
+                            <group string="Part B — Q10">
+                                <group col="5">
+                                    <field name="pb_q10_a"/>
+                                    <field name="pb_q10_b"/>
+                                    <field name="pb_q10_c"/>
+                                    <field name="pb_q10_d"/>
+                                    <field name="pb_q10_total"/>
+                                </group>
+                            </group>
+                            <group string="Part B — Q11">
+                                <group col="5">
+                                    <field name="pb_q11_a"/>
+                                    <field name="pb_q11_b"/>
+                                    <field name="pb_q11_c"/>
+                                    <field name="pb_q11_d"/>
+                                    <field name="pb_q11_total"/>
+                                </group>
+                            </group>
+                            <group string="Part B — Q12">
+                                <group col="5">
+                                    <field name="pb_q12_a"/>
+                                    <field name="pb_q12_b"/>
+                                    <field name="pb_q12_c"/>
+                                    <field name="pb_q12_d"/>
+                                    <field name="pb_q12_total"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="unread_questions_display" readonly="1"
+                                       invisible="not unread_questions_display"/>
+                            </group>
+                            <group string="Raw OCR Data (JSON)"
+                                   invisible="not detected_marks_json">
+                                <field name="detected_marks_json" readonly="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="o_attachment_preview"/>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- OMR Scanner — List -->
+    <record id="view_omr_scanner_list" model="ir.ui.view">
+        <field name="name">exam.omr.scanner.list</field>
+        <field name="model">exam.omr.scanner</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="scan_date"/>
+                <field name="decoded_registration"/>
+                <field name="decoded_student_name"/>
+                <field name="decoded_subject_code"/>
+                <field name="grand_total"/>
+                <field name="valuation_part"/>
+                <field name="pa_q1_a" optional="show"/>
+                <field name="pa_q1_b" optional="show"/>
+                <field name="pa_q1_c" optional="show"/>
+                <field name="pa_q1_d" optional="show"/>
+                <field name="pa_q1_e" optional="show"/>
+                <field name="pa_q1_f" optional="show"/>
+                <field name="pa_q1_g" optional="show"/>
+                <field name="pa_q1_h" optional="show"/>
+                <field name="pa_q1_i" optional="show"/>
+                <field name="pa_q1_j" optional="show"/>
+                <field name="pa_q1_extra" optional="show"/>
+                <field name="pa_q1_total" optional="show"/>
+                <field name="pb_q1_a" optional="show"/>
+                <field name="pb_q1_b" optional="show"/>
+                <field name="pb_q1_c" optional="show"/>
+                <field name="pb_q1_d" optional="show"/>
+                <field name="pb_q1_total" optional="show"/>
+                <field name="pb_q2_a" optional="show"/>
+                <field name="pb_q2_b" optional="show"/>
+                <field name="pb_q2_c" optional="show"/>
+                <field name="pb_q2_d" optional="show"/>
+                <field name="pb_q2_total" optional="show"/>
+                <field name="pb_q3_a" optional="show"/>
+                <field name="pb_q3_b" optional="show"/>
+                <field name="pb_q3_c" optional="show"/>
+                <field name="pb_q3_d" optional="show"/>
+                <field name="pb_q3_total" optional="show"/>
+                <field name="pb_q4_a" optional="show"/>
+                <field name="pb_q4_b" optional="show"/>
+                <field name="pb_q4_c" optional="show"/>
+                <field name="pb_q4_d" optional="show"/>
+                <field name="pb_q4_total" optional="show"/>
+                <field name="pb_q5_a" optional="show"/>
+                <field name="pb_q5_b" optional="show"/>
+                <field name="pb_q5_c" optional="show"/>
+                <field name="pb_q5_d" optional="show"/>
+                <field name="pb_q5_total" optional="show"/>
+                <field name="pb_q6_a" optional="show"/>
+                <field name="pb_q6_b" optional="show"/>
+                <field name="pb_q6_c" optional="show"/>
+                <field name="pb_q6_d" optional="show"/>
+                <field name="pb_q6_total" optional="show"/>
+                <field name="pb_q7_a" optional="show"/>
+                <field name="pb_q7_b" optional="show"/>
+                <field name="pb_q7_c" optional="show"/>
+                <field name="pb_q7_d" optional="show"/>
+                <field name="pb_q7_total" optional="show"/>
+                <field name="pb_q8_a" optional="show"/>
+                <field name="pb_q8_b" optional="show"/>
+                <field name="pb_q8_c" optional="show"/>
+                <field name="pb_q8_d" optional="show"/>
+                <field name="pb_q8_total" optional="show"/>
+                <field name="pb_q9_a" optional="show"/>
+                <field name="pb_q9_b" optional="show"/>
+                <field name="pb_q9_c" optional="show"/>
+                <field name="pb_q9_d" optional="show"/>
+                <field name="pb_q9_total" optional="show"/>
+                <field name="pb_q10_a" optional="show"/>
+                <field name="pb_q10_b" optional="show"/>
+                <field name="pb_q10_c" optional="show"/>
+                <field name="pb_q10_d" optional="show"/>
+                <field name="pb_q10_total" optional="show"/>
+                <field name="pb_q11_a" optional="show"/>
+                <field name="pb_q11_b" optional="show"/>
+                <field name="pb_q11_c" optional="show"/>
+                <field name="pb_q11_d" optional="show"/>
+                <field name="pb_q11_total" optional="show"/>
+                <field name="pb_q12_a" optional="show"/>
+                <field name="pb_q12_b" optional="show"/>
+                <field name="pb_q12_c" optional="show"/>
+                <field name="pb_q12_d" optional="show"/>
+                <field name="pb_q12_total" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state in ('decoded', 'ocr_done')"
+                       decoration-success="state == 'confirmed'"
+                       decoration-danger="state == 'failed'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- OMR Scanner — Kanban -->
+    <record id="view_omr_scanner_kanban" model="ir.ui.view">
+        <field name="name">exam.omr.scanner.kanban</field>
+        <field name="model">exam.omr.scanner</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" default_group_by="state" quick_create="false">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="scan_date"/>
+                <field name="decoded_student_name"/>
+                <field name="decoded_registration"/>
+                <field name="decoded_subject_code"/>
+                <field name="grand_total"/>
+                <field name="valuation_part"/>
+                <field name="state"/>
+
+                <progressbar field="state"
+                             colors='{"draft": "secondary", "decoded": "info", "ocr_done": "warning", "confirmed": "success", "failed": "danger"}'/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_card_header">
+                                <div class="o_kanban_card_header_title">
+                                    <div class="o_primary">
+                                        <strong>
+                                            <field name="name"/>
+                                        </strong>
+                                        <span t-att-class="'badge ms-2 text-bg-' + (record.state.raw_value == 'confirmed' ? 'success' : record.state.raw_value == 'failed' ? 'danger' : record.state.raw_value == 'draft' ? 'info' : 'warning')">
+                                            <field name="state"/>
+                                        </span>
+                                    </div>
+                                    <div class="text-muted">
+                                        <field name="decoded_student_name"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="o_kanban_card_content">
+                                <div class="row mb-2" t-if="record.decoded_registration.raw_value">
+                                    <div class="col-12">
+                                        <i class="fa fa-id-card text-primary"/>
+                                        <field name="decoded_registration"/>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-6" t-if="record.decoded_subject_code.raw_value">
+                                        <i class="fa fa-book text-info"/>
+                                        <field name="decoded_subject_code"/>
+                                    </div>
+                                    <div class="col-6" t-if="record.grand_total.raw_value">
+                                        <i class="fa fa-check-square-o text-success"/>
+                                        <strong><field name="grand_total"/></strong> Marks
+                                    </div>
+                                </div>
+
+                                <div class="row mt-2">
+                                    <div class="col-6">
+                                        <small class="text-muted">
+                                            <field name="valuation_part"/>
+                                        </small>
+                                    </div>
+                                    <div class="col-6" t-if="record.scan_date.raw_value">
+                                        <small class="text-muted">
+                                            <i class="fa fa-calendar"/> <field name="scan_date"/>
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="o_kanban_card_footer">
+                                <div class="o_kanban_footer_left">
+                                    <!-- Empty for future use -->
+                                </div>
+                                <div class="o_kanban_footer_right">
+                                    <field name="activity_ids" widget="kanban_activity"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- OMR Scanner — Search -->
+    <record id="view_omr_scanner_search" model="ir.ui.view">
+        <field name="name">exam.omr.scanner.search</field>
+        <field name="model">exam.omr.scanner</field>
+        <field name="arch" type="xml">
+            <search string="OMR Scans">
+                <field name="name"/>
+                <field name="decoded_registration"/>
+                <field name="decoded_student_name"/>
+                <field name="student_id"/>
+                <field name="examination_id"/>
+                <filter name="draft" string="Pending" domain="[('state', '=', 'draft')]"/>
+                <filter name="confirmed" string="Confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <filter name="failed" string="Failed" domain="[('state', '=', 'failed')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_exam" string="Examination"
+                            context="{'group_by': 'examination_id'}"/>
+                    <filter name="group_subject" string="Subject"
+                            context="{'group_by': 'subject_id'}"/>
+                    <filter name="group_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                </group>
+                <searchpanel>
+                    <field name="examination_id" string="Examination"
+                           select="multi"
+                           icon="fa-graduation-cap"/>
+                    <field name="subject_id" string="Subject"
+                           select="multi"
+                           icon="fa-book"/>
+                    <field name="valuation_part" string="Valuation Part"
+                           select="multi"
+                           icon="fa-copy"/>
+                    <field name="state" string="Status"
+                           select="multi"
+                           icon="fa-filter"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_omr_scanner" model="ir.actions.act_window">
+        <field name="name">OMR Sheet Scanner</field>
+        <field name="res_model">exam.omr.scanner</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Scan a Corrected OMR Sheet
+            </p>
+            <p>Upload the scanned image of a corrected OMR sheet. The system will read the barcode to identify the student and use OCR to detect handwritten marks, then update the student's result.</p>
+        </field>
+    </record>
+
+</odoo>

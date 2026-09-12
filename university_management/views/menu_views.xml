@@ -522,6 +522,70 @@
               action="action_grade_system"
               sequence="1"/>
 
+    <!-- ============================================================ -->
+    <!-- THEORY QUESTION BANK (new sub-menu under Examinations) -->
+    <!-- ============================================================ -->
+    <menuitem id="menu_theory_qb_root"
+              name="Theory Question Bank"
+              parent="menu_examination"
+              sequence="25"/>
+
+    <menuitem id="menu_theory_question_bank"
+              name="Question Banks"
+              parent="menu_theory_qb_root"
+              action="action_theory_question_bank"
+              sequence="1"/>
+
+    <menuitem id="menu_theory_question"
+              name="Questions"
+              parent="menu_theory_qb_root"
+              action="action_theory_question"
+              sequence="2"/>
+
+    <menuitem id="menu_question_paper"
+              name="Question Papers"
+              parent="menu_theory_qb_root"
+              action="action_question_paper"
+              sequence="3"/>
+
+    <!-- ============================================================ -->
+    <!-- OMR SHEETS & SCANNING (new sub-menu under Examinations) -->
+    <!-- ============================================================ -->
+    <menuitem id="menu_omr_root"
+              name="OMR Sheets &amp; Scanning"
+              parent="menu_examination"
+              sequence="30"/>
+
+    <menuitem id="menu_omr_template"
+              name="OMR Templates"
+              parent="menu_omr_root"
+              action="action_omr_template"
+              sequence="1"/>
+
+    <menuitem id="menu_omr_sheet"
+              name="Student OMR Sheets"
+              parent="menu_omr_root"
+              action="action_omr_sheet"
+              sequence="2"/>
+
+    <menuitem id="menu_generate_omr_sheets"
+              name="Generate OMR Sheets"
+              parent="menu_omr_root"
+              action="action_generate_omr_sheets_wizard"
+              sequence="3"/>
+
+    <menuitem id="menu_omr_scanner"
+              name="Scan OMR Sheets (OCR)"
+              parent="menu_omr_root"
+              action="action_omr_scanner"
+              sequence="4"/>
+
+    <menuitem id="menu_bulk_omr_scan"
+              name="Bulk OMR Scan"
+              parent="menu_omr_root"
+              action="action_bulk_omr_scan_wizard"
+              sequence="5"/>
+
     <!-- ================================= -->
     <!-- LIBRARY Module -->
     <!-- ================================= -->

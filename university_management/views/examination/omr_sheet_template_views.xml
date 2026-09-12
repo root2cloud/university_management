@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- OMR Sheet Template — Form -->
+    <!-- ============================================================ -->
+    <record id="view_omr_template_form" model="ir.ui.view">
+        <field name="name">exam.omr.template.form</field>
+        <field name="model">exam.omr.template</field>
+        <field name="arch" type="xml">
+            <form string="OMR Sheet Template">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_sheets" type="object"
+                                class="oe_stat_button text-primary"
+                                icon="fa-file-text-o">
+                            <field name="sheet_count" widget="statinfo" string="OMR Sheets"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <group>
+                        <group string="Template Info">
+                            <field name="name" placeholder="e.g., R22 M.Tech Template"/>
+                            <field name="code"/>
+                            <field name="format_type"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Institution Details">
+                            <field name="institution_name"/>
+                            <field name="institution_subtitle"/>
+                            <field name="valuation_copies"/>
+                        </group>
+                    </group>
+
+                    <!-- R22 Settings -->
+                    <group string="R22 Format Settings"
+                           invisible="format_type != 'r22'">
+                        <group>
+                            <field name="r22_total_questions"/>
+                            <field name="r22_sub_parts"/>
+                        </group>
+                    </group>
+
+                    <!-- R20 Settings -->
+                    <group string="R20 Format Settings"
+                           invisible="format_type != 'r20'">
+                        <group string="Part-A (Objective)">
+                            <field name="r20_part_a_columns"/>
+                            <field name="r20_part_a_questions"/>
+                        </group>
+                        <group string="Part-B (Descriptive)">
+                            <field name="r20_part_b_questions"/>
+                            <field name="r20_part_b_sub_parts"/>
+                        </group>
+                    </group>
+
+                    <!-- Custom Settings -->
+                    <group string="Custom Format Settings"
+                           invisible="format_type != 'custom'">
+                        <group>
+                            <field name="custom_total_questions"/>
+                            <field name="custom_sub_parts"/>
+                        </group>
+                        <group>
+                            <field name="custom_has_part_a"/>
+                            <field name="custom_part_a_columns"
+                                   invisible="not custom_has_part_a"/>
+                        </group>
+                    </group>
+
+                    <group string="Description">
+                        <field name="description" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- OMR Template — List -->
+    <record id="view_omr_template_list" model="ir.ui.view">
+        <field name="name">exam.omr.template.list</field>
+        <field name="model">exam.omr.template</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="not active">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="format_type" widget="badge"
+                       decoration-info="format_type == 'r20'"
+                       decoration-warning="format_type == 'r22'"
+                       decoration-success="format_type == 'custom'"/>
+                <field name="sheet_count"/>
+                <field name="valuation_copies"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- OMR Template — Kanban -->
+    <record id="view_omr_template_kanban" model="ir.ui.view">
+        <field name="name">exam.omr.template.kanban</field>
+        <field name="model">exam.omr.template</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" default_group_by="format_type" quick_create="false">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="format_type"/>
+                <field name="sheet_count"/>
+                <field name="valuation_copies"/>
+                <field name="active"/>
+
+                <progressbar field="format_type"
+                             colors='{"r20": "info", "r22": "warning", "custom": "success"}'/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click #{record.active.raw_value ? '' : 'oe_kanban_card_inactive'}">
+                            <div class="o_kanban_card_header">
+                                <div class="o_kanban_card_header_title">
+                                    <div class="o_primary">
+                                        <strong>
+                                            <field name="name"/>
+                                        </strong>
+                                        <span t-att-class="'badge ms-2 text-bg-' + (record.format_type.raw_value == 'r20' ? 'info' : record.format_type.raw_value == 'r22' ? 'warning' : 'success')">
+                                            <field name="format_type"/>
+                                        </span>
+                                    </div>
+                                    <div class="text-muted">
+                                        <field name="code"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="o_kanban_card_content">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <i class="fa fa-file-text-o text-primary"/>
+                                        <strong><field name="sheet_count"/></strong> Sheets
+                                    </div>
+                                    <div class="col-6">
+                                        <i class="fa fa-copy text-info"/>
+                                        <strong><field name="valuation_copies"/></strong> Valuation Copies
+                                    </div>
+                                </div>
+                                <div class="row mt-2" t-if="!record.active.raw_value">
+                                    <div class="col-12">
+                                        <span class="badge text-bg-danger">Archived</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- OMR Template — Search -->
+    <record id="view_omr_template_search" model="ir.ui.view">
+        <field name="name">exam.omr.template.search</field>
+        <field name="model">exam.omr.template</field>
+        <field name="arch" type="xml">
+            <search string="OMR Sheet Templates">
+                <field name="name"/>
+                <field name="code"/>
+                <filter name="active" string="Active" domain="[('active', '=', True)]"/>
+                <filter name="inactive" string="Archived" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_format_type" string="Format Type"
+                            context="{'group_by': 'format_type'}"/>
+                </group>
+                <searchpanel>
+                    <field name="format_type" string="Format Type"
+                           select="multi"
+                           icon="fa-th-large"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_omr_template" model="ir.actions.act_window">
+        <field name="name">OMR Sheet Templates</field>
+        <field name="res_model">exam.omr.template</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_omr_template_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create an OMR Sheet Template
+            </p>
+            <p>Configure the OMR grid layout — R20 (Part A + Part B), R22 (10 questions), or custom format.</p>
+        </field>
+    </record>
+
+</odoo>

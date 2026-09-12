@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<t t-name="university_management.BulkOmrMultiUploadWidget">
+    <div class="o_bulk_omr_upload_zone"
+         t-on-dragover="onDragOver"
+         t-on-dragleave="onDragLeave"
+         t-on-drop="onDrop"
+         t-on-click="onPickClick">
+
+        <input type="file"
+               t-ref="bulkOmrFileInput"
+               class="o_bulk_omr_file_input"
+               multiple="multiple"
+               accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+               t-on-change="onFileInputChange"/>
+
+        <t t-if="!state.uploading">
+            <i class="fa fa-cloud-upload o_bulk_omr_icon" aria-hidden="true"/>
+            <div class="o_bulk_omr_text">
+                <strong>Click to select multiple files</strong>
+                <span>or drag &amp; drop them here — PDF, JPG, PNG, DOC, DOCX (select as many as you like, e.g. 100 files at once)</span>
+            </div>
+        </t>
+        <t t-if="state.uploading">
+            <i class="fa fa-spinner fa-spin o_bulk_omr_icon" aria-hidden="true"/>
+            <div class="o_bulk_omr_text">
+                <strong>Uploading files… (<t t-esc="state.done"/>/<t t-esc="state.total"/>)</strong>
+                <span>Please wait, this may take a moment for large batches.</span>
+            </div>
+        </t>
+    </div>
+</t>
+
+</templates>

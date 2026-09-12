@@ -90,7 +90,9 @@ class ExaminationHallTicket(models.Model):
     @api.model
     def create(self, vals):
         if vals.get('name', '/') == '/':
-            vals['name'] = self.env['ir.sequence'].next_by_code('examination.hall.ticket') or '/'
+            student = self.env['student.student'].browse(vals.get('student_id'))
+            vals['name'] = student.university_usn or \
+                self.env['ir.sequence'].next_by_code('examination.hall.ticket') or '/'
         return super(ExaminationHallTicket, self).create(vals)
 
     @api.depends('student_id', 'name', 'examination_id')

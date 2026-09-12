@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- Question Paper — Form -->
+    <!-- ============================================================ -->
+    <record id="view_question_paper_form" model="ir.ui.view">
+        <field name="name">exam.question.paper.form</field>
+        <field name="model">exam.question.paper</field>
+        <field name="arch" type="xml">
+            <form string="Question Paper">
+                <header>
+                    <button name="action_generate_paper" type="object"
+                            string="Auto-Generate Paper" class="btn-primary"
+                            invisible="state != 'draft'"
+                            confirm="This will clear existing questions and generate new ones, then rebuild the PDF. Continue?"/>
+                    <button name="action_generate_paper" type="object"
+                            string="Regenerate Paper" class="btn-secondary"
+                            invisible="state == 'draft'"
+                            confirm="This will clear existing questions and generate new ones, then rebuild the PDF. Continue?"/>
+                    <button name="action_print_pdf" type="object"
+                            string="Print PDF" class="btn-primary"
+                            invisible="state == 'draft'"/>
+                    <button name="action_approve" type="object" string="Approve"
+                            invisible="state != 'generated'" class="btn-success"/>
+                    <button name="action_lock" type="object" string="Lock / Print"
+                            invisible="state != 'approved'" class="btn-success"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                            class="btn-danger"
+                            invisible="state == 'draft'"
+                            confirm="Reset this paper to draft?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,generated,approved,locked"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_paper_questions" type="object"
+                                class="oe_stat_button text-primary" icon="fa-list-ol"
+                                invisible="not question_line_count">
+                            <field name="question_line_count" widget="statinfo" string="Questions"/>
+                        </button>
+                        <button name="action_view_source_banks" type="object"
+                                class="oe_stat_button text-info" icon="fa-book"
+                                invisible="not bank_count">
+                            <field name="bank_count" widget="statinfo" string="Source Banks"/>
+                        </button>
+                    </div>
+
+                    <widget name="web_ribbon" title="Generated" bg_color="text-bg-info"
+                            invisible="state != 'generated'"/>
+                    <widget name="web_ribbon" title="Approved" bg_color="text-bg-success"
+                            invisible="state != 'approved'"/>
+                    <widget name="web_ribbon" title="Locked / Printed" bg_color="text-bg-dark"
+                            invisible="state != 'locked'"/>
+
+                    <group>
+                        <group string="Paper Details">
+                            <field name="name" placeholder="e.g., Power Systems-II — December 2025"/>
+                            <field name="code"/>
+                            <field name="subject_id"/>
+                            <field name="department_id"/>
+                            <field name="semester_id"/>
+                            <field name="regulation"/>
+                            <field name="examination_id"/>
+                        </group>
+                        <group string="Letterhead">
+                            <field name="subject_code" placeholder="e.g., R23EEE-PC3103"/>
+                            <field name="exam_session" placeholder="e.g., III B. Tech, I-Semester Regular Examinations, December 2025"/>
+                            <field name="branch_short" placeholder="e.g., EEE"/>
+                            <field name="exam_date"/>
+                            <field name="affiliation_line"/>
+                            <field name="location_line"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Configuration">
+                            <field name="paper_pattern"/>
+                            <field name="total_marks"/>
+                            <field name="duration_minutes"/>
+                            <field name="number_of_questions"
+                                   invisible="paper_pattern != 'custom'"/>
+                        </group>
+                        <group string="Part A / Part B Config"
+                               invisible="paper_pattern not in ('r23', 'r20')">
+                            <field name="part_a_questions"/>
+                            <field name="part_a_marks_each"/>
+                            <field name="part_b_questions"/>
+                            <field name="part_b_marks_each"/>
+                        </group>
+                    </group>
+
+                    <group string="Source Question Banks">
+                        <field name="bank_ids" widget="many2many_tags" nolabel="1"/>
+                    </group>
+
+                    <notebook>
+                        <page string="Generated Questions" name="questions">
+                            <field name="paper_question_ids">
+                                <list>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="part"/>
+                                    <field name="question_number"/>
+                                    <field name="sub_part"/>
+                                    <field name="question_text"/>
+                                    <field name="marks"/>
+                                    <field name="unit"/>
+                                    <field name="co_level"/>
+                                    <field name="rbt_level"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Instructions" name="instructions">
+                            <field name="instructions"/>
+                        </page>
+                        <page string="PDF" name="pdf">
+                            <group>
+                                <field name="paper_pdf" filename="paper_pdf_filename" readonly="1"/>
+                                <field name="paper_pdf_filename" invisible="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="o_attachment_preview"/>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Question Paper — List -->
+    <record id="view_question_paper_list" model="ir.ui.view">
+        <field name="name">exam.question.paper.list</field>
+        <field name="model">exam.question.paper</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="subject_id"/>
+                <field name="paper_pattern"/>
+                <field name="total_marks"/>
+                <field name="examination_id"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'generated'"
+                       decoration-success="state in ('approved', 'locked')"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Question Paper — Search -->
+    <record id="view_question_paper_search" model="ir.ui.view">
+        <field name="name">exam.question.paper.search</field>
+        <field name="model">exam.question.paper</field>
+        <field name="arch" type="xml">
+            <search string="Question Papers">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="subject_id"/>
+                <field name="examination_id"/>
+                <filter name="approved" string="Approved"
+                        domain="[('state', '=', 'approved')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_subject" string="Subject"
+                            context="{'group_by': 'subject_id'}"/>
+                    <filter name="group_pattern" string="Pattern"
+                            context="{'group_by': 'paper_pattern'}"/>
+                    <filter name="group_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                </group>
+                <searchpanel>
+                    <field name="subject_id" string="Subject"
+                           select="multi"
+                           icon="fa-book"/>
+                    <field name="examination_id" string="Examination"
+                           select="multi"
+                           icon="fa-graduation-cap"/>
+                    <field name="paper_pattern" string="Pattern"
+                           select="multi"
+                           icon="fa-th-large"/>
+                    <field name="state" string="Status"
+                           select="multi"
+                           icon="fa-filter"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Question Paper — Kanban -->
+    <record id="view_question_paper_kanban" model="ir.ui.view">
+        <field name="name">exam.question.paper.kanban</field>
+        <field name="model">exam.question.paper</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" default_group_by="state" quick_create="false">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="subject_id"/>
+                <field name="examination_id"/>
+                <field name="paper_pattern"/>
+                <field name="total_marks"/>
+                <field name="question_line_count"/>
+                <field name="bank_count"/>
+                <field name="state"/>
+
+                <progressbar field="state"
+                             colors='{"draft": "secondary", "generated": "warning", "approved": "success", "locked": "dark"}'/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_card_header">
+                                <div class="o_kanban_card_header_title">
+                                    <div class="o_primary">
+                                        <strong>
+                                            <field name="name"/>
+                                        </strong>
+                                        <span t-att-class="'badge ms-2 text-bg-' + (record.state.raw_value in ['approved', 'locked'] ? 'success' : record.state.raw_value == 'generated' ? 'warning' : 'info')">
+                                            <field name="state"/>
+                                        </span>
+                                    </div>
+                                    <div class="text-muted">
+                                        <field name="code"/> — <field name="subject_id"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="o_kanban_card_content">
+                                <div class="row mb-2" t-if="record.examination_id.raw_value">
+                                    <div class="col-12">
+                                        <i class="fa fa-graduation-cap text-primary"/>
+                                        <field name="examination_id"/>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-4">
+                                        <i class="fa fa-star text-warning"/>
+                                        <field name="total_marks"/> Marks
+                                    </div>
+                                    <div class="col-4">
+                                        <i class="fa fa-list-ol text-info"/>
+                                        <field name="question_line_count"/> Qs
+                                    </div>
+                                    <div class="col-4">
+                                        <i class="fa fa-book text-success"/>
+                                        <field name="bank_count"/> Banks
+                                    </div>
+                                </div>
+
+                                <div class="row mt-2">
+                                    <div class="col-12">
+                                        <small class="text-muted">
+                                            <field name="paper_pattern"/>
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="o_kanban_card_footer">
+                                <div class="o_kanban_footer_left">
+                                    <!-- Empty for future use -->
+                                </div>
+                                <div class="o_kanban_footer_right">
+                                    <field name="activity_ids" widget="kanban_activity"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_question_paper" model="ir.actions.act_window">
+        <field name="name">Question Papers</field>
+        <field name="res_model">exam.question.paper</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a Question Paper
+            </p>
+            <p>Auto-generate question papers from theory question banks with unit coverage and marks distribution.</p>
+        </field>
+    </record>
+
+</odoo>

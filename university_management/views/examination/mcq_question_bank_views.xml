@@ -10,7 +10,7 @@
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button name="action_mcq_questions" type="object"
-                                class="oe_stat_button" icon="fa-question-circle"
+                                class="oe_stat_button text-primary" icon="fa-question-circle"
                                 context="{'default_bank_id': id, 'search_default_bank_id': id}">
                             <field name="question_count" widget="statinfo" string="Questions"/>
                         </button>

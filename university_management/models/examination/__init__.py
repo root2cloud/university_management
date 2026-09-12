@@ -12,3 +12,8 @@ from . import mcq_question
 from . import online_exam
 from . import online_exam_attempt
 from . import online_exam_response
+from . import question_bank
+from . import question_paper
+from . import omr_sheet_template
+from . import omr_sheet
+from . import omr_scanner

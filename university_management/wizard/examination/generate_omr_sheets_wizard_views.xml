@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_generate_omr_sheets_wizard_form" model="ir.ui.view">
+        <field name="name">exam.generate.omr.sheets.wizard.form</field>
+        <field name="model">exam.generate.omr.sheets.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate OMR Sheets">
+                <group>
+                    <group string="Examination Details">
+                        <field name="examination_id"/>
+                        <field name="subject_id"/>
+                        <field name="omr_template_id"/>
+                    </group>
+                    <group string="Sheet Details">
+                        <field name="exam_month_year" placeholder="AUGUST 2026"/>
+                        <field name="exam_date"/>
+                        <field name="generate_pdf"/>
+                    </group>
+                </group>
+                <group string="Filters (Optional)">
+                    <group>
+                        <field name="program_id"/>
+                        <field name="department_id"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_generate" type="object"
+                            string="Generate OMR Sheets" class="oe_highlight"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_generate_omr_sheets_wizard" model="ir.actions.act_window">
+        <field name="name">Generate OMR Sheets</field>
+        <field name="res_model">exam.generate.omr.sheets.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

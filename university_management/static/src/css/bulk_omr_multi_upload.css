@@ -1,0 +1,44 @@
+.o_bulk_omr_upload_zone {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    border: 2px dashed #7C7BAD;
+    border-radius: 8px;
+    background-color: #F7F7FC;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.o_bulk_omr_upload_zone:hover,
+.o_bulk_omr_upload_zone.o_bulk_omr_drop_hover {
+    background-color: #EFEFFB;
+    border-color: #714B67;
+}
+
+.o_bulk_omr_file_input {
+    display: none;
+}
+
+.o_bulk_omr_icon {
+    font-size: 28px;
+    color: #714B67;
+    flex: 0 0 auto;
+}
+
+.o_bulk_omr_text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.4;
+}
+
+.o_bulk_omr_text strong {
+    color: #212529;
+}
+
+.o_bulk_omr_text span {
+    color: #6c757d;
+    font-size: 0.85rem;
+}

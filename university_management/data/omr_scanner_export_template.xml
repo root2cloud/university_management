@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="0">
+
+    <!-- Saved Export Template for the native "Export" wizard.
+         Selecting "OMR Marks (Ordered)" from the Template dropdown in
+         the standard Export Data popup loads all fields already in a
+         fixed, sensible order — identity fields first, marks last — so
+         nobody needs to drag rows into place by hand. -->
+    <record id="ir_exports_omr_scanner_ordered" model="ir.exports">
+        <field name="name">OMR Marks</field>
+        <field name="resource">exam.omr.scanner</field>
+    </record>
+
+    <record id="ir_exports_line_omr_scanner_001" model="ir.exports.line">
+        <field name="name">name</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_002" model="ir.exports.line">
+        <field name="name">scan_date</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_003" model="ir.exports.line">
+        <field name="name">decoded_registration</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_004" model="ir.exports.line">
+        <field name="name">decoded_student_name</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_005" model="ir.exports.line">
+        <field name="name">decoded_subject_code</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_006" model="ir.exports.line">
+        <field name="name">valuation_part</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_007" model="ir.exports.line">
+        <field name="name">state</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_008" model="ir.exports.line">
+        <field name="name">grand_total</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_009" model="ir.exports.line">
+        <field name="name">pa_q1_a</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_010" model="ir.exports.line">
+        <field name="name">pa_q1_b</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_011" model="ir.exports.line">
+        <field name="name">pa_q1_c</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_012" model="ir.exports.line">
+        <field name="name">pa_q1_d</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_013" model="ir.exports.line">
+        <field name="name">pa_q1_e</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_014" model="ir.exports.line">
+        <field name="name">pa_q1_f</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_015" model="ir.exports.line">
+        <field name="name">pa_q1_g</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_016" model="ir.exports.line">
+        <field name="name">pa_q1_h</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_017" model="ir.exports.line">
+        <field name="name">pa_q1_i</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_018" model="ir.exports.line">
+        <field name="name">pa_q1_j</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_019" model="ir.exports.line">
+        <field name="name">pa_q1_extra</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_020" model="ir.exports.line">
+        <field name="name">pa_q1_total</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_021" model="ir.exports.line">
+        <field name="name">pb_q1_a</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_022" model="ir.exports.line">
+        <field name="name">pb_q1_b</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_023" model="ir.exports.line">
+        <field name="name">pb_q1_c</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_024" model="ir.exports.line">
+        <field name="name">pb_q1_d</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_025" model="ir.exports.line">
+        <field name="name">pb_q1_total</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_026" model="ir.exports.line">
+        <field name="name">pb_q2_a</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_027" model="ir.exports.line">
+        <field name="name">pb_q2_b</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_028" model="ir.exports.line">
+        <field name="name">pb_q2_c</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_029" model="ir.exports.line">
+        <field name="name">pb_q2_d</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_030" model="ir.exports.line">
+        <field name="name">pb_q2_total</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_031" model="ir.exports.line">
+        <field name="name">pb_q3_a</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_032" model="ir.exports.line">
+        <field name="name">pb_q3_b</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_033" model="ir.exports.line">
+        <field name="name">pb_q3_c</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_034" model="ir.exports.line">
+        <field name="name">pb_q3_d</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_035" model="ir.exports.line">
+        <field name="name">pb_q3_total</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_036" model="ir.exports.line">
+        <field name="name">pb_q4_a</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_037" model="ir.exports.line">
+        <field name="name">pb_q4_b</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_038" model="ir.exports.line">
+        <field name="name">pb_q4_c</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_039" model="ir.exports.line">
+        <field name="name">pb_q4_d</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_040" model="ir.exports.line">
+        <field name="name">pb_q4_total</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_041" model="ir.exports.line">
+        <field name="name">pb_q5_a</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_042" model="ir.exports.line">
+        <field name="name">pb_q5_b</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_043" model="ir.exports.line">
+        <field name="name">pb_q5_c</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_044" model="ir.exports.line">
+        <field name="name">pb_q5_d</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_045" model="ir.exports.line">
+        <field name="name">pb_q5_total</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_046" model="ir.exports.line">
+        <field name="name">pb_q6_a</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_047" model="ir.exports.line">
+        <field name="name">pb_q6_b</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_048" model="ir.exports.line">
+        <field name="name">pb_q6_c</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_049" model="ir.exports.line">
+        <field name="name">pb_q6_d</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_050" model="ir.exports.line">
+        <field name="name">pb_q6_total</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_051" model="ir.exports.line">
+        <field name="name">pb_q7_a</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_052" model="ir.exports.line">
+        <field name="name">pb_q7_b</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_053" model="ir.exports.line">
+        <field name="name">pb_q7_c</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_054" model="ir.exports.line">
+        <field name="name">pb_q7_d</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_055" model="ir.exports.line">
+        <field name="name">pb_q7_total</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_056" model="ir.exports.line">
+        <field name="name">pb_q8_a</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_057" model="ir.exports.line">
+        <field name="name">pb_q8_b</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_058" model="ir.exports.line">
+        <field name="name">pb_q8_c</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_059" model="ir.exports.line">
+        <field name="name">pb_q8_d</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_060" model="ir.exports.line">
+        <field name="name">pb_q8_total</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_061" model="ir.exports.line">
+        <field name="name">pb_q9_a</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_062" model="ir.exports.line">
+        <field name="name">pb_q9_b</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_063" model="ir.exports.line">
+        <field name="name">pb_q9_c</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_064" model="ir.exports.line">
+        <field name="name">pb_q9_d</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_065" model="ir.exports.line">
+        <field name="name">pb_q9_total</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_066" model="ir.exports.line">
+        <field name="name">pb_q10_a</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_067" model="ir.exports.line">
+        <field name="name">pb_q10_b</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_068" model="ir.exports.line">
+        <field name="name">pb_q10_c</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_069" model="ir.exports.line">
+        <field name="name">pb_q10_d</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_070" model="ir.exports.line">
+        <field name="name">pb_q10_total</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_071" model="ir.exports.line">
+        <field name="name">pb_q11_a</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_072" model="ir.exports.line">
+        <field name="name">pb_q11_b</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_073" model="ir.exports.line">
+        <field name="name">pb_q11_c</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_074" model="ir.exports.line">
+        <field name="name">pb_q11_d</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_075" model="ir.exports.line">
+        <field name="name">pb_q11_total</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_076" model="ir.exports.line">
+        <field name="name">pb_q12_a</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_077" model="ir.exports.line">
+        <field name="name">pb_q12_b</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_078" model="ir.exports.line">
+        <field name="name">pb_q12_c</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_079" model="ir.exports.line">
+        <field name="name">pb_q12_d</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+    <record id="ir_exports_line_omr_scanner_080" model="ir.exports.line">
+        <field name="name">pb_q12_total</field>
+        <field name="export_id" ref="ir_exports_omr_scanner_ordered"/>
+    </record>
+
+</odoo>

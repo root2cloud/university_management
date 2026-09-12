@@ -1,0 +1,95 @@
+/* ------------------------------------------------------------------ */
+/* OMR Scan overlay — animated "scanning" effect over the PDF preview */
+/* ------------------------------------------------------------------ */
+
+.o_attachment_preview,
+.o-mail-Attachment,
+.o-mail-PopoutAttachmentView,
+.o-mail-Chatter,
+.o_omr_scan_relative {
+    position: relative;
+}
+
+.o_omr_scan_overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.o_omr_scan_overlay_backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(17, 24, 39, 0.15);
+}
+
+/* Faint horizontal rule grid, like a document being read line by line */
+.o_omr_scan_grid {
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+        to bottom,
+        rgba(0, 128, 255, 0.08) 0px,
+        rgba(0, 128, 255, 0.08) 1px,
+        transparent 1px,
+        transparent 26px
+    );
+}
+
+/* The moving "laser" scan line */
+.o_omr_scan_line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(
+        90deg,
+        rgba(0, 150, 255, 0) 0%,
+        rgba(0, 150, 255, 0.95) 50%,
+        rgba(0, 150, 255, 0) 100%
+    );
+    box-shadow: 0 0 12px 3px rgba(0, 150, 255, 0.75);
+    animation: o_omr_scan_sweep 1.6s ease-in-out infinite;
+}
+
+@keyframes o_omr_scan_sweep {
+    0% {
+        top: 0%;
+        opacity: 0;
+    }
+    8% {
+        opacity: 1;
+    }
+    50% {
+        top: 100%;
+    }
+    92% {
+        opacity: 1;
+    }
+    100% {
+        top: 0%;
+        opacity: 0;
+    }
+}
+
+.o_omr_scan_label {
+    position: relative;
+    margin-bottom: 18px;
+    padding: 6px 16px;
+    border-radius: 20px;
+    background: rgba(17, 24, 39, 0.75);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    animation: o_omr_scan_pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes o_omr_scan_pulse {
+    0%, 100% { opacity: 0.85; }
+    50% { opacity: 1; }
+}
