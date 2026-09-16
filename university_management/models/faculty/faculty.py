@@ -122,6 +122,12 @@ class Faculty(models.Model):
     conferences_attended = fields.Integer(string='Conferences Attended')
     awards = fields.Text(string='Awards & Recognitions')
 
+    # NBA Research, Publications, FDP & Projects (per-faculty NBA records)
+    nba_research_ids = fields.One2many('nba.research', 'faculty_id',
+                                       string='NBA Research & Publications')
+    nba_research_count = fields.Integer(string='NBA Records',
+                                        compute='_compute_nba_research_count')
+
     # Bank Details
     bank_account_number = fields.Char(string='Bank Account Number')
     bank_name = fields.Char(string='Bank Name')
@@ -273,6 +279,11 @@ class Faculty(models.Model):
                 record.average_rating = sum(record.evaluation_ids.mapped('overall_rating')) / len(record.evaluation_ids)
             else:
                 record.average_rating = 0.0
+
+    @api.depends('nba_research_ids')
+    def _compute_nba_research_count(self):
+        for record in self:
+            record.nba_research_count = len(record.nba_research_ids)
 
     def action_activate(self):
         self.write({'state': 'active'})

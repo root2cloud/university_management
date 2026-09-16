@@ -285,7 +285,67 @@
                                     <field name="research_papers"/>
                                     <field name="conferences_attended"/>
                                 </group>
+                                <group>
+                                    <field name="nba_research_count" readonly="1"/>
+                                </group>
                             </group>
+                            <separator string="NBA Research, Publications, FDP &amp; Projects"/>
+                            <field name="nba_research_ids">
+                                <list>
+                                    <field name="academic_year_id"/>
+                                    <field name="research_type"/>
+                                    <field name="title"/>
+                                    <field name="publisher_journal"/>
+                                    <field name="indexed_in" optional="show"/>
+                                    <field name="doi" optional="hide"/>
+                                    <field name="publication_date"/>
+                                    <field name="funding_agency" optional="hide"/>
+                                    <field name="amount_lacs" optional="hide"/>
+                                    <field name="patent_status" optional="hide"/>
+                                </list>
+                                <form string="Research / Publication / Project">
+                                    <sheet>
+                                        <group>
+                                            <group>
+                                                <field name="research_type"/>
+                                                <field name="title"/>
+                                                <field name="publisher_journal"/>
+                                                <field name="indexed_in"/>
+                                                <field name="doi"/>
+                                            </group>
+                                            <group>
+                                                <field name="academic_year_id"/>
+                                                <field name="publication_date"/>
+                                                <field name="funding_agency"/>
+                                                <field name="amount_lacs"/>
+                                                <field name="patent_status"/>
+                                            </group>
+                                        </group>
+                                        <group string="Additional Financial Details"
+                                               invisible="research_type not in ['funded_project','consultancy','seed_money']">
+                                            <field name="duration_months"/>
+                                            <field name="amount_utilized_lacs"/>
+                                        </group>
+                                        <group string="FDP Details"
+                                               invisible="research_type not in ['fdp_attended','fdp_organized']">
+                                            <field name="fdp_duration_days"/>
+                                            <field name="fdp_is_external"/>
+                                            <field name="fdp_organizer"/>
+                                            <field name="fdp_location"/>
+                                        </group>
+                                        <group string="Co-Investigators"
+                                               invisible="research_type not in ['funded_project','consultancy']">
+                                            <field name="co_pi_ids" widget="many2many_tags"/>
+                                        </group>
+                                        <group>
+                                            <field name="notes"
+                                                   placeholder="Any additional notes..."/>
+                                        </group>
+                                        <field name="faculty_id" invisible="1"/>
+                                        <field name="sar_id" invisible="1"/>
+                                    </sheet>
+                                </form>
+                            </field>
                             <separator string="Awards &amp; Recognitions"/>
                             <field name="awards"
                                    placeholder="Enter awards, honors, and recognitions received..."/>
