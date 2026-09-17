@@ -293,6 +293,8 @@
                             <field name="nba_research_ids">
                                 <list>
                                     <field name="academic_year_id"/>
+                                    <field name="sar_id" readonly="1" optional="show"/>
+                                    <field name="year_label" readonly="1" optional="hide"/>
                                     <field name="research_type"/>
                                     <field name="title"/>
                                     <field name="publisher_journal"/>
@@ -341,8 +343,12 @@
                                             <field name="notes"
                                                    placeholder="Any additional notes..."/>
                                         </group>
+                                        <group string="NBA / SAR Linkage">
+                                            <field name="sar_id" readonly="1"
+                                                   help="Automatically resolved from the department and academic year"/>
+                                            <field name="year_label" readonly="1"/>
+                                        </group>
                                         <field name="faculty_id" invisible="1"/>
-                                        <field name="sar_id" invisible="1"/>
                                     </sheet>
                                 </form>
                             </field>
