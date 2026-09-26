@@ -22,8 +22,7 @@ class UniversityLoginRedirect(Home):
     normal Odoo way.
     """
 
-    @classmethod
-    def _login_redirect(cls, uid, redirect=None):
+    def _login_redirect(self, uid, redirect=None):
         if not redirect:
             user = request.env['res.users'].sudo().browse(uid)
             if user.has_group('university_management.group_student_portal'):
