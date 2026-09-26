@@ -3,9 +3,47 @@ from odoo import http, _
 from odoo.http import request
 from odoo.exceptions import AccessError, MissingError
 from odoo.addons.portal.controllers.portal import CustomerPortal, pager as portal_pager
+from odoo.addons.web.controllers.home import Home
 import logging
 
 _logger = logging.getLogger(__name__)
+
+
+class UniversityLoginRedirect(Home):
+    """Send Faculty / Student / Parent users straight to their own
+    dashboard the moment they log in, instead of the backend or the
+    website homepage. Admins and any explicit ``redirect`` target
+    (e.g. a shared deep link) are left untouched.
+    """
+
+    @http.route('/web/login', type='http', auth="none")
+    def web_login(self, redirect=None, **kw):
+        response = super().web_login(redirect=redirect, **kw)
+
+        # Only step in right after a successful login submission where
+        # nobody already asked to be sent somewhere specific.
+        if request.httprequest.method == 'POST' and not redirect and request.session.uid:
+            dashboard_url = self._get_university_dashboard_url(
+                request.env['res.users'].sudo().browse(request.session.uid)
+            )
+            if dashboard_url:
+                return request.redirect(dashboard_url)
+
+        return response
+
+    @staticmethod
+    def _get_university_dashboard_url(user):
+        """Return the dashboard URL for this user's role, or False to
+        keep Odoo's normal redirect behaviour (used for admins/staff)."""
+        if user.has_group('university_management.group_university_admin'):
+            return False
+        if user.has_group('university_management.group_student_portal'):
+            return '/my/student/dashboard'
+        if user.has_group('university_management.group_parent_portal'):
+            return '/my/parent/dashboard'
+        if user.has_group('university_management.group_faculty'):
+            return '/my/faculty/dashboard'
+        return False
 
 
 class UniversityWebsiteController(http.Controller):
