@@ -14,36 +14,26 @@ class UniversityLoginRedirect(Home):
     dashboard the moment they log in, instead of the backend or the
     website homepage. Admins and any explicit ``redirect`` target
     (e.g. a shared deep link) are left untouched.
+
+    This hooks into ``_login_redirect``, the helper Odoo's own
+    ``web_login`` already calls right after a successful
+    authentication to decide where to send the user, so the login
+    response, session and cookies are still built exactly once, the
+    normal Odoo way.
     """
 
-    @http.route('/web/login', type='http', auth="none")
-    def web_login(self, redirect=None, **kw):
-        response = super().web_login(redirect=redirect, **kw)
-
-        # Only step in right after a successful login submission where
-        # nobody already asked to be sent somewhere specific.
-        if request.httprequest.method == 'POST' and not redirect and request.session.uid:
-            dashboard_url = self._get_university_dashboard_url(
-                request.env['res.users'].sudo().browse(request.session.uid)
-            )
-            if dashboard_url:
-                return request.redirect(dashboard_url)
-
-        return response
-
-    @staticmethod
-    def _get_university_dashboard_url(user):
-        """Return the dashboard URL for this user's role, or False to
-        keep Odoo's normal redirect behaviour (used for admins/staff)."""
-        if user.has_group('university_management.group_university_admin'):
-            return False
-        if user.has_group('university_management.group_student_portal'):
-            return '/my/student/dashboard'
-        if user.has_group('university_management.group_parent_portal'):
-            return '/my/parent/dashboard'
-        if user.has_group('university_management.group_faculty'):
-            return '/my/faculty/dashboard'
-        return False
+    @classmethod
+    def _login_redirect(cls, uid, redirect=None):
+        if not redirect:
+            user = request.env['res.users'].sudo().browse(uid)
+            if user.has_group('university_management.group_student_portal'):
+                redirect = '/my/student/dashboard'
+            elif user.has_group('university_management.group_parent_portal'):
+                redirect = '/my/parent/dashboard'
+            elif user.has_group('university_management.group_faculty') and not \
+                    user.has_group('university_management.group_university_admin'):
+                redirect = '/my/faculty/dashboard'
+        return super()._login_redirect(uid, redirect=redirect)
 
 
 class UniversityWebsiteController(http.Controller):
