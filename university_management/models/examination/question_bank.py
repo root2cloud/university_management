@@ -49,9 +49,9 @@ class TheoryQuestionBank(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'name'
 
-    name = fields.Char(string='Bank Name', required=True, tracking=True)
+    name = fields.Char(string='Question Bank Name', required=True, tracking=True)
     code = fields.Char(
-        string='Bank Code', required=True, copy=False,
+        string='Question Bank Code', required=True, copy=False,
         default=lambda self: self.env['ir.sequence'].next_by_code('exam.theory.question.bank') or 'NEW',
     )
     active = fields.Boolean(default=True)
