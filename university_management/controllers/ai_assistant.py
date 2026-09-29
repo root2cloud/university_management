@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 import json
 import logging
+import re
+import time
 import requests
+from datetime import date
 from odoo import http
+from odoo.exceptions import AccessError
 from odoo.http import request
 
 _logger = logging.getLogger(__name__)
@@ -20,7 +24,7 @@ TOOLS = [
                 "name": {"type": "string", "description": "Student name (partial match)"},
                 "registration_number": {"type": "string", "description": "Student registration number"},
                 "university_usn": {"type": "string", "description": "University USN"},
-                "course_id_name": {"type": "string", "description": "Course/program name"},
+                "course_id_name": {"type": "string", "description": "Program name, e.g. 'Bachelor of Technology(ECE)'. Only set this if the user explicitly gave a program; do NOT put a department name here"},
                 "semester": {"type": "string", "description": "Semester name"},
                 "limit": {"type": "integer", "description": "Max records to return (default 10)"}
             }
@@ -95,6 +99,69 @@ TOOLS = [
         }
     },
     {
+        "name": "get_hall_ticket",
+        "description": "Get hall ticket number(s), examination, issue date, status and eligibility for a student. Use for questions like 'hall ticket number of X'.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "student_id": {"type": "integer", "description": "Student database ID (from search_students)"},
+                "student_name": {"type": "string", "description": "Student name (partial match)"},
+                "registration_number": {"type": "string", "description": "Student registration number"}
+            }
+        }
+    },
+    # ── Generic, read-only data tools (no code change needed for new questions) ──
+    {
+        "name": "list_models",
+        "description": "List the data models (tables) you are allowed to read, e.g. student, hall ticket, library, placement, assets. Pass an optional keyword to filter. Use this first when no specific tool fits the question.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "keyword": {"type": "string", "description": "Optional word to filter by, e.g. 'hall', 'library', 'placement'"}
+            }
+        }
+    },
+    {
+        "name": "describe_model",
+        "description": "Get the fields of a model (name, label, type, related model, selection values). Call before search_records so you use correct field names.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "model": {"type": "string", "description": "Technical model name from list_models, e.g. 'examination.hall.ticket'"}
+            },
+            "required": ["model"]
+        }
+    },
+    {
+        "name": "search_records",
+        "description": "Read records from any allowed model. domain is a JSON string like [[\"student_id.name\",\"ilike\",\"chandu\"]] (use dotted paths to follow relations). Returns matching records plus the total match count.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "model": {"type": "string", "description": "Technical model name, e.g. 'examination.hall.ticket'"},
+                "domain": {"type": "string", "description": "JSON list of [field, operator, value] filters. Operators: =, !=, >, >=, <, <=, ilike, like, in, not in. Empty string or [] for all."},
+                "fields": {"type": "array", "items": {"type": "string"}, "description": "Field names to return. Omit to get a default set."},
+                "limit": {"type": "integer", "description": "Max records (default 20, max 50)"},
+                "order": {"type": "string", "description": "e.g. 'create_date desc'"}
+            },
+            "required": ["model"]
+        }
+    },
+    {
+        "name": "aggregate_records",
+        "description": "Count, sum, average, min or max over an allowed model, optionally grouped. Use for 'how many', 'total', 'average', 'by department'.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "model": {"type": "string", "description": "Technical model name"},
+                "domain": {"type": "string", "description": "JSON list of filters, same format as search_records"},
+                "group_by": {"type": "array", "items": {"type": "string"}, "description": "Fields to group by, e.g. ['department_id']; dates accept 'date_field:month'"},
+                "aggregates": {"type": "array", "items": {"type": "string"}, "description": "e.g. ['__count', 'amount:sum', 'cgpa:avg']. Default ['__count']"}
+            },
+            "required": ["model"]
+        }
+    },
+    {
         "name": "get_university_stats",
         "description": "Get overall university statistics: total students, faculty, fee collection, placements, etc.",
         "input_schema": {
@@ -162,6 +229,9 @@ class AIAssistantController(http.Controller):
           Any other OpenAI-compatible endpoint.
         """
         try:
+            if not request.env.user._is_internal():
+                return {'error': 'The AI assistant is available to staff and administrators only.'}
+
             params = request.env['ir.config_parameter'].sudo()
 
             api_key  = params.get_param('university.ai.api_key', '')
@@ -204,19 +274,29 @@ class AIAssistantController(http.Controller):
     # ── System prompt ─────────────────────────────────────────────────────────
 
     def _build_system_prompt(self):
-        return """You are an intelligent AI assistant for a University Management System built on Odoo.
-You have access to real-time university data through tools. Use them to answer any question about:
-- Students (fees, attendance, results, enrollment, scholarships, hostel, transport)
-- Faculty (details, workload, salary, leave)
-- University statistics and reports
+        return """You are an intelligent AI assistant for a University Management System built on Odoo, used by administrators and staff.
+Today's date is %s.
+You have real-time, read-only access to university data through tools.
+
+Workflow:
+1. For common questions use the specific tools (search_students, get_fee_details, get_attendance, get_exam_results, get_hall_ticket, etc.).
+2. For anything else (library, placement, assets, hostel, transport, events, projects, alumni, ...) use the generic tools:
+   a) list_models with a keyword to find the right model,
+   b) describe_model to see its exact field names,
+   c) search_records to read records, or aggregate_records for counts, totals and averages.
+   Never guess model or field names — look them up first. If a tool returns an error, read it, fix the call and retry.
 
 Rules:
 1. Always use tools to fetch real data before answering — never guess or make up numbers.
-2. When a user asks about a student by name, first call search_students to get their ID, then use that ID for subsequent tool calls.
+2. When a user asks about a student by name, you can filter with dotted fields, e.g. [["student_id.name","ilike","chandu"]], or call search_students first to get the ID.
 3. Present financial amounts in Indian Rupee format (₹).
-4. Be concise but complete. Format tables using plain text when showing lists.
+4. Answer exactly what was asked and nothing more. If the user asks for one value (e.g. a hall ticket number), reply in one short sentence with that value. Add extra details only if asked.
+   FORMAT: never use markdown tables or pipe (|) characters. For several items, use one short line per item, like "Name - value", or a simple numbered list. You may use **bold** for key values.
 5. If no data is found, say so clearly.
-6. You are read-only — you cannot modify any data."""
+6. You are read-only — you cannot modify any data.
+7. Only use filters the user actually mentioned. Do not invent course or department filters.
+8. If a name search returns nothing, retry with just part of the name before saying it was not found.
+9. Some fields are hidden for privacy; if asked for them, say they are not available.""" % date.today().strftime('%A, %d %B %Y')
 
     # ── Anthropic agentic loop ────────────────────────────────────────────────
 
@@ -246,7 +326,8 @@ Rules:
                 json=payload,
                 timeout=60
             )
-            resp.raise_for_status()
+            if not resp.ok:
+                raise Exception(f"API error {resp.status_code} from {resp.url}: {resp.text[:500]}")
             data = resp.json()
 
             stop_reason = data.get('stop_reason')
@@ -274,7 +355,7 @@ Rules:
                         tool_results.append({
                             'type': 'tool_result',
                             'tool_use_id': block['id'],
-                            'content': json.dumps(result, default=str)
+                            'content': self._dump(result)
                         })
 
                 current_messages.append({'role': 'user', 'content': tool_results})
@@ -296,8 +377,15 @@ Rules:
         }
 
         # Build message list: system message first, then conversation
+        # Free/low tiers have a tokens-per-minute cap, and 'max_tokens' counts toward
+        # it, so keep the request small: short reply budget + only recent history.
+        try:
+            max_tokens = int(request.env['ir.config_parameter'].sudo().get_param(
+                'university.ai.max_tokens', '1024'))
+        except (TypeError, ValueError):
+            max_tokens = 1024
         current_messages = [{'role': 'system', 'content': system_prompt}]
-        for m in messages:
+        for m in list(messages)[-8:]:
             current_messages.append({'role': m['role'], 'content': m['content']})
 
         openai_tools = _tools_to_openai(TOOLS)
@@ -307,19 +395,48 @@ Rules:
         for _ in range(max_iterations):
             payload = {
                 'model': model,
-                'max_tokens': 2048,
+                'max_tokens': max_tokens,
+                'temperature': 0.2,
                 'messages': current_messages,
                 'tools': openai_tools,
                 'tool_choice': 'auto',
             }
 
-            resp = requests.post(url, headers=headers, json=payload, timeout=60)
-            resp.raise_for_status()
+            # Some models (e.g. openai/gpt-oss-*) occasionally emit a malformed
+            # tool name like 'search_students<|channel|>commentary'. Groq rejects
+            # that with 400 "tool_use_failed". The failure is random, so retry.
+            resp = None
+            for attempt in range(4):
+                resp = requests.post(url, headers=headers, json=payload, timeout=60)
+                if resp.ok:
+                    break
+                if resp.status_code == 400 and 'tool_use_failed' in resp.text and attempt < 3:
+                    _logger.warning("AI tool call malformed, retrying (%s/3): %s",
+                                    attempt + 1, resp.text[:300])
+                    continue
+                if resp.status_code == 429 and attempt < 2:
+                    # Rate limit (tokens per minute). Groq says how long to wait.
+                    m_wait = re.search(r'try again in ([\d.]+)s', resp.text)
+                    wait = min(float(m_wait.group(1)) + 1 if m_wait else 10, 30)
+                    _logger.warning("AI rate limit hit, waiting %.0fs then retrying", wait)
+                    time.sleep(wait)
+                    continue
+                if resp.status_code == 429:
+                    raise Exception('The AI service is busy (rate limit reached). '
+                                    'Please wait about a minute and ask again.')
+                raise Exception(f"API error {resp.status_code} from {resp.url}: {resp.text[:500]}")
             data = resp.json()
 
             choice = data.get('choices', [{}])[0]
             message = choice.get('message', {})
             finish_reason = choice.get('finish_reason', '')
+
+            # Clean any leaked special tokens from tool names, e.g.
+            # 'search_students<|channel|>commentary' -> 'search_students'
+            for _tc in message.get('tool_calls') or []:
+                _fn = _tc.get('function') or {}
+                if _fn.get('name'):
+                    _fn['name'] = _fn['name'].split('<|')[0].strip()
 
             # Add assistant reply to history
             current_messages.append(message)
@@ -339,7 +456,7 @@ Rules:
                     current_messages.append({
                         'role': 'tool',
                         'tool_call_id': tc.get('id', ''),
-                        'content': json.dumps(result, default=str),
+                        'content': self._dump(result),
                     })
 
             elif finish_reason in ('stop', 'end_turn', 'eos', 'length') or not message.get('tool_calls'):
@@ -365,6 +482,11 @@ Rules:
             'get_hostel_transport': self._get_hostel_transport,
             'get_enrolled_courses': self._get_enrolled_courses,
             'get_university_stats': self._get_university_stats,
+            'get_hall_ticket':    self._get_hall_ticket,
+            'list_models':        self._list_models,
+            'describe_model':     self._describe_model,
+            'search_records':     self._search_records,
+            'aggregate_records':  self._aggregate_records,
             'search_faculty':     self._search_faculty,
         }
         fn = dispatch.get(tool_name)
@@ -373,6 +495,36 @@ Rules:
         return {'error': f'Unknown tool: {tool_name}'}
 
     # ── Tool implementations (unchanged) ─────────────────────────────────────
+
+    def _get_hall_ticket(self, env, inp):
+        domain = []
+        if inp.get('student_id'):
+            domain.append(('student_id', '=', inp['student_id']))
+        if inp.get('student_name'):
+            domain.append(('student_id.name', 'ilike', inp['student_name']))
+        if inp.get('registration_number'):
+            domain.append(('student_id.registration_number', 'ilike', inp['registration_number']))
+        if not domain:
+            return {'error': 'Provide student_id, student_name or registration_number.'}
+
+        tickets = env['examination.hall.ticket'].sudo().search(
+            domain, order='issue_date desc, id desc', limit=20)
+        state_labels = dict(env['examination.hall.ticket']._fields['state'].selection)
+        return {
+            'count': len(tickets),
+            'hall_tickets': [{
+                'hall_ticket_number': t.name,
+                'student': t.student_id.name,
+                'registration_number': t.registration_number,
+                'examination': t.examination_id.name,
+                'academic_year': t.academic_year_id.name,
+                'semester': t.semester_id.name,
+                'issue_date': str(t.issue_date) if t.issue_date else None,
+                'status': state_labels.get(t.state, t.state),
+                'eligible': t.is_eligible,
+                'ineligibility_reason': t.ineligibility_reason or None,
+            } for t in tickets],
+        }
 
     def _search_students(self, env, inp):
         domain = []
@@ -625,7 +777,7 @@ Rules:
             domain.append(('department_id.name', 'ilike', inp['department']))
 
         limit = inp.get('limit', 10)
-        faculty = env['university.faculty'].sudo().search(domain, limit=limit)
+        faculty = env['faculty.faculty'].sudo().search(domain, limit=limit)
         return {
             'count': len(faculty),
             'faculty': [{
@@ -637,6 +789,232 @@ Rules:
                 'mobile': f.mobile_phone if hasattr(f, 'mobile_phone') else '',
             } for f in faculty]
         }
+
+    # ── Generic read-only data tools ─────────────────────────────────────────
+    #
+    # Safety model:
+    #   * Only models that belong to this module are readable by default.
+    #     Extra models:   System Parameter  university.ai.extra_models    = hr.employee,account.move
+    #     Hide models:    System Parameter  university.ai.blocked_models  = some.model
+    #     Hide fields:    System Parameter  university.ai.blocked_fields  = extra_field_1,extra_field_2
+    #   * Queries run as the logged-in user (NOT sudo), so Odoo access rights and
+    #     record rules apply.
+    #   * Sensitive-looking fields (passwords, tokens, bank / ID numbers) are never exposed.
+
+    MAX_RECORDS = 50
+    MAX_RESULT_CHARS = 6000
+    BLOCKED_FIELD_RE = re.compile(
+        r'(password|passwd|secret|token|api_key|apikey|oauth|totp|signup|'
+        r'aadhaar|aadhar|pan_no|pan_number|bank_acc|acc_number|ifsc|iban|cvv|otp)',
+        re.I)
+    BLOCKED_MODEL_PREFIXES = ('ir.', 'base.', 'res.users', 'res.config', 'bus.', 'mail.', 'auth.')
+    SAFE_OPERATORS = {'=', '!=', '>', '>=', '<', '<=', 'like', 'not like', 'ilike', 'not ilike',
+                      'in', 'not in', '=like', '=ilike', 'child_of'}
+
+    def _dump(self, result):
+        text = json.dumps(result, default=str)
+        if len(text) > self.MAX_RESULT_CHARS:
+            text = text[:self.MAX_RESULT_CHARS] + '... [truncated - narrow the filter or reduce fields]'
+        return text
+
+    def _param_list(self, env, key):
+        raw = env['ir.config_parameter'].sudo().get_param(key, '') or ''
+        return {x.strip() for x in raw.split(',') if x.strip()}
+
+    def _allowed_models(self, env):
+        """Technical names of models the assistant may read."""
+        module = 'university_management'
+        data = env['ir.model.data'].sudo().search([
+            ('module', '=', module), ('model', '=', 'ir.model')])
+        models = env['ir.model'].sudo().browse(data.mapped('res_id')).exists()
+        allowed = set()
+        for m in models:
+            if m.model not in env:
+                continue
+            M = env[m.model]
+            if M._transient or M._abstract:
+                continue
+            allowed.add(m.model)
+        allowed |= self._param_list(env, 'university.ai.extra_models')
+        blocked = self._param_list(env, 'university.ai.blocked_models')
+        return {m for m in allowed
+                if m in env and m not in blocked
+                and not m.startswith(self.BLOCKED_MODEL_PREFIXES)}
+
+    def _is_blocked_field(self, env, name):
+        if self.BLOCKED_FIELD_RE.search(name or ''):
+            return True
+        return name in self._param_list(env, 'university.ai.blocked_fields')
+
+    def _get_model(self, env, model_name):
+        """Return (Model, error). Model is bound to the *current user's* env."""
+        model_name = (model_name or '').strip()
+        if model_name not in self._allowed_models(env):
+            return None, ('Model "%s" is not available. Call list_models to see allowed models.' % model_name)
+        Model = env[model_name]
+        try:
+            Model.check_access('read')
+        except AccessError:
+            return None, 'You do not have permission to read "%s".' % model_name
+        return Model, None
+
+    def _parse_domain(self, env, Model, raw):
+        if raw in (None, '', []):
+            return [], None
+        try:
+            domain = json.loads(raw) if isinstance(raw, str) else raw
+        except ValueError:
+            return None, 'domain must be valid JSON, e.g. [["name","ilike","x"]]'
+        if not isinstance(domain, list):
+            return None, 'domain must be a JSON list.'
+        clean = []
+        for leaf in domain:
+            if isinstance(leaf, str) and leaf in ('&', '|', '!'):
+                clean.append(leaf)
+                continue
+            if not (isinstance(leaf, (list, tuple)) and len(leaf) == 3):
+                return None, 'Each domain item must be [field, operator, value].'
+            path, op, val = leaf
+            if not isinstance(path, str) or op not in self.SAFE_OPERATORS:
+                return None, 'Invalid field or operator in %r. Allowed operators: %s' % (
+                    leaf, ', '.join(sorted(self.SAFE_OPERATORS)))
+            parts = path.split('.')
+            if parts[0] not in Model._fields:
+                return None, 'Unknown field "%s" on %s. Use describe_model.' % (parts[0], Model._name)
+            if any(self._is_blocked_field(env, p) for p in parts):
+                return None, 'Field "%s" is not available.' % path
+            clean.append((path, op, val))
+        return clean, None
+
+    def _fmt_value(self, v):
+        if isinstance(v, tuple) and len(v) == 2:      # many2one -> name
+            return v[1]
+        if isinstance(v, list):                        # x2many -> count
+            return '%d record(s)' % len(v)
+        return v
+
+    def _list_models(self, env, inp):
+        kw = (inp.get('keyword') or '').strip().lower()
+        rows = []
+        for name in sorted(self._allowed_models(env)):
+            try:
+                Model = env[name]
+                Model.check_access('read')
+            except Exception:
+                continue
+            label = Model._description or name
+            if kw and kw not in name.lower() and kw not in label.lower():
+                continue
+            rows.append({'model': name, 'label': label})
+        return {'count': len(rows), 'models': rows[:80],
+                'note': 'Call describe_model on one of these to see its fields.'}
+
+    def _describe_model(self, env, inp):
+        Model, err = self._get_model(env, inp.get('model'))
+        if err:
+            return {'error': err}
+        fields_out = []
+        for fname, f in Model._fields.items():
+            if self._is_blocked_field(env, fname) or f.type in ('binary', 'html', 'properties'):
+                continue
+            item = {'name': fname, 'label': f.string, 'type': f.type}
+            if f.type in ('many2one', 'one2many', 'many2many'):
+                item['relation'] = f.comodel_name
+            if f.type == 'selection' and isinstance(f.selection, list):
+                item['values'] = [k for k, _ in f.selection][:15]
+            if not f.store:
+                item['computed_not_searchable'] = True
+            fields_out.append(item)
+        return {'model': Model._name, 'label': Model._description,
+                'fields': fields_out[:120]}
+
+    def _default_fields(self, env, Model):
+        picked = []
+        for fname, f in Model._fields.items():
+            if (f.store and fname not in ('id', 'create_uid', 'write_uid', 'write_date')
+                    and f.type in ('char', 'integer', 'float', 'monetary', 'boolean',
+                                   'date', 'datetime', 'selection', 'many2one')
+                    and not self._is_blocked_field(env, fname)):
+                picked.append(fname)
+            if len(picked) >= 12:
+                break
+        return picked
+
+    def _search_records(self, env, inp):
+        Model, err = self._get_model(env, inp.get('model'))
+        if err:
+            return {'error': err}
+        domain, err = self._parse_domain(env, Model, inp.get('domain'))
+        if err:
+            return {'error': err}
+        try:
+            limit = max(1, min(int(inp.get('limit') or 20), self.MAX_RECORDS))
+        except (TypeError, ValueError):
+            limit = 20
+        order = inp.get('order') or None
+        if order and not re.match(r'^[\w\s,\.]+$', order):
+            order = None
+
+        req_fields = inp.get('fields') or []
+        if req_fields:
+            bad = [f for f in req_fields if f not in Model._fields or self._is_blocked_field(env, f)]
+            if bad:
+                return {'error': 'Unknown or unavailable fields: %s. Use describe_model.' % ', '.join(bad)}
+            fields_list = [f for f in req_fields if Model._fields[f].type != 'binary']
+        else:
+            fields_list = self._default_fields(env, Model)
+
+        try:
+            total = Model.search_count(domain)
+            records = Model.search(domain, limit=limit, order=order)
+            rows = []
+            for r in records.read(fields_list):
+                row = {k: self._fmt_value(v) for k, v in r.items() if k != 'id'}
+                row['id'] = r['id']
+                rows.append(row)
+        except AccessError:
+            return {'error': 'You do not have permission to read this data.'}
+        except Exception as e:
+            return {'error': 'Query failed: %s' % str(e).splitlines()[0][:300]}
+        return {'model': Model._name, 'total_matching': total,
+                'returned': len(rows), 'records': rows}
+
+    def _aggregate_records(self, env, inp):
+        Model, err = self._get_model(env, inp.get('model'))
+        if err:
+            return {'error': err}
+        domain, err = self._parse_domain(env, Model, inp.get('domain'))
+        if err:
+            return {'error': err}
+
+        group_by = inp.get('group_by') or []
+        aggregates = inp.get('aggregates') or ['__count']
+        for g in group_by:
+            base = g.split(':')[0]
+            if base not in Model._fields or self._is_blocked_field(env, base):
+                return {'error': 'Unknown or unavailable group_by field "%s".' % g}
+        for a in aggregates:
+            if a == '__count':
+                continue
+            base, _, op = a.partition(':')
+            if (base not in Model._fields or self._is_blocked_field(env, base)
+                    or op not in ('sum', 'avg', 'min', 'max', 'count', 'count_distinct')):
+                return {'error': 'Invalid aggregate "%s". Use "field:sum|avg|min|max" or "__count".' % a}
+        try:
+            rows = Model._read_group(domain, groupby=group_by, aggregates=aggregates)
+        except AccessError:
+            return {'error': 'You do not have permission to read this data.'}
+        except Exception as e:
+            return {'error': 'Aggregate failed: %s' % str(e).splitlines()[0][:300]}
+
+        labels = list(group_by) + list(aggregates)
+        out = []
+        for row in rows[:100]:
+            item = {}
+            for label, val in zip(labels, row):
+                item[label] = val.display_name if hasattr(val, 'display_name') else val
+            out.append(item)
+        return {'model': Model._name, 'groups': len(rows), 'rows': out}
 
     # ── Helper ────────────────────────────────────────────────────────────────
 
