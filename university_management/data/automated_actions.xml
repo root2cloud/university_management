@@ -50,6 +50,17 @@
             <field name="active" eval="True"/>
         </record>
 
+        <!-- 4a. Question Paper Preparation Reminder to Faculty (Daily) -->
+        <record id="cron_exam_paper_reminder" model="ir.cron">
+            <field name="name">Examination: Question Paper Preparation Reminder to Faculty</field>
+            <field name="model_id" ref="model_examination_timetable"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_send_paper_reminders()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
         <!-- 5. Birthday Wishes to Students (Daily) -->
         <record id="cron_student_birthday_wishes" model="ir.cron">
             <field name="name">Student: Send Birthday Wishes</field>

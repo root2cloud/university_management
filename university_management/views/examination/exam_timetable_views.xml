@@ -17,6 +17,9 @@
                     <button name="action_complete" type="object" string="Mark as Completed"
                             class="oe_highlight"
                             invisible="state != 'ongoing'"/>
+                    <button name="action_send_paper_reminder" type="object"
+                            string="Send Paper Reminder"
+                            invisible="state in ['completed', 'cancelled']"/>
                     <button name="action_cancel" type="object" string="Cancel Exam"
                             invisible="state in ['completed', 'cancelled']"/>
                     <button name="action_reset_to_draft" type="object" string="Reset to Draft"
@@ -84,6 +87,18 @@
                         <group string="Invigilators">
                             <field name="invigilator_ids" widget="many2many_tags"
                                    options="{'color_field': 'color', 'no_create': True}"/>
+                        </group>
+                    </group>
+
+                    <group string="Question Paper Reminder">
+                        <group>
+                            <field name="paper_reminder_days"/>
+                            <field name="paper_faculty_ids" widget="many2many_tags" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="question_paper_ready" readonly="1"/>
+                            <field name="paper_reminder_sent" readonly="1"/>
+                            <field name="paper_reminder_date" readonly="1"/>
                         </group>
                     </group>
 
