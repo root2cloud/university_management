@@ -13,7 +13,7 @@ class TimetableSubstitution(models.Model):
                        copy=False, default='/')
 
     # Original Class
-    timetable_id = fields.Many2one('class.timetable', string='Original Class',
+    timetable_id = fields.Many2one('university.timetable', string='Original Class',
                                    required=True, tracking=True)
 
     subject_id = fields.Many2one(related='timetable_id.subject_id', string='Subject', store=True)

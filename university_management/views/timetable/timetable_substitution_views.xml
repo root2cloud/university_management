@@ -301,7 +301,7 @@
                 Manage substitute teacher assignments with comprehensive features. View name (char required
                 readonly copy=False default '/', auto-generated via ir.sequence 'timetable.substitution',
                 'Substitution Number', displayed as h1 title labeled "Substitution Number"). Select timetable_id
-                (Many2one to class.timetable required tracked, 'Original Class', no-create). View subject_id
+                (Many2one to university.timetable required tracked, 'Original Class', no-create). View subject_id
                 (Many2one related from timetable_id.subject_id stored readonly, 'Subject'). View
                 original_faculty_id (Many2one related from timetable_id.faculty_id stored readonly, 'Original
                 Faculty'). Select date (date required default fields.Date.today tracked, 'Substitution Date').
@@ -338,12 +338,5 @@
             </p>
         </field>
     </record>
-
-    <!-- Menu Item -->
-<!--    <menuitem id="menu_timetable_substitution"-->
-<!--              name="Timetable Substitution"-->
-<!--              parent="menu_timetable_root"-->
-<!--              action="action_timetable_substitution"-->
-<!--              sequence="40"/>-->
 
 </odoo>

@@ -248,7 +248,6 @@
         'views/events/hackathon_winner_views.xml',
 
         # Views - Timetable
-        'views/timetable/class_timetable_views.xml',
         'views/timetable/faculty_timetable_views.xml',
         'views/timetable/lab_schedule_views.xml',
         'views/timetable/timetable_substitution_views.xml',
@@ -357,12 +356,18 @@
         'templates/naac/naac_evidence_templates.xml',
         'templates/portalfee/portal_fee_templates.xml',
         'templates/asset/asset_qr_templates.xml',
+        'templates/portalschedule/portal_schedule_templates.xml',
 
         # Menu
         'views/menu_views.xml',
+        'views/academic/syllabus_coverage_views.xml',
     ],
 
     'assets': {
+        'web.assets_frontend': [
+            'university_management/static/src/css/portal_schedule.css',
+            'university_management/static/src/js/portal_schedule.js',
+        ],
         'web.assets_backend': [
             'university_management/static/src/css/dashboard.css',
             'university_management/static/src/css/iic_naac_dashboard.css',

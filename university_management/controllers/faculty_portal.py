@@ -6,6 +6,8 @@ from odoo.addons.portal.controllers.portal import CustomerPortal, pager as porta
 import base64
 import logging
 
+from . import schedule_utils as su
+
 _logger = logging.getLogger(__name__)
 
 
@@ -31,13 +33,19 @@ class FacultyPortalController(CustomerPortal):
         if not faculty:
             return request.redirect('/my')
 
-        # Get today's classes
+        # Get today's classes (only today's weekday, in the user's timezone)
         today = fields.Date.today()
+        local_today = su.local_now(request.env).date()
         env = request.env(su=True)
         today_classes = env['university.timetable'].search([
             ('faculty_id', '=', faculty.id),
             ('active', '=', True),
-        ])
+            ('day_of_week', '=', str(local_today.weekday())),
+        ], order='start_time')
+
+        # Now / next class (timetable + substitutions) and syllabus to explain
+        nn = su.faculty_now_next(request.env, faculty)
+        su.attach_progress(request.env, [nn['current'], nn['next']])
 
         # Get attendance summary
         attendance_today = env['student.attendance'].search_count([
@@ -49,6 +57,8 @@ class FacultyPortalController(CustomerPortal):
             'faculty': faculty,
             'today_classes': today_classes,
             'attendance_today': attendance_today,
+            'nn': nn,
+            'role': 'faculty',
             'page_name': 'faculty_dashboard',
         }
 

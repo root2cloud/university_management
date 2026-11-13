@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="syllabus_coverage_log_view_list" model="ir.ui.view">
+        <field name="name">syllabus.coverage.log.view.list</field>
+        <field name="model">syllabus.coverage.log</field>
+        <field name="arch" type="xml">
+            <list string="Syllabus Coverage">
+                <field name="date"/>
+                <field name="course_id"/>
+                <field name="subject_id"/>
+                <field name="batch_id"/>
+                <field name="unit_id"/>
+                <field name="faculty_id"/>
+                <field name="topics_covered"/>
+                <field name="completion_percent" widget="progressbar"/>
+                <field name="unit_completed"/>
+                <field name="is_substitution" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="syllabus_coverage_log_view_form" model="ir.ui.view">
+        <field name="name">syllabus.coverage.log.view.form</field>
+        <field name="model">syllabus.coverage.log</field>
+        <field name="arch" type="xml">
+            <form string="Syllabus Coverage">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="course_id"/>
+                            <field name="syllabus_id"/>
+                            <field name="unit_id"/>
+                            <field name="faculty_id"/>
+                        </group>
+                        <group>
+                            <field name="date"/>
+                            <field name="timetable_id"/>
+                            <field name="start_time" widget="float_time"/>
+                            <field name="end_time" widget="float_time"/>
+                            <field name="is_substitution"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="topics_covered"/>
+                        <field name="completion_percent" widget="progressbar"/>
+                        <field name="unit_completed"/>
+                        <field name="remarks"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="syllabus_coverage_log_view_search" model="ir.ui.view">
+        <field name="name">syllabus.coverage.log.view.search</field>
+        <field name="model">syllabus.coverage.log</field>
+        <field name="arch" type="xml">
+            <search string="Search Syllabus Coverage">
+                <field name="course_id"/>
+                <field name="subject_id"/>
+                <field name="faculty_id"/>
+                <field name="unit_id"/>
+                <field name="batch_id"/>
+                <filter name="unit_done" string="Unit completed" domain="[('unit_completed', '=', True)]"/>
+                <filter name="substitution" string="Substitution classes" domain="[('is_substitution', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_faculty" string="Faculty" context="{'group_by': 'faculty_id'}"/>
+                    <filter name="group_subject" string="Subject" context="{'group_by': 'subject_id'}"/>
+                    <filter name="group_batch" string="Batch" context="{'group_by': 'batch_id'}"/>
+                    <filter name="group_date" string="Date" context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_syllabus_coverage_log" model="ir.actions.act_window">
+        <field name="name">Syllabus Coverage</field>
+        <field name="res_model">syllabus.coverage.log</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_syllabus_coverage_log"
+          name="Syllabus Coverage"
+          parent="menu_academic"
+          action="action_syllabus_coverage_log"
+          sequence="85"/>
+
+</odoo>

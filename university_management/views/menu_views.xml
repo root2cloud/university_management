@@ -1042,23 +1042,17 @@
               parent="menu_university_root"
               sequence="140"/>
 
-    <menuitem id="menu_class_timetable"
-              name="Class Timetable"
+    <menuitem id="menu_faculty_timetable"
+              name="Faculty Timetable"
               parent="menu_timetable_root"
-              action="action_class_timetable"
-              sequence="10"/>
+              action="action_faculty_timetable"
+              sequence="20"/>
 
-<!--    <menuitem id="menu_faculty_timetable"-->
-<!--              name="Faculty Timetable"-->
-<!--              parent="menu_timetable_root"-->
-<!--              action="action_faculty_timetable"-->
-<!--              sequence="20"/>-->
-
-<!--    <menuitem id="menu_lab_schedule"-->
-<!--              name="Lab Schedule"-->
-<!--              parent="menu_timetable_root"-->
-<!--              action="action_lab_schedule"-->
-<!--              sequence="30"/>-->
+    <menuitem id="menu_lab_schedule"
+              name="Lab Schedule"
+              parent="menu_timetable_root"
+              action="action_lab_schedule"
+              sequence="30"/>
 
     <menuitem id="menu_timetable_substitution"
               name="Timetable Substitution"

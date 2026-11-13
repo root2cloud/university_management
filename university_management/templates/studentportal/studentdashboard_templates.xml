@@ -44,6 +44,21 @@
                         </div>
                     </div>
 
+                    <!-- Now & Next (schedule, calendar, syllabus) -->
+                    <t t-if="nn">
+                        <div class="um-page" style="padding:0 0 8px">
+                            <div class="um-section-title" style="margin-bottom:12px">
+                                <h4><i class="fa fa-bolt"></i> Now &amp; next period</h4>
+                                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                                    <a href="/my/schedule" class="um-btn um-btn-primary"><i class="fa fa-calendar"></i> Schedule &amp; calendar</a>
+                                    <a href="/my/syllabus" class="um-btn um-btn-ghost"><i class="fa fa-book"></i> My syllabus</a>
+                                </div>
+                            </div>
+                            <t t-call="university_management.um_now_next"/>
+                        </div>
+                        <div class="mb-4"></div>
+                    </t>
+
                     <!-- Quick Stats -->
                     <div class="row mb-4">
                         <div class="col-md-3">

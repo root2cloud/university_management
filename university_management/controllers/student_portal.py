@@ -9,6 +9,8 @@ import base64
 import logging
 import datetime
 
+from . import schedule_utils as su
+
 _logger = logging.getLogger(__name__)
 
 
@@ -50,10 +52,16 @@ class StudentPortalController(CustomerPortal):
         if not student:
             return request.redirect('/my')
 
+        # Now / next period (timetable + substitutions) and syllabus progress
+        nn = su.student_now_next(request.env, student)
+        su.attach_progress(request.env, [nn['current'], nn['next']])
+
         # Get dashboard data
         values = {
             'student': student,
             'page_name': 'student_dashboard',
+            'nn': nn,
+            'role': 'student',
 
             # Academic Info
             'current_semester': student.current_semester,
@@ -69,7 +77,7 @@ class StudentPortalController(CustomerPortal):
 
             # Upcoming
             'upcoming_exams': request.env['examination.examination'].search([
-                ('semester_id', '=', student.current_semester),
+                ('semester_id.semester_number', '=', student.current_semester),
                 ('start_date', '>=', request.env.context.get('today', fields.Date.today())),
             ], limit=3, order='start_date'),
         }
@@ -189,7 +197,8 @@ class StudentPortalController(CustomerPortal):
 
         timetable = request.env['university.timetable'].search([
             ('batch_id', '=', student.batch_id.id),
-            ('semester_id', '=', student.current_semester),
+            '|', ('semester_id', '=', False),
+            ('semester_id.semester_number', '=', student.current_semester),
             ('active', '=', True)
         ], order='day_of_week, start_time')
 

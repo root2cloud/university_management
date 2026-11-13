@@ -48,6 +48,10 @@ class UniversityTimetable(models.Model):
     classroom_id = fields.Many2one('university.classroom', string='Classroom', tracking=True)
     room_number_id = fields.Many2one('university.classroom', string='Room Number')
 
+    # Section & Laboratory (merged from the former class.timetable)
+    section = fields.Char(string='Section')
+    lab_id = fields.Many2one('lab.schedule', string='Laboratory', ondelete='set null')
+
     # Class Type
     class_type = fields.Selection([
         ('theory', 'Theory'),
@@ -211,4 +215,3 @@ class UniversityTimetable(models.Model):
             'res_id': self.calendar_event_id.id,
             'target': 'current',
         }
-

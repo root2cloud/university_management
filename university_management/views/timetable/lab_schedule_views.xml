@@ -37,7 +37,7 @@
                     <notebook>
                         <page string="Lab Schedule" name="schedule">
                             <field name="timetable_ids"
-                                   context="{'default_class_type': 'practical', 'default_room_number': lab_number}">
+                                   context="{'default_class_type': 'practical'}">
                                 <list>
                                     <field name="day_of_week"/>
                                     <field name="start_time" widget="float_time"/>
@@ -273,7 +273,7 @@
                 (Electronics Lab), mechanical (Mechanical Workshop), other (Other). Enter capacity (integer,
                 "Capacity", placeholder "Number of students"). Select department_id (Many2one to
                 university.department, "Department", no-create). Select lab_incharge_id (Many2one to
-                faculty.faculty, "Lab In-charge", no-create). View timetable_ids (One2many to class.timetable
+                faculty.faculty, "Lab In-charge", no-create). View timetable_ids (One2many to university.timetable
                 filtered by room_number with domain [('class_type','=','practical')], "Lab Schedule", list view
                 showing day_of_week/start_time float_time/end_time float_time/subject_id/faculty_id/batch_id/
                 section optional/active optional, context default_class_type practical/default_room_number

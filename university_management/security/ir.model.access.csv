@@ -515,10 +515,6 @@ access_id_card_request_faculty,id.card.request.faculty,model_id_card_request,gro
 access_id_card_request_student,id.card.request.student,model_id_card_request,group_student_portal,1,1,1,0
 access_id_card_request_parent,id.card.request.parent,model_id_card_request,group_parent_portal,1,0,0,0
 
-access_class_timetable_admin,class.timetable.admin,model_class_timetable,group_university_admin,1,1,1,1
-access_class_timetable_faculty,class.timetable.faculty,model_class_timetable,group_faculty,1,1,1,0
-access_class_timetable_student,class.timetable.student,model_class_timetable,group_student_portal,1,0,0,0
-
 access_faculty_timetable_admin,faculty.timetable.admin,model_faculty_timetable,group_university_admin,1,1,1,1
 access_faculty_timetable_faculty,faculty.timetable.faculty,model_faculty_timetable,group_faculty,1,1,1,0
 access_faculty_timetable_student,faculty.timetable.student,model_faculty_timetable,group_student_portal,1,0,0,0
@@ -860,3 +856,8 @@ access_bulk_scan_wizard_admin,exam.omr.bulk.scan.wizard.admin,model_exam_omr_bul
 access_bulk_scan_wizard_controller,exam.omr.bulk.scan.wizard.controller,model_exam_omr_bulk_scan_wizard,group_exam_controller,1,1,1,0
 access_bulk_scan_wizard_line_admin,exam.omr.bulk.scan.wizard.line.admin,model_exam_omr_bulk_scan_wizard_line,group_university_admin,1,1,1,1
 access_bulk_scan_wizard_line_controller,exam.omr.bulk.scan.wizard.line.controller,model_exam_omr_bulk_scan_wizard_line,group_exam_controller,1,1,1,0
+access_syllabus_coverage_log_admin,syllabus.coverage.log.admin,model_syllabus_coverage_log,group_university_admin,1,1,1,1
+access_syllabus_coverage_log_coordinator,syllabus.coverage.log.coordinator,model_syllabus_coverage_log,group_academic_coordinator,1,1,1,0
+access_syllabus_coverage_log_hod,syllabus.coverage.log.hod,model_syllabus_coverage_log,group_hod,1,0,0,0
+access_syllabus_coverage_log_faculty,syllabus.coverage.log.faculty,model_syllabus_coverage_log,group_faculty,1,1,1,0
+access_syllabus_coverage_log_student,syllabus.coverage.log.student,model_syllabus_coverage_log,group_student_portal,1,0,0,0

@@ -37,17 +37,19 @@
                 <separator/>
 
                 <filter name="filter_monday" string="Monday"
-                        domain="[('day_of_week', '=', 'monday')]"/>
+                        domain="[('day_of_week', '=', '0')]"/>
                 <filter name="filter_tuesday" string="Tuesday"
-                        domain="[('day_of_week', '=', 'tuesday')]"/>
+                        domain="[('day_of_week', '=', '1')]"/>
                 <filter name="filter_wednesday" string="Wednesday"
-                        domain="[('day_of_week', '=', 'wednesday')]"/>
+                        domain="[('day_of_week', '=', '2')]"/>
                 <filter name="filter_thursday" string="Thursday"
-                        domain="[('day_of_week', '=', 'thursday')]"/>
+                        domain="[('day_of_week', '=', '3')]"/>
                 <filter name="filter_friday" string="Friday"
-                        domain="[('day_of_week', '=', 'friday')]"/>
+                        domain="[('day_of_week', '=', '4')]"/>
                 <filter name="filter_saturday" string="Saturday"
-                        domain="[('day_of_week', '=', 'saturday')]"/>
+                        domain="[('day_of_week', '=', '5')]"/>
+                <filter name="filter_sunday" string="Sunday"
+                        domain="[('day_of_week', '=', '6')]"/>
 
                 <group expand="0" string="Group By">
                     <filter name="group_by_faculty" string="Faculty"
@@ -63,7 +65,7 @@
                 <searchpanel>
                     <field name="faculty_id" string="Faculty"
                            icon="fa-user"
-                           enable_hierarchy="false"/>
+                           hierarchize="0"/>
                     <field name="day_of_week" string="Day"
                            select="multi"
                            icon="fa-calendar-o"/>
@@ -157,32 +159,6 @@
         </field>
     </record>
 
-    <!-- Calendar View - Faculty Timetable -->
-    <record id="faculty_timetable_view_calendar" model="ir.ui.view">
-        <field name="name">faculty.timetable.view.calendar</field>
-        <field name="model">faculty.timetable</field>
-        <field name="arch" type="xml">
-            <calendar string="Faculty Schedule Calendar"
-                      date_start="start_datetime"
-                      date_stop="end_datetime"
-                      mode="week"
-                      quick_create="0"
-                      create="0"
-                      edit="0"
-                      delete="0"
-                      color="faculty_id"
-                      event_open_popup="1"
-                      hide_time="0"
-                      scales="week">
-                <field name="subject_id"/>
-                <field name="faculty_id"/>
-                <field name="batch_id"/>
-                <field name="room_number_id"/>
-                <field name="day_of_week" filters="1" invisible="1"/>
-            </calendar>
-        </field>
-    </record>
-
     <!-- Pivot View - Faculty Timetable -->
     <record id="faculty_timetable_view_pivot" model="ir.ui.view">
         <field name="name">faculty.timetable.view.pivot</field>
@@ -214,45 +190,17 @@
     <record id="action_faculty_timetable" model="ir.actions.act_window">
         <field name="name">Faculty Timetable</field>
         <field name="res_model">faculty.timetable</field>
-        <field name="view_mode">calendar,list,kanban,pivot,graph</field>
+        <field name="view_mode">kanban,list,pivot,graph</field>
         <field name="context">{'search_default_group_by_faculty': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Faculty Timetable View
+                Faculty Timetable
             </p>
             <p>
-                View faculty teaching schedules in a read-only format. This is a SQL VIEW that automatically
-                aggregates data from class timetable entries. View faculty_id (Many2one to faculty.faculty
-                readonly), 6 day_of_week options readonly (monday/Monday, tuesday/Tuesday, wednesday/Wednesday,
-                thursday/Thursday, friday/Friday, saturday/Saturday), start_time (float readonly, float_time
-                widget), end_time (float readonly, float_time widget), subject_id (Many2one to university.subject
-                readonly), batch_id (Many2one to university.batch readonly), room_number_id (char readonly). List
-                view with create/edit/delete disabled (false), ordered by faculty_id/day_of_week/start_time,
-                float_time widgets for start_time/end_time, optional room_number_id. Kanban view grouped by
-                faculty_id showing subject_id as title with day_of_week badge (primary background), centered
-                time alert (info background, clock icon, h5 start_time-end_time float_time widgets), batch_id
-                card (light background, users icon success, "Batch" label), conditional room_number_id card (light
-                background, map-marker icon danger, "Room" label, shown if room_number_id exists),
-                create/edit/delete disabled. Calendar view with date_start/date_stop using start_time/end_time,
-                mode week, color by faculty_id, day_of_week filters, event_open_popup, scales week only,
-                create/edit/delete disabled. Pivot view with faculty_id as row, day_of_week as col, subject_id
-                as measure, create/edit/delete disabled. Graph view (bar chart) showing faculty_id vs
-                day_of_week measure for workload analysis, create disabled. Comprehensive search filters for 6
-                days (monday-saturday)/group by faculty-day-subject-batch. Searchpanel for faculty_id and
-                day_of_week multi-select. Default filter: grouped by Faculty. SQL VIEW created in init() method
-                using tools.drop_view_if_exists and CREATE OR REPLACE VIEW selecting ROW_NUMBER() OVER() as id,
-                faculty_id, day_of_week, start_time, end_time, subject_id, batch_id, room_number_id FROM
-                class_timetable WHERE active=true. Complete read-only faculty schedule view for teaching load
-                analysis and schedule management.
+                Read-only teaching schedule per faculty, generated automatically from the
+                Timetable entries (university.timetable).
             </p>
         </field>
     </record>
-
-    <!-- Menu Item -->
-<!--    <menuitem id="menu_faculty_timetable"-->
-<!--              name="Faculty Timetable"-->
-<!--              parent="menu_timetable_root"-->
-<!--              action="action_faculty_timetable"-->
-<!--              sequence="20"/>-->
 
 </odoo>

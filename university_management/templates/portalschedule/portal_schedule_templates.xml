@@ -1,0 +1,560 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ============================================================
+             SHARED PIECES
+             ============================================================ -->
+
+        <!-- One class card (Now / Next).  Expects: ev, ev_label, role -->
+        <template id="um_class_card" name="Portal class card">
+            <div t-attf-class="um-now um-c-#{ev['class_type']}">
+                <div class="um-now-head">
+                    <span t-attf-class="um-pill #{'live' if ev_label == 'Now' else ''}"><t t-esc="ev_label"/></span>
+                    <span class="um-muted" style="font-size:.82rem">
+                        <t t-esc="ev.get('when')"/> · <t t-esc="ev.get('when_detail')"/>
+                    </span>
+                </div>
+                <h3><t t-esc="ev['title']"/></h3>
+                <div class="um-now-time">
+                    <i class="fa fa-clock-o"/> <t t-esc="ev['start_label']"/> – <t t-esc="ev['end_label']"/>
+                    <t t-if="role == 'student' and ev['period']"> · Period <t t-esc="ev['period']"/></t>
+                </div>
+
+                <div class="um-person">
+                    <t t-if="role == 'student'">
+                        <span class="um-avatar"><t t-esc="ev['faculty_initials']"/><img t-if="ev.get('faculty_id')" t-attf-src="/my/schedule/faculty-photo/#{ev['faculty_id']}" alt="" onerror="this.remove()"/></span>
+                        <div>
+                            <b><t t-esc="ev['faculty'] or 'Faculty to be announced'"/></b>
+                            <small>Faculty<t t-if="ev['substitution']"> · substitute</t></small>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <span class="um-avatar"><i class="fa fa-users"/></span>
+                        <div>
+                            <b><t t-esc="ev['batch'] or ev['course']"/></b>
+                            <small><t t-esc="ev['course']"/></small>
+                        </div>
+                    </t>
+                </div>
+
+                <div class="um-metaline">
+                    <span class="um-chip"><i class="fa fa-map-marker"/> <t t-esc="ev['room']"/></span>
+                    <span class="um-chip"><i class="fa fa-tag"/> <t t-esc="ev['type_label']"/></span>
+                </div>
+                <div t-if="ev['note']" class="um-note"><i class="fa fa-exchange"/> <t t-esc="ev['note']"/></div>
+
+                <div t-if="ev.get('progress') and ev['progress']['has_syllabus']" class="um-mini-progress">
+                    <t t-if="role == 'student'">Syllabus covered so far</t>
+                    <t t-else="">Syllabus to explain</t>
+                    <b style="color:var(--um-ink)"> · <t t-esc="ev['progress']['unit']"/></b>
+                    <div class="um-bar"><i t-attf-style="width: #{ev['progress']['overall']}%"/></div>
+                    <div style="display:flex;justify-content:space-between;margin-top:4px">
+                        <span><t t-esc="ev['progress']['overall']"/>% of subject</span>
+                        <a t-attf-href="/my/#{'faculty/' if role == 'faculty' else ''}syllabus/#{ev['course_id']}">Open</a>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- Now / Next pair.  Expects: nn, role -->
+        <template id="um_now_next" name="Portal Now and Next">
+            <div class="um-now-grid" data-autorefresh="1">
+                <t t-if="nn['current']">
+                    <t t-set="ev" t-value="nn['current']"/>
+                    <t t-set="ev_label" t-value="'Now'"/>
+                    <t t-call="university_management.um_class_card"/>
+                </t>
+                <t t-else="">
+                    <div class="um-now" style="--c:#94a3b8">
+                        <div class="um-now-head"><span class="um-pill">Now</span></div>
+                        <div class="um-empty">
+                                                        <t t-if="role == 'student'">No class is running right now.</t>
+                            <t t-else="">You are not teaching right now.</t>
+                        </div>
+                    </div>
+                </t>
+
+                <t t-if="nn['next']">
+                    <t t-set="ev" t-value="nn['next']"/>
+                    <t t-set="ev_label" t-value="'Next period' if role == 'student' else 'Next class'"/>
+                    <t t-call="university_management.um_class_card"/>
+                </t>
+                <t t-else="">
+                    <div class="um-now" style="--c:#94a3b8">
+                        <div class="um-now-head"><span class="um-pill">Next</span></div>
+                        <div class="um-empty">
+                                                        No upcoming classes in the next two weeks.
+                        </div>
+                    </div>
+                </t>
+            </div>
+        </template>
+
+        <!-- Today's timeline.  Expects: nn, role -->
+        <template id="um_today_timeline" name="Portal Today Timeline">
+            <t t-if="nn['today']">
+                <div class="um-timeline">
+                    <t t-foreach="nn['today']" t-as="ev">
+                        <div t-attf-class="um-tl-item um-c-#{ev['class_type']} #{ev['status']}">
+                            <div class="um-tl-time">
+                                <t t-esc="ev['start_label']"/>
+                                <small>to <t t-esc="ev['end_label']"/></small>
+                            </div>
+                            <div class="um-tl-main">
+                                <div class="um-tl-title">
+                                    <t t-esc="ev['title']"/>
+                                    <span t-if="role == 'student' and ev['period']" class="um-chip" style="margin-left:6px">P<t t-esc="ev['period']"/></span>
+                                </div>
+                                <div class="um-tl-sub">
+                                    <t t-if="role == 'student'"><i class="fa fa-user-o"/> <t t-esc="ev['faculty']"/></t>
+                                    <t t-else=""><i class="fa fa-users"/> <t t-esc="ev['batch']"/></t>
+                                    · <i class="fa fa-map-marker"/> <t t-esc="ev['room']"/>
+                                </div>
+                                <div t-if="ev['note']" class="um-note" style="margin-top:6px"><t t-esc="ev['note']"/></div>
+                            </div>
+                            <div>
+                                <span t-if="ev['status'] == 'ongoing'" class="um-pill live">Live</span>
+                                <span t-elif="ev['status'] == 'done'" class="um-pill">Done</span>
+                                <span t-elif="ev['status'] == 'cancelled'" class="um-pill cancel">Covered</span>
+                                <span t-else="" class="um-chip"><t t-esc="ev['type_label']"/></span>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </t>
+            <t t-else="">
+                <div class="um-card um-empty">No classes scheduled for today.</div>
+            </t>
+        </template>
+
+        <!-- Calendar mount point.  Expects: events_url, ics_url, role, today_iso -->
+        <template id="um_calendar" name="Portal Calendar">
+            <div class="um-section">
+                <div class="um-section-title">
+                    <h4><i class="fa fa-calendar"/> Calendar</h4>
+                    <a t-att-href="ics_url" class="um-btn um-btn-ghost" title="Import into Google / Outlook / Apple Calendar">
+                        <i class="fa fa-download"/> Add to my calendar (.ics)
+                    </a>
+                </div>
+                <div class="um-cal" t-att-data-events-url="events_url" t-att-data-role="role" t-att-data-today="today_iso">
+                    <div class="um-empty">Loading calendar…</div>
+                </div>
+            </div>
+        </template>
+
+        <!-- Subject progress card (list pages).  Expects: row, role -->
+        <template id="um_subject_card" name="Portal Subject Progress Card">
+            <t t-set="d" t-value="row['data']"/>
+            <t t-set="href" t-value="('/my/faculty/syllabus/%d' if role == 'faculty' else '/my/syllabus/%d') % row['course'].id"/>
+            <div class="um-card um-subj">
+                <div class="um-subj-top">
+                    <span t-attf-class="um-ring #{'done' if d['overall'] >= 100 else ''}" t-attf-style="--p: #{d['overall']}"><b><t t-esc="d['overall']"/>%</b></span>
+                    <div style="min-width:0">
+                        <h4><t t-esc="row['course'].subject_id.name or row['course'].name"/></h4>
+                        <div class="meta">
+                            <t t-esc="row['course'].subject_id.code or row['course'].code"/>
+                            <t t-if="role == 'student' and row.get('teachers')"> · <t t-esc="row['teachers']"/></t>
+                            <t t-if="role == 'faculty'"> · <t t-esc="row['course'].batch_id.name"/></t>
+                        </div>
+                        <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+                            <span t-if="row.get('teaching_today') and not row.get('logged_today')" class="um-badge pending">Log today's class</span>
+                            <span t-elif="row.get('teaching_today')" class="um-badge completed">Today logged</span>
+                            <span class="um-badge not_started"><t t-esc="d['classes_held']"/> classes logged</span>
+                        </div>
+                    </div>
+                </div>
+                <t t-if="d['units']">
+                    <div class="um-next">
+                        <t t-if="d['next_unit']">
+                            <span class="um-muted" t-if="role == 'faculty'">Next to explain</span>
+                            <span class="um-muted" t-else="">Currently / next unit</span>
+                            <b><t t-esc="d['next_unit']['name']"/> <span class="um-muted">(<t t-esc="d['next_unit']['percent']"/>%)</span></b>
+                        </t>
+                        <t t-else=""><b>All units completed</b></t>
+                        <t t-if="d['last_date']"><span class="um-muted" style="font-size:.78rem">Last covered <t t-esc="d['last_date'].strftime('%d %b %Y')"/></span></t>
+                    </div>
+                </t>
+                <t t-else="">
+                    <div class="um-next um-muted">Syllabus not published for this subject yet.</div>
+                </t>
+                <div><a t-att-href="href" class="um-btn um-btn-primary">
+                    <t t-if="role == 'faculty'">Open tracker</t><t t-else="">View syllabus</t></a></div>
+            </div>
+        </template>
+
+        <!-- Unit accordion.  Expects: data, role -->
+        <template id="um_unit_list" name="Portal Unit List">
+            <t t-foreach="data['units']" t-as="u">
+                <details t-attf-class="um-unit #{u['status']}" t-att-open="'open' if (data['next_unit'] and data['next_unit']['id'] == u['id']) else None">
+                    <summary>
+                        <span class="um-unit-num"><t t-esc="u_index + 1"/></span>
+                        <div class="um-unit-title">
+                            <t t-esc="u['name']"/>
+                            <small>
+                                <t t-if="u['hours']"><t t-esc="u['hours']"/> hrs · </t>
+                                <t t-esc="u['sessions']"/> class<t t-if="u['sessions'] != 1">es</t> logged
+                                <t t-if="u['last_date']"> · last <t t-esc="u['last_date'].strftime('%d %b')"/></t>
+                            </small>
+                        </div>
+                        <div class="um-unit-bar">
+                            <div class="um-bar green"><i t-attf-style="width: #{u['percent']}%"/></div>
+                        </div>
+                        <span t-attf-class="um-badge #{u['status']}">
+                            <t t-if="u['status'] == 'completed'">Completed</t>
+                            <t t-elif="u['status'] == 'in_progress'"><t t-esc="u['percent']"/>%</t>
+                            <t t-else="">Not started</t>
+                        </span>
+                    </summary>
+                    <div class="um-unit-body">
+                        <t t-if="u['topics']"><h6>Topics</h6><div><t t-out="u['topics']"/></div></t>
+                        <t t-if="u['outcomes']"><h6>Learning outcomes</h6><div><t t-out="u['outcomes']"/></div></t>
+                        <t t-if="u['recent']">
+                            <h6>Covered in class</h6>
+                            <ul class="um-loglist">
+                                <t t-foreach="u['recent']" t-as="r">
+                                    <li>
+                                        <t t-esc="r['topics']"/>
+                                        <small>
+                                            <t t-esc="r['date'].strftime('%d %b %Y')"/> · <t t-esc="r['faculty']"/>
+                                            <t t-if="r['substitute']"> (substitute)</t>
+                                        </small>
+                                    </li>
+                                </t>
+                            </ul>
+                        </t>
+                        <t t-if="role == 'faculty'">
+                            <button type="button" class="um-quick" t-att-data-pick-unit="u['id']">+ Log a class for this unit</button>
+                        </t>
+                    </div>
+                </details>
+            </t>
+        </template>
+
+
+        <!-- ============================================================
+             STUDENT PAGES
+             ============================================================ -->
+
+        <template id="student_schedule" name="Student Schedule and Calendar">
+            <t t-call="portal.portal_layout">
+                <t t-set="role" t-value="'student'"/>
+                <div class="container um-page">
+                    <div class="um-hero">
+                        <div class="um-hero-top">
+                            <div>
+                                <h2>Hi, <t t-esc="(student.name or '').split(' ')[0]"/></h2>
+                                <p><t t-esc="nn['now'].strftime('%A, %d %B %Y')"/> · Semester <t t-esc="student.current_semester"/></p>
+                            </div>
+                            <div class="um-hero-actions">
+                                <a href="/my/syllabus" class="um-btn um-btn-light"><i class="fa fa-book"/> My syllabus</a>
+                                <a href="/my/timetable" class="um-btn um-btn-light"><i class="fa fa-table"/> Weekly table</a>
+                            </div>
+                        </div>
+                        <div class="um-tiles">
+                            <div class="um-tile"><b><t t-esc="nn['today_count']"/></b><span>Classes today</span></div>
+                            <div class="um-tile"><b><t t-esc="nn['remaining_today']"/></b><span>Still to come</span></div>
+                            <div class="um-tile"><b><t t-esc="subject_count"/></b><span>Subjects</span></div>
+                            <div class="um-tile"><b><t t-esc="avg_progress"/>%</b><span>Syllabus covered</span></div>
+                        </div>
+                    </div>
+
+                    <div class="um-section">
+                        <div class="um-section-title"><h4><i class="fa fa-bolt"/> Now &amp; next</h4></div>
+                        <t t-call="university_management.um_now_next"/>
+                    </div>
+
+                    <div class="um-section">
+                        <div class="um-section-title"><h4><i class="fa fa-list-ol"/> Today's periods</h4></div>
+                        <t t-call="university_management.um_today_timeline"/>
+                    </div>
+
+                    <t t-call="university_management.um_calendar"/>
+                </div>
+            </t>
+        </template>
+
+        <template id="student_syllabus" name="Student Syllabus">
+            <t t-call="portal.portal_layout">
+                <t t-set="role" t-value="'student'"/>
+                <div class="container um-page">
+                    <div class="um-hero">
+                        <div class="um-hero-top">
+                            <div>
+                                <h2>My Syllabus</h2>
+                                <p>Semester <t t-esc="student.current_semester"/> · see what has been taught and what is coming next</p>
+                            </div>
+                            <div class="um-hero-actions">
+                                <a href="/my/schedule" class="um-btn um-btn-light"><i class="fa fa-calendar"/> Schedule &amp; calendar</a>
+                            </div>
+                        </div>
+                        <div class="um-tiles">
+                            <div class="um-tile"><b><t t-esc="len(rows)"/></b><span>Subjects</span></div>
+                            <div class="um-tile"><b><t t-esc="avg_progress"/>%</b><span>Average covered</span></div>
+                        </div>
+                    </div>
+                    <div class="um-section">
+                        <t t-if="rows">
+                            <div class="um-grid-2">
+                                <t t-foreach="rows" t-as="row">
+                                    <t t-call="university_management.um_subject_card"/>
+                                </t>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="um-card um-empty">No subjects found for your current semester.</div>
+                        </t>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <template id="student_syllabus_detail" name="Student Syllabus Detail">
+            <t t-call="portal.portal_layout">
+                <t t-set="role" t-value="'student'"/>
+                <div class="container um-page">
+                    <a href="/my/syllabus" class="um-back"><i class="fa fa-angle-left"/> All subjects</a>
+                    <div class="um-card" style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
+                        <span t-attf-class="um-ring lg #{'done' if data['overall'] >= 100 else ''}" t-attf-style="--p: #{data['overall']}"><b><t t-esc="data['overall']"/>%</b></span>
+                        <div style="flex:1;min-width:220px">
+                            <h2 style="font-size:1.5rem;font-weight:800"><t t-esc="course.subject_id.name or course.name"/></h2>
+                            <div class="um-muted">
+                                <t t-esc="course.subject_id.code or course.code"/>
+                                <t t-if="teachers"> · <t t-esc="teachers"/></t>
+                                <t t-if="course.credits"> · <t t-esc="course.credits"/> credits</t>
+                            </div>
+                            <div class="um-metaline">
+                                <span class="um-chip"><i class="fa fa-check-square-o"/> <t t-esc="data['classes_held']"/> classes logged</span>
+                                <span t-if="data['last_date']" class="um-chip"><i class="fa fa-clock-o"/> Last covered <t t-esc="data['last_date'].strftime('%d %b %Y')"/></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <t t-if="data['units']">
+                        <div class="um-section">
+                            <div class="um-section-title"><h4><i class="fa fa-th-list"/> Units</h4></div>
+                            <t t-call="university_management.um_unit_list"/>
+                        </div>
+                        <div class="um-grid-2 um-section" t-if="syllabus.course_objectives or syllabus.course_outcomes">
+                            <div class="um-card" t-if="syllabus.course_objectives"><h4>Course objectives</h4><div style="margin-top:8px"><t t-out="syllabus.course_objectives"/></div></div>
+                            <div class="um-card" t-if="syllabus.course_outcomes"><h4>Course outcomes</h4><div style="margin-top:8px"><t t-out="syllabus.course_outcomes"/></div></div>
+                        </div>
+                        <div class="um-card um-section" t-if="syllabus.textbooks or syllabus.reference_books or syllabus.online_resources">
+                            <h4>Books &amp; resources</h4>
+                            <div t-if="syllabus.textbooks" style="margin-top:8px"><b>Textbooks</b><div style="white-space:pre-line"><t t-esc="syllabus.textbooks"/></div></div>
+                            <div t-if="syllabus.reference_books" style="margin-top:8px"><b>References</b><div style="white-space:pre-line"><t t-esc="syllabus.reference_books"/></div></div>
+                            <div t-if="syllabus.online_resources" style="margin-top:8px"><b>Online</b><div style="white-space:pre-line"><t t-esc="syllabus.online_resources"/></div></div>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <div class="um-card um-empty um-section">The syllabus for this subject has not been published yet.</div>
+                    </t>
+                </div>
+            </t>
+        </template>
+
+
+        <!-- ============================================================
+             FACULTY PAGES
+             ============================================================ -->
+
+        <template id="faculty_schedule" name="Faculty Schedule and Calendar">
+            <t t-call="website.layout">
+                <t t-set="role" t-value="'faculty'"/>
+                <div class="container um-page" style="margin-top:20px">
+                    <div class="um-hero um-hero-faculty">
+                        <div class="um-hero-top">
+                            <div>
+                                <h2>Hello, <t t-esc="faculty.name"/></h2>
+                                <p><t t-esc="nn['now'].strftime('%A, %d %B %Y')"/> · your teaching day at a glance</p>
+                            </div>
+                            <div class="um-hero-actions">
+                                <a href="/my/faculty/syllabus" class="um-btn um-btn-light"><i class="fa fa-tasks"/> Syllabus tracking</a>
+                                <a href="/my/faculty/attendance" class="um-btn um-btn-light"><i class="fa fa-check-square-o"/> Attendance</a>
+                            </div>
+                        </div>
+                        <div class="um-tiles">
+                            <div class="um-tile"><b><t t-esc="nn['today_count']"/></b><span>Classes today</span></div>
+                            <div class="um-tile"><b><t t-esc="nn['remaining_today']"/></b><span>Still to come</span></div>
+                            <div class="um-tile"><b><t t-esc="subject_count"/></b><span>Subjects</span></div>
+                            <div class="um-tile"><b><t t-esc="avg_progress"/>%</b><span>Avg syllabus done</span></div>
+                        </div>
+                    </div>
+
+                    <div t-if="nn['today_count'] and not logged_today" class="um-alert warn um-section">
+                        <b>Don't forget:</b> you have not logged any syllabus coverage today.
+                        <a href="/my/faculty/syllabus">Update syllabus tracker</a>
+                    </div>
+
+                    <div class="um-section">
+                        <div class="um-section-title"><h4><i class="fa fa-bolt"/> Now &amp; next</h4></div>
+                        <t t-call="university_management.um_now_next"/>
+                    </div>
+
+                    <div class="um-section">
+                        <div class="um-section-title"><h4><i class="fa fa-list-ol"/> Today's classes</h4></div>
+                        <t t-call="university_management.um_today_timeline"/>
+                    </div>
+
+                    <t t-call="university_management.um_calendar"/>
+                </div>
+            </t>
+        </template>
+
+        <template id="faculty_syllabus" name="Faculty Syllabus Tracking">
+            <t t-call="website.layout">
+                <t t-set="role" t-value="'faculty'"/>
+                <div class="container um-page" style="margin-top:20px">
+                    <div class="um-hero um-hero-faculty">
+                        <div class="um-hero-top">
+                            <div>
+                                <h2>Syllabus tracking</h2>
+                                <p>Log what you covered in each class and see what to explain next.</p>
+                            </div>
+                            <div class="um-hero-actions">
+                                <a href="/my/faculty/schedule" class="um-btn um-btn-light"><i class="fa fa-calendar"/> Schedule &amp; calendar</a>
+                            </div>
+                        </div>
+                        <div class="um-tiles">
+                            <div class="um-tile"><b><t t-esc="len(rows)"/></b><span>Subjects</span></div>
+                            <div class="um-tile"><b><t t-esc="avg_progress"/>%</b><span>Average covered</span></div>
+                        </div>
+                    </div>
+                    <div class="um-section">
+                        <t t-if="rows">
+                            <div class="um-grid-2">
+                                <t t-foreach="rows" t-as="row">
+                                    <t t-call="university_management.um_subject_card"/>
+                                </t>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="um-card um-empty">No subjects are assigned to you yet.</div>
+                        </t>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <template id="faculty_syllabus_detail" name="Faculty Syllabus Detail">
+            <t t-call="website.layout">
+                <t t-set="role" t-value="'faculty'"/>
+                <div class="container um-page" style="margin-top:20px">
+                    <a href="/my/faculty/syllabus" class="um-back"><i class="fa fa-angle-left"/> All subjects</a>
+
+                    <div t-if="saved" class="um-alert ok">Class logged. Progress has been updated.</div>
+                    <div t-if="error" class="um-alert err"><t t-esc="error"/></div>
+
+                    <div class="um-card" style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
+                        <span t-attf-class="um-ring lg #{'done' if data['overall'] >= 100 else ''}" t-attf-style="--p: #{data['overall']}"><b><t t-esc="data['overall']"/>%</b></span>
+                        <div style="flex:1;min-width:220px">
+                            <h2 style="font-size:1.5rem;font-weight:800"><t t-esc="course.subject_id.name or course.name"/></h2>
+                            <div class="um-muted">
+                                <t t-esc="course.subject_id.code or course.code"/> · <t t-esc="course.batch_id.name"/>
+                                <t t-if="course.credits"> · <t t-esc="course.credits"/> credits</t>
+                            </div>
+                            <div class="um-metaline">
+                                <span class="um-chip"><i class="fa fa-check-square-o"/> <t t-esc="data['classes_held']"/> classes logged</span>
+                                <span t-if="data['last_date']" class="um-chip"><i class="fa fa-clock-o"/> Last covered <t t-esc="data['last_date'].strftime('%d %b %Y')"/></span>
+                            </div>
+                        </div>
+                        <div class="um-next" t-if="data['next_unit']" style="min-width:230px">
+                            <span class="um-muted">Next to explain</span>
+                            <b><t t-esc="data['next_unit']['name']"/></b>
+                            <span class="um-muted" style="font-size:.8rem"><t t-esc="data['next_unit']['percent']"/>% done</span>
+                        </div>
+                    </div>
+
+                    <t t-if="data['units']">
+                        <div class="um-layout um-section">
+                            <div>
+                                <div class="um-section-title"><h4><i class="fa fa-th-list"/> Units &amp; topics</h4></div>
+                                <t t-call="university_management.um_unit_list"/>
+
+                                <div class="um-card um-section">
+                                    <h4>Recent class log</h4>
+                                    <t t-if="logs">
+                                        <div class="table-responsive" style="margin-top:8px">
+                                            <table class="um-table">
+                                                <thead><tr><th>Date</th><th>Unit</th><th>Topics covered</th><th>%</th><th/></tr></thead>
+                                                <tbody>
+                                                    <t t-foreach="logs" t-as="l">
+                                                        <tr>
+                                                            <td style="white-space:nowrap"><t t-esc="l.date.strftime('%d %b %Y')"/>
+                                                                <div class="um-muted" t-if="l.start_time"><t t-esc="'%d:%02d' % (int(l.start_time), int(round((l.start_time % 1) * 60)))"/></div></td>
+                                                            <td><t t-esc="l.unit_id.name"/></td>
+                                                            <td style="white-space:pre-line"><t t-esc="l.topics_covered"/>
+                                                                <div class="um-muted" t-if="l.remarks"><t t-esc="l.remarks"/></div>
+                                                                <div t-if="l.faculty_id != faculty" class="um-muted">by <t t-esc="l.faculty_id.name"/></div></td>
+                                                            <td><t t-esc="l.completion_percent"/>%</td>
+                                                            <td>
+                                                                <form t-if="l.faculty_id == faculty" t-attf-action="/my/faculty/syllabus/log/#{l.id}/delete" method="post"
+                                                                      onsubmit="return confirm('Delete this entry?');">
+                                                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                                                    <button type="submit" class="um-btn um-btn-danger" style="padding:3px 10px">Delete</button>
+                                                                </form>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </t>
+                                    <t t-else=""><div class="um-empty">No classes logged yet.</div></t>
+                                </div>
+                            </div>
+
+                            <div class="um-sticky">
+                                <div class="um-card">
+                                    <h4>Log a class</h4>
+                                    <form class="um-form um-log-form" action="/my/faculty/syllabus/log" method="post">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                        <input type="hidden" name="course_id" t-att-value="course.id"/>
+
+                                        <label>Date</label>
+                                        <input type="date" name="date" t-att-value="today_iso" t-att-max="today_iso" required="required"/>
+
+                                        <label t-if="slots">Period / slot (optional)</label>
+                                        <select name="timetable_id" t-if="slots">
+                                            <option value="">— not linked —</option>
+                                            <t t-foreach="slots" t-as="s"><option t-att-value="s['id']"><t t-esc="s['label']"/></option></t>
+                                        </select>
+
+                                        <label>Unit</label>
+                                        <select name="unit_id" required="required">
+                                            <t t-foreach="data['units']" t-as="u">
+                                                <option t-att-value="u['id']" t-att-data-percent="u['percent']"
+                                                        t-att-selected="'selected' if u['id'] == default_unit_id else None">
+                                                    <t t-esc="u_index + 1"/>. <t t-esc="u['name']"/> (<t t-esc="u['percent']"/>%)
+                                                </option>
+                                            </t>
+                                        </select>
+
+                                        <label>Topics covered today</label>
+                                        <textarea name="topics_covered" required="required" placeholder="e.g. Thevenin's theorem – statement, steps, two worked examples"/>
+
+                                        <label>Unit completion after this class</label>
+                                        <div class="um-range-row">
+                                            <input type="range" name="completion_percent" min="0" max="100" step="5" value="0"/>
+                                            <output>0%</output>
+                                        </div>
+                                        <div class="um-check"><input type="checkbox" name="unit_completed" id="um_unit_done"/><label for="um_unit_done" style="margin:0;text-transform:none;letter-spacing:0;font-size:.9rem;color:var(--um-ink)">Unit fully completed</label></div>
+
+                                        <label>Remarks (optional)</label>
+                                        <textarea name="remarks" style="min-height:56px" placeholder="Assignments given, doubts pending, etc."/>
+
+                                        <button type="submit" class="um-btn um-btn-primary" style="margin-top:16px;width:100%;justify-content:center">Save class log</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <div class="um-card um-empty um-section">No syllabus units are defined for this subject yet. Ask the academic coordinator to publish the syllabus.</div>
+                    </t>
+                </div>
+            </t>
+        </template>
+
+    </data>
+</odoo>

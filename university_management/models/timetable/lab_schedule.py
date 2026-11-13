@@ -7,7 +7,7 @@ class LabSchedule(models.Model):
     _name = 'lab.schedule'
     _description = 'Laboratory Schedule'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _order = 'day_of_week, start_time'
+    _order = 'name, lab_number'
 
     name = fields.Char(string='Lab Name', required=True)
 
@@ -28,9 +28,9 @@ class LabSchedule(models.Model):
     department_id = fields.Many2one('university.department', string='Department')
 
     # Schedule (linked to class timetable)
-    timetable_ids = fields.One2many('class.timetable', 'room_number_id',
+    timetable_ids = fields.One2many('university.timetable', 'lab_id',
                                     string='Lab Schedule',
-                                    domain=[('class_type', '=', 'practical')])
+                                    domain=[('class_type', 'in', ['practical', 'lab'])])
 
     # Lab In-charge
     lab_incharge_id = fields.Many2one('faculty.faculty', string='Lab In-charge')

@@ -5,6 +5,7 @@ from . import marksheet_controller
 from . import student_portal
 from . import parent_portal
 from . import faculty_portal
+from . import schedule_portal
 from . import alumni_portal
 from . import iic_portal
 from . import iic_poster_controller

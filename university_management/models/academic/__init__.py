@@ -8,4 +8,5 @@ from . import university_batch
 from . import university_timetable
 from . import university_academic_year
 from . import university_syllabus
+from . import syllabus_coverage
 
