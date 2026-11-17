@@ -84,7 +84,7 @@ class Faculty(models.Model):
     courses_taught_ids = fields.Many2many('university.course', 'faculty_course_taught_rel',
                                           'faculty_id', 'course_id',
                                           string='Courses Taught')
-    subjects_taught_ids = fields.Many2many('university.subject', 'faculty_subject_rel',
+    subjects_taught_ids = fields.Many2many('university.subject', 'subject_faculty_rel',
                                            'faculty_id', 'subject_id',
                                            string='Subjects Can Teach')
 

@@ -170,6 +170,9 @@
                 <field name="name" string="Subject Name"/>
                 <field name="code"/>
                 <field name="department_id"/>
+                <field name="dept_faculty_count" string="Dept. Faculty"/>
+                <field name="faculty_ids" widget="many2many_tags" string="Faculty Allocated"/>
+                <field name="faculty_count" string="No. of Faculty"/>
                 <field name="subject_type" widget="badge"/>
                 <field name="credits"/>
                 <field name="theory_credits" optional="hide"/>
@@ -193,7 +196,15 @@
                        filter_domain="['|', ('name', 'ilike', self), ('code', 'ilike', self)]"/>
                 <field name="code"/>
                 <field name="department_id"/>
+                <field name="faculty_ids" string="Faculty"/>
                 <field name="subject_type"/>
+
+                <separator/>
+
+                <filter name="filter_no_faculty" string="No Faculty Allocated"
+                        domain="[('faculty_ids', '=', False)]"/>
+                <filter name="filter_has_faculty" string="Faculty Allocated"
+                        domain="[('faculty_ids', '!=', False)]"/>
 
                 <separator/>
 
@@ -234,16 +245,24 @@
                 <group expand="0" string="Group By">
                     <filter name="group_by_department" string="Department"
                             context="{'group_by': 'department_id'}"/>
+                    <filter name="group_by_faculty" string="Faculty"
+                            context="{'group_by': 'faculty_ids'}"/>
                     <filter name="group_by_subject_type" string="Subject Type"
                             context="{'group_by': 'subject_type'}"/>
                     <filter name="group_by_credits" string="Credits"
                             context="{'group_by': 'credits'}"/>
                 </group>
 
-                <searchpanel>
+                <searchpanel class="o_collapsible_groups">
                     <field name="department_id" string="Department"
                            select="multi"
                            icon="fa-building"/>
+                    <field name="faculty_ids" string="Faculty"
+                           select="multi"
+                           groupby="department_id"
+                           enable_counters="1"
+                           expand="1"
+                           icon="fa-user"/>
                     <field name="subject_type" string="Type"
                            select="multi"
                            icon="fa-tags"/>
@@ -264,6 +283,9 @@
                 <field name="name"/>
                 <field name="code"/>
                 <field name="department_id"/>
+                <field name="faculty_ids"/>
+                <field name="faculty_count"/>
+                <field name="dept_faculty_count"/>
                 <field name="subject_type"/>
                 <field name="credits"/>
                 <field name="theory_credits"/>
@@ -298,6 +320,20 @@
                                         <i class="fa fa-building text-primary"/>
                                         <field name="department_id"/>
                                     </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-6">
+                                        <i class="fa fa-users text-success"/>
+                                        <strong><field name="dept_faculty_count"/></strong> Dept. Faculty
+                                    </div>
+                                    <div class="col-6">
+                                        <i class="fa fa-user text-primary"/>
+                                        <strong><field name="faculty_count"/></strong> Teaching
+                                    </div>
+                                </div>
+                                <div class="mb-2" t-if="record.faculty_count.raw_value &gt; 0">
+                                    <field name="faculty_ids" widget="many2many_tags"/>
                                 </div>
 
                                 <div class="row">

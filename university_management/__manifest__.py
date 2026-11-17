@@ -390,6 +390,9 @@
             'university_management/static/src/js/bulk_omr_multi_upload_widget.js',
             'university_management/static/src/xml/bulk_omr_multi_upload_templates.xml',
             'university_management/static/src/js/omr_export_template_autoselect.js',
+            'university_management/static/src/css/search_panel_collapsible.css',
+            'university_management/static/src/js/search_panel_collapsible.js',
+            'university_management/static/src/xml/search_panel_collapsible.xml',
         ],
     },
 

@@ -50,6 +50,15 @@ class UniversitySubject(models.Model):
     faculty_ids = fields.Many2many('faculty.faculty', 'subject_faculty_rel',
                                    'subject_id', 'faculty_id',
                                    string='Faculty Teaching')
+    faculty_count = fields.Integer(
+        string='Faculty Teaching (Count)',
+        compute='_compute_faculty_count',
+        store=True,
+        help='Number of faculty members allocated to this subject')
+    dept_faculty_count = fields.Integer(
+        string='Faculty in Department',
+        compute='_compute_dept_faculty_count',
+        help='Total number of faculty members in the subject\'s department')
 
     # Syllabus
     syllabus_ids = fields.One2many('university.syllabus', 'subject_id', string='Syllabus')
@@ -68,6 +77,22 @@ class UniversitySubject(models.Model):
         for record in self:
             record.total_hours = (record.theory_hours or 0) + (record.practical_hours or 0)
 
+    @api.depends('faculty_ids')
+    def _compute_faculty_count(self):
+        for record in self:
+            record.faculty_count = len(record.faculty_ids)
+
+    @api.depends('department_id')
+    def _compute_dept_faculty_count(self):
+        counts = {}
+        if self.department_id:
+            data = self.env['faculty.faculty']._read_group(
+                [('department_id', 'in', self.department_id.ids)],
+                ['department_id'], ['__count'])
+            counts = {dept.id: count for dept, count in data}
+        for record in self:
+            record.dept_faculty_count = counts.get(record.department_id.id, 0)
+
     @api.depends('course_ids')
     def _compute_course_count(self):
         for record in self:
@@ -83,5 +108,3 @@ class UniversitySubject(models.Model):
             'domain': [('subject_id', '=', self.id)],
             'context': {'default_subject_id': self.id}
         }
-
-

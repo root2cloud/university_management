@@ -547,94 +547,138 @@
         <!-- ==================== TIMETABLE ==================== -->
         <template id="student_timetable" name="Student Timetable">
             <t t-call="portal.portal_layout">
-                <div class="container mt-3">
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 class="card-title mb-0">
-                                        <i class="fa fa-calendar text-primary"></i> Class Timetable
-                                    </h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th>Time</th>
-                                                    <th>Monday</th>
-                                                    <th>Tuesday</th>
-                                                    <th>Wednesday</th>
-                                                    <th>Thursday</th>
-                                                    <th>Friday</th>
-                                                    <th>Saturday</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <!-- Define time slots -->
-                                                <t t-set="time_slots" t-value="[('8:00', '9:30'), ('9:30', '11:00'),
-                                                                                ('11:00', '12:30'), ('12:30', '14:00'),
-                                                                                ('14:00', '15:30'), ('15:30', '17:00')]"/>
+                <div class="container um-page">
 
-                                                <t t-foreach="time_slots" t-as="slot">
-                                                    <tr>
-                                                        <td class="text-center align-middle">
-                                                            <strong><t t-esc="slot[0]"/> - <t t-esc="slot[1]"/></strong>
-                                                        </td>
-                                                        <!-- Monday to Saturday -->
-                                                        <t t-foreach="['0', '1', '2', '3', '4', '5']" t-as="day">
-                                                            <td>
-                                                                <t t-set="found_classes" t-value="[]"/>
-                                                                <t t-foreach="timetable_by_day.get(day, [])" t-as="tt">
-                                                                    <t t-set="tt_start" t-value="int(tt.start_time)"/>
-                                                                    <t t-set="tt_end" t-value="int(tt.end_time)"/>
-                                                                    <t t-set="slot_start" t-value="int(slot[0].split(':')[0])"/>
-                                                                    <t t-set="slot_end" t-value="int(slot[1].split(':')[0])"/>
-                                                                    <t t-if="tt_start >= slot_start and tt_start &lt; slot_end">
-                                                                        <t t-set="found_classes" t-value="found_classes + [tt]"/>
-                                                                    </t>
-                                                                </t>
-                                                                <t t-foreach="found_classes" t-as="cls">
-                                                                    <div class="timetable-class mb-2 p-2 rounded"
-                                                                         style="background-color: #e3f2fd; border-left: 4px solid #2196f3;">
-                                                                        <strong><t t-esc="cls.subject_id.name"/></strong><br/>
-                                                                        <small class="text-muted">
-                                                                            <i class="fa fa-user"></i> <t t-esc="cls.faculty_id.sudo().name or ''"/><br/>
-                                                                            <i class="fa fa-sign-in"></i> <t t-esc="cls.room_number or 'TBA'"/><br/>
-                                                                            <span class="badge bg-info"><t t-esc="cls.class_type"/></span>
-                                                                        </small>
-                                                                    </div>
-                                                                </t>
-                                                                <t t-if="not found_classes">
-                                                                    <div class="text-center text-muted">-</div>
-                                                                </t>
-                                                            </td>
-                                                        </t>
-                                                    </tr>
-                                                </t>
-                                            </tbody>
-                                        </table>
-                                    </div>
-
-                                    <!-- Legend -->
-                                    <div class="row mt-4">
-                                        <div class="col-12">
-                                            <h6>Legend:</h6>
-                                            <div class="d-flex flex-wrap gap-2">
-                                                <span class="badge bg-primary">Theory</span>
-                                                <span class="badge bg-success">Practical</span>
-                                                <span class="badge bg-warning">Lab</span>
-                                                <span class="badge bg-info">Tutorial</span>
-                                                <span class="badge bg-secondary">Seminar</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                    <!-- Hero -->
+                    <div class="um-hero">
+                        <div class="um-hero-top">
+                            <div>
+                                <h2>My Timetable</h2>
+                                <p>Week of <t t-esc="week_label"/> · Semester <t t-esc="student.current_semester"/></p>
                             </div>
+                            <div class="um-hero-actions">
+                                <a href="/my/schedule" class="um-btn um-btn-primary"><i class="fa fa-calendar"/> Schedule &amp; calendar</a>
+                                <a href="/my/syllabus" class="um-btn um-btn-light"><i class="fa fa-book"/> My syllabus</a>
+                            </div>
+                        </div>
+                        <div class="um-tiles">
+                            <div class="um-tile"><b><t t-esc="tile_classes"/></b><span>Classes this week</span></div>
+                            <div class="um-tile"><b><t t-esc="tile_days"/></b><span>Class days</span></div>
+                            <div class="um-tile"><b><t t-esc="tile_subjects"/></b><span>Subjects</span></div>
+                            <div class="um-tile"><b><t t-esc="tile_hours"/></b><span>Hours / week</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Weekly table -->
+                    <div class="um-section">
+                        <div class="um-cal">
+                            <div class="um-cal-bar">
+                                <div class="um-cal-nav">
+                                    <a t-attf-href="/my/timetable?week=#{prev_week}" class="um-icon-btn" title="Previous week"><i class="fa fa-chevron-left"/></a>
+                                    <a t-attf-href="/my/timetable?week=#{next_week}" class="um-icon-btn" title="Next week"><i class="fa fa-chevron-right"/></a>
+                                    <a href="/my/timetable" class="um-btn um-btn-ghost" style="padding:6px 14px">This week</a>
+                                </div>
+                                <div class="um-cal-title"><t t-esc="week_label"/></div>
+                                <div style="min-width:120px"/>
+                            </div>
+
+                            <t t-if="legend">
+                                <div class="um-legend">
+                                    <t t-foreach="legend" t-as="lg">
+                                        <span t-attf-class="um-legend-chip um-c-#{lg[0]}"><i/> <t t-esc="lg[1]"/></span>
+                                    </t>
+                                </div>
+                            </t>
+
+                            <t t-if="has_classes">
+                                <!-- Desktop / tablet: grid -->
+                                <div class="um-tt-wrap">
+                                    <table class="um-tt">
+                                        <thead>
+                                            <tr>
+                                                <th class="um-tt-timehead">Time</th>
+                                                <t t-foreach="days" t-as="day">
+                                                    <th t-attf-class="um-tt-dayhead #{'today' if day['is_today'] else ''}">
+                                                        <span><t t-esc="day['name']"/></span>
+                                                        <b><t t-esc="day['date'].strftime('%d %b')"/></b>
+                                                    </th>
+                                                </t>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="rows" t-as="row">
+                                                <tr>
+                                                    <td class="um-tt-time">
+                                                        <b><t t-esc="row['start_label']"/></b>
+                                                        <small>to <t t-esc="row['end_label']"/></small>
+                                                    </td>
+                                                    <t t-foreach="days" t-as="day">
+                                                        <td t-attf-class="um-tt-cell #{'today' if day['is_today'] else ''}">
+                                                            <t t-foreach="row['cells'][day['idx']]" t-as="ev">
+                                                                <t t-call="university_management.um_tt_card"/>
+                                                            </t>
+                                                        </td>
+                                                    </t>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Phones: day by day -->
+                                <div class="um-tt-agenda">
+                                    <t t-foreach="agenda" t-as="item">
+                                        <div t-attf-class="um-tt-agenda-day #{'today' if item['day']['is_today'] else ''}">
+                                            <h5>
+                                                <t t-esc="item['day']['name']"/>
+                                                <small class="um-muted"> · <t t-esc="item['day']['date'].strftime('%d %b')"/></small>
+                                                <span t-if="item['day']['is_today']" class="um-pill live" style="margin-left:8px">Today</span>
+                                            </h5>
+                                            <t t-foreach="item['events']" t-as="ev">
+                                                <div class="um-tt-agenda-row">
+                                                    <div class="um-tt-agenda-time">
+                                                        <b><t t-esc="ev['start_label']"/></b>
+                                                        <small>to <t t-esc="ev['end_label']"/></small>
+                                                    </div>
+                                                    <div class="um-tt-agenda-card">
+                                                        <t t-call="university_management.um_tt_card"/>
+                                                    </div>
+                                                </div>
+                                            </t>
+                                        </div>
+                                    </t>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div class="um-empty" style="padding:48px 12px">
+                                    <i class="fa fa-calendar-o fa-2x um-muted"/>
+                                    <p style="margin:12px 0 0"><b>No classes scheduled for this week.</b></p>
+                                    <p class="um-muted" style="margin:4px 0 0">Classes appear here automatically once they are added to your timetable.</p>
+                                </div>
+                            </t>
                         </div>
                     </div>
                 </div>
             </t>
+        </template>
+
+        <!-- One class card in the weekly table.  Expects: ev -->
+        <template id="um_tt_card" name="Timetable Class Card">
+            <div t-attf-class="um-tt-card um-c-#{ev['class_type']} #{'cancelled' if ev['cancelled'] else ''} #{'sub' if ev['substitution'] else ''} #{ev['status']}">
+                <div class="um-tt-title"><t t-esc="ev['title']"/></div>
+                <div class="um-tt-meta">
+                    <span class="um-ev-av"><t t-esc="ev['faculty_initials']"/><img t-if="ev.get('faculty_id')" t-attf-src="/my/schedule/faculty-photo/#{ev['faculty_id']}" alt="" onerror="this.remove()"/></span>
+                    <span><t t-esc="ev['faculty'] or 'Faculty TBA'"/></span>
+                </div>
+                <div class="um-tt-meta"><i class="fa fa-map-marker"/> <span><t t-esc="ev['room']"/></span></div>
+                <div class="um-tt-foot">
+                    <span class="um-chip"><t t-esc="ev['type_label']"/></span>
+                    <span t-if="ev['status'] == 'ongoing'" class="um-pill live">Live</span>
+                    <span t-if="ev['substitution'] and not ev['cancelled']" class="um-pill sub">Substitute</span>
+                    <span t-if="ev['cancelled']" class="um-pill cancel">Covered</span>
+                </div>
+                <div t-if="ev['note']" class="um-tt-note"><t t-esc="ev['note']"/></div>
+            </div>
         </template>
 
         <!-- ==================== FEES ==================== -->

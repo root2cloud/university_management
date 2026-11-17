@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="university_management.SearchPanel.Section"
+       t-inherit="web.SearchPanel.Section"
+       t-inherit-mode="extension">
+
+        <!-- clicking the group title (not the checkbox) toggles expand/collapse -->
+        <xpath expr="//header[hasclass('o_search_panel_group_header')]//label" position="attributes">
+            <attribute name="t-on-click">(ev) => this.onGroupLabelClick(ev, section.id, groupId, group)</attribute>
+        </xpath>
+
+        <!-- caret icon in front of the group name -->
+        <xpath expr="//header[hasclass('o_search_panel_group_header')]//span[hasclass('o_search_panel_label_title')]/t[@t-esc='group.name']" position="before">
+            <i t-if="hasCollapsibleGroups"
+               class="fa fa-fw o_search_panel_group_caret me-1"
+               t-att-class="isGroupExpanded(section.id, groupId, group) ? 'fa-caret-down' : 'fa-caret-right'"/>
+        </xpath>
+
+        <!-- children list: hidden when collapsed (kept in the DOM so the
+             group checkbox state/indeterminate logic keeps working) -->
+        <xpath expr="//li[hasclass('o_search_panel_filter_group')]/ul" position="attributes">
+            <attribute name="t-att-class">isGroupExpanded(section.id, groupId, group) ? '' : 'd-none'</attribute>
+        </xpath>
+    </t>
+
+</templates>

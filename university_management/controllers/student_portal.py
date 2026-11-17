@@ -188,30 +188,83 @@ class StudentPortalController(CustomerPortal):
 
     # ==================== TIMETABLE ====================
     @http.route(['/my/timetable'], type='http', auth="user", website=True)
-    def student_timetable(self, **kw):
-        """View class timetable"""
-        student = request.env['student.student'].search([('user_id', '=', request.env.uid)], limit=1)
+    def student_timetable(self, week=0, **kw):
+        """Weekly class timetable.
 
+        Everything is built from the student's real timetable records for the
+        selected week (``?week=0`` current, ``-1`` previous, ``1`` next ...):
+        the time rows come from the distinct start/end times that exist, the
+        day columns are Mon-Sat (+ Sunday only when it has a class) and
+        substitutions / cancellations are applied.  Same data source as
+        /my/schedule, so both pages always agree.
+        """
+        env = request.env
+        student = su.get_student(env)
         if not student:
             return request.redirect('/my')
 
-        timetable = request.env['university.timetable'].search([
-            ('batch_id', '=', student.batch_id.id),
-            '|', ('semester_id', '=', False),
-            ('semester_id.semester_number', '=', student.current_semester),
-            ('active', '=', True)
-        ], order='day_of_week, start_time')
+        try:
+            offset = max(-52, min(52, int(week)))
+        except (TypeError, ValueError):
+            offset = 0
 
-        # Group by day
-        timetable_by_day = {}
-        for tt in timetable:
-            if tt.day_of_week not in timetable_by_day:
-                timetable_by_day[tt.day_of_week] = []
-            timetable_by_day[tt.day_of_week].append(tt)
+        today = su.local_now(env).date()
+        monday = today - datetime.timedelta(days=today.weekday()) + datetime.timedelta(weeks=offset)
+        sunday = monday + datetime.timedelta(days=6)
+
+        events = [e for e in su.build_student_events(env, student, monday, sunday, extras=False)
+                  if e['kind'] == 'class']
+
+        # ---- day columns (Mon-Sat always, Sunday only if used)
+        has_sunday = any(e['date'] == sunday.isoformat() for e in events)
+        days = []
+        for i in range(7 if has_sunday else 6):
+            d = monday + datetime.timedelta(days=i)
+            days.append({
+                'idx': i, 'name': su.WEEKDAYS[i], 'short': su.WEEKDAYS[i][:3],
+                'date': d, 'iso': d.isoformat(), 'is_today': d == today,
+                'count': sum(1 for e in events if e['date'] == d.isoformat() and not e['cancelled']),
+            })
+
+        # ---- time rows: one per distinct (start, end) that really exists
+        slot_keys = sorted({(e['start'], e['end']) for e in events})
+        rows = []
+        for start, end in slot_keys:
+            cells = {}
+            for day in days:
+                cells[day['idx']] = [e for e in events
+                                     if e['start'] == start and e['end'] == end and e['date'] == day['iso']]
+            rows.append({
+                'start_label': su.float_to_label(start),
+                'end_label': su.float_to_label(end),
+                'cells': cells,
+            })
+
+        # ---- mobile agenda (day by day)
+        agenda = [{'day': day, 'events': [e for e in events if e['date'] == day['iso']]}
+                  for day in days if any(e['date'] == day['iso'] for e in events)]
+
+        active = [e for e in events if not e['cancelled']]
+        legend = []
+        for e in events:
+            if (e['class_type'], e['type_label']) not in legend:
+                legend.append((e['class_type'], e['type_label']))
 
         values = {
             'student': student,
-            'timetable_by_day': timetable_by_day,
+            'days': days,
+            'rows': rows,
+            'agenda': agenda,
+            'legend': legend,
+            'has_classes': bool(events),
+            'tile_classes': len(active),
+            'tile_days': len({e['date'] for e in active}),
+            'tile_subjects': len({e['course_id'] for e in active}),
+            'tile_hours': round(sum(e['end'] - e['start'] for e in active), 1),
+            'week_label': '%s – %s' % (monday.strftime('%d %b'), sunday.strftime('%d %b %Y')),
+            'offset': offset,
+            'prev_week': offset - 1,
+            'next_week': offset + 1,
             'page_name': 'timetable',
         }
 

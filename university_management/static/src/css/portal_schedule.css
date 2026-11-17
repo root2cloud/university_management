@@ -265,3 +265,59 @@
 /* faculty photo inside week blocks and day agenda */
 .um-block .um-ev-av { float: left; width: 20px; height: 20px; margin: 1px 6px 0 0; font-size: .55rem; }
 .um-day-item .um-ev-av { width: 38px; height: 38px; font-size: .8rem; }
+
+/* ---------- Weekly timetable (/my/timetable) ---------- */
+.um-icon-btn { text-decoration: none !important; }
+.um-legend-chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--um-line); background: #fff; border-radius: 999px;
+  padding: 3px 11px; font-size: .76rem; color: #374151; }
+.um-legend-chip i { width: 9px; height: 9px; border-radius: 50%; background: var(--c); display: inline-block; }
+
+.um-tt-wrap { overflow-x: auto; }
+.um-tt { width: 100%; min-width: 860px; border-collapse: separate; border-spacing: 0; table-layout: fixed; }
+.um-tt th, .um-tt td { border-right: 1px solid var(--um-line); border-bottom: 1px solid var(--um-line); vertical-align: top; }
+.um-tt th:last-child, .um-tt td:last-child { border-right: 0; }
+.um-tt tbody tr:last-child td { border-bottom: 0; }
+.um-tt-timehead, .um-tt-time { width: 112px; }
+.um-tt-timehead { padding: 12px 10px; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--um-muted); text-align: center; background: #fcfcfe; }
+.um-tt-dayhead { padding: 10px 6px; text-align: center; background: #fcfcfe; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--um-muted); }
+.um-tt-dayhead b { display: block; margin-top: 2px; font-size: .95rem; letter-spacing: 0; text-transform: none; color: var(--um-ink); }
+.um-tt-dayhead.today b { display: inline-block; margin-top: 3px; padding: 1px 12px; border-radius: 999px; background: var(--um-brand); color: #fff; }
+.um-tt-time { padding: 12px 10px; text-align: center; vertical-align: middle !important; background: #fcfcfe; font-size: .85rem; }
+.um-tt-time b { display: block; color: var(--um-ink); }
+.um-tt-time small { color: var(--um-muted); }
+.um-tt-cell { padding: 6px; min-height: 96px; }
+.um-tt-cell.today { background: #f8fafc; }
+
+.um-tt-card { --c: var(--um-theory); position: relative; padding: 8px 10px; border-radius: 10px; margin-bottom: 6px; font-size: .78rem; line-height: 1.35;
+  background: color-mix(in srgb, var(--c) 10%, #fff); border: 1px solid color-mix(in srgb, var(--c) 22%, #fff);
+  box-shadow: 0 1px 2px rgba(16,24,40,.06); transition: transform .12s, box-shadow .12s; }
+.um-tt-card:last-child { margin-bottom: 0; }
+.um-tt-card:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(16,24,40,.14); }
+.um-tt-title { font-weight: 800; font-size: .84rem; color: color-mix(in srgb, var(--c) 70%, #000); margin-bottom: 4px; }
+.um-tt-meta { display: flex; align-items: center; gap: 6px; color: #374151; margin-top: 2px; min-width: 0; }
+.um-tt-meta span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.um-tt-meta .fa { color: var(--um-muted); width: 18px; text-align: center; }
+.um-tt-foot { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; align-items: center; }
+.um-tt-foot .um-chip { padding: 1px 8px; font-size: .7rem; background: #fff; }
+.um-tt-foot .um-pill { padding: 1px 8px; font-size: .62rem; }
+.um-tt-note { margin-top: 6px; padding: 4px 8px; border-radius: 8px; background: #fff7ed; color: #9a3412; font-size: .72rem; }
+.um-tt-card.done { opacity: .66; }
+.um-tt-card.ongoing { box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 22%, transparent); }
+.um-tt-card.cancelled { opacity: .55; }
+.um-tt-card.cancelled .um-tt-title { text-decoration: line-through; }
+.um-tt-card.sub { border-style: dashed; }
+
+/* phones: day-by-day agenda instead of the wide grid */
+.um-tt-agenda { display: none; padding: 12px 14px 16px; }
+.um-tt-agenda-day { margin-bottom: 18px; }
+.um-tt-agenda-day h5 { font-size: .95rem; font-weight: 800; margin-bottom: 8px; }
+.um-tt-agenda-day.today h5 { color: var(--um-brand); }
+.um-tt-agenda-row { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 8px; }
+.um-tt-agenda-time { min-width: 74px; font-size: .8rem; padding-top: 8px; }
+.um-tt-agenda-time small { display: block; color: var(--um-muted); }
+.um-tt-agenda-card { flex: 1; min-width: 0; }
+.um-tt-agenda .um-tt-card { margin-bottom: 0; }
+@media (max-width: 760px) {
+  .um-tt-wrap { display: none; }
+  .um-tt-agenda { display: block; }
+}
