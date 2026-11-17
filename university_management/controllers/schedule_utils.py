@@ -159,6 +159,67 @@ def _daterange(d_from, d_to):
 
 
 # ----------------------------------------------------------------------
+# Weekly timetable table (shared by the student and faculty "My Timetable" pages)
+# ----------------------------------------------------------------------
+def week_bounds(week, today):
+    """Return (offset, monday, sunday) for ?week=<offset> (0 = current week)."""
+    try:
+        offset = max(-52, min(52, int(week)))
+    except (TypeError, ValueError):
+        offset = 0
+    monday = today - timedelta(days=today.weekday()) + timedelta(weeks=offset)
+    return offset, monday, monday + timedelta(days=6)
+
+
+def week_table(events, monday, today):
+    """Turn class events of one week into everything the weekly-table template needs.
+
+    * time rows  -> one per distinct (start, end) that really exists
+    * day columns-> Mon-Sat always, Sunday only when it has a class
+    * agenda     -> the same data day by day (used on phones)
+    """
+    events = [e for e in events if e['kind'] == 'class']
+    sunday = monday + timedelta(days=6)
+    has_sunday = any(e['date'] == sunday.isoformat() for e in events)
+
+    days = []
+    for i in range(7 if has_sunday else 6):
+        d = monday + timedelta(days=i)
+        days.append({
+            'idx': i, 'name': WEEKDAYS[i], 'short': WEEKDAYS[i][:3], 'date': d,
+            'iso': d.isoformat(), 'is_today': d == today,
+        })
+
+    rows = []
+    for start, end in sorted({(e['start'], e['end']) for e in events}):
+        rows.append({
+            'start_label': float_to_label(start),
+            'end_label': float_to_label(end),
+            'cells': {day['idx']: [e for e in events if e['start'] == start and e['end'] == end
+                                   and e['date'] == day['iso']] for day in days},
+        })
+
+    agenda = [{'day': day, 'events': [e for e in events if e['date'] == day['iso']]}
+              for day in days if any(e['date'] == day['iso'] for e in events)]
+
+    legend = []
+    for e in events:
+        if (e['class_type'], e['type_label']) not in legend:
+            legend.append((e['class_type'], e['type_label']))
+
+    active = [e for e in events if not e['cancelled']]
+    return {
+        'days': days, 'rows': rows, 'agenda': agenda, 'legend': legend,
+        'has_classes': bool(events),
+        'tile_classes': len(active),
+        'tile_days': len({e['date'] for e in active}),
+        'tile_subjects': len({e['course_id'] for e in active}),
+        'tile_hours': round(sum(e['end'] - e['start'] for e in active), 1),
+        'week_label': '%s – %s' % (monday.strftime('%d %b'), sunday.strftime('%d %b %Y')),
+    }
+
+
+# ----------------------------------------------------------------------
 # Event construction
 # ----------------------------------------------------------------------
 def _room(tt):

@@ -66,38 +66,38 @@ class FacultyPortalController(CustomerPortal):
 
     # ==================== MY CLASSES ====================
     @http.route(['/my/faculty/classes'], type='http', auth="user", website=True)
-    def faculty_classes(self, **kw):
-        """View assigned classes"""
+    def faculty_classes(self, week=0, **kw):
+        """Weekly teaching timetable (``?week=0`` current, ``-1`` previous, ``1`` next ...).
+
+        Built from the faculty's real timetable records, so time rows and day
+        columns are dynamic; substitutions (covered / substituting) are applied.
+        Same data source as /my/faculty/schedule.
+        """
         faculty = self._get_faculty()
 
         if not faculty:
             return request.redirect('/my')
 
-        # Get timetable
         env = request.env(su=True)
-        timetable = env['university.timetable'].search([
-            ('faculty_id', '=', faculty.id),
-            ('active', '=', True)
-        ], order='day_of_week, start_time')
+        today = su.local_now(env).date()
+        offset, monday, sunday = su.week_bounds(week, today)
+        events = su.build_faculty_events(env, faculty, monday, sunday, extras=False)
 
-        # Group by day
-        timetable_by_day = {}
-        for tt in timetable:
-            if tt.day_of_week not in timetable_by_day:
-                timetable_by_day[tt.day_of_week] = []
-            timetable_by_day[tt.day_of_week].append(tt)
-
-        # Get subjects
+        # Subjects the faculty is attached to
         subjects = env['university.subject'].search([
             ('faculty_ids', 'in', [faculty.id])
         ])
 
-        values = {
+        values = su.week_table(events, monday, today)
+        values.update({
             'faculty': faculty,
-            'timetable_by_day': timetable_by_day,
             'subjects': subjects,
+            'subject_types': dict(env['university.subject']._fields['subject_type'].selection),
+            'offset': offset,
+            'prev_week': offset - 1,
+            'next_week': offset + 1,
             'page_name': 'faculty_classes',
-        }
+        })
 
         return request.render("university_management.faculty_classes", values)
 

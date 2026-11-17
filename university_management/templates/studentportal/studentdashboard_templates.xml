@@ -547,6 +547,7 @@
         <!-- ==================== TIMETABLE ==================== -->
         <template id="student_timetable" name="Student Timetable">
             <t t-call="portal.portal_layout">
+                <t t-set="role" t-value="'student'"/>
                 <div class="container um-page">
 
                     <!-- Hero -->
@@ -666,7 +667,10 @@
         <template id="um_tt_card" name="Timetable Class Card">
             <div t-attf-class="um-tt-card um-c-#{ev['class_type']} #{'cancelled' if ev['cancelled'] else ''} #{'sub' if ev['substitution'] else ''} #{ev['status']}">
                 <div class="um-tt-title"><t t-esc="ev['title']"/></div>
-                <div class="um-tt-meta">
+                <div t-if="role == 'faculty'" class="um-tt-meta">
+                    <i class="fa fa-users"/> <span><t t-esc="ev['batch'] or ev['course']"/></span>
+                </div>
+                <div t-else="" class="um-tt-meta">
                     <span class="um-ev-av"><t t-esc="ev['faculty_initials']"/><img t-if="ev.get('faculty_id')" t-attf-src="/my/schedule/faculty-photo/#{ev['faculty_id']}" alt="" onerror="this.remove()"/></span>
                     <span><t t-esc="ev['faculty'] or 'Faculty TBA'"/></span>
                 </div>

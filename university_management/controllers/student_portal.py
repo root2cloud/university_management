@@ -203,71 +203,18 @@ class StudentPortalController(CustomerPortal):
         if not student:
             return request.redirect('/my')
 
-        try:
-            offset = max(-52, min(52, int(week)))
-        except (TypeError, ValueError):
-            offset = 0
-
         today = su.local_now(env).date()
-        monday = today - datetime.timedelta(days=today.weekday()) + datetime.timedelta(weeks=offset)
-        sunday = monday + datetime.timedelta(days=6)
+        offset, monday, sunday = su.week_bounds(week, today)
+        events = su.build_student_events(env, student, monday, sunday, extras=False)
 
-        events = [e for e in su.build_student_events(env, student, monday, sunday, extras=False)
-                  if e['kind'] == 'class']
-
-        # ---- day columns (Mon-Sat always, Sunday only if used)
-        has_sunday = any(e['date'] == sunday.isoformat() for e in events)
-        days = []
-        for i in range(7 if has_sunday else 6):
-            d = monday + datetime.timedelta(days=i)
-            days.append({
-                'idx': i, 'name': su.WEEKDAYS[i], 'short': su.WEEKDAYS[i][:3],
-                'date': d, 'iso': d.isoformat(), 'is_today': d == today,
-                'count': sum(1 for e in events if e['date'] == d.isoformat() and not e['cancelled']),
-            })
-
-        # ---- time rows: one per distinct (start, end) that really exists
-        slot_keys = sorted({(e['start'], e['end']) for e in events})
-        rows = []
-        for start, end in slot_keys:
-            cells = {}
-            for day in days:
-                cells[day['idx']] = [e for e in events
-                                     if e['start'] == start and e['end'] == end and e['date'] == day['iso']]
-            rows.append({
-                'start_label': su.float_to_label(start),
-                'end_label': su.float_to_label(end),
-                'cells': cells,
-            })
-
-        # ---- mobile agenda (day by day)
-        agenda = [{'day': day, 'events': [e for e in events if e['date'] == day['iso']]}
-                  for day in days if any(e['date'] == day['iso'] for e in events)]
-
-        active = [e for e in events if not e['cancelled']]
-        legend = []
-        for e in events:
-            if (e['class_type'], e['type_label']) not in legend:
-                legend.append((e['class_type'], e['type_label']))
-
-        values = {
+        values = su.week_table(events, monday, today)
+        values.update({
             'student': student,
-            'days': days,
-            'rows': rows,
-            'agenda': agenda,
-            'legend': legend,
-            'has_classes': bool(events),
-            'tile_classes': len(active),
-            'tile_days': len({e['date'] for e in active}),
-            'tile_subjects': len({e['course_id'] for e in active}),
-            'tile_hours': round(sum(e['end'] - e['start'] for e in active), 1),
-            'week_label': '%s – %s' % (monday.strftime('%d %b'), sunday.strftime('%d %b %Y')),
             'offset': offset,
             'prev_week': offset - 1,
             'next_week': offset + 1,
             'page_name': 'timetable',
-        }
-
+        })
         return request.render("university_management.student_timetable", values)
 
     # ==================== FEE PAYMENTS ====================
