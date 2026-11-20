@@ -88,7 +88,7 @@ class FacultyPortalController(CustomerPortal):
             ('faculty_ids', 'in', [faculty.id])
         ])
 
-        values = su.week_table(events, monday, today)
+        values = su.week_table(events, monday, today, kw.get('type'))
         values.update({
             'faculty': faculty,
             'subjects': subjects,

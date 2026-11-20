@@ -281,7 +281,7 @@
 .um-tt-timehead { padding: 12px 10px; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--um-muted); text-align: center; background: #fcfcfe; }
 .um-tt-dayhead { padding: 10px 6px; text-align: center; background: #fcfcfe; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--um-muted); }
 .um-tt-dayhead b { display: block; margin-top: 2px; font-size: .95rem; letter-spacing: 0; text-transform: none; color: var(--um-ink); }
-.um-tt-dayhead.today b { display: inline-block; margin-top: 3px; padding: 1px 12px; border-radius: 999px; background: var(--um-brand); color: #fff; }
+.um-tt-dayhead.today b { display: table; margin: 3px auto 0; padding: 1px 12px; border-radius: 999px; background: var(--um-brand); color: #fff; }
 .um-tt-time { padding: 12px 10px; text-align: center; vertical-align: middle !important; background: #fcfcfe; font-size: .85rem; }
 .um-tt-time b { display: block; color: var(--um-ink); }
 .um-tt-time small { color: var(--um-muted); }
@@ -322,3 +322,12 @@
   .um-tt-wrap { display: none; }
   .um-tt-agenda { display: block; }
 }
+
+/* class-type filter capsule (right end of the week bar) */
+.um-type-filter { min-width: 120px; display: flex; justify-content: flex-end; }
+.um-type-btn { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--um-line); background: #fff; color: var(--um-ink);
+  border-radius: 999px; padding: 6px 14px; font-size: .84rem; font-weight: 600; cursor: pointer; }
+.um-type-btn:hover { background: #f3f4f6; }
+.um-type-filter .dropdown-item { display: flex; align-items: center; gap: 8px; font-size: .86rem; }
+.um-type-filter .dropdown-item.active { background: #eef2ff; color: var(--um-ink); font-weight: 700; }
+.um-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--c); display: inline-block; }

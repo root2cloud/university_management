@@ -207,7 +207,7 @@ class StudentPortalController(CustomerPortal):
         offset, monday, sunday = su.week_bounds(week, today)
         events = su.build_student_events(env, student, monday, sunday, extras=False)
 
-        values = su.week_table(events, monday, today)
+        values = su.week_table(events, monday, today, kw.get('type'))
         values.update({
             'student': student,
             'offset': offset,

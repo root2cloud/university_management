@@ -171,16 +171,27 @@ def week_bounds(week, today):
     return offset, monday, monday + timedelta(days=6)
 
 
-def week_table(events, monday, today):
+def week_table(events, monday, today, class_type=None):
     """Turn class events of one week into everything the weekly-table template needs.
 
-    * time rows  -> one per distinct (start, end) that really exists
-    * day columns-> Mon-Sat always, Sunday only when it has a class
-    * agenda     -> the same data day by day (used on phones)
+    * day columns -> Mon-Sat always, Sunday only when it has a class
+    * time rows   -> one per distinct (start, end) among the classes shown
+    * agenda      -> the same data day by day (used on phones)
+    * class_type  -> optional filter (e.g. 'theory'); the summary tiles and the
+                     list of available types always describe the whole week
     """
     events = [e for e in events if e['kind'] == 'class']
     sunday = monday + timedelta(days=6)
     has_sunday = any(e['date'] == sunday.isoformat() for e in events)
+
+    # types that really exist this week -> options of the filter dropdown
+    type_options = []
+    for e in events:
+        if (e['class_type'], e['type_label']) not in type_options:
+            type_options.append((e['class_type'], e['type_label']))
+    if class_type not in dict(type_options):
+        class_type = ''
+    shown = [e for e in events if not class_type or e['class_type'] == class_type]
 
     days = []
     for i in range(7 if has_sunday else 6):
@@ -191,26 +202,25 @@ def week_table(events, monday, today):
         })
 
     rows = []
-    for start, end in sorted({(e['start'], e['end']) for e in events}):
+    for start, end in sorted({(e['start'], e['end']) for e in shown}):
         rows.append({
             'start_label': float_to_label(start),
             'end_label': float_to_label(end),
-            'cells': {day['idx']: [e for e in events if e['start'] == start and e['end'] == end
+            'cells': {day['idx']: [e for e in shown if e['start'] == start and e['end'] == end
                                    and e['date'] == day['iso']] for day in days},
         })
 
-    agenda = [{'day': day, 'events': [e for e in events if e['date'] == day['iso']]}
-              for day in days if any(e['date'] == day['iso'] for e in events)]
-
-    legend = []
-    for e in events:
-        if (e['class_type'], e['type_label']) not in legend:
-            legend.append((e['class_type'], e['type_label']))
+    agenda = [{'day': day, 'events': [e for e in shown if e['date'] == day['iso']]}
+              for day in days if any(e['date'] == day['iso'] for e in shown)]
 
     active = [e for e in events if not e['cancelled']]
     return {
-        'days': days, 'rows': rows, 'agenda': agenda, 'legend': legend,
-        'has_classes': bool(events),
+        'days': days, 'rows': rows, 'agenda': agenda,
+        'has_classes': bool(shown),
+        'type_options': type_options,
+        'active_type': class_type,
+        'active_type_label': dict(type_options).get(class_type, 'All types'),
+        'type_qs': ('&type=%s' % class_type) if class_type else '',
         'tile_classes': len(active),
         'tile_days': len({e['date'] for e in active}),
         'tile_subjects': len({e['course_id'] for e in active}),

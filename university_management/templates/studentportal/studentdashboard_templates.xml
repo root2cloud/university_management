@@ -575,21 +575,28 @@
                         <div class="um-cal">
                             <div class="um-cal-bar">
                                 <div class="um-cal-nav">
-                                    <a t-attf-href="/my/timetable?week=#{prev_week}" class="um-icon-btn" title="Previous week"><i class="fa fa-chevron-left"/></a>
-                                    <a t-attf-href="/my/timetable?week=#{next_week}" class="um-icon-btn" title="Next week"><i class="fa fa-chevron-right"/></a>
+                                    <a t-attf-href="/my/timetable?week=#{prev_week}#{type_qs}" class="um-icon-btn" title="Previous week"><i class="fa fa-chevron-left"/></a>
+                                    <a t-attf-href="/my/timetable?week=#{next_week}#{type_qs}" class="um-icon-btn" title="Next week"><i class="fa fa-chevron-right"/></a>
                                     <a href="/my/timetable" class="um-btn um-btn-ghost" style="padding:6px 14px">This week</a>
                                 </div>
                                 <div class="um-cal-title"><t t-esc="week_label"/></div>
-                                <div style="min-width:120px"/>
+                                <div class="dropdown um-type-filter">
+                                    <button class="um-type-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fa fa-filter"/> <span><t t-esc="active_type_label"/></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a t-attf-class="dropdown-item #{'active' if not active_type else ''}" t-attf-href="/my/timetable?week=#{offset}">All types</a></li>
+                                        <t t-foreach="type_options" t-as="opt">
+                                            <li>
+                                                <a t-attf-class="dropdown-item #{'active' if opt[0] == active_type else ''}" t-attf-href="/my/timetable?week=#{offset}&amp;type=#{opt[0]}">
+                                                    <span t-attf-class="um-dot um-c-#{opt[0]}"/> <t t-esc="opt[1]"/>
+                                                </a>
+                                            </li>
+                                        </t>
+                                    </ul>
+                                </div>
                             </div>
 
-                            <t t-if="legend">
-                                <div class="um-legend">
-                                    <t t-foreach="legend" t-as="lg">
-                                        <span t-attf-class="um-legend-chip um-c-#{lg[0]}"><i/> <t t-esc="lg[1]"/></span>
-                                    </t>
-                                </div>
-                            </t>
 
                             <t t-if="has_classes">
                                 <!-- Desktop / tablet: grid -->
@@ -653,7 +660,7 @@
                             <t t-else="">
                                 <div class="um-empty" style="padding:48px 12px">
                                     <i class="fa fa-calendar-o fa-2x um-muted"/>
-                                    <p style="margin:12px 0 0"><b>No classes scheduled for this week.</b></p>
+                                    <p style="margin:12px 0 0"><b t-if="active_type">No <t t-esc="active_type_label"/> classes this week.</b><b t-else="">No classes scheduled for this week.</b></p>
                                     <p class="um-muted" style="margin:4px 0 0">Classes appear here automatically once they are added to your timetable.</p>
                                 </div>
                             </t>
