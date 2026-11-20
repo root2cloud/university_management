@@ -215,7 +215,10 @@ def week_table(events, monday, today):
         'tile_days': len({e['date'] for e in active}),
         'tile_subjects': len({e['course_id'] for e in active}),
         'tile_hours': round(sum(e['end'] - e['start'] for e in active), 1),
-        'week_label': '%s – %s' % (monday.strftime('%d %b'), sunday.strftime('%d %b %Y')),
+        # the range ends on Saturday unless Sunday actually has a class
+        'week_label': '%s – %s' % (
+            monday.strftime('%d %b'),
+            (sunday if has_sunday else sunday - timedelta(days=1)).strftime('%d %b %Y')),
     }
 
 

@@ -288,7 +288,8 @@
 .um-tt-cell { padding: 6px; min-height: 96px; }
 .um-tt-cell.today { background: #f8fafc; }
 
-.um-tt-card { --c: var(--um-theory); position: relative; padding: 8px 10px; border-radius: 10px; margin-bottom: 6px; font-size: .78rem; line-height: 1.35;
+:where(.um-tt-card) { --c: var(--um-theory); }
+.um-tt-card { position: relative; padding: 8px 10px; border-radius: 10px; margin-bottom: 6px; font-size: .78rem; line-height: 1.35;
   background: color-mix(in srgb, var(--c) 10%, #fff); border: 1px solid color-mix(in srgb, var(--c) 22%, #fff);
   box-shadow: 0 1px 2px rgba(16,24,40,.06); transition: transform .12s, box-shadow .12s; }
 .um-tt-card:last-child { margin-bottom: 0; }
