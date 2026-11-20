@@ -36,7 +36,6 @@ class UniversityTimetable(models.Model):
         ('3', 'Thursday'),
         ('4', 'Friday'),
         ('5', 'Saturday'),
-        ('6', 'Sunday'),
     ], string='Day', required=True, tracking=True)
 
     start_time = fields.Float(string='Start Time', required=True,

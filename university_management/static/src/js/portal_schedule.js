@@ -159,6 +159,13 @@
       .sort(function (a, b) { return a.start - b.start; });
   };
 
+  // 6 columns (Mon-Sat); Sunday is added only when a Sunday in the shown range has an event
+  Calendar.prototype.weekCols = function (start, count) {
+    var self = this, sundays = {}, i, d;
+    for (i = 0; i < count; i++) { d = addDays(start, i); if (weekIdx(d) === 6) sundays[iso(d)] = 1; }
+    return Object.keys(this.events).some(function (k) { return sundays[self.events[k].date]; }) ? 7 : 6;
+  };
+
   Calendar.prototype.render = function () {
     if (this.view === 'month') this.renderMonth();
     else if (this.view === 'week') this.renderWeek();
@@ -179,11 +186,14 @@
   }
 
   Calendar.prototype.renderMonth = function () {
-    var c = this.cursor, s = this.range()[0], todayIso = iso(this.today), html = '<div class="um-month-head">';
-    DAYS.forEach(function (d) { html += '<div>' + d + '</div>'; });
-    html += '</div><div class="um-month-grid">';
+    var c = this.cursor, s = this.range()[0], todayIso = iso(this.today), cols = this.weekCols(s, 42);
+    var colsStyle = ' style="grid-template-columns:repeat(' + cols + ',minmax(0,1fr))"';
+    var html = '<div class="um-month-head"' + colsStyle + '>';
+    DAYS.slice(0, cols).forEach(function (d) { html += '<div>' + d + '</div>'; });
+    html += '</div><div class="um-month-grid"' + colsStyle + '>';
     for (var i = 0; i < 42; i++) {
       var d = addDays(s, i), di = iso(d), evs = this.eventsOn(di);
+      if (cols === 6 && weekIdx(d) === 6) continue;
       var cls = 'um-cell' + (d.getMonth() !== c.getMonth() ? ' other' : '') + (di === todayIso ? ' today' : '') + (weekIdx(d) >= 5 ? ' weekend' : '');
       html += '<div class="' + cls + '" data-day="' + di + '"><span class="um-daynum">' + d.getDate() + '</span>';
       html += evs.slice(0, 3).map(chip).join('');
@@ -195,7 +205,9 @@
 
   Calendar.prototype.renderWeek = function () {
     var s = this.range()[0], todayIso = iso(this.today), self = this, days = [], i;
-    for (i = 0; i < 7; i++) days.push(addDays(s, i));
+    var cols = this.weekCols(s, 7);
+    var gridStyle = ' style="grid-template-columns:56px repeat(' + cols + ',minmax(0,1fr))"';
+    for (i = 0; i < cols; i++) days.push(addDays(s, i));
     var timed = [], allDay = {};
     days.forEach(function (d) {
       var di = iso(d);
@@ -207,17 +219,17 @@
     var minH = 8, maxH = 17;
     timed.forEach(function (e) { minH = Math.min(minH, Math.floor(e.start)); maxH = Math.max(maxH, Math.ceil(e.end)); });
     minH = Math.max(minH, 5); maxH = Math.min(maxH, 23);
-    var html = '<div class="um-week"><div class="um-week-inner"><div class="um-week-head"><div></div>';
+    var html = '<div class="um-week"><div class="um-week-inner"><div class="um-week-head"' + gridStyle + '><div></div>';
     days.forEach(function (d) {
       html += '<div class="' + (iso(d) === todayIso ? 'today' : '') + '">' + DAYS[weekIdx(d)] + '<b>' + d.getDate() + '</b></div>';
     });
     html += '</div>';
     if (days.some(function (d) { return allDay[iso(d)].length; })) {
-      html += '<div class="um-allday-row"><div class="lab">all-day</div>';
+      html += '<div class="um-allday-row"' + gridStyle + '><div class="lab">all-day</div>';
       days.forEach(function (d) { html += '<div>' + allDay[iso(d)].map(chip).join('') + '</div>'; });
       html += '</div>';
     }
-    html += '<div class="um-week-grid"><div class="um-hours">';
+    html += '<div class="um-week-grid"' + gridStyle + '><div class="um-hours">';
     for (var h = minH; h < maxH; h++) html += '<div>' + hourLabel(h) + '</div>';
     html += '</div>';
     var nowH = new Date().getHours() + new Date().getMinutes() / 60;
