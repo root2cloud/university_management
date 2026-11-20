@@ -199,29 +199,6 @@
                     <!-- Weekly table -->
                     <div class="um-section">
                         <div class="um-cal">
-                            <div class="um-cal-bar">
-                                <div class="um-cal-nav">
-                                    <a t-attf-href="/my/faculty/classes?week=#{prev_week}#{type_qs}" class="um-icon-btn" title="Previous week"><i class="fa fa-chevron-left"/></a>
-                                    <a t-attf-href="/my/faculty/classes?week=#{next_week}#{type_qs}" class="um-icon-btn" title="Next week"><i class="fa fa-chevron-right"/></a>
-                                    <a href="/my/faculty/classes" class="um-btn um-btn-ghost" style="padding:6px 14px">This week</a>
-                                </div>
-                                <div class="um-cal-title"><t t-esc="week_label"/></div>
-                                <div class="dropdown um-type-filter">
-                                    <button class="um-type-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fa fa-filter"/> <span><t t-esc="active_type_label"/></span>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end">
-                                        <li><a t-attf-class="dropdown-item #{'active' if not active_type else ''}" t-attf-href="/my/faculty/classes?week=#{offset}">All types</a></li>
-                                        <t t-foreach="type_options" t-as="opt">
-                                            <li>
-                                                <a t-attf-class="dropdown-item #{'active' if opt[0] == active_type else ''}" t-attf-href="/my/faculty/classes?week=#{offset}&amp;type=#{opt[0]}">
-                                                    <span t-attf-class="um-dot um-c-#{opt[0]}"/> <t t-esc="opt[1]"/>
-                                                </a>
-                                            </li>
-                                        </t>
-                                    </ul>
-                                </div>
-                            </div>
 
 
                             <t t-if="has_classes">
@@ -232,8 +209,7 @@
                                                 <th class="um-tt-timehead">Time</th>
                                                 <t t-foreach="days" t-as="day">
                                                     <th t-attf-class="um-tt-dayhead #{'today' if day['is_today'] else ''}">
-                                                        <span><t t-esc="day['name']"/></span>
-                                                        <b><t t-esc="day['date'].strftime('%d %b')"/></b>
+                                                        <b><t t-esc="day['name']"/></b>
                                                     </th>
                                                 </t>
                                             </tr>
@@ -264,7 +240,6 @@
                                         <div t-attf-class="um-tt-agenda-day #{'today' if item['day']['is_today'] else ''}">
                                             <h5>
                                                 <t t-esc="item['day']['name']"/>
-                                                <small class="um-muted"> · <t t-esc="item['day']['date'].strftime('%d %b')"/></small>
                                                 <span t-if="item['day']['is_today']" class="um-pill live" style="margin-left:8px">Today</span>
                                             </h5>
                                             <t t-foreach="item['events']" t-as="ev">
